@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmhdsblockheadercachestub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                         \
+    hdsblockheadercacheutilstub.c \
+

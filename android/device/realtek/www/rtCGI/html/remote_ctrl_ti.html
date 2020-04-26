@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<script type="text/javascript" src="javascript/util.js"></script>
+	<script type="text/javascript" src="javascript/remote-control.js"></script>
+	<style>
+		textarea:focus, input:focus {
+			outline: none;
+		}
+
+		#textField{
+			z-index: 1;
+			position: absolute;
+			border: 0px;
+			outline:none;
+			top: 258px;
+			left: 34px;
+			height: 62px;
+			width: 334px;
+			font-size: 200%;
+		}
+
+		* {margin:0; padding:0;}
+		html, body{
+			height:100%;
+		}
+	</style>
+
+	<script>
+		function sendText()
+		{
+			var textEle = document.getElementById("textField");
+			if (textEle != null)
+			{
+				if (textEle.value.length > 0)
+				{
+					var setTextStr = encodeURIComponent(textEle.value);
+					sendInputString(setTextStr);
+					console.log("sent text:" + setTextStr);
+					textEle.value = "";
+				}
+			}
+		}
+
+		function resizeImgText()
+		{
+			var dspSize = {width:10, height:10};
+			var downRatio = resizeImage('RemoteCtrlTxtInputImg', dspSize, CACHE_ANY, RESIZE_MODE_NONE);
+			var textImgPos = getOffset(document.getElementById('RemoteCtrlTxtInputImg'));
+			var textEle = document.getElementById("textField");
+			//if ((downRatio < 1) && (textEle != null))
+			if ((downRatio > 0) && (textEle != null))
+			{
+				textEle.style.top = parseInt(258 *downRatio + 1) + textImgPos.top + 'px';
+				textEle.style.left = parseInt(34 *downRatio - 2) + textImgPos.left + 'px';
+				textEle.style.height = parseInt(62*downRatio) + 'px';
+				textEle.style.width = parseInt(334*downRatio + 4) + 'px';
+				textEle.style["font-size"] = parseInt(200*downRatio) + '%';
+			}
+		}
+	</script>
+</head>
+
+<body bgcolor="#5D6E39" style="overflow: hidden;overflow-y: hidden" scrolling="no" onload="resizeImgText()">
+	<table height="100%" width="100%" align="center" cellspacing="0">
+	<td valign="top" align="center">
+	<!-- Below is the remote control main section, which contains the mapping to up/down/lef/right/select/guide/return -->
+	<img id="RemoteCtrlTxtInputImg"  src ="images/bg-remote-key-ti-portrait.png" width="520" height="680" usemap="#planetmap"/>
+	<map name="planetmap">
+		<area shape ="rect" coords ="380,254,494,322" onclick="sendText()"/>
+		<area shape ="rect" coords ="416,24,500,82" onclick="backHistory();"/>
+	</map>
+	<input id="textField" type="text" value="" maxlength="128">
+	</td>
+	<table>
+</body>
+</html>
+

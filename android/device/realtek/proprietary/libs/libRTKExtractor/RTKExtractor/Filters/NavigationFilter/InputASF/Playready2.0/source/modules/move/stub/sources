@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmovestub
+TARGETTYPE=LIBRARY
+
+SOURCES =             \
+    drmmoveimplstub.c \
+    moveutilstub.c
+

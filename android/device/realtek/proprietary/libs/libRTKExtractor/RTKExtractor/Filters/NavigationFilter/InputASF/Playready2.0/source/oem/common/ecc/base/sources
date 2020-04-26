@@ -1,0 +1,17 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemeccbase
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)                   \
+    -DDRM_BUILDING_OEMECCBASE_LIB       \
+!else
+C_DEFINES= $(C_DEFINES)                 \
+    -DDRM_BUILDING_OEMECCBASE_LIB       \
+!endif
+
+SOURCES =                  \
+    oemeccp160.c           \
+    oemeccp256.c           \
+

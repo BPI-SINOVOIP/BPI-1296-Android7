@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcontractreal
+TARGETTYPE=LIBRARY
+
+SOURCES = \
+    contractutilreal.c \
+    drmcontract.c      \
+

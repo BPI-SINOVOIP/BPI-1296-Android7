@@ -1,0 +1,5 @@
+DIRS =   \
+    lib  \
+    main \
+    test \
+    trace

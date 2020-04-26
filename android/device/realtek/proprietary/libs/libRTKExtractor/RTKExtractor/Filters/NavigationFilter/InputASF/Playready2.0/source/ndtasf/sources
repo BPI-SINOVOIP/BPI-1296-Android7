@@ -1,0 +1,23 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=ndtasf
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\ndtinc;
+
+SOURCES =             \
+    drmndtasf.c       \
+    drmorderedlist.c  \
+    ndtasfdrm.c       \
+    ndtasf_internal.c \
+    ndtasfguids.c     \
+    asfsample.c       \
+    mux.c             \
+    muxstream.c       \
+    sendwindow.c      \
+    leakybucket.c     \
+    packetwriter.c    \
+    asfmediabuffer.c
+
+

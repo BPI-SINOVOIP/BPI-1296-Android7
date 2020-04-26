@@ -1,0 +1,19 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_keyfile
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEM_KEYFILE_LIB  \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEM_KEYFILE_LIB  \
+!endif
+
+INCLUDES = \
+    $(INCLUDES)
+
+SOURCES =        \
+    oemkeyfile.c
+

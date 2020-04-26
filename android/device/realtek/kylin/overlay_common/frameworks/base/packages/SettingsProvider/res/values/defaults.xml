@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * Copyright (c) 2010, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<resources>
+    <!-- Set the automatic brightness mode on by default -->
+    <bool name="def_screen_brightness_automatic_mode">true</bool>
+
+    <!-- Value for Settings.Global.LOW_BATTERY_SOUND_TIMEOUT:
+         Mute battery sounds on tablets after one hour with screen off -->
+    <integer name="def_low_battery_sound_timeout">3600000</integer>
+
+    <!-- Comma-separated list of location providers.
+         Network location is off by default because it requires
+         user opt-in via Setup Wizard or Settings.
+    -->
+    <string name="def_location_providers_allowed" translatable="false">network</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_HDMI_OUTPUT_MODE -->
+    <!-- 0:RAW, 1:LPCM 2ch, 2:LPCM Multi-ch, 3:Auto -->
+    <add-resource type="string" name="def_realtek_setup_hdmi_ouput_mode"/>
+    <string name="def_realtek_setup_hdmi_ouput_mode">1</string>
+
+    <!-- Default for Settings.System.REALTEK_DEEP_COLOR_MODE -->
+    <!-- AUTO(0), 12BIT(1), 10BIT(2), OFF(3) -->
+    <add-resource type="integer" name="def_realtek_deep_color_mode"/>
+    <integer name="def_realtek_deep_color_mode">3</integer>
+
+    <integer name="def_screen_off_timeout">300000</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_DLNA_DMR_ON -->
+    <add-resource type="bool" name="def_realtek_setup_dlna_dmr_on"/>
+    <bool name="def_realtek_setup_dlna_dmr_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_MIRACAST_SINK_TOGGLE_ON -->
+    <add-resource type="bool" name="def_realtek_setup_miracast_sink_toggle_on"/>
+    <bool name="def_realtek_setup_miracast_sink_toggle_on">false</bool>
+
+    <bool name="def_install_non_market_apps">true</bool>
+    <bool name="def_stay_on_while_plugged_in">true</bool>
+    <bool name="def_lockscreen_disabled">true</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_SYSTEM -->
+    <add-resource type="integer" name="def_realtek_setup_tv_system"/>
+    <integer name="def_realtek_setup_tv_system">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_STANDARD -->
+    <add-resource type="integer" name="def_realtek_setup_tv_standard"/>
+    <integer name="def_realtek_setup_tv_standard">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_REAL_TV_SYSTEM -->
+    <add-resource type="integer" name="def_realtek_setup_real_tv_system"/>
+    <integer name="def_realtek_setup_real_tv_system">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_SYSTEM_USER -->
+    <add-resource type="integer" name="def_realtek_setup_tv_system_user"/>
+    <integer name="def_realtek_setup_tv_system_user">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_ASPECT_RATIO -->
+	<!-- Default value is FIT_MODE (0) -->
+    <add-resource type="integer" name="def_realtek_setup_aspect_ratio"/>
+    <integer name="def_realtek_setup_aspect_ratio">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_CURRENT_HDMI_TV_VID -->
+    <add-resource type="integer" name="def_realtek_setup_current_hdmi_tv_vid"/>
+    <integer name="def_realtek_setup_current_hdmi_tv_vid">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_SYSTEM_AUTO_MODE -->
+	<!-- Default value is TV_SYSTEM_AUTO_MODE_HDMI_EDID (2) -->
+    <add-resource type="integer" name="def_realtek_setup_tv_system_auto_mode"/>
+    <integer name="def_realtek_setup_tv_system_auto_mode">2</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_SYSTEM_MANUAL -->
+    <add-resource type="integer" name="def_realtek_setup_tv_system_manual"/>
+    <integer name="def_realtek_setup_tv_system_manual">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TV_STANDARD_MANUAL -->
+    <add-resource type="integer" name="def_realtek_setup_tv_standard_manual"/>
+    <integer name="def_realtek_setup_tv_standard_manual">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_VIDEO_VGA_RESOLUTION -->
+	<!-- Default value is VIDEO_VGA_RESOLUTION_AUTO (0) -->
+    <add-resource type="integer" name="def_realtek_setup_video_vga_resolution"/>
+    <integer name="def_realtek_setup_video_vga_resolution">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_VIDEO_OUTPUT -->
+	<!-- Default value is VOUT_YUV (0) -->
+    <add-resource type="integer" name="def_realtek_setup_video_output"/>
+    <integer name="def_realtek_setup_video_output">0</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_DLNA_DMS_DEVICE_NAME -->
+    <add-resource type="string" name="def_realtek_setup_dlna_dms_device_name"/>
+    <string name="def_realtek_setup_dlna_dms_device_name" translatable="false">Realtek_Device</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_DLNA_DMS_DEVICE_UUID -->
+    <add-resource type="string" name="def_realtek_setup_dlna_dms_device_uuid"/>
+    <string name="def_realtek_setup_dlna_dms_device_uuid" translatable="false">Realtek_UUID</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_SAMBA_SERVER_ON -->
+    <add-resource type="bool" name="def_realtek_setup_samba_server_on"/>
+    <bool name="def_realtek_setup_samba_server_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_PLAYBACK_EFFECT_MODE -->
+    <add-resource type="string" name="def_realtek_setup_playback_effect_mode"/>
+    <string name="def_realtek_setup_playback_effect_mode">off</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_SOFTAP_WPS_METHOD -->
+    <add-resource type="string" name="def_realtek_setup_softap_wps_method"/>
+    <string name="def_realtek_setup_softap_wps_method">sw_pbc</string>
+
+    <!-- Default for Settings.Global.HDMI_CEC_POWER_ON_FROM_TV -->
+    <add-resource type="integer" name="def_hdmi_cec_power_on_from_tv"/>
+    <integer name="def_hdmi_cec_power_on_from_tv">1</integer>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_IRDA_CEC_SWITCH -->
+    <add-resource type="string" name="def_realtek_setup_irda_cec_switch"/>
+    <string name="def_realtek_setup_irda_cec_switch">off</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_SCREEN_ZOOM_ON -->
+    <add-resource type="bool" name="def_realtek_setup_screen_zoom_on"/>
+    <bool name="def_realtek_setup_screen_zoom_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_USER_HAVE_AMPLIFIER_ON -->
+    <add-resource type="bool" name="def_realtek_setup_user_have_amplifier_on"/>
+    <bool name="def_realtek_setup_user_have_amplifier_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_USER_HAVE_AMPLIFIER_51CH_OUTPUT_ON -->
+    <add-resource type="bool" name="def_realtek_setup_user_have_amplifier_51ch_output_on"/>
+    <bool name="def_realtek_setup_user_have_amplifier_51ch_output_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_USER_HAVE_AMPLIFIER_71CH_OUTPUT_ON -->
+    <add-resource type="bool" name="def_realtek_setup_user_have_amplifier_71ch_output_on"/>
+    <bool name="def_realtek_setup_user_have_amplifier_71ch_output_on">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_SPDIF_OUTPUT_MODE -->
+    <add-resource type="string" name="def_realtek_setup_spdif_ouput_mode"/>
+    <string name="def_realtek_setup_spdif_ouput_mode">0</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_TEXT_ENCODING_MODE -->
+    <add-resource type="string" name="def_realtek_setup_text_encoding_mode"/>
+    <string name="def_realtek_setup_text_encoding_mode">AUTO</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_CGI_UPLOAD_FILE_PATH -->
+    <add-resource type="string" name="def_realtek_setup_cgi_upload_file_path"/>
+    <string name="def_realtek_setup_cgi_upload_file_path">/data/upload</string>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_MIRACAST_SINK_CONNECTION_REMINDER_ON -->
+    <add-resource type="bool" name="def_realtek_setup_miracast_sink_connection_reminder_on"/>
+    <bool name="def_realtek_setup_miracast_sink_connection_reminder_on">true</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_MIRACAST_SINK_PIN_CODE -->
+    <add-resource type="string" name="def_realtek_setup_miracast_sink_pin_code"/>
+    <string name="def_realtek_setup_miracast_sink_pin_code">00000000</string>
+
+    <!-- Default for Settings.System.REALTEK_IS_DEVICE_NAME_CHANGED_BY_USER-->
+    <add-resource type="bool" name="def_realtek_is_def_device_name_changed_by_user"/>
+    <bool name="def_realtek_is_def_device_name_changed_by_user">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_IS_WIFI_MACADDR_READY-->
+    <add-resource type="bool" name="def_realtek_is_wifi_macAddr_ready"/>
+    <bool name="def_realtek_is_wifi_macAddr_ready">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_DEFAULT_DEVICE_NAME-->
+    <add-resource type="string" name="def_realtek_def_deivce_name"/>
+    <string name="def_realtek_def_deivce_name">AirFun</string>
+
+    <!-- Default for Settings.System.REALTEK_IGNORE_HDMI_PLUGOUT-->
+    <add-resource type="bool" name="def_realtek_ignore_hdmi_plugout"/>
+    <bool name="def_realtek_ignore_hdmi_plugout">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_AUTO_1080P24-->
+    <add-resource type="bool" name="def_realtek_setup_auto_1080p24"/>
+    <bool name="def_realtek_setup_auto_1080p24">true</bool>
+
+    <!-- Default for Settings.System.YST_MODE-->
+    <add-resource type="bool" name="def_realtek_yst_mode"/>
+    <bool name="def_realtek_yst_mode">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_AUTO_2997HZ-->
+    <add-resource type="bool" name="def_realtek_setup_auto_2997hz"/>
+    <bool name="def_realtek_setup_auto_2997hz">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_SETUP_FORCE_SDAUDIO -->
+    <add-resource type="bool" name="def_realtek_setup_force_sdaudio"/>
+    <bool name="def_realtek_setup_force_sdaudio">false</bool>
+
+    <!-- Default for Settings.System.REALTEK_FORCE_RT_MEDIAPLAYER -->
+    <add-resource type="bool" name="def_realtek_force_rt_mediaplayer_on"/>
+    <bool name="def_realtek_force_rt_mediaplayer_on">true</bool>
+
+    <!-- Default for Settings.Global.CAPTIVE_PORTAL_DETECTION_ENABLED -->
+    <add-resource type="integer" name="def_connectivity_check_enabled"/>
+    <integer name="def_connectivity_check_enabled">1</integer>
+
+    <!-- Default for Settings.Global.CAPTIVE_PORTAL_SERVER -->
+    <add-resource type="string" name="def_connectivity_check_url"/>
+    <string name="def_connectivity_check_url">connectivitycheck.gstatic.com</string>
+</resources>

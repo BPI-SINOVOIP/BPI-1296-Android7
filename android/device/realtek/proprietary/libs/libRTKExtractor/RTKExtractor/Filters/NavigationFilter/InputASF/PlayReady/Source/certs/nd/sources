@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmndcerts
+TARGETTYPE=LIBRARY
+
+SOURCES =               \
+    drmndcertbuilder.c  \
+    drmnddevicecert.c   \
+    drmxmlrsakeys.c  

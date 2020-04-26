@@ -1,0 +1,21 @@
+Adding CUSTOM_LOCALES [hdpi] to PRODUCT_LOCALES [en_US zh_TW zh_CN]
+============================================
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=4.2.1
+TARGET_PRODUCT=rtk_saturn
+TARGET_BUILD_VARIANT=eng
+TARGET_BUILD_TYPE=release
+TARGET_BUILD_APPS=
+TARGET_ARCH=mips
+TARGET_ARCH_VARIANT=mips32r2-fp
+HOST_ARCH=x86
+HOST_OS=linux
+HOST_OS_EXTRA=Linux-3.6.6-gentoo-x86_64-Intel-R-_Core-TM-_i3-2125_CPU_@_3.30GHz-with-gentoo-2.1
+HOST_BUILD_TYPE=release
+BUILD_ID=JOP40D
+OUT_DIR=out
+============================================
+make: Entering directory `/local/mips_android_build/software_Saturn_JB/android'
+target  C: libInputMP4 <= frameworks/av/media/libstagefright/rtk/RTKExtractor/Filters/NavigationFilter/InputMP4/InputMP4.c
+prebuilts/misc/linux-x86/ccache/ccache prebuilts/gcc/linux-x86/mips/mipsel-linux-android-4.6/bin/mipsel-linux-android-gcc -I frameworks/av/media/libstagefright/rtk/RTKExtractor/Filters/NavigationFilter/InputMP4/../../../ -I frameworks/av/media/libstagefright/rtk/RTKExtractor/Filters/NavigationFilter/InputMP4/../../../Include -I ./hardware/realtek/realtek_omx/rtk_libs/OSAL/include -I ./hardware/realtek/realtek_omx/rtk_libs/common/IPC/include -I ./hardware/realtek/realtek_omx/osal/ -I ./hardware/realtek/realtek_omx/rtk_libs/common/IPC/generate/include/system -I frameworks/av/media/libstagefright/rtk/RTKExtractor/Filters/NavigationFilter/InputMP4 -I out/target/product/saturn/obj/STATIC_LIBRARIES/libInputMP4_intermediates -I libnativehelper/include/nativehelper  -isystem system/core/include -isystem hardware/libhardware/include -isystem hardware/libhardware_legacy/include -isystem hardware/ril/include -isystem libnativehelper/include -isystem frameworks/native/include -isystem frameworks/native/opengl/include -isystem frameworks/av/include -isystem frameworks/base/include -isystem frameworks/base/opengl/include -isystem external/skia/include -isystem out/target/product/saturn/obj/include -isystem bionic/libc/arch-mips/include -isystem bionic/libc/include -isystem bionic/libstdc++/include -isystem bionic/libc/kernel/common -isystem bionic/libc/kernel/arch-mips -isystem bionic/libm/include -isystem bionic/libm/include/mips -isystem bionic/libthread_db/include -c  -fno-exceptions -Wno-multichar -O2 -fomit-frame-pointer -fno-strict-aliasing -funswitch-loops -Ulinux -U__unix -U__unix__ -Umips -fpic -fPIE -ffunction-sections -fdata-sections -funwind-tables -Wa,--noexecstack -Werror=format-security -D_FORTIFY_SOURCE=1 -EL -march=mips32r2 -mtune=mips32r2 -mips32r2 -mhard-float -msynci -include build/core/combo/include/arch/linux-mips/AndroidConfig.h -I build/core/combo/include/arch/linux-mips/ -Wno-unused-but-set-variable -fno-strict-volatile-bitfields -Wno-psabi -DANDROID -fmessage-length=0 -W -Wall -Wno-unused -Winit-self -Wpointer-arith -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -DNDEBUG -g -Wstrict-aliasing=2 -fgcse-after-reload -frerun-cse-after-loop -frename-registers -DNDEBUG -UDEBUG    -Wno-multichar "-DIS_CHIP(SATURN)" "-DCHIP_MODEL=0x1186" "-DAP_CONFIG_WITH(APCFG_SMOOTH_TRICK_PLAY)"     -MD -MF out/target/product/saturn/obj/STATIC_LIBRARIES/libInputMP4_intermediates/InputMP4.d -o out/target/product/saturn/obj/STATIC_LIBRARIES/libInputMP4_intermediates/InputMP4.o frameworks/av/media/libstagefright/rtk/RTKExtractor/Filters/NavigationFilter/InputMP4/InputMP4.c
+make: Leaving directory `/local/mips_android_build/software_Saturn_JB/android'

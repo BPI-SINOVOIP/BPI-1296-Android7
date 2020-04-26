@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcertcachestub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =               \
+    certcacheutilstub.c \
+    certcachestub.c     \
+

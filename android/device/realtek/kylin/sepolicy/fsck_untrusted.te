@@ -1,0 +1,24 @@
+#============= fsck_untrusted ==============
+allow fsck_untrusted audio_device:dir getattr;
+allow fsck_untrusted block_device:dir getattr;
+allow fsck_untrusted console_device:chr_file getattr;
+allow fsck_untrusted device:chr_file getattr;
+allow fsck_untrusted device:dir { read open };
+allow fsck_untrusted device:file getattr;
+allow fsck_untrusted fscklogs:dir getattr;
+allow fsck_untrusted full_device:chr_file getattr;
+#allow fsck_untrusted fuse_device:chr_file getattr; # Android N marked
+allow fsck_untrusted graphics_device:dir getattr;
+#allow fsck_untrusted hw_random_device:chr_file getattr;
+allow fsck_untrusted qtaguid_device:chr_file getattr;
+allow fsck_untrusted ppp_device:chr_file getattr;
+allow fsck_untrusted input_device:dir getattr;
+#allow fsck_untrusted kmem_device:chr_file getattr;
+allow fsck_untrusted kmsg_device:chr_file getattr;
+allow fsck_untrusted serial_device:chr_file getattr;
+#allow fsck_untrusted system_file:file entrypoint;
+allow fsck_untrusted tty_device:chr_file getattr;
+allow fsck_untrusted tun_device:chr_file getattr;
+allow fsck_untrusted uhid_device:chr_file getattr;
+allow fsck_untrusted uio_device:chr_file getattr;
+allow fsck_untrusted vcs_device:chr_file getattr;

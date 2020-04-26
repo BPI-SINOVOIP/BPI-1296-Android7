@@ -1,0 +1,6 @@
+service gator /system/bin/gatord
+    class core
+    user root
+    group root
+    disabled
+

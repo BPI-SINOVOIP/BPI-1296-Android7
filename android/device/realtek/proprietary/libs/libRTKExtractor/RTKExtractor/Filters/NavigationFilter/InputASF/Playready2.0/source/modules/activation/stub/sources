@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmactivationstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                   \
+    drmactivationutilstub.c \
+    drmactivationimpstub.c
+

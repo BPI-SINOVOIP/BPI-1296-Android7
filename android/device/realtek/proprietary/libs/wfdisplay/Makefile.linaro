@@ -1,0 +1,103 @@
+ANDROID_SRC_PATH=../../../../..
+RTK_SRC_PATH=$(ANDROID_SRC_PATH)/../software_Phoenix_RTK
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H -DHAVE_PTHREADS
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libRtkhdcp2.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+#USE_RTK_VOUT_UTIL=YES
+USE_RT_ION = true
+
+##LOCAL_CFLAGS += -DANDROID
+
+LOCAL_SRC_FILES += spu/core/bigdigits.c
+LOCAL_SRC_FILES += spu/core/crypto.c
+LOCAL_SRC_FILES += spu/core/hmac.c
+LOCAL_SRC_FILES += spu/core/hdcp2_interface.c
+LOCAL_SRC_FILES += spu/core/hdcp2_message.c
+LOCAL_SRC_FILES += spu/core/hdcp2_session.c
+LOCAL_SRC_FILES += spu/crypto_spu.c
+LOCAL_SRC_FILES += spu/secure_flash.c
+LOCAL_SRC_FILES += spu/hdmi.c
+LOCAL_SRC_FILES += spu/spu_main.c
+
+##
+LIBNAME1= $(GENERIC_LINUX_PATH)/lib/libRtkwfdisplay.a
+LOCAL_SRC_FILES1 += deliver_info_to_dvdplayer.cpp
+LOCAL_SRC_FILES1 += systemCommand.cpp
+LOCAL_SRC_FILES1 += wifi_hdcp2.cpp
+LOCAL_SRC_FILES1 += wifi_rtsp_cmds.cpp
+LOCAL_SRC_FILES1 += wifi_rtsp.cpp
+LOCAL_SRC_FILES1 += wifi_hid_keyboard.cpp
+LOCAL_SRC_FILES1 += RTKWifiDisplaySink.cpp
+
+
+ifeq ($(USE_RTK_VOUT_UTIL),YES)
+LOCAL_CFLAGS += $(DEFINES) -DSYS_UNIX=1 -DUSE_RTK_VOUT_UTIL
+endif
+
+LOCAL_C_INCLUDES += $(TOP)/../../output/build/openssl-1.0.1g/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/spu
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/spu/core
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/spu/include
+LOCAL_C_INCLUDES += ${TOP}/system/core/include
+LOCAL_C_INCLUDES += ${TOP}/device/realtek/proprietary/libs/RT_IPC
+LOCAL_C_INCLUDES += ${TOP}/device/realtek/proprietary/libs/RT_MediaPlayClient
+LOCAL_C_INCLUDES += ${TOP}/device/realtek/proprietary/libs/RT_MediaPlayClient/RT_MediaPlayClient
+LOCAL_C_INCLUDES += ${TOP}/device/realtek/proprietary_trunk-6.0.0_r1/libs/libMCPControl/inc
+
+ifeq ($(USE_RT_ION),true)
+LOCAL_CFLAGS += -DUSE_RT_ION
+endif
+LOCAL_CFLAGS += -Wno-multichar
+LOCAL_CFLAGS += -DSYS_UNIX=1
+LOCAL_CFLAGS += -DHDCP_REPEATER=0
+LOCAL_CFLAGS += -DHDCP2_KEY_PROTECT_WITH_KIMG
+LOCAL_CFLAGS += -DHDCP2_1
+#			   -DREALTEK_WFDISPLAY_SIGMA
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+OBJ_FILES1 = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES1)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+all: $(LIBNAME) $(LIBNAME1)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+$(LIBNAME1) : $(OBJ_FILES1) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES1)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES1) $(LIBNAME1) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

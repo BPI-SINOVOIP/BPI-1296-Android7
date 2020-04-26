@@ -1,0 +1,16 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemshahmac
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_BUILDING_OEMSHAHMAC_LIB
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_BUILDING_OEMSHAHMAC_LIB
+!endif
+
+SOURCES=         \
+    oemshahmac.c
+

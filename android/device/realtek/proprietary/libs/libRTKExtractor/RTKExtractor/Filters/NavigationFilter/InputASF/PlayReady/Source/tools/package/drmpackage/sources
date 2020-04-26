@@ -1,0 +1,32 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=Package
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+INCLUDES = \
+    $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\tools\common
+
+SOURCES = \
+    drmpkg.c
+
+TARGETLIBS = \
+    $(_DRM_COMMON_LIBS)                        \
+    $(_DRM_OEM_MAIN_LIB)                       \
+    $(_DRM_MANAGER_DIR)\drmmanager.lib         \
+    $(_DRM_BLACKBOX_DIR)\drmblackbox.lib       \
+    $(_DRM_DEVCERT_PARSER_DIR)\drmdevcert.lib  \
+    $(_DRM_DEVICEDEVCERT_DIR)\drmdevicedevcert.lib          \
+    $(_DRM_SECURECLOCK_DIR)\drmsecureclock.lib \
+    $(_DRM_SYNCLIST_DIR)\drmsynclist.lib       \
+    $(_DRM_METERING_DIR)\drmmetering.lib       \
+    $(_DRM_SOURCE_PATH)\tools\common\$(_DRM_OBJ_DIR)\drmtoolscommon.lib \
+    $(_DRM_WMDRMCERT_DIR)\wmdrmcert.lib        \
+    $(_DRM_RSA_DIR)\oemrsa.lib                 \
+    $(_DRM_AES_DIR)\oemaes.lib                 \
+
+
+
+	

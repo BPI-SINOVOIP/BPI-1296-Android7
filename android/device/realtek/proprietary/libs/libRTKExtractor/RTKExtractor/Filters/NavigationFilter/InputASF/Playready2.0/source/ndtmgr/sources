@@ -1,0 +1,15 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=ndtmgr
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\ndtinc;
+
+SOURCES =                 \
+    ndtlicense.c          \
+    ndtnetmsg.c           \
+    ndtmanager_internal.c \
+    ndtreg.c              \
+    ndtencrypt.c
+

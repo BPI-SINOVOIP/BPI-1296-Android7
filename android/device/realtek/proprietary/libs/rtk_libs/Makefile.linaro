@@ -1,0 +1,147 @@
+ANDROID_SRC_PATH=../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AS=$(MYAS)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libRTK_lib.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+RTK_TOP := $(TOP)/device/realtek/proprietary/libs/rtk_libs
+
+
+#OSAL/Android.mk
+LOCAL_SRC_FILES := \
+    OSAL/OSAL.cpp \
+    OSAL/CThread.cpp \
+    OSAL/PLI.cpp \
+    OSAL/Threads.cpp \
+    OSAL/IO.cpp \
+    OSAL/remote_malloc_svc.c \
+    OSAL/remote_malloc_xdr.c \
+    OSAL/debug_level_clnt.c \
+    OSAL/debug_level_xdr.c \
+    OSAL/remote_malloc_ion.c
+
+#common/IPC/src/xdr/Android.mk
+LOCAL_SRC_FILES += \
+    common/IPC/src/xdr/xdr.c \
+    common/IPC/src/xdr/xdr_mem.c \
+    common/IPC/src/xdr/xdr_array.c \
+    common/IPC/src/xdr/xdr_float.c \
+    common/IPC/src/xdr/xdr_intXX_t.c \
+    common/IPC/src/xdr/xdr_ref.c \
+    common/IPC/src/xdr/xdr_sizeof.c
+
+#common/IPC/src/Android.mk
+LOCAL_SRC_FILES += \
+    common/IPC/src/RPCstruct.c \
+    common/IPC/src/rpcapi.c \
+    common/IPC/src/RPCProxy.c \
+    common/IPC/src/SVCFunc.c \
+    common/IPC/src/rpcstubapi.c \
+    common/IPC/src/ClientStub.c
+
+#common/IPC/generate/src/system/Android.mk
+LOCAL_SRC_FILES += \
+    common/IPC/generate/src/system/AudioRPC_Agent_svc.c \
+    common/IPC/generate/src/system/AudioRPC_Agent_svr.c \
+    common/IPC/generate/src/system/AudioRPC_System_clnt.c \
+    common/IPC/generate/src/system/AudioRPCBaseDS_xdr.c \
+    common/IPC/generate/src/system/AudioRPC_Agent_xdr.c \
+    common/IPC/generate/src/system/AudioRPC_System_xdr.c \
+    common/IPC/generate/src/system/RPCBaseDS_xdr.c
+
+LOCAL_SRC_FILES += \
+    common/IPC/generate/src/system/VideoRPC_Agent_svc.c \
+    common/IPC/generate/src/system/VideoRPC_Agent_svr.c \
+    common/IPC/generate/src/system/VideoRPC_System_clnt.c \
+    common/IPC/generate/src/system/VideoRPC_Agent_xdr.c \
+    common/IPC/generate/src/system/VideoRPC_System_xdr.c \
+    common/IPC/generate/src/system/VideoRPCBaseDS_xdr.c
+
+#LOCAL_SRC_FILES += \
+#	common/IPC/script/video/VideoRPC_System_fakeClnt.c  \
+#	common/IPC/script/video/VideoRPC_System_fakeSvc.c
+
+ifneq ($(TARGET_ARCH), mips)
+    DEFINES := $(filter-out -mips32r2,$(DEFINES))
+endif
+LOCAL_CFLAGS := $(DEFINES) -DSYS_UNIX=1 -D_GNU_SOURCE -Wall -g $(COMPILE_OPT)
+
+ifeq ($(HOST), mipsel-linux)
+LOCAL_CFLAGS += -D_GNU_SOURCE -D_MIPSEL_LINUX
+endif
+
+ifneq ($(TARGET_BOARD), NO)
+LOCAL_CFLAGS += -DTARGET_BOARD
+endif
+
+ifeq ($(DFB_MULTI_APP), YES)
+LOCAL_CFLAGS += -fPIC
+endif
+
+ifeq ($(ENABLE_DFB_VKBD), YES)
+#for compile dfb_vkd
+LOCAL_CFLAGS += -fPIC
+endif
+
+LOCAL_CFLAGS += -DRTD_1195
+
+LOCAL_C_INCLUDES += $(RTK_TOP)/OSAL
+LOCAL_C_INCLUDES += $(RTK_TOP)/OSAL/include
+LOCAL_C_INCLUDES += $(RTK_TOP)/OSAL/include/ion
+LOCAL_C_INCLUDES += $(RTK_TOP)/OSAL/include/OSAL
+LOCAL_C_INCLUDES += $(RTK_TOP)/OSAL/libc/arch-arm/syscalls
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/include
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/src/xdr
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/src
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/generate/include
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/generate/include/system
+LOCAL_C_INCLUDES += $(RTK_TOP)/common/IPC/generate/src/system
+LOCAL_C_INCLUDES += $(TOP)/external/stlport/stlport
+LOCAL_C_INCLUDES += \
+	$(TOP)/system/core/include \
+	$(TOP)/bionic/libc/kernel/common \
+	$(GENERIC_LINUX_PATH)/include
+
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES) )
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS) -fPIC
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@
+
+.S.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.S] ---------------------------
+	$(SHOW_COMMAND)$(AS) $(WARNING) -c $*.S -o $@

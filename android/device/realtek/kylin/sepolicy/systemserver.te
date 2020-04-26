@@ -1,0 +1,5 @@
+allow system_server shell_exec:file execute_no_trans;
+allow system_server system_file:system module_load;
+allow system_server user_profile_data_file:dir {read open};
+allow system_server realtek:binder { transfer };
+allow system_server realtek:fd { use };

@@ -1,0 +1,17 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=bcertdump
+TARGETTYPE=LIBRARY
+UMTYPE=console
+UMENTRY=wmain
+
+
+SOURCES = \
+    ..\bcertdump.c
+
+INCLUDES = \
+    $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\inc;  \
+    $(_DRM_SOURCE_PATH)\tools\common;  \
+    $(_DRM_SOURCE_PATH)\certs
+

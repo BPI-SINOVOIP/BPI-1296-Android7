@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdeletedstorereal
+TARGETTYPE=LIBRARY
+
+SOURCES =                  \
+    deletedstoreimplreal.c \
+    deletedstoreutilreal.c \
+

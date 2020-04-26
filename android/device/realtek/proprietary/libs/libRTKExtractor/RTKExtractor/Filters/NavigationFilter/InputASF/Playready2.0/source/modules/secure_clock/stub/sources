@@ -1,0 +1,13 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmsecureclockstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                     \
+    secureclockutilstub.c     \
+    secureclockrequeststub.c  \
+    secureclockresponsestub.c \
+    secureclockmanagerstub.c  \
+

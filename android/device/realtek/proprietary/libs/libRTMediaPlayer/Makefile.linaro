@@ -1,0 +1,106 @@
+ANDROID_SRC_PATH=../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H -DHAVE_PTHREADS
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libRtkMediaPlayer.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+USE_RTK_VOUT_UTIL=YES
+
+LOCAL_SRC_FILES:= RTMediaPlayer.cpp
+
+LOCAL_SRC_FILES += 								\
+	DataTransportServer/DataTransportServer.cpp	\
+	DataTransportServer/SocketTransport.cpp		\
+	DataTransportServer/SharedMemTransport.cpp
+
+LOCAL_SRC_FILES += RTMediaPlayerEventListener.cpp
+LOCAL_SRC_FILES += audio_table.cpp
+LOCAL_SRC_FILES += video_table.cpp
+LOCAL_SRC_FILES += GetTrackInfo.cpp
+
+LOCAL_CFLAGS += -DUSE_RT_MEDIA_PLAYER
+
+ifeq ($(PLATFORM_VERSION), 6.0)
+LOCAL_CFLAGS += -DANDROID_6
+endif
+
+ifeq ($(USE_RTK_VOUT_UTIL),YES)
+LOCAL_CFLAGS += $(DEFINES) -DSYS_UNIX=1 -DUSE_RTK_VOUT_UTIL
+endif
+
+
+LOCAL_C_INCLUDES :=                                                 \
+	$(TOP)/frameworks/av/media/libstagefright/include               \
+	$(TOP)/frameworks/av/media/libstagefright/wifi-display          \
+	$(TOP)/frameworks/native/include/media/openmax                  \
+	$(TOP)/external/tremolo/Tremolo                                 \
+	$(TOP)/frameworks/native/include								\
+	$(TOP)/frameworks/native/include/gui							\
+	$(TOP)/device/realtek/proprietary/libs/RT_IPC                   \
+	$(TOP)/device/realtek/proprietary/libs							\
+	$(LOCAL_PATH)/../Include										\
+	$(LOCAL_PATH)/DataTransportServer
+
+ifeq ($(USE_RTK_VOUT_UTIL),YES)
+LOCAL_C_INCLUDES += \
+	$(TOP)/device/realtek/proprietary/libs/Include/Application/AppClass/\
+	$(TOP)/device/realtek/proprietary/libs/Include/\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include/system\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include/xdr\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/src/xdr\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include\
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include/OSAL
+endif
+
+LOCAL_C_INCLUDES += \
+	$(TOP)/device/realtek/proprietary/libs/transcode \
+	$(TOP)/device/realtek/video/rvsd/$(TARGET_BOARD_PLATFORM) \
+	$(TOP)/frameworks/av/media/libstagefright \
+	$(TOP)/frameworks/av/media/libstagefright/include \
+	$(TOP)/frameworks/native/include/media/openmax \
+	$(TOP)/external/stlport/stlport
+
+LOCAL_C_INCLUDES += \
+	$(TOP)/frameworks/av/include/ \
+	$(TOP)/system/core/include/ \
+	$(TOP)/hardware/libhardware/include/
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS) -fPIC
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

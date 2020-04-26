@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmerror
+TARGETTYPE=LIBRARY
+
+SOURCES =               \
+    ..\drmerror.c       \
+    ..\drmresultsinc.c  \
+

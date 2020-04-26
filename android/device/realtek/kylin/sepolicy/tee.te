@@ -1,0 +1,22 @@
+##
+# trusted execution environment (tee) daemon
+#
+
+domain_trans(init, tee_exec, tee)
+
+allow tee rootfs:file { entrypoint };
+
+allow tee user_device:chr_file { setattr getattr read write};
+allow tee user_device:blk_file {read write open create ioctl};
+
+allow tee tee_exec:file {execute_no_trans getattr execute read open};
+allow tee tmpfs:dir { write create add_name };
+allow tee system_file:file {execute_no_trans};
+allow tee system_data_file:dir {write add_name create};
+
+allow tee tee:capability {chown sys_rawio};
+
+allow tee block_device:dir {search};
+
+allow tee toolbox_exec:file {execute execute_no_trans getattr open read};
+allow tee uio_device:chr_file {read write rw_file_perms};

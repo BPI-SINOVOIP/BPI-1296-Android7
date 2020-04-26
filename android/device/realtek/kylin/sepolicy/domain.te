@@ -1,0 +1,7 @@
+dontaudit domain rootfs:chr_file { read write };
+# For /dev/rpc, /dev/avcpu
+allow domain user_device:chr_file { rw_file_perms open };
+allow domain user_device:file { rw_file_perms create };
+allow domain user_device:dir r_dir_perms;
+#allow domain user_device:blk_file { setattr getattr };
+

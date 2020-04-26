@@ -1,0 +1,2 @@
+#type devnullfs, fstype, mlstrustedobject;
+#type ufsd, fs_type;

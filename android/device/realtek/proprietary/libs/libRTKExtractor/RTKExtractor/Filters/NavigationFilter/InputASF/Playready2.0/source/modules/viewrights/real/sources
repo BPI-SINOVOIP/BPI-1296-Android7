@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmviewrightsreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                       \
+    drmviewrightsimplreal.c     \
+    drmviewrightsutilreal.c
+

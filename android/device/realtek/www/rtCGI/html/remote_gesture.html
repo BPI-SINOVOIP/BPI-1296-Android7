@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Remote Control</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<script type="text/javascript" src="javascript/util.js"></script>
+	<script type="text/javascript" src="javascript/remote-control.js"></script>
+	<style>
+		* {margin:0; padding:0;}
+		html, body{
+			height:100%;
+		}
+	</style>
+</head>
+
+<body bgcolor="#5D6E39" style="overflow: hidden" onload="initGesture('gesture_bg');">
+	<table height="100%" width="100%" align="center" cellspacing="0">
+	<tr><td valign="top" align="center">
+
+	<!-- Below is the remote control main section, which contains the mapping to up/down/lef/right/select/guide/return -->
+	<img id ="gesture_bg" src ="images/bg-remote-gesture-portrait.jpg" width="520" height="680" usemap="#planetmap"/>
+
+	<map name="planetmap">
+		<area shape ="circle" coords="434,76,58" onclick="sendRemoteCommand('HOME')"/>
+		<area shape ="circle" coords="84,76,58" onclick="sendRemoteCommand('MENU')"/>
+		<area shape ="circle" coords="96,434,60" onclick="sendRemoteCommand('BACK')"/>
+		<area shape ="rect" coords ="28,540,170,618" onclick="sendRemoteCommand('PLAY')"/>
+		<area shape ="rect" coords ="188,540,332,618" onclick="sendRemoteCommand('STOP')"/>
+		<!-- temporary remove
+		<area shape ="rect" coords ="350,540,494,618" onclick="self.location.href='remote_ctrl_ti.html';"/>
+		-->
+		<!--<area shape ="rect" coords ="0,0,520,474" alt="gesture" id="gestureArea"/> -->
+		<!-- <div left="84" top="84" width="428" height="302" alt="gesture" id="gestureArea"/> -->
+	</map>
+
+    </td></tr>
+	</table>
+</body>
+</html>
+

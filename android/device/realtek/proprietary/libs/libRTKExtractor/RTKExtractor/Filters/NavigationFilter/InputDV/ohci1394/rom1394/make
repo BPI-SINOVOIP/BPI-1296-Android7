@@ -1,0 +1,48 @@
+##----------------------------------------------------------------------------
+# Created with genmake.pl v1.1 on Thu Sep  2 15:30:38 2004
+# genmake.pl home: http://muquit.com/muquit/software/
+# Copryright: GNU GPL (http://www.gnu.org/copyleft/gpl.html)
+##----------------------------------------------------------------------------
+include ../../../../../../include/MakeConfig
+rm=/bin/rm -f
+CC= $(MYCC)
+LINK= -=LINK=-
+DEFS=  
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+
+INCLUDES= -I../../../Include -L/usr/local/lib
+
+DEFINES= $(INCLUDES) $(DEFS) -DSYS_UNIX=1
+CFLAGS= $(DEFINES) $(COMPILE_OPT)
+CFLAGS+= -g
+ifeq ($(__NAV_USE_DLL_PLUGIN__), YES)
+LIBNAME= ../../../../lib/1394rom.so
+CFLAGS+= -fPIC -D__NAV_USE_DLL_PLUGIN_ _
+else
+LIBNAME= ../../../../lib/lib1394rom.a
+endif
+
+SRCS = rom1394_internal.c rom1394_main.c
+OBJS = rom1394_internal.o rom1394_main.o
+
+
+.cpp.o:
+	$(rm) -f $@
+	$(CC) $(CFLAGS) $(DEBUGFLAG) -c $*.cpp
+
+all: $(LIBNAME)
+
+ifeq ($(__NAV_USE_DLL_PLUGIN__), YES)
+$(LIBNAME) : $(OBJS)
+	$(rm) $@
+	$(CC) -shared -o $(LIBNAME) $(OBJS)
+else
+$(LIBNAME) : $(OBJS)
+	$(rm) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+endif
+
+clean:
+	$(rm) $(OBJS) $(LIBNAME) core *~

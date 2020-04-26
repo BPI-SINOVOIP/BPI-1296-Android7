@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BluetoothRTK3ddService</string>
+    <string name="start_3ddserv">Begin to start 3dd sync service! Please put on your glass!</string>
+    <string name="stop_3ddserv">3dd sync stervice has stoped !</string>
+    <string name="connect_3dg">3DG has connected address is : !</string>
+    <string name="bluetooth3d_match_success">3D Glass have connected</string>
+    <string name="text5">Delay</string>
+    <string name="delay_def">0</string>
+    <string name="broadcast">Send Shutter Data</string>
+    <string name="reset_data">Reset Shutter Data</string>
+</resources>

@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmhdsstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =            \
+    drmhdsutilstub.c \
+    drmhdsimplstub.c
+

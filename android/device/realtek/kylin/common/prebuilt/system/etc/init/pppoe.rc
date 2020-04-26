@@ -1,0 +1,42 @@
+# for pppoe script files
+service pppoe-setup /system/bin/pppoe-setup
+    class main
+    oneshot
+    disabled
+    seclabel u:r:pppoe:s0
+
+service pppoe-start /system/bin/pppoe-start
+    class main
+    oneshot
+    disabled
+    seclabel u:r:pppoe:s0
+
+service pppoe-stop /system/bin/pppoe-stop
+    class main
+    oneshot
+    disabled
+    seclabel u:r:pppoe:s0
+
+on property:rtk.net.pppoe.driver=1
+    insmod /system/vendor/modules/pppox.ko
+    insmod /system/vendor/modules/pppoe.ko
+    insmod /system/vendor/modules/ppp_synctty.ko
+    insmod /system/vendor/modules/crc-ccitt.ko
+    insmod /system/vendor/modules/ppp_async.ko
+
+on property:sys.boot_completed=1
+    # insert pppoe driver kernel module
+    #insmod /system/vendor/modules/slhc.ko
+    #insmod /system/vendor/modules/sha1_generic.ko
+    #insmod /system/vendor/modules/ppp_generic.ko
+    #insmod /system/vendor/modules/bsd_comp.ko
+    #insmod /system/vendor/modules/pppox.ko
+    #insmod /system/vendor/modules/pppoe.ko
+    #insmod /system/vendor/modules/pppopns.ko
+    #insmod /system/vendor/modules/pppolac.ko
+    #insmod /system/vendor/modules/ppp_deflate.ko
+    #insmod /system/vendor/modules/ppp_synctty.ko
+    #insmod /system/vendor/modules/crc-ccitt.ko
+    #insmod /system/vendor/modules/ppp_async.ko
+    #insmod /system/vendor/modules/ppp_mppe.ko
+

@@ -1,0 +1,13 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_ansi
+TARGETTYPE=LIBRARY
+
+SOURCES =      	            \
+	..\oemdebug.c           \
+	..\oemimpl.c            \
+	..\oemfileio.c          \
+	..\oeminfo.c            \
+	..\oemtime.c            \
+	..\oemprofile.c         \
+	..\oemcriticalsection.c

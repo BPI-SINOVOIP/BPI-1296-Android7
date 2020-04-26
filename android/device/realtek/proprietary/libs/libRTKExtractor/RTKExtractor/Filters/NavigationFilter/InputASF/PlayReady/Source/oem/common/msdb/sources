@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_msdb
+TARGETTYPE=LIBRARY
+
+
+SOURCES =      	     \
+	oemcfdimpl.c

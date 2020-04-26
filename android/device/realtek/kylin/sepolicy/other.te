@@ -1,0 +1,269 @@
+#============= rootfs ==============
+allow rootfs { selinuxfs labeledfs }:filesystem { getattr remount };
+allow rootfs {device rootfs system_file sysfs sysfs_devices_system_cpu debugfs system_data_file cache_file}:dir {search add_name write remove_name getattr read open ioctl };
+allow rootfs {device owntty_device null_device }:chr_file {create read write open getattr ioctl unlink};
+# Android N don't allow : rootfs rootfs:file { setattr }; 
+# allow rootfs { rootfs properties_device system_file proc proc sysfs_devices_system_cpu shell_exec}:file {read open getattr setattr execute execute_no_trans entrypoint}; # Original for Android L
+allow rootfs { properties_device proc proc sysfs_devices_system_cpu shell_exec}:file {read open getattr setattr execute execute_no_trans entrypoint};
+allow rootfs rootfs:file {read open getattr execute execute_no_trans entrypoint};
+# Android N don't allow : rootfs system_file:file { entrypoint };
+allow rootfs system_file:file {read open getattr setattr execute execute_no_trans };
+#allow rootfs { properties_device proc proc sysfs_devices_system_cpu shell_exec}:file {read open getattr setattr execute execute_no_trans entrypoint};
+
+allow rootfs { rootfs system_file proc}:lnk_file read;
+allow rootfs {rootfs kernel init}:process {fork sigchld setsched};
+allow rootfs rootfs:capability {fowner fsetid sys_module sys_resource dac_override mknod};
+allow rootfs {init kernel}:fd use;
+allow rootfs user_device:blk_file {read open ioctl getattr write};
+#============= kernel ==============
+allow kernel user_device:chr_file relabelto;
+
+#============= init ==============
+#allow init { rootfs sdcardd_exec system_file system_server_service watchdogd_exec dumpstate}:process { siginh transition rlimitinh noatsecure sigkill};
+allow init { rootfs sdcardd_exec system_file system_server_service watchdogd_exec dumpstate}:process { siginh rlimitinh noatsecure sigkill};
+allow init init:process {rlimitinh siginh};
+allow init system_server_service:file { read getattr open execute execute_no_trans};
+allow init vfat:file {getattr read open};
+allow init vfat:dir {read open};
+allow init port:tcp_socket name_connect;
+#* allow init dumpstate:process {transition rlimitinh siginh noatsecure};
+#* allow init sdcardd_exec:process {rlimitinh siginh noatsecure transition};
+#* allow init system_file:process {transition rlimitinh siginh noatsecure};
+#allow init system_file:file entrypoint;  <-- Never Allow define in /external/sepolicy/init.te and /external/sepolicy/domain.te
+#allow init init:process transition; <-- Never Allow define in external/sepolicy/init.te
+#allow init self:process transition;
+#* allow init system_server_service:process { siginh rlimitinh transition noatsecure };
+#* allow init watchdogd_exec:process transition;
+#* allow init rootfs:process {transition rlimitinh siginh noatsecure};
+
+#============= init_shell ==============
+#allow init_shell user_device:blk_file { read open };
+
+#============= netd ==============
+allow netd init:tcp_socket { write create read getattr setattr getopt setopt};
+allow netd kernel:system module_request;
+allow netd self:capability sys_module;
+#============= servicemanager ==============
+allow servicemanager { system_file system_server_service realtek}:process { getattr };
+allow servicemanager { system_server_service realtek }:dir search;
+allow servicemanager {system_server_service realtek }:file { read open };
+#============= logd ==============
+allow logd { sdcardd_exec  system_server_service dumpstate}:dir search;
+allow logd { sdcardd_exec  system_server_service dumpstate } :file { read open };
+#allow logd sdcardd_exec:file {read open};
+#allow logd system_server_service:file { read open };
+#allow logd dumpstate:file { read open };
+
+#============= system_file ==============
+allow system_file { binder_device device user_device null_device owntty_device ptmx_device devpts}:chr_file { read write ioctl open getattr};
+#allow system_file { cgroup self shell_exec system_file properties_device proc proc_net sysfs}:file { write open execute_no_trans read execute entrypoint getattr };
+# Android N remove entrypoint
+allow system_file { cgroup self shell_exec system_file properties_device proc proc_net sysfs}:file { write open execute_no_trans read execute getattr };
+allow system_file { debugfs system_file sysfs }:dir { search };
+allow system_file { self system_file init}:process { setsched sigchld fork sigchld};
+#allow system_file self:sem { write create unix_write read unix_read associate}; # Original For Android L
+# Android N need remove, 1 rule 
+
+allow system_file servicemanager:binder { transfer call };
+allow system_file { system_file logd }:unix_dgram_socket { create connect write sendto };
+allow system_file {system_file init}:unix_stream_socket {create connect write connectto};
+allow system_file { init kernel }:fd use;
+allow system_file { rootfs proc }:lnk_file read;
+allow system_file { logdw_socket property_socket }:sock_file write;
+allow system_file system_prop:property_service set;
+#============= system_server ==============
+allow system_server { sdcardd_exec system_server_service }:dir search;
+allow system_server realtek:unix_stream_socket connectto;
+allow system_server tmpfs:dir rw_dir_perms;
+allow system_server tmpfs:file rw_file_perms;
+allow system_server { system_server_tmpfs tmpfs }:file { rw_file_perms create } ;
+allow system_server self:capability sys_module;
+#allow system_server default_prop:property_service set;
+allow system_server shell_exec:file { r_file_perms execute}; # Androind N remove execute_no_trans
+#allow system_server { device rootfs }:chr_file {read write};
+allow system_server { system_server_service realtek_tmpfs sdcardd_exec}:file { read getattr open };
+allow system_server { socket_device unlabeled }:sock_file { getattr unlink write};
+allow system_server tmpfs:sock_file { create unlink };
+#allow system_server default_android_service:service_manager { add };
+allow system_server realtek_tmpfs:file { write };
+
+allow system_server default_android_service:service_manager find;
+allow system_server dex2oat_exec:file { read open };
+allow system_server user_device:chr_file { read write open };
+
+allow system_server realtek:binder { call };
+#allow system_server dex2oat_exec:file { read open execute execute_no_trans};
+#============= system_server_service ==============
+allow system_server_service { devpts null_device ptmx_device device owntty_device user_device ion_device graphics_device uio_device binder_device}:chr_file { read write open getattr ioctl};
+allow system_server_service { init kernel }:fd use;
+#allow system_server_service { proc properties_device system_file init proc_net shell_exec self sysfs rootfs tmpfs cgroup}:file { read getattr open execute entrypoint execute_no_trans setattr}; # Original Rules for Android L  
+# Android N need marked system_file entrypoint ==> 91 rules
+allow system_server_service system_file:file { read getattr open execute execute_no_trans setattr};
+# Android N need remove rootfs:file { setattr }; ==> 91 rules
+allow system_server_service rootfs:file { read getattr open execute entrypoint execute_no_trans };
+# Android N need remove init:file { execute execute_no_trans }; ==> 91 rules
+allow system_server_service { proc properties_device proc_net shell_exec self sysfs tmpfs cgroup}:file { read getattr open execute execute_no_trans setattr};
+allow system_server_service init:file { read getattr open setattr};
+
+allow system_server_service { rootfs proc system_file }:lnk_file read;
+allow system_server_service { init self }:process {fork sigchld setsched signal getsched};
+allow system_server_service { debugfs system_file self socket_device sysfs rootfs tmpfs }:dir { write getattr create setattr add_name search};
+allow system_server_service { logdw_socket property_socket tmpfs }:sock_file { create setattr write};;
+#allow system_server_service self:sem { write read create unix_write unix_read associate};  # Android N marked for 91 rules
+allow system_server_service {logd self }:unix_dgram_socket { write create connect sendto};
+allow system_server_service { init self }:unix_stream_socket { write create connect connectto bind listen};
+allow system_server_service system_prop:property_service set;
+
+allow system_server_service self:capability { sys_nice dac_override fowner chown fsetid};
+allow system_server_service { node port self }:tcp_socket { node_bind name_bind bind create setopt accept listen};
+allow system_server_service selinuxfs:filesystem getattr;
+allow system_server_service { self tmpfs }:fifo_file { read write create open};
+allow system_server_service user_device:blk_file { read write open };
+allow system_server_service servicemanager:binder { transfer call };
+
+#============= shell ==============
+allow shell { tmpfs block_device system_server_service pstorefs }:dir {write add_name create remove_name setattr getattr search open };
+allow shell sdcardd_exec:dir {getattr search};
+allow shell tmpfs:lnk_file {read getattr};
+allow shell { shell_tmpfs proc_sysrq system_server_service realtek_tmpfs system_server_tmpfs sysfs_devices_system_cpu}:file {create open getattr setattr unlink append read write };
+allow shell rootfs:file execute_no_trans;
+allow shell sdcardd_exec:file { read open };
+#allow shell shell:capability net_raw;
+#allow shell shell:capability { sys_admin };
+#allow shell shell:capability dac_override;
+#allow shell shell:capability { dac_read_search };
+#allow shell shell:capability2 syslog;
+#allow shell shell:capability2 dac_read_search;
+#allow shell kernel:system syslog_mod;
+allow shell { block_device loop_device ram_device }:blk_file getattr;
+allow shell { system_ndebug_socket tmpfs }:sock_file {getattr};
+allow shell { rootfs sdcardd_exec system_file system_server_service } :process getattr;
+#allow shell default_prop:property_service { set };
+allow shell tmpfs:fifo_file { getattr };
+#allow shell kernel:security { setenforce };
+#allow shell user_device:blk_file { read write };
+#allow shell shell:capability { chown }
+#allow shell labeledfs:filesystem { remount };
+allow shell usermodehelper:file { getattr };
+allow shell proc_security:file { getattr };
+#allow shell proc:file { write };
+#============= system_app ==============
+#allow system_app { system_data_file media_rw_data_file }:dir {add_name create setattr search getattr write}; # Andoird N marked
+# Android N remove system_app system_data_file:dir { write create setattr };
+allow system_app system_data_file: dir {add_name search getattr }; 
+allow system_app { media_rw_data_file }:dir {add_name create setattr search getattr write}; 
+
+allow system_app system_file:binder {call};
+allow system_app media_rw_data_file:file {open read write};
+allow system_app cache_file:dir {add_name create write open read};
+allow system_app { cache_file system_app_tmpfs }:file {create write open getattr read};
+allow system_app ctl_default_prop:property_service set;
+#============= mediaserver ==============
+#allow mediaserver system_server_service:sem { unix_read unix_write associate read write}; # Android N remove for 91 rules
+allow mediaserver user_device:chr_file { read write open ioctl };
+allow mediaserver shell_exec:file { read execute open getattr}; # Android N remove execute_no_trans
+allow mediaserver shell_tmpfs:file { read open getattr };
+allow mediaserver mediaserver_tmpfs:file { create open lock getattr};
+#============= vold ==============
+allow vold { system_server_service sdcardd_exec }:dir {search read open};
+allow vold system_server_service:file {read open getattr};
+allow vold { system_server_service sdcardd_exec}:lnk_file {getattr read };
+#============= debuggerd ==============
+allow debuggerd sdcardd_exec:dir search;
+allow debuggerd sdcardd_exec:process ptrace;
+
+#============= dumpstate ==============
+#allow dumpstate { watchdogd tmpfs system_server_service cgroup debugfs init installd keystore platform_app proc properties_device radio self shell sysfs sysfs_devices_system_cpu system_app untrusted_app zygote proc_net  qtaguid_proc }:file { entrypoint write read open setattr open getattr create rename }; # Android N reduce 12 failures
+#allow dumpstate dumpstate_exec:file entrypoint;
+allow dumpstate sdcardd_exec:file read;
+allow dumpstate shell_data_file:file { write create open getattr rename};
+#allow dumpstate su_exec:file { read execute open execute_no_trans };
+allow dumpstate su_exec:file { read open };
+allow dumpstate system_file:file { getattr open execute execute_no_trans read};
+allow dumpstate anr_data_file:file { read getattr open rename};
+allow dumpstate dalvikcache_data_file:file { read getattr open execute };
+allow dumpstate shell_exec:file { read execute open };
+# Android N : don't allow dumpstate system_app_data_file:file { open };
+allow dumpstate system_app_data_file:file { write getattr setattr read lock };
+allow dumpstate vdc_exec:file { read execute open execute_no_trans };
+allow dumpstate zygote_exec:file { read getattr open execute execute_no_trans };
+allow dumpstate { init kernel surfaceflinger}:fd use;
+allow dumpstate {shell null_device alarm_device ashmem_device binder_device ion_device owntty_device }:chr_file {read write open getattr ioctl};
+allow dumpstate { system_data_file sysfs proc_net ueventd untrusted_app vold watchdogd zygote system_server_service system_server system_file system_app sysfs_devices_system_cpu surfaceflinger shell_data_file servicemanager self anr_data_file debugfs debuggerd drmserver healthd init installd kernel keystore lmkd logd mediaserver netd platform_app radio realtek sdcardd_exec}:dir 
+{ search remove_name getattr read open};
+allow dumpstate dalvikcache_data_file:dir { search getattr read open};
+allow dumpstate sdcardd_exec:dir { search getattr };
+#neverallow allow dumpstate su:dir getattr;
+allow dumpstate wpa_socket:dir { write search add_name };
+allow dumpstate {proc zygote watchdogd untrusted_app ueventd system_server_service sysfs shell self system_app system_file installd keystore lmkd logd platform_app radio rootfs sdcardd_exec}:lnk_file read;
+allow dumpstate {untrusted_app system_app radio platform_app self }:process { fork sigchld setcap setsched signal};
+allow dumpstate {surfaceflinger system_server system_file servicemanager radio mediaserver keystore healthd drmserver realtek }:binder { call transfer};
+allow dumpstate kernel:system syslog_read;
+allow dumpstate self:capability { setuid net_raw setgid net_admin setgid};
+allow dumpstate { tmpfs sysfs rootfs proc labeledfs selinuxfs devpts fuse cgroup }:filesystem getattr;
+#allow dumpstate { servicemanager system_server_service surfaceflinger_service radio_service mediaserver_service keystore_service healthd_service drmserver_service }:service_manager {find list};
+# Android N : dumpstate servicemanager:service_manager { find };
+allow dumpstate { system_server_service surfaceflinger_service radio_service mediaserver_service keystore_service drmserver_service }:service_manager {find}; # Android N remove list for 96 rules
+allow dumpstate { logd self}:unix_dgram_socket { sendto write bind create connect };
+allow dumpstate { wpa_socket logdr_socket logdw_socket vold_socket }:sock_file { create setattr write};
+allow dumpstate self:rawip_socket { getopt create };
+allow dumpstate self:udp_socket { create ioctl };
+allow dumpstate { self vold }:unix_stream_socket { bind create connect connectto};
+#allow dumpstate su:unix_stream_socket connectto;
+#============= drmserver ==============
+allow drmserver dumpstate:fd use;
+#============= platform_app ==============
+allow platform_app { unlabeled system_server_service sdcardd_exec }:dir search;
+allow platform_app {system_server_service sdcardd_exec }:file { read getattr open };
+allow platform_app user_device:chr_file write;
+allow platform_app init:unix_stream_socket connectto;
+allow platform_app property_socket:sock_file write;
+#============= surfaceflinger ==============
+allow surfaceflinger sysfs:file { write };
+#============= untrusted_app ==============
+#allow untrusted_app { proc_sysrq proc_security }:file { getattr read};
+allow untrusted_app proc_sysrq:file {getattr read};
+allow untrusted_app proc_security:file {getattr};
+allow untrusted_app realtek:binder { call };
+#allow untrusted_app default_prop:property_service set;
+#allow untrusted_app init:unix_stream_socket connectto;
+#allow untrusted_app property_socket:sock_file write;
+#allow untrusted_app property_socket:sock_file { write };
+allow untrusted_app user_device:chr_file write;
+allow untrusted_app self:udp_socket ioctl;
+allow untrusted_app usb_device:dir {read open};
+allow untrusted_app unlabeled:filesystem getattr;
+allow untrusted_app system_app_tmpfs:file {read open getattr};
+#============= keystore ==============
+allow keystore app_data_file:file { write };
+#============= healthd ==============
+allow healthd app_data_file:file { write };
+#============= zygote ==============
+neverallow zygote runas_exec:file { getattr }; # android.security.cts.SELinuxTest#testZygote FAIL
+allow zygote unlabeled:dir search;
+allow zygote unlabeled:file { write open };
+allow zygote debugfs_tracing:file { open write };
+#============= unlabeled:file ==============
+#allow { netd sdcardd dhcp system_server shared_relro system_app wpa platform_app untrusted_app radio} unlabeled:file { write unlink read getattr open rename setattr lock}; # Android N modified
+allow { netd sdcardd dhcp system_server shared_relro system_app wpa platform_app radio} unlabeled:file { write unlink read getattr open rename setattr lock};
+allow untrusted_app unlabeled:file { write read getattr open rename setattr lock};
+
+#============= unlabeled:dir ==============
+allow { untrusted_app system_app radio installd system_server } unlabeled:dir { search write setattr getattr read add_name remove_name open};
+#============= recovery ==============
+#allow shell recovery:file { execute execute_no_trans}; # Android N marked
+
+#============ bluetooth =============
+allow bluetooth sysfs:file write;
+
+#============ TEE =============
+allow realtek user_device:dir write;
+allow realtek cache_file:dir { create write add_name setattr getattr remove_name };
+allow realtek cache_file:file { create write open unlink rename setattr getattr };
+allow realtek user_device:chr_file { setattr getattr read write};
+allow mediaserver cache_file:dir { create write add_name setattr getattr remove_name };
+allow mediaserver cache_file:file { create write open unlink rename setattr getattr };
+allow system_server realtek:binder call;
+
+#========== slideshow ==========
+allow slideshow slideshow:capability dac_override;

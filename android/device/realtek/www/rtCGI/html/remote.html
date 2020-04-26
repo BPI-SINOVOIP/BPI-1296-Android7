@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Remote Control</title>
+<link href="css/boxhome.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="javascript/util.js"></script>
+<script>
+var a=0;
+</script>
+</head>
+
+<body>
+<div class="remote-bg">
+  <div id="remote-main">
+	<div id="remote-key">
+		<div class="option" onClick="sendRemoteCommand('MENU')"></div>
+		<div class="up" onClick="sendRemoteCommand('UP')"></div>
+		<div class="guide" onClick="sendRemoteCommand('HOME')"></div>
+		<div class="left" onClick="sendRemoteCommand('LEFT')"></div>
+		<div class="ok-key" onClick="sendRemoteCommand('OK')"></div>
+		<div class="right" onClick="sendRemoteCommand('RIGHT')"></div>
+		<div class="return" onClick="sendRemoteCommand('BACK')"></div>
+		<div class="down" onClick="sendRemoteCommand('DOWN')"></div>
+		<div class="setup" onClick="sendRemoteCommand('SETUP')"></div>
+		<div class="playback-play" onClick="sendRemoteCommand('PLAY')"></div>
+		<div class="playback-stop" onClick="sendRemoteCommand('STOP')"></div>
+		<div class="zoom" onClick="sendRemoteCommand('ZOOM')"></div>
+		<div class="playback-frwd" onClick="sendRemoteCommand('FR')"></div>
+		<div class="playback-ffwd" onClick="sendRemoteCommand('FF')"></div>
+		<div class="playback-prev" onClick="sendRemoteCommand('PREV')"></div>
+		<div class="playback-next" onClick="sendRemoteCommand('NEXT')"></div>
+		<div class="red-key" onClick="sendRemoteCommand('OPTION_RED')"></div>
+		<div class="green-key" onClick="sendRemoteCommand('OPTION_GREEN')"></div>
+		<div class="volume-up" onClick="sendRemoteCommand('VOL_UP')"></div>
+		<div class="volume-down" onClick="sendRemoteCommand('VOL_DOWN')"></div>
+		<div class="volume-mute" onClick="sendRemoteCommand('VOL_MUTE')"></div>
+	</div>
+  </div>
+  
+
+
+</div>
+</body>
+</html>

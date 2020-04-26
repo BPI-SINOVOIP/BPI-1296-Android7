@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmlicstorereal
+TARGETTYPE=LIBRARY
+
+SOURCES =          \
+    drmlicstore.c
+

@@ -1,0 +1,34 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcore
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_DRMCORE_LIB      \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_DRMCORE_LIB      \
+!endif
+
+SOURCES =                         \
+    ..\drmchain.c                 \
+    ..\drmcleanstore.c            \
+    ..\drmdebug.c                 \
+    ..\drmembedding.c             \
+    ..\drmhdrbuilder.c            \
+    ..\drmkeygen.c                \
+    ..\drmlicacqresp.c            \
+    ..\drmliceval.c               \
+    ..\drmrevocation.c            \
+    ..\drmsecstore.c              \
+    ..\drmint64.c                 \
+    ..\drmrevocationstore.c       \
+    ..\drmsoapxmlutility.c        \
+    ..\drmlicacqv3.c              \
+    ..\drmbcrlparser.c            \
+    ..\drmblobcache.c
+
+OBJLIBFILES =                                  \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmconstants.lib
+

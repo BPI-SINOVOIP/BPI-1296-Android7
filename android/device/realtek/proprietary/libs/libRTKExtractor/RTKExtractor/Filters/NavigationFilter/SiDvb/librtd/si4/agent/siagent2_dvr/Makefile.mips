@@ -1,0 +1,71 @@
+##############################
+# MUST define dtv root dir!!!
+##############################
+DTV_ROOT_DIR	= ../../../..
+DTV_ROOT = $(DTV_ROOT_DIR)
+INC_DIR  := $(DTV_ROOT)/include
+
+##############################
+# include global config file
+##############################
+# include $(DTV_ROOT_DIR)/include/configGlobal.mips
+include $(DTV_ROOT_DIR)/pvr_make.config
+include $(DTV_ROOT)/librtd/si4/make.config
+
+##############################
+# local includes/defines.
+##############################
+CFLAGS		+= -g -Wall
+INCLUDES	+= -I../../ -I$(DTV_ROOT_DIR)/include -I$(DTV_ROOT_DIR)/../../../Include/Filters/NavigationFilter/SiDvb/include -I $(DTV_ROOT_DIR)/../../../Include/Filters/NavigationFilter
+
+##############################
+# DVB Libaray ?
+# Objects to Build.
+##############################
+SI_AGENT2_DVR_LIB	:= siAgent2Dvr.lib
+
+SUBX_DIR :=
+
+SRCS		:= $(wildcard *.c)
+#SRCS		= siAgentCustomize.c siAgentUtil.c siAgentVirSecFilterMgr.c siAgentObject.c  siFunctionWrapper.c siAgentFilterTaskExecutor.c siAgentStateMachine.c
+
+
+
+LOCAL_OBJS  := $(patsubst %.c, %.o, $(SRCS))
+
+ifeq ($(SI_ENABLE_SYSTEM_SOFTWARE_UPDATE), YES)
+	SUBX_DIR += ssu
+	SRCS += ssu/*.c
+endif
+
+TOTAL_OBJS := $(patsubst %.c, %.o, $(SRCS))
+
+# ifeq ($(ENABLE_DVB), Y)
+
+all: $(LOCAL_OBJS) SUB_DIRS
+	$(AR) $(SI_AGENT2_DVR_LIB) $(TOTAL_OBJS)
+	cp $(SI_AGENT2_DVR_LIB) $(DTV_ROOT_DIR)/../../../../lib/libSiDvbAgent.a
+#	$(RANLIB) $(SI_AGENT2_DVR_LIB)
+#	@echo -= $(SI_AGENT2_DVR_LIB) is built. =-
+
+SUB_DIRS:
+	@for i in $(SUBX_DIR) ; do  ($(MAKE) -C $$i -f Makefile.mips);   done
+	
+
+#%_$(ARCH).o: %.c
+#	$(CC) -c $*.c -o $@	$(DEFINES) $(CFLAGS) $(INCLUDES)
+.c.o:
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC)  -c  $(CFLAGS) $(DEFINES)  $(INCLUDES) $<
+
+# endif
+
+
+
+##############################
+# Clean up.
+##############################
+clean:
+	@for i in $(SUBX_DIR) ; do  ($(MAKE) -C $$i -f Makefile.mips clean);   done
+	rm -f *.o *.gcno *.gcda *.bak *.lib
+	rm -f *~

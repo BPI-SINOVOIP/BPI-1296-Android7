@@ -1,0 +1,9 @@
+allow cameraserver cameraserver:netlink_kobject_uevent_socket { create setopt getopt bind read };
+allow cameraserver property_socket:sock_file { write };
+allow cameraserver mediacodec_service:service_manager { find };
+allow cameraserver init:unix_stream_socket { connectto };
+allow cameraserver proc_net:file { read };
+allow cameraserver sysfs:file { open read getattr };
+allow cameraserver proc_net:file { open getattr };
+allow cameraserver system_prop:property_service { set };
+allow cameraserver tmpfs:dir { search };

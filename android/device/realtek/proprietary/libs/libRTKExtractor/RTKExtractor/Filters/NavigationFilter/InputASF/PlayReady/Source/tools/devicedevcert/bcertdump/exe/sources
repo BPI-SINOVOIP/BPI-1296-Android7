@@ -1,0 +1,28 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=bcertdump
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+SOURCES = \
+	..\bcertdump.c
+
+_DRM_C_DEFINES=$(_DRM_C_DEFINES) BUILD_EXE=1
+
+INCLUDES = \
+    $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\tools\common;  \
+    $(_DRM_SOURCE_PATH)\certs
+
+TARGETLIBS = \
+    $(_DRM_COMMON_LIBS)                        \
+    $(_DRM_OEM_MAIN_LIB)                       \
+    $(_DRM_DEVCERT_PARSER_DIR)\drmdevcert.lib  \
+    $(_DRM_SOURCE_PATH)\tools\common\$(_DRM_OBJ_DIR)\drmtoolscommon.lib \
+    $(_DRM_WMDRMCERT_DIR)\wmdrmcert.lib        \
+    $(_DRM_BLACKBOX_DIR)\drmblackbox.lib       \
+    $(_DRM_AES_DIR)\oemaes.lib                 \
+    $(_DRM_SOURCE_PATH)\certs\$(PLATFORM)\$(_DRM_OBJ_DIR)\drmcerts.lib   \
+
+	

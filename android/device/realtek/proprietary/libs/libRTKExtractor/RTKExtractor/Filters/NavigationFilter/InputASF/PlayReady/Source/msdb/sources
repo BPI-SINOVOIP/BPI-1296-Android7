@@ -1,0 +1,22 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=msdbcore
+TARGETTYPE=LIBRARY
+
+INCLUDES =                    \
+    $(INCLUDES)               \
+    $(_DRM_SOURCE_PATH)\xmr;      \
+
+SOURCES =              \
+    drmcfdalloc.c            \
+    drmcfdbuildcrlupdate.c   \
+    drmcfdbuildheader.c      \
+    drmcfdbuildlicense.c     \
+    drmcfddevicecertctx.c    \
+    drmcfdlicenseutils.c     \
+    drmcfdPackageCtx.c       \
+    drmcfdpk.c               \
+    drmcfd_crl_pack.c        \
+    drmconstants_cfd.c       \
+    drmbindevicecertctx.c    \
+    drmmsdbbuildXMRlicense.c 

@@ -1,0 +1,20 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcrypto_test
+TARGETTYPE=PROGRAM
+UMTYPE=console
+
+SOURCES = \
+    main.c \
+
+INCLUDES =                    \
+    $(INCLUDES)               \
+
+TARGETLIBS =                                  \
+    $(LIBRARY_LIBS)                           \
+    $(_DRM_OEM_MAIN_LIB)                      \
+    $(_DRM_BLACKBOX_DIR)\drmblackbox.lib      \
+    $(_DRM_AES_DIR)\oemaes.lib                \
+    $(_DRM_COMMON_LIBS)                       \
+
+

@@ -1,0 +1,8 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmmanager
+TARGETTYPE=LIBRARY
+
+SOURCES = \
+    ..\drmmanager.c \
+        

@@ -1,0 +1,27 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_common
+TARGETTYPE=LIBRARY
+
+INCLUDES = \
+    $(INCLUDES)
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEM_COMMON_LIBS  \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEM_COMMON_LIBS  \
+!endif
+
+SOURCES =               \
+    oeminfo_common.c    \
+    oemimpl_common.c    \
+    oemndt.c            \
+    oemxmlhash.c        \
+
+
+OBJLIBFILES = \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_profilecommon.lib
+
+

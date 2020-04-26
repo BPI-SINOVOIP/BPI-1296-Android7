@@ -1,0 +1,65 @@
+ANDROID_SRC_PATH=../../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H -DUSE_RTK_VOUT_UTIL -DHAVE_PTHREADS
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libfoundation.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+
+LOCAL_SRC_FILES:=                 \
+    AAtomizer.cpp                 \
+    ABitReader.cpp                \
+    ABuffer.cpp                   \
+    AHandler.cpp                  \
+    AHierarchicalStateMachine.cpp \
+    ALooper.cpp                   \
+    ALooperRoster.cpp             \
+    AMessage.cpp                  \
+    ANetworkSession.cpp           \
+    AString.cpp                   \
+    ParsedMessage.cpp             \
+    base64.cpp                    \
+    hexdump.cpp
+
+LOCAL_C_INCLUDES:= \
+    $(LOCAL_PATH)/include \
+    $(TOP)/system/core/include
+
+LOCAL_CFLAGS += -Wno-multichar -I./include
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

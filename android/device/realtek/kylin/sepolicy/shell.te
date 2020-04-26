@@ -1,0 +1,33 @@
+
+r_dir_file(shell, device);
+allow shell shell_exec:file execute;
+#allow shell shell:capability dac_override;
+allow shell device:capability { dac_override dac_read_search };
+allow lmkd lmkd_exec:file execute;
+allow shell lmkd_exec:file execute;
+allow init lmkd_exec:file execute;
+
+# For busybox 
+# Android N don't allow shell fuse_device:chr_file { getattr };
+# avc: denied { read } for pid=2348 comm="ls" name="/" dev="tmpfs" ino=4468 scontext=u:r:shell:s0 tcontext=u:object_r:device:s0 tclass=dir
+allow shell {device tun_device uhid_device uio_device user_device vcs_device video_device audio_device ppp_device log_device kmsg_device graphics_device full_device fscklogs dm_device }:chr_file getattr;
+# can't access kmem_device
+allow shell { block_device fscklogs graphics_device log_device audio_device }:dir getattr;
+# avc: denied { read } for pid=3506 comm="ls" name="block" dev="tmpfs" ino=269 scontext=u:r:shell:s0 tcontext=u:object_r:block_device:s0 tclass=dir
+allow shell { block_device pstorefs }:dir read;
+
+# avc: denied { execute } for pid=2130 comm="sh" name="busybox" dev="rootfs" ino=4027 scontext=u:r:shell:s0 tcontext=u:object_r:rootfs:s0 tclass=file
+allow shell rootfs:file { execute getattr };
+
+# avc: denied { read write } for path="socket:[889]" dev="sockfs" ino=889 scontext=u:r:init_shell:s0 tcontext=u:r:init:s0 tclass=tcp_socket
+#allow init_shell init:tcp_socket {read write};
+
+# For debug remount
+allow shell block_device:dir search;
+
+# avc: denied { write } for pid=5558 comm="app_process" name="system@framework@boot.art" dev="mmcblk0p2" ino=8101 scontext=u:r:shell:s0 tcontext=u:object_r:dalvikcache_data_file:s0 tclass=file
+#allow shell dalvikcache_data_file:file write;
+
+#allow shell self:capability dac_override;
+
+allow shell system_data_file:dir add_name;

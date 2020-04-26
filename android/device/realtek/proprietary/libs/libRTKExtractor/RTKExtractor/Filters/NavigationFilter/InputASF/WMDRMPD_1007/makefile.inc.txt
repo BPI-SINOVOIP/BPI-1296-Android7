@@ -1,0 +1,107 @@
+SET(REFCODE_INC Source/inc)
+SET(_DRM_CRYPTO_DIR Source/crypto)
+SET(CRYPTO_INC ${_DRM_CRYPTO_DIR}/bignum)
+SET(TOOLS_INC  Source/tools/common)
+SET(DRM_TOOLS_DIR tools)
+SET(DRM_TEST_DIR test)
+
+SET(INCLUDES ${INCLUDES} " ${REFCODE_INC}")
+SET(INCLUDES ${INCLUDES} " ${CRYPTO_INC}")
+SET(INCLUDES ${INCLUDES} " ${TOOLS_INC}")
+
+
+
+SET(BGN_DIR  ${_DRM_CRYPTO_DIR}/bignum)
+message(${BGN_DIR})
+SET(BNG_SRCS  ${BGN_DIR}/bigerrno.c ${BGN_DIR}/bignum.c ${BGN_DIR}/divide.c ${BGN_DIR}/ecex2001.c   ${BGN_DIR}/ecexpon.c ${BGN_DIR}/ecppq.c ${BGN_DIR}/ecurve.c ${BGN_DIR}/field.c  ${BGN_DIR}/kdiv.c ${BGN_DIR}/kinitpr.c  ${BGN_DIR}/kinvert.c  ${BGN_DIR}/kmuladd.c  ${BGN_DIR}/lucas.c   ${BGN_DIR}/modexp.c   ${BGN_DIR}/modmulch1.c    ${BGN_DIR}/modsqrt.c                  ${BGN_DIR}/modular.c                   ${BGN_DIR}/mpaddsubcmp.c             ${BGN_DIR}/mpalloc.c           ${BGN_DIR}/mpgcdex.c                    ${BGN_DIR}/mpinit.c                    ${BGN_DIR}/mpmul22.c                    ${BGN_DIR}/mprand.c                 ${BGN_DIR}/multlow.c)
+
+
+
+SET(PKC_DIR  ${_DRM_CRYPTO_DIR}/pkcrypto)
+
+SET(PKC_SRCS  ${PKC_DIR}/pkcrypto.c)
+SET(PKC_OBJS " ${PKC_DIR}/pkcrypto.o")
+
+
+
+SET(DRC_DIR  ${_DRM_CRYPTO_DIR}/drmcrypto)
+SET(DRC_SRCS ${DRC_DIR}/deskey.c ${DRC_DIR}/rc4.c)
+
+
+SET(OEM_DIR  Source/oem/ansi)
+SET(OEM_SRCS         ${OEM_DIR}/oemcriticalsection.c               ${OEM_DIR}/oemfileio.c                      ${OEM_DIR}/oemimpl.c                            ${OEM_DIR}/oeminfo.c                            ${OEM_DIR}/oemtime.c                            ${OEM_DIR}/rsa/DrmRsa.c                               ${OEM_DIR}/rsa/rsaimpl.c )
+
+
+
+SET(COR_DIR Source/core)
+SET(COR_SRCS        ${COR_DIR}/drmbase64.c       ${COR_DIR}/drmbytemanip.c              
+        ${COR_DIR}/drmcbc.c                      ${COR_DIR}/drmchain.c                      
+        ${COR_DIR}/drmcipher.c                     ${COR_DIR}/drmcleanstore.c                 
+        ${COR_DIR}/drmconstants.c                  ${COR_DIR}/drmcrt.c                        
+        ${COR_DIR}/drmdebug.c                      ${COR_DIR}/drmexpreval.c                   
+        ${COR_DIR}/drmexprfunc.c                  ${COR_DIR}/drmexprvariable.c               
+        ${COR_DIR}/drmhdrbuilder.c                ${COR_DIR}/drmhdrparser.c                  
+        ${COR_DIR}/drmhds.c                       ${COR_DIR}/drmhmac.c                       
+        ${COR_DIR}/drmint64.c                     ${COR_DIR}/drmkeygen.c                     
+        ${COR_DIR}/drmlicacqreq.c                  ${COR_DIR}/drmlicacqresp.c                 
+        ${COR_DIR}/drmliceval.c                    ${COR_DIR}/drmlicparser.c                  
+        ${COR_DIR}/drmlicstore.c                  ${COR_DIR}/drmmd5.c                        
+        ${COR_DIR}/drmoutputlevels.c               ${COR_DIR}/drmprofile.c                    
+        ${COR_DIR}/drmsecstore.c                   ${COR_DIR}/drmsha1.c               
+        ${COR_DIR}/drmstkalloc.c          ${COR_DIR}/drmutilities.c                 ${COR_DIR}/drmviewrights.c                 
+        ${COR_DIR}/drmxmlbuilder.c                ${COR_DIR}/drmxmlutilities.c           ${COR_DIR}/drmrevocation.c         ${COR_DIR}/drmxmlparser.c          ${COR_DIR}/drmrsaex.c              ${COR_DIR}/drmdevicestore.c)
+
+
+
+SET(BBX_DIR Source/blackbox)
+SET(BBX_SRCS ${BBX_DIR}/blackbox.c)
+
+
+
+SET(CMD_DIR Source/cmdlnpars)
+SET(CMD_SRCS  ${CMD_DIR}/cmdlnpars.c)
+
+SET(MGR_DIR Source/drmmanager)
+SET(MGR_SRCS  ${MGR_DIR}/drmmanager.c)
+SET(MGR_OBJS " ${MGR_DIR}/drmmanager.o")
+
+
+
+SET(DDC_DIR Source/devicedevcert)
+SET(DDC_SRCS  ${DDC_DIR}/devicedevcert.c)
+SET(DDC_OBJS " ${DDC_DIR}/devicedevcert.o")
+
+
+
+SET(DCP_DIR Source/devcertparser)
+SET(DCP_SRCS  ${DCP_DIR}/devcert.c)
+SET(DCP_OBJS " ${DCP_DIR}/devcert.o")
+
+
+
+SET(MTR_DIR  Source/metering)
+SET(MTR_SRCS ${MTR_DIR}/drmmgrmeter.c  ${MTR_DIR}/drmmetering.c)
+
+SET(SCK_DIR Source/secure_clock)
+SET(SCK_SRCS ${SCK_DIR}/secureclockrequest.c ${SCK_DIR}/secureclockresponse.c)
+
+
+SET(SYN_DIR Source/synclist)
+SET(SYN_SRCS ${SYN_DIR}/drmgensyncchallenge.c ${SYN_DIR}/drmsyncstore.c)
+
+
+SET(WMC_DIR Source/wmdrmcert/certparser)
+SET(WMC_SRCS ${WMC_DIR}/drmcertparser.c)
+
+
+SET(TCM_DIR Source/tools/common)
+SET(TCM_SCRS  ${TCM_DIR}/drmtoolsconstants.c	${TCM_DIR}/drmtoolsutils.c)
+SET(TCM_OBJS " ${TCM_DIR}/drmtoolsconstants.o	${TCM_DIR}/drmtoolsutils.o")
+
+
+
+#string(REGEX REPLACE  ";" " " CHIP_MODEL_DEFS ${CHIP_MODEL_DEFS})
+#string(REGEX REPLACE  ";" " " APCFG_DEFS ${APCFG_DEFS})
+#string(REGEX REPLACE  ";" " " BUILD_OPTIONS ${BUILD_OPTIONS})
+#string(REGEX REPLACE  ";" " " DEFINES ${DEFINES})
+

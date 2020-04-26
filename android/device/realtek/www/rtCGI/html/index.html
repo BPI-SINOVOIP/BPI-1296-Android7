@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Airfun Download</title>
+<link href="css/boxhome.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="javascript/util.js"></script>
+<script>
+var bIsAndroid = isAndroid();
+var bIsWin = isWindows();
+var airFunLink = false;
+
+function checkCurrentURL()
+{
+	var AIRFUN_MODE = "airfun";
+	var curUrl = window.location.href;
+	var paramIdx = curUrl.indexOf("/remote/?");
+	if (paramIdx == -1)
+	{
+		paramIdx = curUrl.indexOf("/remote/index.html?");
+	}
+
+	if (paramIdx != -1)
+	{
+		var queryStr = curUrl.substr(paramIdx+1);
+		if (queryStr != null)
+		{
+			var airfunMode = getParameter(queryStr, AIRFUN_MODE);
+			if (airfunMode == "in")
+			{
+				airFunLink = true;
+				sendCommandDef("setup in");
+				// PC AirFun, redirect to Remote!
+				window.location.href = 'remote.html'
+				return;
+			}
+			else if(airfunMode == "out")
+			{
+				sendCommandDef("setup out");
+				return;
+			}
+		}
+	}
+	sendCommandDef("check");
+}
+checkCurrentURL();
+
+function initPage()
+{
+    if (!bIsAndroid)
+    {
+        setElementVisible("areaLnkToPlay", "false");
+        setElementVisible("descTextAndroid", "false");
+        setElementVisible("areaDlAPK", "false");
+        
+        if (!bIsWin)
+        {
+            setElementVisible("areaDlPCExe", "hide");
+        }
+        //var ele = document.getElementById("areaDlAPK");
+        //ele.style.height = "40px";
+    }
+    else
+    {
+        setElementVisible("areaDummyLnk", "false");
+        setElementVisible("descTextPC", "false");
+        setElementVisible("areaDlPCExe", "false");
+    }
+}
+</script>
+</head>
+
+<body onload="initPage();">
+<div class="main-bg">
+  <div id="main-area">
+	<div id="logo"></div>
+	<div class="main-content">
+		<table class="airfun-info" border="0">
+			<tr>
+				<td id="slogan">Incredible Virtual Remote</td>
+				<td id="areaLnkToPlay" rowspan="2"><a class="google-market" href="https://play.google.com/store/apps/details?id=com.realtek.airfun.client"></a></td>
+				<td id="areaDummyLnk" rowspan="2"><a class="google-market-dummy"></a></td>
+			</tr>
+			<tr id="descTextAndroid">
+				<td class="airfun-desc" >Enjoy your favorite videos, photos, and music on large TV screen. Turn your smartphone or tablet into a remote controller.</td></tr>
+			</tr>
+			<tr id="descTextPC">
+				<td class="airfun-desc">Enjoy your favorite videos, photos, and music on large TV screen.</td>
+			</tr>
+		</table>
+
+		<table><tr>
+			<td width="20%"></td>
+			<td class="download-btn" id="areaDlAPK" ><a href="AirFun.apk"></a></td>
+			<td class="download-pc-btn" id="areaDlPCExe" ><a href="AirFunInstall.exe"></a></td>
+			<td width="20%"></td>
+		</tr></table>
+
+		<table class="home-function">
+		<tr>
+			<td width="20%" height="180px"></td>
+			<td><a class="btn-remote" href="remote.html"></td>
+			<td><a class="btn-setup" href="setup.html"></td>
+			<td width="20%"></td>
+		</tr>
+		<tr>
+			<td width="20%"></td>
+			<td colspan="2"><!--<div id="footer-logo"></div>--></td>
+			<td width="20%"></td>
+		</tr>
+		</table>
+	</div>
+  </div>
+ 
+</div>
+</body>
+</html>

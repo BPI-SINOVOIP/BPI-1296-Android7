@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmsha256
+TARGETTYPE=LIBRARY
+
+SOURCES=		\
+	..\drmsha256.c	\
+
+

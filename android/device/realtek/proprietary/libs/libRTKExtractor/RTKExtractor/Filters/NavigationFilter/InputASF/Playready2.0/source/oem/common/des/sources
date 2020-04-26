@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oemdes
+TARGETTYPE=LIBRARY
+
+SOURCES =    \
+    deskey.c
+

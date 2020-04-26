@@ -1,0 +1,59 @@
+!IF 0
+
+Copyright (c) Microsoft Corporation
+
+Module Name:
+
+    dirs.
+
+Abstract:
+
+    This file specifies the subdirectories of the current directory that
+    contain component makefiles.
+
+!ENDIF
+
+#-----------------------------------------------------------------------------
+# This file is read by both the NTBUILD tool and the Porting Kit's makefile
+# system. The latter requires the order of directories to be:
+#     1st - Directories that build headers
+#     2nd - Directories that build objects
+#     3rd - Directories that build libraries
+#     4rd - Directories that build executables and DLLs
+# This is analagous to the PASS0, PASS1a/1b, and PASS2 phases of NTBUILD.
+#
+# If one lib packages up another, the final lib must appear later in the list.
+#-----------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------
+# DIRS is read by NTBUILD and the Porting Kit if DRM_DIRS isn't present.
+#-----------------------------------------------------------------------------
+
+DIRS = \
+    generatemodelcert  	        \
+    generatecompanycert      	\
+    generatecompanycertrequest	\
+    generatebinarycert          \
+    bcertdump                   \
+    bsafe2xml
+
+#-----------------------------------------------------------------------------
+# DRM_DIRS is the optional override for use by the Porting Kit. Directory
+# selection can be restricted by platform, architecture, or a combo as follows:
+# DRM_DIRS=foo{ARM} bar{ANSI} baz{WINPC_X86}
+#
+# Supported tags (out of the box):
+# - Platform: ANSI, WINPC, WMSP50
+# - Architecture: X86, AMD64/X64, ARM
+# - PlatArch: Platform and Arch separated by an underscore (e.g. WINPC_X86)
+#-----------------------------------------------------------------------------
+
+# Omit generatebinarycert as it doesn't build with the porting kit system.
+DRM_DIRS = \
+    generatemodelcert  	        \
+    generatecompanycert      	\
+    generatecompanycertrequest	\
+    bcertdump                   \
+    bsafe2xml
+

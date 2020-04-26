@@ -1,0 +1,18 @@
+mips-uclibc-gcc CFramework.c -c -g -Wall -I ../../include
+make -C memory		-f Makefile.mips
+make[1]: Entering directory `/home/ss/work/dtv/librtd/CFramework/memory'
+mips-uclibc-gcc CF_Memory.c -c -g -Wall -DCF_LOGGER_COLOR -I ../../../include
+make[1]: Leaving directory `/home/ss/work/dtv/librtd/CFramework/memory'
+make -C timer		-f Makefile.mips
+make[1]: Entering directory `/home/ss/work/dtv/librtd/CFramework/timer'
+mips-uclibc-gcc CF_Timer.c -c -g -Wall -DCF_LOGGER_COLOR -I ../../../include
+make[1]: Leaving directory `/home/ss/work/dtv/librtd/CFramework/timer'
+make -C message		-f Makefile.mips
+make[1]: Entering directory `/home/ss/work/dtv/librtd/CFramework/message'
+mips-uclibc-gcc CF_Message.c -c -g -Wall -DCF_LOGGER_COLOR -I ../../../include
+make[1]: Leaving directory `/home/ss/work/dtv/librtd/CFramework/message'
+make -C logger		-f Makefile.mips
+make[1]: Entering directory `/home/ss/work/dtv/librtd/CFramework/logger'
+mips-uclibc-gcc CF_Logger.c -c -g -Wall -DCF_LOGGER_COLOR -I ../../../include
+make[1]: Leaving directory `/home/ss/work/dtv/librtd/CFramework/logger'
+mips-uclibc-ar crs cf_mips.lib     

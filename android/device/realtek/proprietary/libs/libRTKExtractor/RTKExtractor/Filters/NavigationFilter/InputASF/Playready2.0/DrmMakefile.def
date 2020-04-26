@@ -1,0 +1,93 @@
+#**@@@+++@@@@*********************************************************
+#*
+#* Microsoft PlayReady
+#* Copyright (c) Microsoft Corporation. All rights reserved.
+#*
+#**@@@---@@@@********************************************************/
+
+#**********************************************************************
+#*
+#* Description:
+#*    This file enables the isolated build environment used for the DRM PK.
+#*
+#*********************************************************************/
+
+#------------------------------------------------------------------------------
+# Integrate with the build environment:
+#
+# 1. Extract the following:
+#    - DRM_TARGET_TYPE: FREE, CHECKED, PERF
+#    - DRM_BUILD_ARCH: X86, X64, ARM, ...
+#    - DRM_BUILD_PLATFORM: ANSI, WIN32, ...
+#    - DRM_ROOT_PATH: <some path, with trailing slash>
+#    - _DRM_BUILD_TOOL: NMAKE, NTBUILD, ...
+#    - _DRM_BUILD_PLATARCH: ANSI_X86, ...
+#    - _DRM_BUILD_PATH: <off of DRM_ROOT_PATH, with trailing slash>
+# 2. Forward declare targets: DRM_BUILD_TARGET and DRM_CLEAN_TARGET
+#
+# Note: For _DRM_BUILD_TOOL = NMAKE
+#    - all: is declared as the default target (dependent on DRM_BUILD_TARGET)
+#    - clean: is declared as an alternate (dependent on DRM_CLEAN_TARGET)
+#------------------------------------------------------------------------------
+
+!include "DrmSetEnvironment.mk"
+
+!IF "$(_DRM_BUILD_TOOL)" == "NTBUILD"
+
+#------------------------------------------------------------------------------
+# Bridge to Microsoft's internal build system
+#------------------------------------------------------------------------------
+
+!include "$(DRM_BUILD_PATH)DrmCoreXT.mk"
+
+!ELSEIF "$(_DRM_BUILD_TOOL)" == "NMAKE"
+
+#------------------------------------------------------------------------------
+# Find and include any project-specific settings.
+#------------------------------------------------------------------------------
+!include "$(DRM_BUILD_PATH)DrmSetProject.mk"
+
+
+#------------------------------------------------------------------------------
+# Build the list of intermediate targets required to build the binary.
+# Description:
+#
+#  Builds the list of following targets.
+#
+#  _DRM_OBJ_TARGETS: The list of obj targets. This is a list of files
+#      with their extensions replaced with obj and PLACEHOLDER_OBJ_PATH
+#      prepended to them. PLACEHOLDER_OBJ_PATH is later replaced with
+#      the location where the object files are placed
+#
+#  _DRM_BUILD_SUBDIR_TARGETS: Target for building all the subdirectories. This
+#      is the list of all subdirectories which need to be built with
+#      .[TARGET_BUILD_DIR] string appended to them
+#
+#  _DRM_CLEAN_SUBDIR_TARGETS: Target for cleaning all the subdirectories. This
+#      is the list of all subdirectories which need to be built with
+#      .[TARGET_CLEAN_DIR] string appended to them
+#
+#  _DRM_BIN_TARGETS: The name of the binary appended with the right extension
+#      depending on the type of binary being built (library or executable)
+#
+#------------------------------------------------------------------------------
+
+!include "$(DRM_BUILD_PATH)DrmComposeTargets.mk"
+
+#------------------------------------------------------------------------------
+# Define the necessary target rules for compiling source files, linking
+# libraries & executables, recursively traversing directories, and cleaning
+# stale files etc.
+#
+# The first include file defines platform+arch specific command lines for
+# each tool. The second file defines rules that use these command lines.
+#------------------------------------------------------------------------------
+
+!include "$(DRM_BUILD_PATH)DrmPlatform.mk"
+
+!include "$(DRM_BUILD_PATH)DrmCreateTargets.mk"
+!ENDIF
+
+
+
+

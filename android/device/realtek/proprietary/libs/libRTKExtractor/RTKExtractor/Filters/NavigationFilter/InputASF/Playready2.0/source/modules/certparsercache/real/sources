@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcertparsercachereal
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    certparsercacheimplreal.c \
+    certparsercacheutilreal.c \
+

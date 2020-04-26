@@ -1,0 +1,46 @@
+#
+# Microsoft (r) PlayReady (r)
+# Copyright (c) Microsoft Corporation. All rights reserved.
+#
+
+#
+# This tool should always support the following settings
+# to be able to operate in all scenarios
+# regardless of the build profile used to compile it.
+#
+DRM_SUPPORT_SECURE_CLOCK=1
+
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=meteringgeneratechallenge
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+SOURCES = \
+    meterview.c
+
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+SOURCES = $(SOURCES) \
+      meterview.rc
+!endif
+
+INCLUDES =      \
+    $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\tools\common
+
+TARGETLIBS =                                        \
+    $(_DRM_COMMON_LIBS)                             \
+    $(_DRM_OEM_MAIN_LIB)                            \
+    $(_DRM_BLACKBOX_LIBS)                           \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmmanager.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmdevicedevcert.lib  \
+    $(DRM_PK_SOURCE_LIB_PATH)\wmdrmcert.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsabase.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib            \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmtoolscommon.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbaseimpl.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbase.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppssimpl.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppss.lib     \
+

@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdevicerevocationreal
+TARGETTYPE=LIBRARY
+
+SOURCES = \
+    devicerevocationimplreal.c \
+    devicerevocationutilreal.c \
+

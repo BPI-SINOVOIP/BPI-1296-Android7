@@ -1,0 +1,11 @@
+service logcat /system/bin/logcat.sh
+    class main
+    user system
+    group system
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0
+
+on property:persist.debug.logcat=1
+    start logcat
+

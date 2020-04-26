@@ -1,0 +1,19 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemshahash
+TARGETTYPE=LIBRARY
+
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_BUILDING_OEMSHAHASH_LIB
+
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_BUILDING_OEMSHAHASH_LIB
+
+!endif
+
+SOURCES=          \
+    oemshahash.c  \
+

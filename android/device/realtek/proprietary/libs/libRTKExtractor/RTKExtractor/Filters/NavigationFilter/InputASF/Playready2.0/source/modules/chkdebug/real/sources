@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmchkdebugreal
+TARGETTYPE=LIBRARY
+
+SOURCES =              \
+      drmchkdebug.c    \
+

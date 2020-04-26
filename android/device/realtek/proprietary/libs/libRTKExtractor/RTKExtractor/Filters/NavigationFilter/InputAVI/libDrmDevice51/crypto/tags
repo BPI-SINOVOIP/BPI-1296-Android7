@@ -1,0 +1,1381 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+A	../crypto/reference/bn.h	/^	XBIGNUM *A;$/;"	m	struct:xbn_blinding_st
+ACPTB_BITS	../DrmTypes.h	42;"	d
+ADD_SETUP	../common/CuTest/CuTest.h	197;"	d
+ADD_TEARDOWN	../common/CuTest/CuTest.h	198;"	d
+ADD_TEST	../common/CuTest/CuTest.h	196;"	d
+AR	../common.mk	/^AR = $(MYAR)$/;"	m
+AR	../crypto/reference/common.mk	/^AR = $(ARCH)ar$/;"	m
+ARCH	../common.mk	/^ARCH = $/;"	m
+ARCH	../common.mk	/^ARCH = arm-elf-$/;"	m
+ARCH	../common.mk	/^ARCH = mipsel-linux-$/;"	m
+ARCH	../common.mk	/^ARCH =$/;"	m
+ARCH	../crypto/reference/common.mk	/^ARCH = $/;"	m
+ARCH	../crypto/reference/common.mk	/^ARCH = arm-elf-$/;"	m
+ARCH	../crypto/reference/common.mk	/^ARCH =$/;"	m
+AS	../common.mk	/^AS = nasm$/;"	m
+AS	../crypto/reference/common.mk	/^AS = nasm$/;"	m
+ASSERT	../common/CuTest/CuTest.h	209;"	d
+ASSERT_EQUALS_DBL	../common/CuTest/CuTest.h	213;"	d
+ASSERT_EQUALS_INT	../common/CuTest/CuTest.h	212;"	d
+ASSERT_EQUALS_PTR	../common/CuTest/CuTest.h	214;"	d
+ASSERT_EQUALS_STR	../common/CuTest/CuTest.h	211;"	d
+ASSERT_MESSAGE	../common/CuTest/CuTest.h	210;"	d
+AUDIO_CRYPTO_BLOCK_SIZE_BYTES	../DrmApi.c	80;"	d	file:
+AUDIO_KEY_SIZE_BITS	../DrmApi.c	81;"	d	file:
+AUDIO_KEY_SIZE_BYTES	../DrmApi.c	79;"	d	file:
+AUDIO_MAX_ENCRYPT_BYTES	../DrmApi.c	82;"	d	file:
+AUDIO_USE_VIDEO_KEY_INDEX	../DrmApi.c	83;"	d	file:
+Ai	../crypto/reference/bn.h	/^	XBIGNUM *Ai;$/;"	m	struct:xbn_blinding_st
+BAD_BLOCK_LENGTH	../crypto/reference/rijndael-api-fst.h	64;"	d
+BAD_CIPHER_INSTANCE	../crypto/reference/rijndael-api-fst.h	65;"	d
+BAD_CIPHER_MODE	../crypto/reference/rijndael-api-fst.h	62;"	d
+BAD_CIPHER_STATE	../crypto/reference/rijndael-api-fst.h	63;"	d
+BAD_DATA	../crypto/reference/rijndael-api-fst.h	66;"	d
+BAD_KEY_DIR	../crypto/reference/rijndael-api-fst.h	59;"	d
+BAD_KEY_INSTANCE	../crypto/reference/rijndael-api-fst.h	61;"	d
+BAD_KEY_MAT	../crypto/reference/rijndael-api-fst.h	60;"	d
+BAD_OTHER	../crypto/reference/rijndael-api-fst.h	67;"	d
+BASE_64_H_INCLUDE	../DataEncodingBase64.h	13;"	d
+BITSPERBLOCK	../crypto/reference/rijndael-api-fst.h	56;"	d
+BITS_H_INCLUDE	../DataEncodingBits.h	17;"	d
+BYTE	../crypto/reference/rijndael-api-fst.h	/^typedef unsigned char   BYTE;$/;"	t
+CC	../common.mk	/^CC = $(MYCC)$/;"	m
+CC	../crypto/reference/common.mk	/^CC = $(ARCH)gcc$/;"	m
+CFStringTowstring	../common/PortableDivx.h	/^	inline std::wstring CFStringTowstring(CFStringRef stringRef)$/;"	f
+CGMSA_BITS	../DrmTypes.h	41;"	d
+CPPUNIT_ASSERT	../common/CuTest/CuTest.h	216;"	d
+CPPUNIT_ASSERT_EQUALS_DBL	../common/CuTest/CuTest.h	220;"	d
+CPPUNIT_ASSERT_EQUALS_INT	../common/CuTest/CuTest.h	219;"	d
+CPPUNIT_ASSERT_EQUALS_PTR	../common/CuTest/CuTest.h	221;"	d
+CPPUNIT_ASSERT_EQUALS_STR	../common/CuTest/CuTest.h	218;"	d
+CPPUNIT_ASSERT_MESSAGE	../common/CuTest/CuTest.h	217;"	d
+CPPUNIT_TEST	../common/CuTest/CuTest.h	226;"	d
+CPPUNIT_TEST_SUITE	../common/CuTest/CuTest.h	225;"	d
+CPPUNIT_TEST_SUITE_END	../common/CuTest/CuTest.h	227;"	d
+CPPUNIT_TEST_SUITE_REGISTRATION	../common/CuTest/CuTest.h	223;"	d
+CPU	../common.mk	/^    CPU = MIPS$/;"	m
+CPU	../common.mk	/^    CPU = X86$/;"	m
+CPU	../common.mk	/^   CPU = POWERPC$/;"	m
+CPU	../common.mk	/^endif #CPU=ARM$/;"	m
+CPU	../crypto/reference/common.mk	/^   CPU = POWERPC$/;"	m
+CPU	../crypto/reference/common.mk	/^   CPU = X86$/;"	m
+CPU	../crypto/reference/common.mk	/^endif #CPU=ARM$/;"	m
+CPU_OPTIMIZE	../common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC $/;"	m
+CPU_OPTIMIZE	../common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC -DPOWERPC$/;"	m
+CPU_OPTIMIZE	../common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC -DX86$/;"	m
+CPU_OPTIMIZE	../common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC$/;"	m
+CPU_OPTIMIZE	../common.mk	/^CPU_OPTIMIZE = -DARCH_X86 -DX86$/;"	m
+CPU_OPTIMIZE	../crypto/reference/common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC -DPOWERPC$/;"	m
+CPU_OPTIMIZE	../crypto/reference/common.mk	/^CPU_OPTIMIZE = -DARCH_GENERIC$/;"	m
+CPU_OPTIMIZE	../crypto/reference/common.mk	/^CPU_OPTIMIZE = -DARCH_X86 -DX86$/;"	m
+CREATE_REGISTRY	../common/CuTest/CuTest.h	203;"	d
+CRYPTO_SIZE	../DrmApi.c	87;"	d	file:
+CU_ALLOC	../common/CuTest/CuTest.h	50;"	d
+CU_TEST_H	../common/CuTest/CuTest.h	40;"	d
+CXX	../common.mk	/^CXX = $(MYCXX)$/;"	m
+CXX	../crypto/reference/common.mk	/^CXX = $(ARCH)g++$/;"	m
+CXXFLAGS	../common.mk	/^CXXFLAGS = $(CFLAGS)$/;"	m
+CXXFLAGS	../crypto/reference/common.mk	/^CXXFLAGS = $(CFLAGS)$/;"	m
+Cho	../crypto/reference/sha256.c	158;"	d	file:
+Cho	../crypto/reference/sha256.c	77;"	d	file:
+CompareAsserts	../common/CuTest/CuTestTest.c	13;"	d	file:
+Csha256_dll	../crypto/reference/sha256_dll.h	/^class SHA256_DLL_API Csha256_dll {$/;"	c
+CuAssert	../common/CuTest/CuTest.h	115;"	d
+CuAssertDblEquals	../common/CuTest/CuTest.h	122;"	d
+CuAssertDblEquals_LineMsg	../common/CuTest/CuTest.c	/^void CuAssertDblEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, $/;"	f
+CuAssertDblEquals_Msg	../common/CuTest/CuTest.h	123;"	d
+CuAssertIntEquals	../common/CuTest/CuTest.h	120;"	d
+CuAssertIntEquals_LineMsg	../common/CuTest/CuTest.c	/^void CuAssertIntEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, $/;"	f
+CuAssertIntEquals_Msg	../common/CuTest/CuTest.h	121;"	d
+CuAssertPtrEquals	../common/CuTest/CuTest.h	124;"	d
+CuAssertPtrEquals_LineMsg	../common/CuTest/CuTest.c	/^void CuAssertPtrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, $/;"	f
+CuAssertPtrEquals_Msg	../common/CuTest/CuTest.h	125;"	d
+CuAssertPtrNotNull	../common/CuTest/CuTest.h	127;"	d
+CuAssertPtrNotNullMsg	../common/CuTest/CuTest.h	128;"	d
+CuAssertStrEquals	../common/CuTest/CuTest.h	118;"	d
+CuAssertStrEquals_LineMsg	../common/CuTest/CuTest.c	/^void CuAssertStrEquals_LineMsg(CuTest* tc, const char* file, int line, const char* message, $/;"	f
+CuAssertStrEquals_Msg	../common/CuTest/CuTest.h	119;"	d
+CuAssertTrue	../common/CuTest/CuTest.h	116;"	d
+CuAssert_Line	../common/CuTest/CuTest.c	/^void CuAssert_Line(CuTest* tc, const char* file, int line, const char* message, int condition)$/;"	f
+CuFail	../common/CuTest/CuTest.h	114;"	d
+CuFailInternal	../common/CuTest/CuTest.c	/^static void CuFailInternal(CuTest* tc, const char* file, int line, CuString* string)$/;"	f	file:
+CuFail_Line	../common/CuTest/CuTest.c	/^void CuFail_Line(CuTest* tc, const char* file, int line, const char* message2, const char* message)$/;"	f
+CuFindTest	../common/CuTest/CuTest.c	/^CuTest *CuFindTest(const CuSuiteRegistry* pReg, const char *testName)$/;"	f
+CuRegistryAddSuite	../common/CuTest/CuTest.c	/^void CuRegistryAddSuite(CuSuiteRegistry* pReg, CuSuite* testSuite)$/;"	f
+CuRegistryRun	../common/CuTest/CuTest.c	/^void CuRegistryRun(const CuSuiteRegistry* pReg)$/;"	f
+CuRegistryRunTests	../common/CuTest/CuTest.c	/^void CuRegistryRunTests(const CuSuiteRegistry* pReg, const char *testName)$/;"	f
+CuStrAlloc	../common/CuTest/CuTest.c	/^char* CuStrAlloc(int size)$/;"	f
+CuStrCopy	../common/CuTest/CuTest.c	/^char* CuStrCopy(const char* old)$/;"	f
+CuString	../common/CuTest/CuTest.h	/^} CuString;$/;"	t	typeref:struct:__anon1
+CuStringAppend	../common/CuTest/CuTest.c	/^void CuStringAppend(CuString* str, const char* text)$/;"	f
+CuStringAppendChar	../common/CuTest/CuTest.c	/^void CuStringAppendChar(CuString* str, char ch)$/;"	f
+CuStringAppendFormat	../common/CuTest/CuTest.c	/^void CuStringAppendFormat(CuString* str, const char* format, ...)$/;"	f
+CuStringInit	../common/CuTest/CuTest.c	/^void CuStringInit(CuString* str)$/;"	f
+CuStringInsert	../common/CuTest/CuTest.c	/^void CuStringInsert(CuString* str, const char* text, int pos)$/;"	f
+CuStringNew	../common/CuTest/CuTest.c	/^CuString* CuStringNew(void)$/;"	f
+CuStringResize	../common/CuTest/CuTest.c	/^void CuStringResize(CuString* str, int newSize)$/;"	f
+CuSuite	../common/CuTest/CuTest.h	/^struct CuSuite$/;"	s
+CuSuite	../common/CuTest/CuTest.h	/^typedef struct CuSuite CuSuite;$/;"	t	typeref:struct:CuSuite
+CuSuiteAdd	../common/CuTest/CuTest.c	/^void CuSuiteAdd(CuSuite* testSuite, CuTest *testCase)$/;"	f
+CuSuiteAddSuite	../common/CuTest/CuTest.c	/^void CuSuiteAddSuite(CuSuite* testSuite, CuSuite* testSuite2)$/;"	f
+CuSuiteDetails	../common/CuTest/CuTest.c	/^void CuSuiteDetails(CuSuite* testSuite, CuString* details)$/;"	f
+CuSuiteInit	../common/CuTest/CuTest.c	/^void CuSuiteInit(CuSuite* testSuite)$/;"	f
+CuSuiteNamedNew	../common/CuTest/CuTest.c	/^CuSuite* CuSuiteNamedNew(const char *name)$/;"	f
+CuSuiteNew	../common/CuTest/CuTest.c	/^CuSuite* CuSuiteNew(void)$/;"	f
+CuSuiteRegistry	../common/CuTest/CuTest.h	/^struct CuSuiteRegistry$/;"	s
+CuSuiteRegistry	../common/CuTest/CuTest.h	/^typedef struct CuSuiteRegistry CuSuiteRegistry;$/;"	t	typeref:struct:CuSuiteRegistry
+CuSuiteRegistryDetails	../common/CuTest/CuTest.c	/^void CuSuiteRegistryDetails(const CuSuiteRegistry* pReg, CuString* details)$/;"	f
+CuSuiteRegistrySummary	../common/CuTest/CuTest.c	/^void CuSuiteRegistrySummary(const CuSuiteRegistry* pReg, CuString* summary)$/;"	f
+CuSuiteRun	../common/CuTest/CuTest.c	/^void CuSuiteRun(CuSuite* testSuite)$/;"	f
+CuSuiteSummary	../common/CuTest/CuTest.c	/^void CuSuiteSummary(CuSuite* testSuite, CuString* summary)$/;"	f
+CuTest	../common/CuTest/CuTest.h	/^struct CuTest$/;"	s
+CuTest	../common/CuTest/CuTest.h	/^typedef struct CuTest CuTest;$/;"	t	typeref:struct:CuTest
+CuTestInit	../common/CuTest/CuTest.c	/^void CuTestInit(CuTest* t, const char* name, TestFunction function)$/;"	f
+CuTestNew	../common/CuTest/CuTest.c	/^CuTest* CuTestNew(const char* name, TestFunction function)$/;"	f
+CuTestRun	../common/CuTest/CuTest.c	/^void CuTestRun(CuTest* tc)$/;"	f
+CuTestSuite	../common/CuTest/CuTestTest.c	/^TEST_SUITE(CuTestSuite);$/;"	v
+DEBUG	../common.mk	/^DEBUG = -g$/;"	m
+DEBUG	../common.mk	/^DEBUG =$/;"	m
+DEBUG	../crypto/reference/common.mk	/^DEBUG = -g$/;"	m
+DECLARE_DIVX_PORTABLE_MODULE	../crypto/DivXPortableAPI.h	60;"	d
+DIGITAL_PROTECTION_BITS	../DrmTypes.h	43;"	d
+DIR_DECRYPT	../crypto/reference/rijndael-api-fst.h	50;"	d
+DIR_ENCRYPT	../crypto/reference/rijndael-api-fst.h	49;"	d
+DIVXINT_NATIVE_64BIT	../common/portab.h	34;"	d
+DIVXRSALOCAL_H	../crypto/reference/DivXRsaLocal.h	12;"	d
+DIVXVERSION_INVALID_LABEL	../common/DivXVersion.h	86;"	d
+DIVXVERSION_INVALID_PARAM	../common/DivXVersion.h	85;"	d
+DIVXVERSION_LABEL_PLACEHOLDER	../common/DivXVersion.h	92;"	d
+DIVXVERSION_LABEL_SEPARATOR	../common/DivXVersion.h	90;"	d
+DIVXVERSION_OK	../common/DivXVersion.h	83;"	d
+DIVXVERSION_UNKNOWN_ERROR	../common/DivXVersion.h	84;"	d
+DIVX_FALSE	../common/DivXBool.h	49;"	d
+DIVX_MAX_MODULES	../crypto/DivXPortableAPI.h	45;"	d
+DIVX_PORTABLE_ADD_MODULE	../crypto/DivXPortableAPI.h	50;"	d
+DIVX_PORTABLE_MODULES_BEGIN	../crypto/DivXPortableAPI.h	51;"	d
+DIVX_PORTABLE_MODULES_END	../crypto/DivXPortableAPI.h	52;"	d
+DIVX_TRUE	../common/DivXBool.h	43;"	d
+DRMAPI_H_INCLUDE	../DrmApi.h	23;"	d
+DRMCONFIG_H_INCLUDE	../DrmConfig.h	13;"	d
+DRMHEADERMACROS_H	../HeaderMacros.h	12;"	d
+DRMLOCAL_H_INCLUDE	../local/DrmLocal.h	21;"	d
+DRMTYPES_H_INCLUDE	../DrmTypes.h	13;"	d
+DRM_ACTIVATION_MESSAGE_FLAG	../DrmTypes.h	83;"	d
+DRM_ACTIVATION_MESSAGE_VERSION	../DrmTypes.h	82;"	d
+DRM_ACTIVATION_MSG_PAYLOAD_BYTES	../DrmTypes.h	101;"	d
+DRM_BASE_ENCRYPTION_ONLY	../DrmConfig.h	73;"	d
+DRM_BASE_KEY_ID_LENGTH	../DrmTypes.h	37;"	d
+DRM_CONTEXT_SIZE_BYTES	../DrmTypes.h	97;"	d
+DRM_DATALOAD_USE_LHS	../DrmConfig.h	60;"	d
+DRM_DEACTIVATION_MESSAGE_FLAG	../DrmTypes.h	84;"	d
+DRM_DESKTOP_LINUX_PLATFORM	../DrmConfig.h	126;"	d
+DRM_DESKTOP_WINDOWS_PLATFORM	../DrmConfig.h	125;"	d
+DRM_ERROR_BAD_PARAMETER	../DrmApi.c	46;"	d	file:
+DRM_ERROR_BAD_SLOT_NUMBER	../DrmApi.c	56;"	d	file:
+DRM_ERROR_DECRYPTION_FAILED	../DrmApi.c	47;"	d	file:
+DRM_ERROR_INVALID_ALIGNMENT	../DrmApi.c	58;"	d	file:
+DRM_ERROR_NEED_MORE_RANDOM_SAMPLE	../DrmApi.c	51;"	d	file:
+DRM_ERROR_NONE	../HeaderErrors.h	14;"	d
+DRM_ERROR_NOT_ACPTB_QUERIED	../DrmApi.c	60;"	d	file:
+DRM_ERROR_NOT_AUTH_USER	../DrmApi.c	49;"	d	file:
+DRM_ERROR_NOT_CGMSA_QUERIED	../DrmApi.c	59;"	d	file:
+DRM_ERROR_NOT_COMMITTED	../DrmApi.c	54;"	d	file:
+DRM_ERROR_NOT_DIGITAL_QUERIED	../DrmApi.c	61;"	d	file:
+DRM_ERROR_NOT_INITIALIZED	../DrmApi.c	52;"	d	file:
+DRM_ERROR_NOT_RENTAL_QUERIED	../DrmApi.c	55;"	d	file:
+DRM_ERROR_NULL_GUARD_SET_SIGNAL	../DrmApi.c	57;"	d	file:
+DRM_ERROR_READING_MEMORY	../local/DrmLocal.h	27;"	d
+DRM_ERROR_RENTAL_EXPIRED	../DrmApi.c	50;"	d	file:
+DRM_ERROR_RESERVED	../DrmApi.c	53;"	d	file:
+DRM_ERROR_SIGNATURE_MISMATCH	../DrmApi.c	62;"	d	file:
+DRM_ERROR_UNRECOGNIZED_DRM_MODE	../DrmApi.c	48;"	d	file:
+DRM_ERROR_WRITING_MEMORY	../local/DrmLocal.h	28;"	d
+DRM_FAILED_CRYPTO	../HeaderErrors.h	16;"	d
+DRM_FRAME_DRM_INFO_SIZE	../DrmTypes.h	100;"	d
+DRM_GENERAL_ERROR	../DrmApi.h	/^    DRM_GENERAL_ERROR,$/;"	e	enum:drmErrorCodes
+DRM_GO_LIVE	../DrmConfig.h	45;"	d
+DRM_GO_LIVE_BASEKEYS	../DrmConfig.h	84;"	d
+DRM_GO_LIVE_BASEKEYS	../DrmConfig.h	86;"	d
+DRM_HARDWARE_SIMULATED	../DrmConfig.h	48;"	d
+DRM_INVALID_LENGTH	../HeaderErrors.h	15;"	d
+DRM_LOCAL_SUCCESS	../local/DrmLocal.h	26;"	d
+DRM_MOBILE_SYMBIAN_PLATFORM	../DrmConfig.h	124;"	d
+DRM_MOBILE_WINDOWS_PLATFORM	../DrmConfig.h	123;"	d
+DRM_NOT_AUTHORIZED	../DrmApi.h	/^    DRM_NOT_AUTHORIZED,$/;"	e	enum:drmErrorCodes
+DRM_NOT_REGISTERED	../DrmApi.h	/^    DRM_NOT_REGISTERED,$/;"	e	enum:drmErrorCodes
+DRM_OTHER_RESERVED	../DrmTypes.h	39;"	d
+DRM_OTHER_SECURE_PLATFORM	../DrmConfig.h	127;"	d
+DRM_REGISTRATION_CODE_BYTES	../DrmTypes.h	98;"	d
+DRM_RENTAL_EXPIRED	../DrmApi.h	/^    DRM_RENTAL_EXPIRED,$/;"	e	enum:drmErrorCodes
+DRM_RENTAL_RESERVED_BYTES	../DrmTypes.h	40;"	d
+DRM_RESERVED	../DrmTypes.h	38;"	d
+DRM_STATE_ACPTB_QUERIED	../DrmApi.c	/^    DRM_STATE_ACPTB_QUERIED,$/;"	e	enum:drmApiState	file:
+DRM_STATE_BOOT	../DrmApi.c	/^    DRM_STATE_BOOT = 1,$/;"	e	enum:drmApiState	file:
+DRM_STATE_CGMSA_QUERIED	../DrmApi.c	/^    DRM_STATE_CGMSA_QUERIED,$/;"	e	enum:drmApiState	file:
+DRM_STATE_COMMITTED	../DrmApi.c	/^    DRM_STATE_COMMITTED,$/;"	e	enum:drmApiState	file:
+DRM_STATE_DIGITAL_PROTECTION_QUERIED	../DrmApi.c	/^    DRM_STATE_DIGITAL_PROTECTION_QUERIED,$/;"	e	enum:drmApiState	file:
+DRM_STATE_FINALIZED	../DrmApi.c	/^    DRM_STATE_FINALIZED$/;"	e	enum:drmApiState	file:
+DRM_STATE_INITIALIZED	../DrmApi.c	/^    DRM_STATE_INITIALIZED,$/;"	e	enum:drmApiState	file:
+DRM_STATE_RENTAL_QUERIED	../DrmApi.c	/^    DRM_STATE_RENTAL_QUERIED,$/;"	e	enum:drmApiState	file:
+DRM_STRD_SIZE_BYTES	../DrmTypes.h	99;"	d
+DRM_SUCCESS	../DrmApi.h	/^    DRM_SUCCESS = 0,$/;"	e	enum:drmErrorCodes
+DRM_TYPE_ACTIVATION_PURCHASE	../DrmTypes.h	52;"	d
+DRM_TYPE_ACTIVATION_RENTAL	../DrmTypes.h	53;"	d
+DRM_TYPE_BASE	../DrmTypes.h	51;"	d
+DRM_TYPE_PROTECTED_AUDIO	../DrmTypes.h	56;"	d
+DRM_TYPE_PURCHASE	../DrmTypes.h	54;"	d
+DRM_TYPE_RENTAL	../DrmTypes.h	55;"	d
+DivXAesCBCDecrypt	../crypto/reference/DivXAesCBCDecrypt.c	/^int32_t DivXAesCBCDecrypt ( aesKeyHandle keyHandle,$/;"	f
+DivXAesCBCEncrypt	../crypto/reference/DivXAesCBCEncrypt.c	/^int32_t DivXAesCBCEncrypt ( aesKeyHandle keyHandle,$/;"	f
+DivXAesCreateKey	../crypto/reference/DivXAesDecrypt.c	/^int32_t DivXAesCreateKey ( aesKeyHandle* keyHandle,$/;"	f
+DivXAesDeleteKey	../crypto/reference/DivXAesDecrypt.c	/^int32_t DivXAesDeleteKey ( aesKeyHandle keyHandle )$/;"	f
+DivXAesECBDecrypt	../crypto/reference/DivXAesDecrypt.c	/^int32_t DivXAesECBDecrypt ( aesKeyHandle keyHandle,$/;"	f
+DivXAesECBEncrypt	../crypto/reference/DivXAesEncrypt.c	/^int32_t DivXAesECBEncrypt ( aesKeyHandle keyHandle,$/;"	f
+DivXBool	../common/DivXBool.h	/^typedef int DivXBool;$/;"	t
+DivXPortableCryptoFinalize	../crypto/reference/DivXPortableCryptoAPI.c	/^int32_t DivXPortableCryptoFinalize (  uint32_t* handle )$/;"	f
+DivXPortableCryptoInitialize	../crypto/reference/DivXPortableCryptoAPI.c	/^int32_t DivXPortableCryptoInitialize ( uint32_t* handle )$/;"	f
+DivXPortableFinalize	../crypto/DivXPortableAPI.c	/^int32_t DivXPortableFinalize ( )$/;"	f
+DivXPortableInitialize	../crypto/DivXPortableAPI.c	/^int32_t DivXPortableInitialize ( )$/;"	f
+DivXRSA	../crypto/reference/DivXRsaLocal.h	/^} DivXRSA;$/;"	t	typeref:struct:_DivXRSA
+DivXRSA_free	../crypto/reference/DivXRsa.c	/^void DivXRSA_free(DivXRSA *divXRSA)$/;"	f
+DivXRSA_new	../crypto/reference/DivXRsa.c	/^DivXRSA *DivXRSA_new()$/;"	f
+DivXRngGetRandomBytes	../crypto/reference/DivXRng.c	/^int32_t DivXRngGetRandomBytes ( uint8_t *buffer,$/;"	f
+DivXRsaCreatePrivateKey	../crypto/reference/DivXRsa.c	/^int32_t DivXRsaCreatePrivateKey( rsaPrivateKeyHandle * keyHandle,$/;"	f
+DivXRsaCreatePublicKey	../crypto/reference/DivXRsa.c	/^int32_t DivXRsaCreatePublicKey( rsaPublicKeyHandle * keyHandle,$/;"	f
+DivXRsaDeletePrivateKey	../crypto/reference/DivXRsa.c	/^int32_t DivXRsaDeletePrivateKey( rsaPrivateKeyHandle keyHandle )$/;"	f
+DivXRsaDeletePublicKey	../crypto/reference/DivXRsa.c	/^int32_t DivXRsaDeletePublicKey( rsaPublicKeyHandle keyHandle )$/;"	f
+DivXRsaPrivateDecrypt	../crypto/reference/DivXRsaDecrypt.c	/^int32_t DivXRsaPrivateDecrypt( rsaPrivateKeyHandle keyHandle,$/;"	f
+DivXRsaPrivateEncrypt	../crypto/reference/DivXRsaEncrypt.c	/^int32_t DivXRsaPrivateEncrypt( rsaPrivateKeyHandle keyHandle,$/;"	f
+DivXRsaPublicDecrypt	../crypto/reference/DivXRsaDecrypt.c	/^int32_t DivXRsaPublicDecrypt( rsaPublicKeyHandle keyHandle,$/;"	f
+DivXRsaPublicEncrypt	../crypto/reference/DivXRsaEncrypt.c	/^int32_t DivXRsaPublicEncrypt( rsaPublicKeyHandle keyHandle,$/;"	f
+DivXSha1	../crypto/reference/DivXSha.c	/^int32_t DivXSha1 ( uint8_t *inBuffer,$/;"	f
+DivXSha256	../crypto/reference/DivXSha.c	/^int32_t DivXSha256 ( uint8_t *inBuffer,$/;"	f
+DivXSha256Final	../crypto/reference/DivXSha.c	/^int32_t DivXSha256Final( sha256Handle_t handle,$/;"	f
+DivXSha256Init	../crypto/reference/DivXSha.c	/^int32_t DivXSha256Init( sha256Handle_t* handle )$/;"	f
+DivXSha256Update	../crypto/reference/DivXSha.c	/^int32_t DivXSha256Update( sha256Handle_t handle,$/;"	f
+DivXVersion	../common/DivXVersion.h	/^DivXVersion;$/;"	t	typeref:struct:_DivXVersion
+DivXVersionGetVersionType	../common/DivXVersion.h	/^typedef int ( *DivXVersionGetVersionType )$/;"	t
+ENCODING_DIRECTION_A_BECOMES_B	../DataEncodingBits.h	21;"	d
+ENCODING_DIRECTION_B_BECOMES_A	../DataEncodingBits.h	22;"	d
+EXT_API_HIGH_VERSION	../local/Reference/DrmLocal.c	413;"	d	file:
+EXT_API_LOW_VERSION	../local/Reference/DrmLocal.c	412;"	d	file:
+FALSE	../common/PortableDivxTypes.h	59;"	d
+FALSE	../common/portab.h	39;"	d
+FALSE	../crypto/reference/rijndael-api-fst.h	55;"	d
+FLAT_BINARY	../common.mk	/^FLAT_BINARY=1$/;"	m
+FLAT_BINARY	../crypto/reference/common.mk	/^FLAT_BINARY=1$/;"	m
+FRAG1	../local/Reference/DrmLocal.c	49;"	d	file:
+FRAG1	../local/Reference/DrmLocal.c	55;"	d	file:
+FRAG1	../local/Reference/DrmLocal.c	70;"	d	file:
+FRAG1	../local/Reference/DrmLocal.c	81;"	d	file:
+FRAG2	../local/Reference/DrmLocal.c	50;"	d	file:
+FRAG2	../local/Reference/DrmLocal.c	56;"	d	file:
+FRAG2	../local/Reference/DrmLocal.c	82;"	d	file:
+FRAG3	../local/Reference/DrmLocal.c	51;"	d	file:
+FRAG3	../local/Reference/DrmLocal.c	57;"	d	file:
+FRAG3	../local/Reference/DrmLocal.c	83;"	d	file:
+GETU32	../crypto/reference/rijndael-alg-fst.c	717;"	d	file:
+GETU32	../crypto/reference/rijndael-alg-fst.c	720;"	d	file:
+HBITS	../crypto/reference/bn_lcl.h	342;"	d
+HEADERERRORS_H	../HeaderErrors.h	12;"	d
+HEADER_BN_LCL_H	../crypto/reference/bn_lcl.h	113;"	d
+HEADER_XBN_H	../crypto/reference/bn.h	60;"	d
+HEX_OCTET_PER_BYTE	../DataEncodingBits.c	18;"	d	file:
+HEX_OCTET_PER_BYTE	../DrmKeyStore.h	22;"	d
+HUGE_STRING_LEN	../common/CuTest/CuTest.h	52;"	d
+Hex	../crypto/reference/bn_print.c	/^static const char Hex[]="0123456789ABCDEF";$/;"	v	file:
+Hw	../crypto/reference/bn_lcl.h	243;"	d
+INCLUDE_DIRS	../Makefile	/^INCLUDE_DIRS	=       -Ilocal -I.\/common -Icrypto -I.\/$/;"	m
+INCLUDE_DIRS	../crypto/reference/Makefile	/^INCLUDE_DIRS	= -I..\/include$/;"	m
+IV	../crypto/reference/rijndael-api-fst.h	/^    BYTE  IV[MAX_IV_SIZE];          \/* A possible Initialization Vector for ciphering *\/$/;"	m	struct:__anon3
+KEY_INDEX_SIZE	../DrmApi.c	85;"	d	file:
+KEY_SIZE_BITS	../DrmTypes.h	36;"	d
+KEY_SIZE_BYTES	../DrmTypes.h	35;"	d
+L2HBITS	../crypto/reference/bn_lcl.h	343;"	d
+LARGE_FILE_SUPPORT	../common.mk	/^LARGE_FILE_SUPPORT=0$/;"	m
+LARGE_FILE_SUPPORT	../common.mk	/^LARGE_FILE_SUPPORT=1$/;"	m
+LARGE_FILE_SUPPORT	../crypto/reference/common.mk	/^LARGE_FILE_SUPPORT=0$/;"	m
+LARGE_FILE_SUPPORT	../crypto/reference/common.mk	/^LARGE_FILE_SUPPORT=1$/;"	m
+LBITS	../crypto/reference/bn_lcl.h	341;"	d
+LD	../common.mk	/^LD=$(CC)$/;"	m
+LD	../crypto/reference/common.mk	/^LD=$(CC)$/;"	m
+LDFLAGS	../common.mk	/^LDFLAGS = -Wl,-elf2flt="-s32768"$/;"	m
+LDFLAGS	../crypto/reference/common.mk	/^LDFLAGS = -Wl,-elf2flt="-s32768"$/;"	m
+LDXX	../common.mk	/^LDXX=$(CXX)$/;"	m
+LDXX	../common.mk	/^LDXX=$(LD)$/;"	m
+LDXX	../crypto/reference/common.mk	/^LDXX=$(CXX)$/;"	m
+LDXX	../crypto/reference/common.mk	/^LDXX=$(LD)$/;"	m
+LFS	../common.mk	/^LFS = -DLARGE_FILE_SUPPORT -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64$/;"	m
+LFS	../common.mk	/^LFS= -DSMALL_FILE_SUPPORT$/;"	m
+LFS	../crypto/reference/common.mk	/^LFS = -DLARGE_FILE_SUPPORT -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64$/;"	m
+LFS	../crypto/reference/common.mk	/^LFS= -DSMALL_FILE_SUPPORT$/;"	m
+LHBITS	../crypto/reference/bn_lcl.h	346;"	d
+LIB	../Makefile	/^LIB = $(LIB_DIR)\/libDrmDevice.a$/;"	m
+LIB	../crypto/reference/Makefile	/^LIB			:= libxbn.a$/;"	m
+LIBS	../Makefile	/^LIBS		=       $/;"	m
+LIB_DIR	../common.mk	/^LIB_DIR = ..\/..\/..\/..\/..\/lib$/;"	m
+LL2HBITS	../crypto/reference/bn_lcl.h	347;"	d
+LLBITS	../crypto/reference/bn_lcl.h	345;"	d
+LOWER_MASK	../mt19937ar.c	51;"	d	file:
+LPVOID	../common/PortableDivxTypes.h	/^	typedef void	*LPVOID;$/;"	t
+Lw	../crypto/reference/bn_lcl.h	242;"	d
+M	../mt19937ar.c	48;"	d	file:
+MATRIX_A	../mt19937ar.c	49;"	d	file:
+MAXKB	../crypto/reference/rijndael-alg-fst.h	30;"	d
+MAXKC	../crypto/reference/rijndael-alg-fst.h	29;"	d
+MAXNR	../crypto/reference/rijndael-alg-fst.h	31;"	d
+MAX_IV_SIZE	../crypto/reference/rijndael-api-fst.h	71;"	d
+MAX_KEY_SIZE	../crypto/reference/rijndael-api-fst.h	70;"	d
+MAX_MESSAGE_SIZE_BYTES	../DrmTypes.h	47;"	d
+MAX_TEST_CASES	../common/CuTest/CuTest.h	132;"	d
+MAX_TEST_CASE_NAME_LENGTH	../common/CuTest/CuTest.c	453;"	d	file:
+MAX_TEST_SUITE_NAME_LENGTH	../common/CuTest/CuTest.c	454;"	d	file:
+MEM_ALIGN	../common.mk	/^MEM_ALIGN = -DDIVX_ARCH_32BIT$/;"	m
+MESSAGE_KEY_INDEX_TOTAL	../DrmKeyStore.c	30;"	d	file:
+MODEL_ID_BYTES	../DrmTypes.h	34;"	d
+MODE_CBC	../crypto/reference/rijndael-api-fst.h	52;"	d
+MODE_CFB1	../crypto/reference/rijndael-api-fst.h	53;"	d
+MODE_ECB	../crypto/reference/rijndael-api-fst.h	51;"	d
+MONT_MUL_MOD	../crypto/reference/bn_exp.c	193;"	d	file:
+MONT_WORD	../crypto/reference/bn_mont.c	72;"	d	file:
+MPF_SIZEOF_FRAME_KEYS	../HeaderMem2Structs.c	48;"	d	file:
+MV	../common.mk	/^MV = mv$/;"	m
+Maj	../crypto/reference/sha256.c	159;"	d	file:
+Maj	../crypto/reference/sha256.c	78;"	d	file:
+N	../crypto/reference/bn.h	/^	XBIGNUM N;	\/* the divisor *\/$/;"	m	struct:xbn_recp_ctx_st
+N	../crypto/reference/bn.h	/^	XBIGNUM N;      \/* The modulus *\/$/;"	m	struct:xbn_mont_ctx_st
+N	../mt19937ar.c	47;"	d	file:
+NDEBUG	../crypto/reference/bn_asm.c	60;"	d	file:
+NDEBUG	../crypto/reference/bn_asm.c	61;"	d	file:
+NDEBUG	../crypto/reference/bn_ctx.c	58;"	d	file:
+NDEBUG	../crypto/reference/bn_ctx.c	59;"	d	file:
+NDEBUG	../crypto/reference/bn_lib.c	60;"	d	file:
+NDEBUG	../crypto/reference/bn_lib.c	61;"	d	file:
+NDEBUG	../crypto/reference/bn_mul.c	60;"	d	file:
+NDEBUG	../crypto/reference/bn_mul.c	61;"	d	file:
+NULL	../common/DivXNULL.h	43;"	d
+NULL	../common/DivXNULL.h	47;"	d
+NULL	../common/PortableDivxTypes.h	64;"	d
+NULL	../common/PortableDivxTypes.h	66;"	d
+NULL	../common/portab.h	47;"	d
+NULL	../common/portab.h	49;"	d
+NUMBER_OF_PORTABLE_MODULES	../crypto/DivXPortableAPI.h	58;"	d
+NUM_BITS_PER_BYTE	../crypto/reference/DivXAesCBCDecrypt.c	21;"	d	file:
+NUM_BITS_PER_BYTE	../crypto/reference/DivXAesCBCEncrypt.c	23;"	d	file:
+NUM_BITS_PER_BYTE	../crypto/reference/DivXAesDecrypt.c	21;"	d	file:
+NUM_BITS_PER_BYTE	../crypto/reference/DivXAesEncrypt.c	24;"	d	file:
+Ni	../crypto/reference/bn.h	/^	XBIGNUM Ni;     \/* R*(1\/R mod N) - N*Ni = 1$/;"	m	struct:xbn_mont_ctx_st
+Nr	../crypto/reference/bn.h	/^	XBIGNUM Nr;	\/* the reciprocal *\/$/;"	m	struct:xbn_recp_ctx_st
+Nr_dec	../crypto/reference/rijndael-api-fst.h	/^	int   Nr_dec;                       \/* key-length-dependent number of rounds *\/$/;"	m	struct:__anon2
+Nr_enc	../crypto/reference/rijndael-api-fst.h	/^	int   Nr_enc;                       \/* key-length-dependent number of rounds *\/$/;"	m	struct:__anon2
+OBJS	../Makefile	/^OBJS 		:= $(foreach src,$(SOURCES),$(src).o)$/;"	m
+OBJS	../crypto/reference/Makefile	/^OBJS 		:= $(foreach src,$(SOURCES),$(src).o)$/;"	m
+OFFSET_SIZE	../DrmApi.c	86;"	d	file:
+OPTIMIZE	../common.mk	/^OPTIMIZE = -O2 $/;"	m
+OPTIMIZE	../common.mk	/^OPTIMIZE =$/;"	m
+OUTPUT_PROTECTION_MASK	../DrmTypes.h	69;"	d
+OUTPUT_SIGNAL_RESERVED_BITS	../DrmTypes.h	44;"	d
+OWNER_GUARD_BYTES	../DrmTypes.h	28;"	d
+OWNER_USER_ID_BYTES	../DrmTypes.h	29;"	d
+PACKED_ALLOCATION_BYTES	../DrmTypes.h	88;"	d
+PACKED_ALLOCATION_BYTES	../DrmTypes.h	90;"	d
+PLATFORM	../common.mk	/^PLATFORM = -DLINUX$/;"	m
+PLATFORM	../crypto/reference/common.mk	/^PLATFORM = -DLINUX$/;"	m
+PORTABLEDIVXTYPES_H	../common/PortableDivxTypes.h	11;"	d
+PORTABLEDIVX_H	../common/PortableDivx.h	12;"	d
+PORTABLE_MODULES_ARRAY_NAME	../crypto/DivXPortableAPI.h	57;"	d
+PROTECTED_AUDIO_MASK	../DrmTypes.h	71;"	d
+PROTECTION_FORMAT_BITS	../DrmMessage.c	23;"	d	file:
+PUTU32	../crypto/reference/rijndael-alg-fst.c	718;"	d	file:
+PUTU32	../crypto/reference/rijndael-alg-fst.c	721;"	d	file:
+PortableDivx	../common/PortableDivx.h	/^class PortableDivx {$/;"	c
+R	../crypto/reference/sha256.c	164;"	d	file:
+R	../crypto/reference/sha256.c	83;"	d	file:
+RANDOM_BYTE_BUCKET_SIZE	../DrmApi.c	77;"	d	file:
+RECP_MUL_MOD	../crypto/reference/bn_exp.c	195;"	d	file:
+REGISTRATION_CODE_BITS	../DrmMessage.c	24;"	d	file:
+REMAINDER_IS_ALREADY_CALCULATED	../crypto/reference/bn_div.c	153;"	d	file:
+RM_DEVICE	../common.mk	/^export ARM_DEVICE = sigma8620$/;"	m
+RM_DEVICE	../crypto/reference/common.mk	/^export ARM_DEVICE = sigma8620$/;"	m
+RR	../crypto/reference/bn.h	/^	XBIGNUM RR;     \/* used to convert to montgomery form *\/$/;"	m	struct:xbn_mont_ctx_st
+RunAllTests	../common/CuTest/AllTests.c	/^void RunAllTests(void)$/;"	f
+S0	../crypto/reference/sha256.c	162;"	d	file:
+S0	../crypto/reference/sha256.c	81;"	d	file:
+S1	../crypto/reference/sha256.c	163;"	d	file:
+S1	../crypto/reference/sha256.c	82;"	d	file:
+SED	../common.mk	/^SED = sed$/;"	m
+SHA256_BYTES	../crypto/DivXSha.h	16;"	d
+SHA256_BYTES	../crypto/reference/sha256.h	40;"	d
+SHA256_CONTEXT	../crypto/reference/sha256.h	/^} SHA256_CONTEXT;$/;"	t	typeref:struct:__anon4
+SHA256_DLL_API	../crypto/reference/sha256_dll.h	10;"	d
+SHA256_DLL_API	../crypto/reference/sha256_dll.h	8;"	d
+SHA256_H_INCLUDE	../crypto/reference/sha256.h	35;"	d
+SHA256_SIZE_BYTES	../DrmTypes.h	45;"	d
+SIGMA_PLATFORM	../common.mk	/^SIGMA_PLATFORM =1$/;"	m
+SIGMA_PLATFORM	../crypto/reference/common.mk	/^SIGMA_PLATFORM =1$/;"	m
+SIGNED_ACTIVATION_MASK	../DrmTypes.h	70;"	d
+SIZEOF_ACTIVATION_MSG_BASE64	../DrmTypes.h	80;"	d
+SIZEOF_BASE_KEY_ID_SIZE_BYTES	../DrmKeyStore.h	20;"	d
+SIZEOF_BASE_KEY_ID_SIZE_BYTES	../DrmTypes.h	76;"	d
+SIZEOF_BASE_KEY_SIZE_BITS	../DrmKeyStore.h	19;"	d
+SIZEOF_BASE_KEY_SIZE_BITS	../DrmTypes.h	75;"	d
+SIZEOF_BASE_KEY_SIZE_BYTES	../DrmKeyStore.h	18;"	d
+SIZEOF_BASE_KEY_SIZE_BYTES	../DrmTypes.h	74;"	d
+SIZEOF_MESSAGE_KEY_SIZE_BYTES	../DrmKeyStore.h	21;"	d
+SIZEOF_MESSAGE_KEY_SIZE_BYTES	../DrmTypes.h	77;"	d
+SIZEOF_TARGET_HEADER	../HeaderMem2Structs.c	89;"	d	file:
+SIZEOF_TARGET_HEADER_BYTES	../DrmTypes.h	78;"	d
+SIZEOF_TRANSACTION_HEADER_BYTES	../DrmTypes.h	79;"	d
+SLOT_SERIAL_NUMBER_BYTES	../DrmTypes.h	31;"	d
+SLOT_USE_DATA_BYTES	../DrmTypes.h	30;"	d
+SOURCES	../Makefile	/^SOURCES 	:= DrmKeyStore \\$/;"	m
+SOURCES	../crypto/reference/Makefile	/^SOURCES 	:=  bn_add  bn_div  bn_lib   bn_mul    bn_recp   bn_word \\$/;"	m
+STRING_INC	../common/CuTest/CuTest.h	54;"	d
+STRING_MAX	../common/CuTest/CuTest.h	53;"	d
+SUITE_ADD_TEST	../common/CuTest/CuTest.h	134;"	d
+SWAP	../crypto/reference/rijndael-alg-fst.c	714;"	d	file:
+Sum0	../crypto/reference/sha256.c	160;"	d	file:
+Sum0	../crypto/reference/sha256.c	79;"	d	file:
+Sum1	../crypto/reference/sha256.c	161;"	d	file:
+Sum1	../crypto/reference/sha256.c	80;"	d	file:
+TABLE_SIZE	../crypto/reference/bn_exp.c	116;"	d	file:
+TAPI_API_HIGH_VERSION	../local/Reference/DrmLocal.c	411;"	d	file:
+TEST_SUITE	../common/CuTest/CuTest.h	191;"	d
+TEST_SUITE_END	../common/CuTest/CuTest.h	200;"	d
+TEST_SUITE_REGISTRATION	../common/CuTest/CuTest.h	205;"	d
+THIRTY_TWO_BIT	../crypto/reference/bn.h	145;"	d
+TOTAL_PLAY_SLOTS	../DrmTypes.h	86;"	d
+TRANSACTION_ID_BYTES	../DrmTypes.h	33;"	d
+TRUE	../common/PortableDivxTypes.h	58;"	d
+TRUE	../common/portab.h	38;"	d
+TRUE	../crypto/reference/rijndael-api-fst.h	54;"	d
+Td0	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Td0[256] = {$/;"	v	file:
+Td1	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Td1[256] = {$/;"	v	file:
+Td2	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Td2[256] = {$/;"	v	file:
+Td3	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Td3[256] = {$/;"	v	file:
+Td4	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Td4[256] = {$/;"	v	file:
+Te0	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Te0[256] = {$/;"	v	file:
+Te1	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Te1[256] = {$/;"	v	file:
+Te2	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Te2[256] = {$/;"	v	file:
+Te3	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Te3[256] = {$/;"	v	file:
+Te4	../crypto/reference/rijndael-alg-fst.c	/^static const u32 Te4[256] = {$/;"	v	file:
+TestAssertDblEquals	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertDblEquals);$/;"	v
+TestAssertDblEquals	../common/CuTest/CuTestTest.c	/^void TestAssertDblEquals(CuTest* tc)$/;"	f
+TestAssertIntEquals	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertIntEquals);$/;"	v
+TestAssertIntEquals	../common/CuTest/CuTestTest.c	/^void TestAssertIntEquals(CuTest* tc)$/;"	f
+TestAssertStrEquals	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertStrEquals);$/;"	v
+TestAssertStrEquals	../common/CuTest/CuTestTest.c	/^void TestAssertStrEquals(CuTest* tc)$/;"	f
+TestAssertStrEquals_FailNULLStr	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertStrEquals_FailNULLStr);$/;"	v
+TestAssertStrEquals_FailNULLStr	../common/CuTest/CuTestTest.c	/^void TestAssertStrEquals_FailNULLStr(CuTest* tc)$/;"	f
+TestAssertStrEquals_FailStrNULL	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertStrEquals_FailStrNULL);$/;"	v
+TestAssertStrEquals_FailStrNULL	../common/CuTest/CuTestTest.c	/^void TestAssertStrEquals_FailStrNULL(CuTest* tc)$/;"	f
+TestAssertStrEquals_NULL	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestAssertStrEquals_NULL);$/;"	v
+TestAssertStrEquals_NULL	../common/CuTest/CuTestTest.c	/^void TestAssertStrEquals_NULL(CuTest* tc)$/;"	f
+TestCuAssert	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuAssert);$/;"	v
+TestCuAssert	../common/CuTest/CuTestTest.c	/^void TestCuAssert(CuTest* tc)$/;"	f
+TestCuAssertPtrEquals_Failure	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuAssertPtrEquals_Failure);$/;"	v
+TestCuAssertPtrEquals_Failure	../common/CuTest/CuTestTest.c	/^void TestCuAssertPtrEquals_Failure(CuTest* tc)$/;"	f
+TestCuAssertPtrEquals_Success	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuAssertPtrEquals_Success);$/;"	v
+TestCuAssertPtrEquals_Success	../common/CuTest/CuTestTest.c	/^void TestCuAssertPtrEquals_Success(CuTest* tc)$/;"	f
+TestCuAssertPtrNotNull_Failure	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuAssertPtrNotNull_Failure);$/;"	v
+TestCuAssertPtrNotNull_Failure	../common/CuTest/CuTestTest.c	/^void TestCuAssertPtrNotNull_Failure(CuTest* tc)$/;"	f
+TestCuAssertPtrNotNull_Success	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuAssertPtrNotNull_Success);$/;"	v
+TestCuAssertPtrNotNull_Success	../common/CuTest/CuTestTest.c	/^void TestCuAssertPtrNotNull_Success(CuTest* tc)$/;"	f
+TestCuStrCopy	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStrCopy);$/;"	v
+TestCuStrCopy	../common/CuTest/CuTestTest.c	/^void TestCuStrCopy(CuTest* tc)$/;"	f
+TestCuStringAppend	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringAppend);$/;"	v
+TestCuStringAppend	../common/CuTest/CuTestTest.c	/^void TestCuStringAppend(CuTest* tc)$/;"	f
+TestCuStringAppendChar	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringAppendChar);$/;"	v
+TestCuStringAppendChar	../common/CuTest/CuTestTest.c	/^void TestCuStringAppendChar(CuTest* tc)$/;"	f
+TestCuStringAppendFormat	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringAppendFormat);$/;"	v
+TestCuStringAppendFormat	../common/CuTest/CuTestTest.c	/^void TestCuStringAppendFormat(CuTest* tc)$/;"	f
+TestCuStringAppendNULL	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringAppendNULL);$/;"	v
+TestCuStringAppendNULL	../common/CuTest/CuTestTest.c	/^void TestCuStringAppendNULL(CuTest* tc)$/;"	f
+TestCuStringInserts	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringInserts);$/;"	v
+TestCuStringInserts	../common/CuTest/CuTestTest.c	/^void TestCuStringInserts(CuTest* tc)$/;"	f
+TestCuStringNew	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringNew);$/;"	v
+TestCuStringNew	../common/CuTest/CuTestTest.c	/^void TestCuStringNew(CuTest* tc)$/;"	f
+TestCuStringResizes	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuStringResizes);$/;"	v
+TestCuStringResizes	../common/CuTest/CuTestTest.c	/^void TestCuStringResizes(CuTest* tc)$/;"	f
+TestCuSuiteAddSuite	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteAddSuite);$/;"	v
+TestCuSuiteAddSuite	../common/CuTest/CuTestTest.c	/^void TestCuSuiteAddSuite(CuTest* tc)$/;"	f
+TestCuSuiteAddTest	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteAddTest);$/;"	v
+TestCuSuiteAddTest	../common/CuTest/CuTestTest.c	/^void TestCuSuiteAddTest(CuTest* tc)$/;"	f
+TestCuSuiteDetails_MultipleFails	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteDetails_MultipleFails);$/;"	v
+TestCuSuiteDetails_MultipleFails	../common/CuTest/CuTestTest.c	/^void TestCuSuiteDetails_MultipleFails(CuTest* tc)$/;"	f
+TestCuSuiteDetails_MultiplePasses	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteDetails_MultiplePasses);$/;"	v
+TestCuSuiteDetails_MultiplePasses	../common/CuTest/CuTestTest.c	/^void TestCuSuiteDetails_MultiplePasses(CuTest* tc)$/;"	f
+TestCuSuiteDetails_SingleFail	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteDetails_SingleFail);$/;"	v
+TestCuSuiteDetails_SingleFail	../common/CuTest/CuTestTest.c	/^void TestCuSuiteDetails_SingleFail(CuTest* tc)$/;"	f
+TestCuSuiteDetails_SinglePass	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteDetails_SinglePass);$/;"	v
+TestCuSuiteDetails_SinglePass	../common/CuTest/CuTestTest.c	/^void TestCuSuiteDetails_SinglePass(CuTest* tc)$/;"	f
+TestCuSuiteInit	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteInit);$/;"	v
+TestCuSuiteInit	../common/CuTest/CuTestTest.c	/^void TestCuSuiteInit(CuTest* tc)$/;"	f
+TestCuSuiteNew	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteNew);$/;"	v
+TestCuSuiteNew	../common/CuTest/CuTestTest.c	/^void TestCuSuiteNew(CuTest* tc)$/;"	f
+TestCuSuiteRun	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteRun);$/;"	v
+TestCuSuiteRun	../common/CuTest/CuTestTest.c	/^void TestCuSuiteRun(CuTest* tc)$/;"	f
+TestCuSuiteSummary	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuSuiteSummary);$/;"	v
+TestCuSuiteSummary	../common/CuTest/CuTestTest.c	/^void TestCuSuiteSummary(CuTest* tc)$/;"	f
+TestCuTestInit	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuTestInit);$/;"	v
+TestCuTestInit	../common/CuTest/CuTestTest.c	/^void TestCuTestInit(CuTest *tc)$/;"	f
+TestCuTestNew	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuTestNew);$/;"	v
+TestCuTestNew	../common/CuTest/CuTestTest.c	/^void TestCuTestNew(CuTest* tc)$/;"	f
+TestCuTestRun	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestCuTestRun);$/;"	v
+TestCuTestRun	../common/CuTest/CuTestTest.c	/^void TestCuTestRun(CuTest* tc)$/;"	f
+TestFail	../common/CuTest/CuTestTest.c	/^ADD_TEST( TestFail);$/;"	v
+TestFail	../common/CuTest/CuTestTest.c	/^void TestFail(CuTest* tc)$/;"	f
+TestFunction	../common/CuTest/CuTest.h	/^typedef void (*TestFunction)(CuTest *);$/;"	t
+TestPasses	../common/CuTest/CuTestTest.c	/^void TestPasses(CuTest* tc)$/;"	f
+UPPER_MASK	../mt19937ar.c	50;"	d	file:
+USE_DPR	../common.mk	/^USE_DPR = 1$/;"	m
+USE_DPR	../crypto/reference/common.mk	/^USE_DPR = 1$/;"	m
+USE_LIMITS	../DrmTypes.h	32;"	d
+USE_LIMIT_ID_FIVE	../DrmTypes.h	62;"	d
+USE_LIMIT_ID_ONE	../DrmTypes.h	60;"	d
+USE_LIMIT_ID_SEVEN	../DrmTypes.h	63;"	d
+USE_LIMIT_ID_TEN	../DrmTypes.h	64;"	d
+USE_LIMIT_ID_THIRTY	../DrmTypes.h	66;"	d
+USE_LIMIT_ID_THREE	../DrmTypes.h	61;"	d
+USE_LIMIT_ID_TWENTY	../DrmTypes.h	65;"	d
+USE_LIMIT_ID_UNLIMITED	../DrmTypes.h	59;"	d
+VALID_MESSAGE_KEY_TOTAL	../DrmKeyStore.c	29;"	d	file:
+VARIABLE_FRAME_KEY_COUNT_MASK	../DrmTypes.h	72;"	d
+VERBOSE_OUTPUT	../common/CuTest/CuTest.h	206;"	d
+VIDEO_KEY_COUNT	../DrmTypes.h	48;"	d
+VIDEO_KEY_COUNT_MAX	../DrmTypes.h	94;"	d
+VIDEO_KEY_SIZE_BYTES	../DrmTypes.h	93;"	d
+WCHARUTILITY	../common.mk	/^WCHARUTILITY=1$/;"	m
+WCHARUTILITY	../crypto/reference/common.mk	/^WCHARUTILITY=1$/;"	m
+WIN32_LEAN_AND_MEAN	../common/PortableDivx.h	15;"	d
+X	../crypto/reference/sha256.c	265;"	d	file:
+X	../crypto/reference/sha256.c	278;"	d	file:
+X86ACCEL	../common.mk	/^X86ACCEL = 1$/;"	m
+X86ACCEL	../common.mk	/^X86ACCEL =$/;"	m
+X86ACCEL	../crypto/reference/common.mk	/^X86ACCEL = 1$/;"	m
+XBIGNUM	../crypto/reference/bn.h	/^	} XBIGNUM;$/;"	t	typeref:struct:xbignum_st
+XBIGNUM	../crypto/reference/bn.h	224;"	d
+XBN_BITS	../crypto/reference/bn.h	104;"	d
+XBN_BITS	../crypto/reference/bn.h	130;"	d
+XBN_BITS	../crypto/reference/bn.h	154;"	d
+XBN_BITS	../crypto/reference/bn.h	182;"	d
+XBN_BITS	../crypto/reference/bn.h	205;"	d
+XBN_BITS2	../crypto/reference/bn.h	106;"	d
+XBN_BITS2	../crypto/reference/bn.h	132;"	d
+XBN_BITS2	../crypto/reference/bn.h	156;"	d
+XBN_BITS2	../crypto/reference/bn.h	184;"	d
+XBN_BITS2	../crypto/reference/bn.h	207;"	d
+XBN_BITS4	../crypto/reference/bn.h	107;"	d
+XBN_BITS4	../crypto/reference/bn.h	133;"	d
+XBN_BITS4	../crypto/reference/bn.h	157;"	d
+XBN_BITS4	../crypto/reference/bn.h	185;"	d
+XBN_BITS4	../crypto/reference/bn.h	208;"	d
+XBN_BLINDING	../crypto/reference/bn.h	/^	} XBN_BLINDING;$/;"	t	typeref:struct:xbn_blinding_st
+XBN_BYTES	../crypto/reference/bn.h	105;"	d
+XBN_BYTES	../crypto/reference/bn.h	131;"	d
+XBN_BYTES	../crypto/reference/bn.h	155;"	d
+XBN_BYTES	../crypto/reference/bn.h	183;"	d
+XBN_BYTES	../crypto/reference/bn.h	206;"	d
+XBN_CTX	../crypto/reference/bn.h	/^typedef struct xbignum_ctx XBN_CTX;$/;"	t	typeref:struct:xbignum_ctx
+XBN_CTX_NUM	../crypto/reference/bn_lcl.h	126;"	d
+XBN_CTX_NUM_POS	../crypto/reference/bn_lcl.h	127;"	d
+XBN_CTX_end	../crypto/reference/bn_ctx.c	/^void XBN_CTX_end(XBN_CTX *ctx)$/;"	f
+XBN_CTX_free	../crypto/reference/bn_ctx.c	/^void XBN_CTX_free(XBN_CTX *ctx)$/;"	f
+XBN_CTX_get	../crypto/reference/bn_ctx.c	/^XBIGNUM *XBN_CTX_get(XBN_CTX *ctx)$/;"	f
+XBN_CTX_init	../crypto/reference/bn_ctx.c	/^void XBN_CTX_init(XBN_CTX *ctx)$/;"	f
+XBN_CTX_new	../crypto/reference/bn_ctx.c	/^XBN_CTX *XBN_CTX_new(void)$/;"	f
+XBN_CTX_start	../crypto/reference/bn_ctx.c	/^void XBN_CTX_start(XBN_CTX *ctx)$/;"	f
+XBN_Context	../crypto/reference/bn.h	/^typedef struct XBN_Context_t XBN_Context;$/;"	t	typeref:struct:XBN_Context_t
+XBN_Context_t	../crypto/reference/bn.h	/^struct XBN_Context_t$/;"	s
+XBN_DEC_CONV	../crypto/reference/bn.h	114;"	d
+XBN_DEC_CONV	../crypto/reference/bn.h	139;"	d
+XBN_DEC_CONV	../crypto/reference/bn.h	169;"	d
+XBN_DEC_CONV	../crypto/reference/bn.h	192;"	d
+XBN_DEC_CONV	../crypto/reference/bn.h	215;"	d
+XBN_DEC_FMT1	../crypto/reference/bn.h	115;"	d
+XBN_DEC_FMT1	../crypto/reference/bn.h	140;"	d
+XBN_DEC_FMT1	../crypto/reference/bn.h	170;"	d
+XBN_DEC_FMT1	../crypto/reference/bn.h	193;"	d
+XBN_DEC_FMT1	../crypto/reference/bn.h	216;"	d
+XBN_DEC_FMT2	../crypto/reference/bn.h	116;"	d
+XBN_DEC_FMT2	../crypto/reference/bn.h	141;"	d
+XBN_DEC_FMT2	../crypto/reference/bn.h	171;"	d
+XBN_DEC_FMT2	../crypto/reference/bn.h	194;"	d
+XBN_DEC_FMT2	../crypto/reference/bn.h	217;"	d
+XBN_DEC_NUM	../crypto/reference/bn.h	117;"	d
+XBN_DEC_NUM	../crypto/reference/bn.h	142;"	d
+XBN_DEC_NUM	../crypto/reference/bn.h	172;"	d
+XBN_DEC_NUM	../crypto/reference/bn.h	195;"	d
+XBN_DEC_NUM	../crypto/reference/bn.h	218;"	d
+XBN_DEFAULT_BITS	../crypto/reference/bn.h	221;"	d
+XBN_DIV2W	../crypto/reference/bn.h	177;"	d
+XBN_DIV2W	../crypto/reference/bn.h	200;"	d
+XBN_DIV2W	../crypto/reference/bn.h	93;"	d
+XBN_FLG_FREE	../crypto/reference/bn.h	229;"	d
+XBN_FLG_MALLOCED	../crypto/reference/bn.h	227;"	d
+XBN_FLG_STATIC_DATA	../crypto/reference/bn.h	228;"	d
+XBN_F_XBN_BLINDING_CONVERT	../crypto/reference/bn.h	529;"	d
+XBN_F_XBN_BLINDING_INVERT	../crypto/reference/bn.h	530;"	d
+XBN_F_XBN_BLINDING_NEW	../crypto/reference/bn.h	531;"	d
+XBN_F_XBN_BLINDING_UPDATE	../crypto/reference/bn.h	532;"	d
+XBN_F_XBN_BN2DEC	../crypto/reference/bn.h	533;"	d
+XBN_F_XBN_BN2HEX	../crypto/reference/bn.h	534;"	d
+XBN_F_XBN_CTX_GET	../crypto/reference/bn.h	535;"	d
+XBN_F_XBN_CTX_NEW	../crypto/reference/bn.h	536;"	d
+XBN_F_XBN_DIV	../crypto/reference/bn.h	537;"	d
+XBN_F_XBN_EXPAND2	../crypto/reference/bn.h	538;"	d
+XBN_F_XBN_EXPAND_INTERNAL	../crypto/reference/bn.h	539;"	d
+XBN_F_XBN_MOD_EXP2_MONT	../crypto/reference/bn.h	540;"	d
+XBN_F_XBN_MOD_EXP_MONT	../crypto/reference/bn.h	541;"	d
+XBN_F_XBN_MOD_EXP_MONT_WORD	../crypto/reference/bn.h	542;"	d
+XBN_F_XBN_MOD_INVERSE	../crypto/reference/bn.h	543;"	d
+XBN_F_XBN_MOD_LSHIFT_QUICK	../crypto/reference/bn.h	544;"	d
+XBN_F_XBN_MOD_MUL_RECIPROCAL	../crypto/reference/bn.h	545;"	d
+XBN_F_XBN_MOD_SQRT	../crypto/reference/bn.h	546;"	d
+XBN_F_XBN_MPI2BN	../crypto/reference/bn.h	547;"	d
+XBN_F_XBN_NEW	../crypto/reference/bn.h	548;"	d
+XBN_F_XBN_RAND	../crypto/reference/bn.h	549;"	d
+XBN_F_XBN_RAND_RANGE	../crypto/reference/bn.h	550;"	d
+XBN_F_XBN_USUB	../crypto/reference/bn.h	551;"	d
+XBN_LLONG	../crypto/reference/bn.h	126;"	d
+XBN_LLONG	../crypto/reference/bn.h	72;"	d
+XBN_LONG	../crypto/reference/bn.h	103;"	d
+XBN_LONG	../crypto/reference/bn.h	129;"	d
+XBN_LONG	../crypto/reference/bn.h	153;"	d
+XBN_LONG	../crypto/reference/bn.h	181;"	d
+XBN_LONG	../crypto/reference/bn.h	204;"	d
+XBN_MASK	../crypto/reference/bn.h	108;"	d
+XBN_MASK	../crypto/reference/bn.h	160;"	d
+XBN_MASK	../crypto/reference/bn.h	162;"	d
+XBN_MASK	../crypto/reference/bn.h	186;"	d
+XBN_MASK	../crypto/reference/bn.h	209;"	d
+XBN_MASK2	../crypto/reference/bn.h	109;"	d
+XBN_MASK2	../crypto/reference/bn.h	134;"	d
+XBN_MASK2	../crypto/reference/bn.h	164;"	d
+XBN_MASK2	../crypto/reference/bn.h	187;"	d
+XBN_MASK2	../crypto/reference/bn.h	210;"	d
+XBN_MASK2h	../crypto/reference/bn.h	111;"	d
+XBN_MASK2h	../crypto/reference/bn.h	136;"	d
+XBN_MASK2h	../crypto/reference/bn.h	167;"	d
+XBN_MASK2h	../crypto/reference/bn.h	190;"	d
+XBN_MASK2h	../crypto/reference/bn.h	213;"	d
+XBN_MASK2h1	../crypto/reference/bn.h	112;"	d
+XBN_MASK2h1	../crypto/reference/bn.h	137;"	d
+XBN_MASK2h1	../crypto/reference/bn.h	166;"	d
+XBN_MASK2h1	../crypto/reference/bn.h	189;"	d
+XBN_MASK2h1	../crypto/reference/bn.h	212;"	d
+XBN_MASK2l	../crypto/reference/bn.h	110;"	d
+XBN_MASK2l	../crypto/reference/bn.h	135;"	d
+XBN_MASK2l	../crypto/reference/bn.h	165;"	d
+XBN_MASK2l	../crypto/reference/bn.h	188;"	d
+XBN_MASK2l	../crypto/reference/bn.h	211;"	d
+XBN_MOD_MUL_WORD	../crypto/reference/bn_exp.c	505;"	d	file:
+XBN_MONT_CTX	../crypto/reference/bn.h	/^	} XBN_MONT_CTX;$/;"	t	typeref:struct:xbn_mont_ctx_st
+XBN_MONT_CTX_SET_SIZE_WORD	../crypto/reference/bn_lcl.h	189;"	d
+XBN_MONT_CTX_copy	../crypto/reference/bn_mont.c	/^XBN_MONT_CTX *XBN_MONT_CTX_copy(XBN_MONT_CTX *to, XBN_MONT_CTX *from)$/;"	f
+XBN_MONT_CTX_free	../crypto/reference/bn_mont.c	/^void XBN_MONT_CTX_free(XBN_MONT_CTX *mont)$/;"	f
+XBN_MONT_CTX_init	../crypto/reference/bn_mont.c	/^void XBN_MONT_CTX_init(XBN_MONT_CTX *ctx)$/;"	f
+XBN_MONT_CTX_new	../crypto/reference/bn_mont.c	/^XBN_MONT_CTX *XBN_MONT_CTX_new(void)$/;"	f
+XBN_MONT_CTX_set	../crypto/reference/bn_mont.c	/^int XBN_MONT_CTX_set(XBN_MONT_CTX *mont, const XBIGNUM *mod, XBN_CTX *ctx)$/;"	f
+XBN_MULL_SIZE_NORMAL	../crypto/reference/bn_lcl.h	185;"	d
+XBN_MUL_COMBA	../crypto/reference/bn.h	75;"	d
+XBN_MUL_LOW_RECURSIVE_SIZE_NORMAL	../crypto/reference/bn_lcl.h	188;"	d
+XBN_MUL_RECURSIVE_SIZE_NORMAL	../crypto/reference/bn_lcl.h	186;"	d
+XBN_RECP_CTX	../crypto/reference/bn.h	/^	} XBN_RECP_CTX;$/;"	t	typeref:struct:xbn_recp_ctx_st
+XBN_RECP_CTX_free	../crypto/reference/bn_recp.c	/^void XBN_RECP_CTX_free(XBN_RECP_CTX *recp)$/;"	f
+XBN_RECP_CTX_init	../crypto/reference/bn_recp.c	/^void XBN_RECP_CTX_init(XBN_RECP_CTX *recp)$/;"	f
+XBN_RECP_CTX_new	../crypto/reference/bn_recp.c	/^XBN_RECP_CTX *XBN_RECP_CTX_new(void)$/;"	f
+XBN_RECP_CTX_set	../crypto/reference/bn_recp.c	/^int XBN_RECP_CTX_set(XBN_RECP_CTX *recp, const XBIGNUM *d, XBN_CTX *ctx)$/;"	f
+XBN_R_ARG2_LT_ARG3	../crypto/reference/bn.h	554;"	d
+XBN_R_BAD_RECIPROCAL	../crypto/reference/bn.h	555;"	d
+XBN_R_CALLED_WITH_EVEN_MODULUS	../crypto/reference/bn.h	557;"	d
+XBN_R_DIV_BY_ZERO	../crypto/reference/bn.h	558;"	d
+XBN_R_ENCODING_ERROR	../crypto/reference/bn.h	559;"	d
+XBN_R_EXPAND_ON_STATIC_XBIGNUM_DATA	../crypto/reference/bn.h	560;"	d
+XBN_R_INPUT_NOT_REDUCED	../crypto/reference/bn.h	561;"	d
+XBN_R_INVALID_LENGTH	../crypto/reference/bn.h	562;"	d
+XBN_R_INVALID_RANGE	../crypto/reference/bn.h	563;"	d
+XBN_R_NOT_A_SQUARE	../crypto/reference/bn.h	564;"	d
+XBN_R_NOT_INITIALIZED	../crypto/reference/bn.h	565;"	d
+XBN_R_NO_INVERSE	../crypto/reference/bn.h	566;"	d
+XBN_R_P_IS_NOT_PRIME	../crypto/reference/bn.h	567;"	d
+XBN_R_TOO_MANY_ITERATIONS	../crypto/reference/bn.h	568;"	d
+XBN_R_TOO_MANY_TEMPORARY_VARIABLES	../crypto/reference/bn.h	569;"	d
+XBN_R_XBIGNUM_TOO_LONG	../crypto/reference/bn.h	556;"	d
+XBN_SQR_COMBA	../crypto/reference/bn.h	76;"	d
+XBN_SQR_RECURSIVE_SIZE_NORMAL	../crypto/reference/bn_lcl.h	187;"	d
+XBN_TBIT	../crypto/reference/bn.h	113;"	d
+XBN_TBIT	../crypto/reference/bn.h	138;"	d
+XBN_TBIT	../crypto/reference/bn.h	168;"	d
+XBN_TBIT	../crypto/reference/bn.h	191;"	d
+XBN_TBIT	../crypto/reference/bn.h	214;"	d
+XBN_TO_MONTGOMERY_WORD	../crypto/reference/bn_exp.c	517;"	d	file:
+XBN_ULLONG	../crypto/reference/bn.h	101;"	d
+XBN_ULLONG	../crypto/reference/bn.h	127;"	d
+XBN_ULLONG	../crypto/reference/bn.h	148;"	d
+XBN_ULLONG	../crypto/reference/bn.h	150;"	d
+XBN_ULLONG	../crypto/reference/bn.h	179;"	d
+XBN_ULLONG	../crypto/reference/bn.h	202;"	d
+XBN_ULONG	../crypto/reference/bn.h	102;"	d
+XBN_ULONG	../crypto/reference/bn.h	128;"	d
+XBN_ULONG	../crypto/reference/bn.h	152;"	d
+XBN_ULONG	../crypto/reference/bn.h	180;"	d
+XBN_ULONG	../crypto/reference/bn.h	203;"	d
+XBN_UMULT_HIGH	../crypto/reference/bn_lcl.h	218;"	d
+XBN_UMULT_HIGH	../crypto/reference/bn_lcl.h	220;"	d
+XBN_UMULT_HIGH	../crypto/reference/bn_lcl.h	229;"	d
+XBN_abs_is_word	../crypto/reference/bn.h	302;"	d
+XBN_add	../crypto/reference/bn_add.c	/^int XBN_add(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_add_word	../crypto/reference/bn_word.c	/^int XBN_add_word(XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_bin2bn	../crypto/reference/bn_lib.c	/^XBIGNUM *XBN_bin2bn(const unsigned char *s, int len, XBIGNUM *ret)$/;"	f
+XBN_bn2bin	../crypto/reference/bn_lib.c	/^int XBN_bn2bin(const XBIGNUM *a, unsigned char *to)$/;"	f
+XBN_bn2dec	../crypto/reference/bn_print.c	/^char *XBN_bn2dec(const XBIGNUM *a)$/;"	f
+XBN_bn2hex	../crypto/reference/bn_print.c	/^char *XBN_bn2hex(const XBIGNUM *a)$/;"	f
+XBN_clear	../crypto/reference/bn_lib.c	/^void XBN_clear(XBIGNUM *a)$/;"	f
+XBN_clear_bit	../crypto/reference/bn_lib.c	/^int XBN_clear_bit(XBIGNUM *a, int n)$/;"	f
+XBN_clear_free	../crypto/reference/bn_lib.c	/^void XBN_clear_free(XBIGNUM *a)$/;"	f
+XBN_cmp	../crypto/reference/bn_lib.c	/^int XBN_cmp(const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_copy	../crypto/reference/bn_lib.c	/^XBIGNUM *XBN_copy(XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_dec2bn	../crypto/reference/bn_print.c	/^int XBN_dec2bn(XBIGNUM **bn, const char *a)$/;"	f
+XBN_div	../crypto/reference/bn_div.c	/^int XBN_div(XBIGNUM *dv, XBIGNUM *rm, const XBIGNUM *num, const XBIGNUM *divisor,$/;"	f
+XBN_div_recp	../crypto/reference/bn_recp.c	/^int XBN_div_recp(XBIGNUM *dv, XBIGNUM *rem, const XBIGNUM *m,$/;"	f
+XBN_div_word	../crypto/reference/bn_word.c	/^XBN_ULONG XBN_div_word(XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_dup	../crypto/reference/bn_lib.c	/^XBIGNUM *XBN_dup(const XBIGNUM *a)$/;"	f
+XBN_exp	../crypto/reference/bn_exp.c	/^int XBN_exp(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *p, XBN_CTX *ctx)$/;"	f
+XBN_free	../crypto/reference/bn_lib.c	/^void XBN_free(XBIGNUM *a)$/;"	f
+XBN_from_montgomery	../crypto/reference/bn_mont.c	/^int XBN_from_montgomery(XBIGNUM *ret, const XBIGNUM *a, XBN_MONT_CTX *mont,$/;"	f
+XBN_gcd	../crypto/reference/bn_gcd.c	/^int XBN_gcd(XBIGNUM *r, const XBIGNUM *in_a, const XBIGNUM *in_b, XBN_CTX *ctx)$/;"	f
+XBN_get_flags	../crypto/reference/bn.h	231;"	d
+XBN_get_params	../crypto/reference/bn_lib.c	/^int XBN_get_params(XBN_Context* context, int which)$/;"	f
+XBN_get_word	../crypto/reference/bn_lib.c	/^XBN_ULONG XBN_get_word(const XBIGNUM *a)$/;"	f
+XBN_hex2bn	../crypto/reference/bn_print.c	/^int XBN_hex2bn(XBIGNUM **bn, const char *a)$/;"	f
+XBN_init	../crypto/reference/bn_lib.c	/^void XBN_init(XBIGNUM *a)$/;"	f
+XBN_init_options	../crypto/reference/bn_lib.c	/^void XBN_init_options(XBN_Context* context)$/;"	f
+XBN_is_bit_set	../crypto/reference/bn_lib.c	/^int XBN_is_bit_set(const XBIGNUM *a, int n)$/;"	f
+XBN_is_odd	../crypto/reference/bn.h	307;"	d
+XBN_is_one	../crypto/reference/bn.h	304;"	d
+XBN_is_word	../crypto/reference/bn.h	305;"	d
+XBN_is_zero	../crypto/reference/bn.h	303;"	d
+XBN_lshift	../crypto/reference/bn_shift.c	/^int XBN_lshift(XBIGNUM *r, const XBIGNUM *a, int n)$/;"	f
+XBN_lshift1	../crypto/reference/bn_shift.c	/^int XBN_lshift1(XBIGNUM *r, const XBIGNUM *a)$/;"	f
+XBN_mask_bits	../crypto/reference/bn_lib.c	/^int XBN_mask_bits(XBIGNUM *a, int n)$/;"	f
+XBN_mod	../crypto/reference/bn.h	373;"	d
+XBN_mod_add	../crypto/reference/bn_mod.c	/^int XBN_mod_add(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, const XBIGNUM *m, XBN_CTX *ctx)$/;"	f
+XBN_mod_add_quick	../crypto/reference/bn_mod.c	/^int XBN_mod_add_quick(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, const XBIGNUM *m)$/;"	f
+XBN_mod_exp	../crypto/reference/bn_exp.c	/^int XBN_mod_exp(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *p, const XBIGNUM *m,$/;"	f
+XBN_mod_exp_mont	../crypto/reference/bn_exp.c	/^int XBN_mod_exp_mont(XBIGNUM *rr, const XBIGNUM *a, const XBIGNUM *p,$/;"	f
+XBN_mod_exp_mont_word	../crypto/reference/bn_exp.c	/^int XBN_mod_exp_mont_word(XBIGNUM *rr, XBN_ULONG a, const XBIGNUM *p,$/;"	f
+XBN_mod_exp_recp	../crypto/reference/bn_exp.c	/^int XBN_mod_exp_recp(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *p,$/;"	f
+XBN_mod_exp_simple	../crypto/reference/bn_exp.c	/^int XBN_mod_exp_simple(XBIGNUM *r,$/;"	f
+XBN_mod_inverse	../crypto/reference/bn_gcd.c	/^XBIGNUM *XBN_mod_inverse(XBIGNUM *in,$/;"	f
+XBN_mod_lshift	../crypto/reference/bn_mod.c	/^int XBN_mod_lshift(XBIGNUM *r, const XBIGNUM *a, int n, const XBIGNUM *m, XBN_CTX *ctx)$/;"	f
+XBN_mod_lshift1	../crypto/reference/bn_mod.c	/^int XBN_mod_lshift1(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *m, XBN_CTX *ctx)$/;"	f
+XBN_mod_lshift1_quick	../crypto/reference/bn_mod.c	/^int XBN_mod_lshift1_quick(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *m)$/;"	f
+XBN_mod_lshift_quick	../crypto/reference/bn_mod.c	/^int XBN_mod_lshift_quick(XBIGNUM *r, const XBIGNUM *a, int n, const XBIGNUM *m)$/;"	f
+XBN_mod_mul	../crypto/reference/bn_mod.c	/^int XBN_mod_mul(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, const XBIGNUM *m,$/;"	f
+XBN_mod_mul_montgomery	../crypto/reference/bn_mont.c	/^int XBN_mod_mul_montgomery(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b,$/;"	f
+XBN_mod_mul_reciprocal	../crypto/reference/bn_recp.c	/^int XBN_mod_mul_reciprocal(XBIGNUM *r, const XBIGNUM *x, const XBIGNUM *y,$/;"	f
+XBN_mod_sqr	../crypto/reference/bn_mod.c	/^int XBN_mod_sqr(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *m, XBN_CTX *ctx)$/;"	f
+XBN_mod_sub	../crypto/reference/bn_mod.c	/^int XBN_mod_sub(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, const XBIGNUM *m, XBN_CTX *ctx)$/;"	f
+XBN_mod_sub_quick	../crypto/reference/bn_mod.c	/^int XBN_mod_sub_quick(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, const XBIGNUM *m)$/;"	f
+XBN_mod_word	../crypto/reference/bn_word.c	/^XBN_ULONG XBN_mod_word(const XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_mul	../crypto/reference/bn_mul.c	/^int XBN_mul(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b, XBN_CTX *ctx)$/;"	f
+XBN_mul_word	../crypto/reference/bn_word.c	/^int XBN_mul_word(XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_new	../crypto/reference/bn_lib.c	/^XBIGNUM *XBN_new(void)$/;"	f
+XBN_nnmod	../crypto/reference/bn_mod.c	/^int XBN_nnmod(XBIGNUM *r, const XBIGNUM *m, const XBIGNUM *d, XBN_CTX *ctx)$/;"	f
+XBN_num_bits	../crypto/reference/bn_lib.c	/^int XBN_num_bits(const XBIGNUM *a)$/;"	f
+XBN_num_bits_word	../crypto/reference/bn_lib.c	/^int XBN_num_bits_word(XBN_ULONG l)$/;"	f
+XBN_num_bytes	../crypto/reference/bn.h	299;"	d
+XBN_one	../crypto/reference/bn.h	309;"	d
+XBN_options	../crypto/reference/bn_lib.c	/^char *XBN_options(XBN_Context* context)$/;"	f
+XBN_prime_checks	../crypto/reference/bn.h	278;"	d
+XBN_prime_checks_for_size	../crypto/reference/bn.h	286;"	d
+XBN_reciprocal	../crypto/reference/bn_recp.c	/^int XBN_reciprocal(XBIGNUM *r, const XBIGNUM *m, int len, XBN_CTX *ctx)$/;"	f
+XBN_rshift	../crypto/reference/bn_shift.c	/^int XBN_rshift(XBIGNUM *r, const XBIGNUM *a, int n)$/;"	f
+XBN_rshift1	../crypto/reference/bn_shift.c	/^int XBN_rshift1(XBIGNUM *r, const XBIGNUM *a)$/;"	f
+XBN_set_bit	../crypto/reference/bn_lib.c	/^int XBN_set_bit(XBIGNUM *a, int n)$/;"	f
+XBN_set_flags	../crypto/reference/bn.h	230;"	d
+XBN_set_params	../crypto/reference/bn_lib.c	/^void XBN_set_params(XBN_Context* context, int mult, int high, int low, int mont)$/;"	f
+XBN_set_word	../crypto/reference/bn_lib.c	/^int XBN_set_word(XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_sqr	../crypto/reference/bn_sqr.c	/^int XBN_sqr(XBIGNUM *r, const XBIGNUM *a, XBN_CTX *ctx)$/;"	f
+XBN_sub	../crypto/reference/bn_add.c	/^int XBN_sub(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_sub_word	../crypto/reference/bn_word.c	/^int XBN_sub_word(XBIGNUM *a, XBN_ULONG w)$/;"	f
+XBN_swap	../crypto/reference/bn_lib.c	/^void XBN_swap(XBIGNUM *a, XBIGNUM *b)$/;"	f
+XBN_to_montgomery	../crypto/reference/bn.h	455;"	d
+XBN_uadd	../crypto/reference/bn_add.c	/^int XBN_uadd(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_ucmp	../crypto/reference/bn_lib.c	/^int XBN_ucmp(const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_usub	../crypto/reference/bn_add.c	/^int XBN_usub(XBIGNUM *r, const XBIGNUM *a, const XBIGNUM *b)$/;"	f
+XBN_value_one	../crypto/reference/bn_lib.c	/^const XBIGNUM *XBN_value_one(void)$/;"	f
+XBN_window_bits_for_exponent_size	../crypto/reference/bn_lcl.h	165;"	d
+XBN_window_bits_for_exponent_size	../crypto/reference/bn_lcl.h	175;"	d
+XBN_zero	../crypto/reference/bn.h	310;"	d
+X_CompareAsserts	../common/CuTest/CuTestTest.c	/^static void X_CompareAsserts(CuTest* tc, const char *file, int line, const char* message, const char* expected, const char* actual)$/;"	f	file:
+_CRT_SECURE_NO_DEPRECATE	../common/CuTest/CuTest.c	38;"	d	file:
+_DIVXAESCBCDECRYPT_H	../crypto/DivXAesCBCDecrypt.h	13;"	d
+_DIVXAESCBCENCRYPT_H	../crypto/DivXAesCBCEncrypt.h	12;"	d
+_DIVXAESDECRYPT_H	../crypto/DivXAesDecrypt.h	13;"	d
+_DIVXAESENCRYPT_H	../crypto/DivXAesEncrypt.h	12;"	d
+_DIVXBOOL_H_	../common/DivXBool.h	22;"	d
+_DIVXINT_DEFINED	../common/DivXInt.h	204;"	d
+_DIVXINT_DEFINED	../common/DivXInt.h	219;"	d
+_DIVXINT_DEFINED	../common/DivXInt.h	92;"	d
+_DIVXINT_H_	../common/DivXInt.h	59;"	d
+_DIVXPORTABLEAPI_H	../crypto/DivXPortableAPI.h	12;"	d
+_DIVXPORTABLECRYPTOAPI_H	../crypto/DivXPortableCryptoAPI.h	12;"	d
+_DIVXRNG_H	../crypto/DivXRng.h	12;"	d
+_DIVXRSADECRYPT_H	../crypto/DivXRsaDecrypt.h	12;"	d
+_DIVXRSAENCRYPT_H	../crypto/DivXRsaEncrypt.h	12;"	d
+_DIVXRSA_H	../crypto/DivXRsa.h	12;"	d
+_DIVXSHA_H	../crypto/DivXSha.h	12;"	d
+_DIVXTYPESNULL_H_	../common/DivXNULL.h	18;"	d
+_DIVXVERSION_H	../common/DivXVersion.h	18;"	d
+_DIVXWCHAR_DEFINED	../common/DivXWchar.h	126;"	d
+_DIVXWCHAR_DEFINED	../common/DivXWchar.h	143;"	d
+_DIVXWCHAR_DEFINED	../common/DivXWchar.h	87;"	d
+_DIVXWCHAR_H_	../common/DivXWchar.h	59;"	d
+_DivXRSA	../crypto/reference/DivXRsaLocal.h	/^typedef struct _DivXRSA {$/;"	s
+_DivXVersion	../common/DivXVersion.h	/^typedef struct _DivXVersion$/;"	s
+_GNU_SOURCE	../local/Reference/DrmLocal.c	27;"	d	file:
+_PORTAB_H_	../common/portab.h	31;"	d
+_REENTRANT	../common/PortableDivx.h	40;"	d
+_WIN32_WINNT	../common/PortableDivx.h	31;"	d
+__DRMMESSAGE_H	../DrmMessage.h	18;"	d
+__KEYSTORE_H	../DrmKeyStore.h	13;"	d
+__MEM2STRUCTS_H	../HeaderMem2Structs.h	12;"	d
+__RIJNDAEL_ALG_FST_H	../crypto/reference/rijndael-alg-fst.h	27;"	d
+__RIJNDAEL_API_FST_H	../crypto/reference/rijndael-api-fst.h	39;"	d
+__STRUCTS2MEM_H	../HeaderStructs2Mem.h	12;"	d
+_base64Chars	../DataEncodingBase64.c	/^char _base64Chars[]= {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',$/;"	v	file:
+_snprintf	../common/DivXWchar.h	114;"	d
+_snwprintf	../common/DivXWchar.h	115;"	d
+_stricmp	../common/DivXWchar.h	120;"	d
+_strnicmp	../common/DivXWchar.h	121;"	d
+_xbn_limits	../crypto/reference/bn.h	/^struct _xbn_limits$/;"	s
+a1Padding	../DrmTypes.h	/^    uint8_t         a1Padding[60];$/;"	m	struct:drmActivationMessageStruct
+activateRecord	../DrmTypes.h	/^	drmActivateRecord_t activateRecord;$/;"	m	struct:drmTargetHeader_t
+activationFailureCnt	../DrmTypes.h	/^    uint32_t activationFailureCnt;$/;"	m	struct:drmMemory
+aesBlockDecrypt	../crypto/reference/rijndael-api-fst.c	/^int aesBlockDecrypt(aesCipherInstance *cipher, aesKeyInstance *key,$/;"	f
+aesBlockEncrypt	../crypto/reference/rijndael-api-fst.c	/^int aesBlockEncrypt(aesCipherInstance *cipher, aesKeyInstance *key,$/;"	f
+aesCipherFinalize	../crypto/reference/rijndael-api-fst.c	/^int aesCipherFinalize(aesCipherInstance *cipher)$/;"	f
+aesCipherInit	../crypto/reference/rijndael-api-fst.c	/^int aesCipherInit(aesCipherInstance *cipher, BYTE mode, char *IV) {$/;"	f
+aesCipherInstance	../crypto/reference/rijndael-api-fst.h	/^} aesCipherInstance;$/;"	t	typeref:struct:__anon3
+aesKeyHandle	../crypto/DivXAesDecrypt.h	/^typedef uint32_t aesKeyHandle;$/;"	t
+aesKeyInstance	../crypto/reference/rijndael-api-fst.h	/^} aesKeyInstance;$/;"	t	typeref:struct:__anon2
+aesKeySize16Bytes	../crypto/DivXAesDecrypt.h	/^    aesKeySize16Bytes = 16,$/;"	e	enum:aesKeySizesInBytes_t
+aesKeySize24Bytes	../crypto/DivXAesDecrypt.h	/^    aesKeySize24Bytes = 24,$/;"	e	enum:aesKeySizesInBytes_t
+aesKeySize32Bytes	../crypto/DivXAesDecrypt.h	/^    aesKeySize32Bytes = 32,$/;"	e	enum:aesKeySizesInBytes_t
+aesKeySizesInBytes	../crypto/DivXAesDecrypt.h	/^typedef enum aesKeySizesInBytes_t aesKeySizesInBytes;$/;"	t	typeref:enum:aesKeySizesInBytes_t
+aesKeySizesInBytes_t	../crypto/DivXAesDecrypt.h	/^enum aesKeySizesInBytes_t$/;"	g
+aesMakeKey	../crypto/reference/rijndael-api-fst.c	/^int aesMakeKey(aesKeyInstance *key, BYTE direction, int keyLen, char *keyMaterial) {$/;"	f
+aesUnmakeKey	../crypto/reference/rijndael-api-fst.c	/^int aesUnmakeKey( aesKeyInstance *key )$/;"	f
+audioCryptoInfo	../DrmApi.c	/^typedef struct audioCryptoInfo$/;"	s	file:
+audioCryptoInfo_t	../DrmApi.c	/^} audioCryptoInfo_t;$/;"	t	typeref:struct:audioCryptoInfo	file:
+base32	../DataEncodingBase64.c	/^static const char base32[32] =$/;"	v	file:
+base64CharValue	../DataEncodingBase64.c	/^static int base64CharValue( char c )$/;"	f	file:
+base64DecodeBlock	../DataEncodingBase64.c	/^static void base64DecodeBlock( char *block,$/;"	f	file:
+base64EncodeBlock	../DataEncodingBase64.c	/^static void base64EncodeBlock( char *block,$/;"	f	file:
+baseKeyId	../DrmApi.c	/^	uint8_t baseKeyId[SIZEOF_BASE_KEY_ID_SIZE_BYTES];$/;"	m	struct:playbackContext	file:
+baseKeyId	../DrmTypes.h	/^	uint8_t baseKeyId[DRM_BASE_KEY_ID_LENGTH];$/;"	m	struct:drmHeader
+baseKeyScrambleIn	../DrmDataLoad.c	/^void baseKeyScrambleIn( uint8_t* data,$/;"	f
+baseKeyScrambleOut	../DrmDataLoad.c	/^void baseKeyScrambleOut( uint8_t* data,$/;"	f
+bn	../crypto/reference/bn_lcl.h	/^	XBIGNUM bn[XBN_CTX_NUM];$/;"	m	struct:xbignum_ctx
+buf	../crypto/reference/sha256.h	/^  uint8_t buf[64];$/;"	m	struct:__anon4
+buffer	../common/CuTest/CuTest.h	/^	char* buffer;$/;"	m	struct:__anon1
+build	../common/DivXVersion.h	/^    uint32_t        build;$/;"	m	struct:_DivXVersion
+bytes2mem	../HeaderMacros.h	23;"	d
+codeName	../common/DivXVersion.h	/^    const char  *codeName;$/;"	m	struct:_DivXVersion
+compileTimeKeyScrambleIn	../DrmDataLoad.c	/^void compileTimeKeyScrambleIn( uint8_t* data,$/;"	f
+compileTimeKeyScrambleOut	../DrmDataLoad.c	/^void compileTimeKeyScrambleOut( uint8_t* data,$/;"	f
+contentId	../DrmTypes.h	/^	uint32_t contentId;$/;"	m	struct:drmTransactionInfoHeaderStruct_t
+count	../common/CuTest/CuTest.h	/^	int count;$/;"	m	struct:CuSuite
+count	../common/CuTest/CuTest.h	/^	int count;$/;"	m	struct:CuSuiteRegistry
+count	../crypto/reference/sha256.h	/^  int  count;$/;"	m	struct:__anon4
+counter	../DrmTypes.h	/^    uint8_t counter;$/;"	m	struct:drmPlaySlot
+d	../crypto/reference/DivXRsaLocal.h	/^    XBIGNUM *d;$/;"	m	struct:_DivXRSA
+d	../crypto/reference/bn.h	/^	XBN_ULONG *d;	\/* Pointer to an array of 'XBN_BITS2' bit chunks. *\/$/;"	m	struct:xbignum_st
+data	../crypto/reference/bn.h	/^    char data[16];$/;"	m	struct:XBN_Context_t
+depth	../crypto/reference/bn_lcl.h	/^	int depth;$/;"	m	struct:xbignum_ctx
+direction	../crypto/reference/rijndael-api-fst.h	/^    BYTE  direction;                \/* Key used for encrypting or decrypting? *\/$/;"	m	struct:__anon2
+divxRijndaelDecrypt	../crypto/reference/rijndael-alg-fst.c	/^void divxRijndaelDecrypt(const u32 rk[\/*4*(Nr + 1)*\/], int Nr, const u8 ct[16], u8 pt[16]) {$/;"	f
+divxRijndaelEncrypt	../crypto/reference/rijndael-alg-fst.c	/^void divxRijndaelEncrypt(const u32 rk[\/*4*(Nr + 1)*\/], int Nr, const u8 pt[16], u8 ct[16]) {$/;"	f
+divxRijndaelKeySetupDec	../crypto/reference/rijndael-alg-fst.c	/^int divxRijndaelKeySetupDec(u32 rk[\/*4*(Nr + 1)*\/], const u8 cipherKey[], int keyBits) {$/;"	f
+divxRijndaelKeySetupEnc	../crypto/reference/rijndael-alg-fst.c	/^int divxRijndaelKeySetupEnc(u32 rk[\/*4*(Nr + 1)*\/], const u8 cipherKey[], int keyBits) {$/;"	f
+dmax	../crypto/reference/bn.h	/^	int dmax;	\/* Size of the d array. *\/$/;"	m	struct:xbignum_st
+drmActivateRecord	../DrmTypes.h	/^typedef struct drmActivateRecord$/;"	s
+drmActivateRecord_t	../DrmTypes.h	/^} drmActivateRecord_t;$/;"	t	typeref:struct:drmActivateRecord
+drmActivationMessageStruct	../DrmTypes.h	/^typedef struct drmActivationMessageStruct$/;"	s
+drmActivationMessage_t	../DrmTypes.h	/^} drmActivationMessage_t;$/;"	t	typeref:struct:drmActivationMessageStruct
+drmActivationProtectedMessageStruct	../DrmTypes.h	/^typedef struct drmActivationProtectedMessageStruct$/;"	s
+drmActivationProtectedMessage_t	../DrmTypes.h	/^} drmActivationProtectedMessage_t;$/;"	t	typeref:struct:drmActivationProtectedMessageStruct
+drmApiState	../DrmApi.c	/^typedef enum drmApiState$/;"	g	file:
+drmApiState_t	../DrmApi.c	/^} drmApiState_t;$/;"	t	typeref:enum:drmApiState	file:
+drmCommitPlayback	../DrmApi.c	/^drmErrorCodes_t drmCommitPlayback( uint8_t *drmContext )$/;"	f
+drmDataLoadGetBaseKey	../DrmDataLoad.c	/^int drmDataLoadGetBaseKey( uint8_t* baseKeyIndexString,$/;"	f
+drmDataLoadGetPublicKey	../DrmDataLoad.c	/^int drmDataLoadGetPublicKey( uint8_t* publicKeyE,$/;"	f
+drmDataLoadGetRTK	../DrmDataLoad.c	/^int drmDataLoadGetRTK( uint8_t* rtk )$/;"	f
+drmDataLoadLoadDrmMemory	../DrmDataLoad.c	/^int drmDataLoadLoadDrmMemory( uint8_t* marshalledMemory,$/;"	f
+drmDataLoadModelId	../DrmDataLoad.c	/^int drmDataLoadModelId( uint8_t* modelId )$/;"	f
+drmDataLoadSaveDrmMemory	../DrmDataLoad.c	/^int drmDataLoadSaveDrmMemory( uint8_t* marshalledMemory,$/;"	f
+drmDecryptAudio	../DrmApi.c	/^drmErrorCodes_t drmDecryptAudio( uint8_t *drmContext,$/;"	f
+drmDecryptVideo	../DrmApi.c	/^drmErrorCodes_t drmDecryptVideo( uint8_t *drmContext,$/;"	f
+drmErrorCodes	../DrmApi.h	/^typedef enum drmErrorCodes $/;"	g
+drmErrorCodes_t	../DrmApi.h	/^} drmErrorCodes_t;$/;"	t	typeref:enum:drmErrorCodes
+drmFinalizePlayback	../DrmApi.c	/^drmErrorCodes_t drmFinalizePlayback( uint8_t *drmContext )$/;"	f
+drmFrameKeys	../DrmTypes.h	/^typedef struct drmFrameKeys$/;"	s
+drmFrameKeys_t	../DrmTypes.h	/^} drmFrameKeys_t;$/;"	t	typeref:struct:drmFrameKeys
+drmGetActivationMessage	../DrmApi.c	/^drmErrorCodes_t drmGetActivationMessage( uint8_t* drmContext,$/;"	f
+drmGetActivationStatus	../DrmApi.c	/^drmErrorCodes_t drmGetActivationStatus( uint8_t* userId,$/;"	f
+drmGetDeactivationCodeString	../DrmApi.c	/^drmErrorCodes_t drmGetDeactivationCodeString( uint8_t* drmContext,$/;"	f
+drmGetDeactivationMessage	../DrmApi.c	/^drmErrorCodes_t drmGetDeactivationMessage( uint8_t* drmContext,$/;"	f
+drmGetDrmContextSize	../DrmApi.c	/^uint32_t drmGetDrmContextSize( )$/;"	f
+drmGetLastError	../DrmApi.c	/^drmErrorCodes_t drmGetLastError( uint8_t* drmContext )$/;"	f
+drmGetRandomSampleCounter	../DrmApi.c	/^uint32_t drmGetRandomSampleCounter( uint8_t* drmContext )$/;"	f
+drmGetRegistrationCodeString	../DrmApi.c	/^drmErrorCodes_t drmGetRegistrationCodeString( uint8_t* drmContext,$/;"	f
+drmGetStrdSize	../DrmApi.c	/^uint32_t drmGetStrdSize( )$/;"	f
+drmGetVersion	../DrmApi.c	/^int drmGetVersion( DivXVersion *pVersion )$/;"	f
+drmHeader	../DrmTypes.h	/^typedef struct drmHeader$/;"	s
+drmHeader_t	../DrmTypes.h	/^} drmHeader_t;$/;"	t	typeref:struct:drmHeader
+drmInitPlayback	../DrmApi.c	/^drmErrorCodes_t drmInitPlayback( uint8_t *drmContext,$/;"	f
+drmInitSystem	../DrmApi.c	/^drmErrorCodes_t drmInitSystem( uint8_t *drmContext,$/;"	f
+drmLastError	../DrmApi.c	/^	drmErrorCodes_t drmLastError;$/;"	m	struct:playbackContext	file:
+drmMemory	../DrmTypes.h	/^typedef struct drmMemory$/;"	s
+drmMemory2Mem	../HeaderStructs2Mem.c	/^int32_t drmMemory2Mem( drmMemory_t * drmMemory,$/;"	f
+drmMemoryScrambleIn	../DrmDataLoad.c	/^void drmMemoryScrambleIn( uint8_t* data,$/;"	f
+drmMemoryScrambleOut	../DrmDataLoad.c	/^void drmMemoryScrambleOut( uint8_t* data,$/;"	f
+drmMemory_t	../DrmTypes.h	/^} drmMemory_t;$/;"	t	typeref:struct:drmMemory
+drmMessagePacked	../DrmTypes.h	/^typedef struct drmMessagePacked$/;"	s
+drmMessagePacked_t	../DrmTypes.h	/^} drmMessagePacked_t;$/;"	t	typeref:struct:drmMessagePacked
+drmMode	../DrmTypes.h	/^	uint16_t drmMode;$/;"	m	struct:drmTargetHeader_t
+drmOwnerSlot	../DrmTypes.h	/^typedef struct drmOwnerSlot$/;"	s
+drmOwnerSlot_t	../DrmTypes.h	/^} drmOwnerSlot_t;$/;"	t	typeref:struct:drmOwnerSlot
+drmPackedMemory	../DrmTypes.h	/^typedef struct drmPackedMemory$/;"	s
+drmPackedMemory_t	../DrmTypes.h	/^} drmPackedMemory_t;$/;"	t	typeref:struct:drmPackedMemory
+drmPlaySlot	../DrmTypes.h	/^typedef struct drmPlaySlot$/;"	s
+drmPlaySlot_t	../DrmTypes.h	/^} drmPlaySlot_t;$/;"	t	typeref:struct:drmPlaySlot
+drmQueryAcptb	../DrmApi.c	/^drmErrorCodes_t drmQueryAcptb( uint8_t *drmContext,$/;"	f
+drmQueryCgmsa	../DrmApi.c	/^drmErrorCodes_t drmQueryCgmsa( uint8_t *drmContext,$/;"	f
+drmQueryDigitalProtection	../DrmApi.c	/^drmErrorCodes_t drmQueryDigitalProtection( uint8_t *drmContext,$/;"	f
+drmQueryRentalStatus	../DrmApi.c	/^drmErrorCodes_t drmQueryRentalStatus( uint8_t *drmContext,$/;"	f
+drmRegistrationRequest	../DrmTypes.h	/^typedef struct drmRegistrationRequest$/;"	s
+drmRegistrationRequest_t	../DrmTypes.h	/^} drmRegistrationRequest_t;$/;"	t	typeref:struct:drmRegistrationRequest
+drmRentalRecord	../DrmTypes.h	/^typedef struct drmRentalRecord$/;"	s
+drmRentalRecord_t	../DrmTypes.h	/^} drmRentalRecord_t;$/;"	t	typeref:struct:drmRentalRecord
+drmSetRandomSample	../DrmApi.c	/^drmErrorCodes_t drmSetRandomSample( uint8_t* drmContext )$/;"	f
+drmSubMode	../DrmTypes.h	/^	uint16_t drmSubMode;$/;"	m	struct:drmTargetHeader_t
+drmTargetHeader_t	../DrmTypes.h	/^typedef struct drmTargetHeader_t$/;"	s
+drmTargetHeader_t	../DrmTypes.h	/^} drmTargetHeader_t;$/;"	t	typeref:struct:drmTargetHeader_t
+drmTransactionInfoHeaderStruct_t	../DrmTypes.h	/^typedef struct drmTransactionInfoHeaderStruct_t$/;"	s
+drmTransactionInfoHeader_t	../DrmTypes.h	/^} drmTransactionInfoHeader_t;$/;"	t	typeref:struct:drmTransactionInfoHeaderStruct_t
+drmUseLimitIdInfo	../DrmTypes.h	/^typedef struct drmUseLimitIdInfo$/;"	s
+drmUseLimitIdInfo_t	../DrmTypes.h	/^} drmUseLimitIdInfo_t;$/;"	t	typeref:struct:drmUseLimitIdInfo
+drmVideoDDChunk	../DrmTypes.h	/^typedef struct drmVideoDDChunk$/;"	s
+drmVideoDDChunk_t	../DrmTypes.h	/^} drmVideoDDChunk_t;$/;"	t	typeref:struct:drmVideoDDChunk
+e	../crypto/reference/DivXRsaLocal.h	/^    XBIGNUM *e;$/;"	m	struct:_DivXRSA
+encodingAssign	../DataEncodingBits.c	/^void encodingAssign(uint8_t *a, uint8_t *b, uint8_t direction)$/;"	f
+encodingBase32Decode40Bits	../DataEncodingBase64.c	/^void encodingBase32Decode40Bits( const int8_t *input,$/;"	f
+encodingBase32Encode40Bits	../DataEncodingBase64.c	/^void encodingBase32Encode40Bits( const uint8_t *input,$/;"	f
+encodingBase64Decode	../DataEncodingBase64.c	/^int32_t encodingBase64Decode( int8_t *str,$/;"	f
+encodingBase64Encode	../DataEncodingBase64.c	/^int32_t encodingBase64Encode( int8_t *buffer,$/;"	f
+encodingConvertBinToHex	../DataEncodingBits.c	/^void encodingConvertBinToHex(const uint8_t *binary, uint32_t binarySizeBytes, char *allocatedHexString)$/;"	f
+encodingConvertHexToBin	../DataEncodingBits.c	/^int32_t encodingConvertHexToBin(const char *hexString, uint32_t allocatedBinaryDataSize, uint8_t *allocatedBinaryData)$/;"	f
+encodingGetByteLoopSizeFromBits	../DataEncodingBits.c	/^uint8_t encodingGetByteLoopSizeFromBits(uint8_t sizeInBits)$/;"	f
+encodingHalfByteSwap	../DataEncodingBits.c	/^void encodingHalfByteSwap(uint8_t *a, uint8_t *b, uint8_t position)$/;"	f
+encodingMaskSwap	../DataEncodingBits.c	/^void encodingMaskSwap(uint8_t *a, uint8_t *b, uint8_t mask)$/;"	f
+encodingPack	../DataEncodingBits.c	/^uint16_t encodingPack(uint8_t low, uint8_t hi)$/;"	f
+encodingQuarterByteSwap	../DataEncodingBits.c	/^void encodingQuarterByteSwap(uint8_t *a, uint8_t *b, uint8_t position)$/;"	f
+encodingUnpack	../DataEncodingBits.c	/^void encodingUnpack(uint16_t whole, uint8_t *hi, uint8_t *low)$/;"	f
+encodingValidBase32Data	../DataEncodingBase64.c	/^int32_t encodingValidBase32Data( const int8_t *str,$/;"	f
+encodingValidBase64Data	../DataEncodingBase64.c	/^int32_t encodingValidBase64Data( int8_t *str,$/;"	f
+euclid	../crypto/reference/bn_gcd.c	/^static XBIGNUM *euclid(XBIGNUM *a, XBIGNUM *b)$/;"	f	file:
+explicitGuard	../DrmTypes.h	/^	uint8_t explicitGuard[OWNER_GUARD_BYTES];$/;"	m	struct:drmActivateRecord
+failCount	../common/CuTest/CuTest.h	/^	int failCount;$/;"	m	struct:CuSuite
+failed	../common/CuTest/CuTest.h	/^	int failed;$/;"	m	struct:CuTest
+finalizeFPtr	../crypto/DivXPortableAPI.h	/^    portableFPtr finalizeFPtr;$/;"	m	struct:moduleDescriptor_t
+fix	../common/DivXVersion.h	/^    uint32_t        fix;$/;"	m	struct:_DivXVersion
+flags	../DrmTypes.h	/^    uint8_t         flags[4];$/;"	m	struct:drmActivationMessageStruct
+flags	../crypto/reference/bn.h	/^	int flags;$/;"	m	struct:xbignum_st
+flags	../crypto/reference/bn.h	/^	int flags;$/;"	m	struct:xbn_mont_ctx_st
+flags	../crypto/reference/bn.h	/^	int flags;$/;"	m	struct:xbn_recp_ctx_st
+flags	../crypto/reference/bn_lcl.h	/^	int flags;$/;"	m	struct:xbignum_ctx
+frameKeyCount	../DrmTypes.h	/^	uint8_t frameKeyCount;$/;"	m	struct:drmTargetHeader_t
+frameKeys	../DrmApi.c	/^    drmFrameKeys_t frameKeys;$/;"	m	struct:playbackContext	file:
+frameKeys	../DrmTypes.h	/^	uint8_t frameKeys[128][16];$/;"	m	struct:drmFrameKeys
+frameKeys	../DrmTypes.h	/^	uint8_t frameKeys[VIDEO_KEY_COUNT][VIDEO_KEY_SIZE_BYTES];$/;"	m	struct:drmHeader
+frameKeys2Mem	../HeaderStructs2Mem.c	/^int32_t frameKeys2Mem( const drmFrameKeys_t * frameKeys,$/;"	f
+function	../common/CuTest/CuTest.h	/^	TestFunction function;$/;"	m	struct:CuTest
+gTc	../common/CuTest/CuTest.c	/^CuTest  *gTc;$/;"	v
+g_CuTestErrors	../common/CuTest/CuTest.c	/^int     g_CuTestErrors = 0;$/;"	v
+genrand_int31	../mt19937ar.c	/^long genrand_int31(void)$/;"	f
+genrand_int32	../mt19937ar.c	/^unsigned long genrand_int32(void)$/;"	f
+genrand_real1	../mt19937ar.c	/^double genrand_real1(void)$/;"	f
+genrand_real2	../mt19937ar.c	/^double genrand_real2(void)$/;"	f
+genrand_real3	../mt19937ar.c	/^double genrand_real3(void)$/;"	f
+genrand_res53	../mt19937ar.c	/^double genrand_res53(void) $/;"	f
+guard	../DrmTypes.h	/^    uint8_t guard[OWNER_GUARD_BYTES];$/;"	m	struct:drmOwnerSlot
+guardHash	../DrmTypes.h	/^    uint8_t         guardHash[32];$/;"	m	struct:drmActivationMessageStruct
+h0	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h1	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h2	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h3	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h4	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h5	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h6	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+h7	../crypto/reference/sha256.h	/^  uint32_t  h0,h1,h2,h3,h4,h5,h6,h7;$/;"	m	struct:__anon4
+handle	../crypto/DivXPortableAPI.h	/^    uint32_t handle;$/;"	m	struct:moduleDescriptor_t
+id	../DrmTypes.h	/^    uint16_t id;$/;"	m	struct:drmUseLimitIdInfo
+init	../crypto/reference/bn.h	/^	int init;$/;"	m	struct:xbn_blinding_st
+init	../crypto/reference/bn.h	/^    int init;$/;"	m	struct:XBN_Context_t
+init_by_array	../mt19937ar.c	/^void init_by_array(init_key, key_length)$/;"	f
+init_genrand	../mt19937ar.c	/^void init_genrand(unsigned long s)$/;"	f
+initializeFPtr	../crypto/DivXPortableAPI.h	/^    portableFPtr initializeFPtr;$/;"	m	struct:moduleDescriptor_t
+int162mem	../HeaderMacros.h	17;"	d
+int16_t	../common/DivXInt.h	/^    typedef __int16             int16_t;$/;"	t
+int16_t	../common/DivXInt.h	/^    typedef short               int16_t;$/;"	t
+int16_t	../common/PortableDivxTypes.h	/^	typedef __int16 int16_t;$/;"	t
+int16_t	../common/PortableDivxTypes.h	/^	typedef short     int16_t;$/;"	t
+int322mem	../HeaderMacros.h	14;"	d
+int32_t	../common/DivXInt.h	/^    typedef __int32             int32_t;$/;"	t
+int32_t	../common/DivXInt.h	/^    typedef int                 int32_t;$/;"	t
+int32_t	../common/PortableDivxTypes.h	/^	typedef __int32 int32_t;$/;"	t
+int32_t	../common/PortableDivxTypes.h	/^	typedef int       int32_t;$/;"	t
+int64_t	../common/DivXInt.h	/^    typedef __int64             int64_t;$/;"	t
+int64_t	../common/DivXInt.h	/^    typedef long long           int64_t;$/;"	t
+int64_t	../common/PortableDivxTypes.h	/^	typedef __int64 int64_t;$/;"	t
+int64_t	../common/PortableDivxTypes.h	/^    typedef long long int64_t;$/;"	t
+int82mem	../HeaderMacros.h	20;"	d
+int8_t	../common/DivXInt.h	/^    typedef __int8              int8_t;$/;"	t
+int8_t	../common/DivXInt.h	/^    typedef char                int8_t;$/;"	t
+int8_t	../common/PortableDivxTypes.h	/^	typedef __int8  int8_t;$/;"	t
+jumpBuf	../common/CuTest/CuTest.h	/^	jmp_buf *jumpBuf;$/;"	m	struct:CuTest
+key	../DrmApi.c	/^    aesKeyHandle key;$/;"	m	struct:audioCryptoInfo	file:
+key	../DrmTypes.h	/^    uint8_t key[KEY_SIZE_BYTES];$/;"	m	struct:drmOwnerSlot
+keyIdTable	../DrmDataLoad.c	/^const char keyIdTable[60][45] = $/;"	v
+keyIndex	../DrmTypes.h	/^	uint16_t keyIndex;$/;"	m	struct:drmVideoDDChunk
+keyLen	../crypto/reference/rijndael-api-fst.h	/^    int   keyLen;                   \/* Length of the key  *\/$/;"	m	struct:__anon2
+keyMaterial	../crypto/reference/rijndael-api-fst.h	/^    char  keyMaterial[MAX_KEY_SIZE+1];  \/* Raw key data in ASCII, e.g., user input or KAT values *\/$/;"	m	struct:__anon2
+keyStoreGetMessageKey	../DrmKeyStore.c	/^int32_t keyStoreGetMessageKey( uint8_t protectionFormatFlag,$/;"	f
+keyStoreGetProtectionFormat	../DrmKeyStore.c	/^int32_t keyStoreGetProtectionFormat( uint8_t *protectionFormatFlag,$/;"	f
+keys	../DrmApi.c	/^	aesKeyHandle keys[VIDEO_KEY_COUNT_MAX];$/;"	m	struct:playbackContext	file:
+length	../common/CuTest/CuTest.h	/^	int length;$/;"	m	struct:__anon1
+list	../common/CuTest/CuTest.h	/^	CuTest* list[MAX_TEST_CASES];$/;"	m	struct:CuSuite
+localClock	../local/Reference/DrmLocal.c	/^uint32_t localClock()$/;"	f
+localClockTicksPerSec	../local/Reference/DrmLocal.c	/^uint32_t localClockTicksPerSec()$/;"	f
+localGetBootDriveName	../local/Reference/DrmLocal.c	/^uint32_t localGetBootDriveName( uint8_t* bootDriveName,$/;"	f
+localGetIMEI	../local/Reference/DrmLocal.c	/^uint32_t localGetIMEI( uint8_t* imei,$/;"	f
+localGetLocalHardwareSecret	../local/Reference/DrmLocal.c	/^uint32_t localGetLocalHardwareSecret( uint8_t *lhs )$/;"	f
+localGetMacAddress	../local/Reference/DrmLocal.c	/^uint32_t localGetMacAddress( uint8_t* mac,$/;"	f
+localGetMachineId	../local/Reference/DrmLocal.c	/^uint32_t localGetMachineId( uint8_t* machineId,$/;"	f
+localGetManufacturer	../local/Reference/DrmLocal.c	/^uint32_t localGetManufacturer( uint8_t* manufacturer,$/;"	f
+localGetProcessorString	../local/Reference/DrmLocal.c	/^uint32_t localGetProcessorString( uint8_t* processorString,$/;"	f
+localGetRevision	../local/Reference/DrmLocal.c	/^uint32_t localGetRevision( uint8_t* revision,$/;"	f
+localGetSerial	../local/Reference/DrmLocal.c	/^uint32_t localGetSerial( uint8_t* serial,$/;"	f
+localLoadDrmMemoryFragment1	../local/Reference/DrmLocal.c	/^uint32_t localLoadDrmMemoryFragment1( uint8_t *frag,$/;"	f
+localLoadDrmMemoryFragment2	../local/Reference/DrmLocal.c	/^uint32_t localLoadDrmMemoryFragment2( uint8_t *frag,$/;"	f
+localLoadDrmMemoryFragment3	../local/Reference/DrmLocal.c	/^uint32_t localLoadDrmMemoryFragment3( uint8_t *frag,$/;"	f
+localSaveDrmMemoryFragment1	../local/Reference/DrmLocal.c	/^uint32_t localSaveDrmMemoryFragment1( uint8_t *frag,$/;"	f
+localSaveDrmMemoryFragment2	../local/Reference/DrmLocal.c	/^uint32_t localSaveDrmMemoryFragment2( uint8_t *frag,$/;"	f
+localSaveDrmMemoryFragment3	../local/Reference/DrmLocal.c	/^uint32_t localSaveDrmMemoryFragment3( uint8_t *frag,$/;"	f
+localTicker	../DrmApi.c	/^    uint8_t localTicker;$/;"	m	struct:playbackContext	file:
+main	../common/CuTest/AllTests.c	/^int main(void)$/;"	f
+major	../common/DivXVersion.h	/^    uint32_t        major;$/;"	m	struct:_DivXVersion
+mem2DrmMemory	../HeaderMem2Structs.c	/^int32_t mem2DrmMemory( uint8_t * * mem,$/;"	f
+mem2FrameKeys	../HeaderMem2Structs.c	/^int32_t mem2FrameKeys( uint8_t * * mem,$/;"	f
+mem2TargetHeader	../HeaderMem2Structs.c	/^int32_t mem2TargetHeader( uint8_t * * mem,$/;"	f
+mem2TransactionHeader	../HeaderMem2Structs.c	/^int32_t mem2TransactionHeader( uint8_t** mem,$/;"	f
+mem2VideoDDChunk	../HeaderMem2Structs.c	/^int32_t mem2VideoDDChunk( uint8_t * * mem,$/;"	f
+mem2bytes	../HeaderMacros.h	24;"	d
+mem2int16	../HeaderMacros.h	18;"	d
+mem2int32	../HeaderMacros.h	15;"	d
+mem2int8	../HeaderMacros.h	21;"	d
+memoryGuard	../DrmTypes.h	/^	uint8_t memoryGuard[OWNER_GUARD_BYTES];$/;"	m	struct:drmActivateRecord
+message	../DrmTypes.h	/^    uint8_t message[MAX_MESSAGE_SIZE_BYTES];$/;"	m	struct:drmMessagePacked
+message	../common/CuTest/CuTest.h	/^	const char* message;$/;"	m	struct:CuTest
+minor	../common/DivXVersion.h	/^    uint32_t        minor;$/;"	m	struct:_DivXVersion
+mod	../crypto/reference/bn.h	/^	XBIGNUM *mod; \/* just a reference *\/$/;"	m	struct:xbn_blinding_st
+mode	../crypto/reference/rijndael-api-fst.h	/^    BYTE  mode;                     \/* MODE_ECB, MODE_CBC, or MODE_CFB1 *\/$/;"	m	struct:__anon3
+modelId	../DrmTypes.h	/^	uint8_t modelId[MODEL_ID_BYTES];$/;"	m	struct:drmActivateRecord
+modelId	../DrmTypes.h	/^    uint8_t modelId[MODEL_ID_BYTES];$/;"	m	struct:drmRegistrationRequest
+moduleDescriptor	../crypto/DivXPortableAPI.h	/^typedef struct moduleDescriptor_t moduleDescriptor;$/;"	t	typeref:struct:moduleDescriptor_t
+moduleDescriptor_t	../crypto/DivXPortableAPI.h	/^struct moduleDescriptor_t$/;"	s
+mt	../mt19937ar.c	/^static unsigned long mt[N]; \/* the array for the state vector  *\/$/;"	v	file:
+mti	../mt19937ar.c	/^static int mti=N+1; \/* mti==N+1 means mt[N] is not initialized *\/$/;"	v	file:
+mul	../crypto/reference/bn_lcl.h	292;"	d
+mul	../crypto/reference/bn_lcl.h	320;"	d
+mul	../crypto/reference/bn_lcl.h	400;"	d
+mul64	../crypto/reference/bn_lcl.h	349;"	d
+mul_add	../crypto/reference/bn_lcl.h	285;"	d
+mul_add	../crypto/reference/bn_lcl.h	307;"	d
+mul_add	../crypto/reference/bn_lcl.h	384;"	d
+mul_add_c	../crypto/reference/bn_asm.c	435;"	d	file:
+mul_add_c	../crypto/reference/bn_asm.c	464;"	d	file:
+mul_add_c	../crypto/reference/bn_asm.c	494;"	d	file:
+mul_add_c2	../crypto/reference/bn_asm.c	442;"	d	file:
+mul_add_c2	../crypto/reference/bn_asm.c	472;"	d	file:
+mul_add_c2	../crypto/reference/bn_asm.c	501;"	d	file:
+n	../crypto/reference/DivXRsaLocal.h	/^    XBIGNUM *n;$/;"	m	struct:_DivXRSA
+n0	../crypto/reference/bn.h	/^	XBN_ULONG n0;   \/* least significant word of Ni *\/$/;"	m	struct:xbn_mont_ctx_st
+name	../common/CuTest/CuTest.h	/^	const char* name;$/;"	m	struct:CuSuite
+name	../common/CuTest/CuTest.h	/^	const char* name;$/;"	m	struct:CuTest
+nblocks	../crypto/reference/sha256.h	/^  uint32_t  nblocks;$/;"	m	struct:__anon4
+neg	../crypto/reference/bn.h	/^	int neg;	\/* one if the number is negative *\/$/;"	m	struct:xbignum_st
+nullGuard	../DrmApi.c	/^static const uint8_t nullGuard[OWNER_GUARD_BYTES] = {0,0,0};$/;"	v	file:
+num_bits	../crypto/reference/bn.h	/^	int num_bits;$/;"	m	struct:xbn_recp_ctx_st
+officialName	../common/DivXVersion.h	/^    const char  *officialName; $/;"	m	struct:_DivXVersion
+offset	../DrmApi.c	/^	uint16_t offset;$/;"	m	struct:audioCryptoInfo	file:
+offset	../DrmTypes.h	/^	uint32_t offset;$/;"	m	struct:drmVideoDDChunk
+optionFlags	../DrmTypes.h	/^	uint8_t optionFlags;$/;"	m	struct:drmTargetHeader_t
+outputProtectionFlags	../DrmTypes.h	/^	uint8_t outputProtectionFlags;$/;"	m	struct:drmTargetHeader_t
+owner	../DrmTypes.h	/^    drmOwnerSlot_t owner;$/;"	m	struct:drmMemory
+pCuSuite	../common/CuTest/CuTest.h	/^static CuSuite* pCuSuite;$/;"	v
+pRegistry	../common/CuTest/CuTest.h	/^	CuSuiteRegistry *pRegistry;$/;"	m	struct:CuSuite
+pRegistry	../common/CuTest/CuTest.h	/^CuSuiteRegistry registry,*pRegistry;$/;"	v
+pSuite	../common/CuTest/CuTest.h	/^	CuSuite *pSuite;$/;"	m	struct:CuTest
+packRegistrationLogic	../DrmMessage.c	/^void packRegistrationLogic(drmRegistrationRequest_t *request, drmMessagePacked_t *messagePacked, uint8_t direction)$/;"	f
+packdrmRegistrationRequest_t	../DrmMessage.c	/^void packdrmRegistrationRequest_t( drmRegistrationRequest_t request, drmMessagePacked_t *messagePacked)$/;"	f
+packed	../DrmTypes.h	/^    uint8_t packed[PACKED_ALLOCATION_BYTES];$/;"	m	struct:drmPackedMemory
+playbackContext	../DrmApi.c	/^typedef struct playbackContext$/;"	s	file:
+playbackContext_t	../DrmApi.c	/^} playbackContext_t;$/;"	t	typeref:struct:playbackContext	file:
+portableFPtr	../crypto/DivXPortableAPI.h	/^typedef int32_t (*portableFPtr) ( uint32_t *handle );$/;"	t
+pos	../crypto/reference/bn_lcl.h	/^	int pos[XBN_CTX_NUM_POS];$/;"	m	struct:xbignum_ctx
+postfixPad	../DrmTypes.h	/^    uint8_t postfixPad[4];$/;"	m	struct:drmMemory
+prefixPad	../DrmTypes.h	/^    uint8_t prefixPad[4];$/;"	m	struct:drmMemory
+protectedAudioCryptoSize	../DrmTypes.h	/^	uint8_t protectedAudioCryptoSize;$/;"	m	struct:drmTargetHeader_t
+protectedAudioOffset	../DrmTypes.h	/^	uint8_t protectedAudioOffset;$/;"	m	struct:drmTargetHeader_t
+protectedPayload	../DrmTypes.h	/^    uint8_t        protectedPayload[256];$/;"	m	struct:drmActivationProtectedMessageStruct
+publicKeyScrambleIn	../DrmDataLoad.c	/^void publicKeyScrambleIn( uint8_t* data,$/;"	f
+publicKeyScrambleOut	../DrmDataLoad.c	/^void publicKeyScrambleOut( uint8_t* data,$/;"	f
+ran	../common/CuTest/CuTest.h	/^	int ran;$/;"	m	struct:CuTest
+randomByteBucket	../DrmApi.c	/^    uint8_t randomByteBucket[RANDOM_BYTE_BUCKET_SIZE];$/;"	m	struct:playbackContext	file:
+randomPad	../DrmTypes.h	/^    uint8_t randomPad;$/;"	m	struct:drmPlaySlot
+randomPad1	../DrmTypes.h	/^    uint8_t randomPad1;$/;"	m	struct:drmOwnerSlot
+randomPad1	../DrmTypes.h	/^    uint8_t randomPad1[4];$/;"	m	struct:drmMemory
+randomPad2	../DrmTypes.h	/^    uint8_t randomPad2;$/;"	m	struct:drmOwnerSlot
+randomPad2	../DrmTypes.h	/^    uint8_t randomPad2[5];$/;"	m	struct:drmMemory
+randomPad3	../DrmTypes.h	/^    uint8_t randomPad3;$/;"	m	struct:drmOwnerSlot
+randomSamples	../DrmApi.c	/^    uint32_t randomSamples;$/;"	m	struct:playbackContext	file:
+rcon	../crypto/reference/rijndael-alg-fst.c	/^static const u32 rcon[] = {$/;"	v	file:
+registrationCode	../DrmTypes.h	/^    int8_t          registrationCode[8];$/;"	m	struct:drmActivationMessageStruct
+registrationSecuritySwap	../DrmMessage.c	/^void registrationSecuritySwap(drmMessagePacked_t *messagePacked)$/;"	f
+registry	../common/CuTest/CuTest.h	/^CuSuiteRegistry registry,*pRegistry;$/;"	v
+rentalRecord	../DrmTypes.h	/^    drmRentalRecord_t rentalRecord;$/;"	m	struct:drmTargetHeader_t
+reserved	../DrmTypes.h	/^	uint8_t reserved[DRM_OTHER_RESERVED];$/;"	m	struct:drmTransactionInfoHeaderStruct_t
+reserved	../DrmTypes.h	/^	uint8_t reserved[DRM_RENTAL_RESERVED_BYTES];$/;"	m	struct:drmRentalRecord
+reserved	../DrmTypes.h	/^	uint8_t reserved[DRM_RESERVED];$/;"	m	struct:drmTargetHeader_t
+reserved	../DrmTypes.h	/^    uint32_t       reserved;$/;"	m	struct:drmActivationProtectedMessageStruct
+reserved	../DrmTypes.h	/^    uint8_t         reserved[32];$/;"	m	struct:drmActivationMessageStruct
+reservedFlags	../DrmTypes.h	/^	uint32_t reservedFlags;$/;"	m	struct:drmHeader
+ri	../crypto/reference/bn.h	/^	int ri;        \/* number of bits in R *\/$/;"	m	struct:xbn_mont_ctx_st
+rk_dec	../crypto/reference/rijndael-api-fst.h	/^	u32   rk_dec[4*(MAXNR + 1)];        \/* key schedule *\/$/;"	m	struct:__anon2
+rk_enc	../crypto/reference/rijndael-api-fst.h	/^	u32   rk_enc[4*(MAXNR + 1)];        \/* key schedule *\/$/;"	m	struct:__anon2
+ror	../crypto/reference/sha256.c	76;"	d	file:
+rsaPrivateKeyHandle	../crypto/DivXRsa.h	/^typedef uint32_t rsaPrivateKeyHandle;$/;"	t
+rsaPublicKeyHandle	../crypto/DivXRsa.h	/^typedef uint32_t rsaPublicKeyHandle;$/;"	t
+runCount	../common/CuTest/CuTest.h	/^	int runCount;$/;"	m	struct:CuSuite
+s01replacementMap	../DrmDataLoad.c	/^const uint8_t s01replacementMap[] = \\$/;"	v
+s02replacementMap	../DrmDataLoad.c	/^const uint8_t s02replacementMap[] = \\$/;"	v
+s03replacementMap	../DrmDataLoad.c	/^const uint8_t s03replacementMap[] = \\$/;"	v
+s_activationGenerateProtectedMessage	../DrmApi.c	/^int32_t s_activationGenerateProtectedMessage( uint8_t* messageBuffer,$/;"	f
+s_activationMsgStruct2Mem	../DrmApi.c	/^static void s_activationMsgStruct2Mem( uint8_t* toBuffer,$/;"	f	file:
+s_activationProtectedMsgStruct2Mem	../DrmApi.c	/^static void s_activationProtectedMsgStruct2Mem( uint8_t* toBuffer,$/;"	f	file:
+s_decryptAudio	../DrmApi.c	/^int32_t s_decryptAudio( audioCryptoInfo_t *audioSettings,$/;"	f
+s_getSessionKey	../DrmApi.c	/^drmErrorCodes_t s_getSessionKey( playbackContext_t *context,$/;"	f
+s_getWindowsGeneralInfo	../local/Reference/DrmLocal.c	/^static int32_t s_getWindowsGeneralInfo( LINEGENERALINFO** lineGeneralInfo )$/;"	f	file:
+s_loadDrmMemory	../DrmApi.c	/^drmErrorCodes_t s_loadDrmMemory( drmMemory_t *memory )$/;"	f
+s_maskCheck	../DrmApi.c	/^uint8_t s_maskCheck( const uint8_t option,$/;"	f
+s_messageKeyTable	../DrmKeyStore.c	/^static const uint8_t s_messageKeyTable[MESSAGE_KEY_INDEX_TOTAL][SIZEOF_MESSAGE_KEY_SIZE_BYTES] =$/;"	v	file:
+s_randomizeGuard	../DrmApi.c	/^drmErrorCodes_t s_randomizeGuard( playbackContext_t *context,$/;"	f
+s_readFragment	../local/Reference/DrmLocal.c	/^static int32_t s_readFragment( uint32_t fragmentNum,$/;"	f	file:
+s_saveDrmMemory	../DrmApi.c	/^drmErrorCodes_t s_saveDrmMemory( drmMemory_t *memory )$/;"	f
+s_writeFragment	../local/Reference/DrmLocal.c	/^static int32_t s_writeFragment( uint32_t fragmentNum,$/;"	f	file:
+serialNumber	../DrmTypes.h	/^	uint8_t serialNumber[SLOT_SERIAL_NUMBER_BYTES];$/;"	m	struct:drmRentalRecord
+serialNumber	../DrmTypes.h	/^    uint8_t serialNumber[SLOT_SERIAL_NUMBER_BYTES];$/;"	m	struct:drmPlaySlot
+sessionKey	../DrmTypes.h	/^	uint8_t sessionKey[KEY_SIZE_BYTES];$/;"	m	struct:drmTargetHeader_t
+setLastError	../DrmApi.c	/^void setLastError(  uint8_t* drmContext,$/;"	f
+setUp	../common/CuTest/CuTestTest.c	/^ADD_SETUP(setUp);$/;"	v
+setUp	../common/CuTest/CuTestTest.c	/^static void setUp(CuTest *tc)$/;"	f	file:
+setUpFunction	../common/CuTest/CuTest.h	/^	void (*setUpFunction)();$/;"	m	struct:CuSuite
+setUpFunction	../common/CuTest/CuTest.h	/^	void (*setUpFunction)();$/;"	m	struct:CuTest
+sha256	../crypto/reference/sha256.c	/^sha256( uint8_t *data,$/;"	f
+sha256	../crypto/reference/sha256.c	/^sha256(uint8_t *data, uint32_t size, uint8_t *hash)$/;"	f
+sha256Handle_t	../crypto/DivXSha.h	/^typedef void* sha256Handle_t;$/;"	t
+sha256_final	../crypto/reference/sha256.c	/^sha256_final(void *context)$/;"	f
+sha256_init	../crypto/reference/sha256.c	/^sha256_init (void *context)$/;"	f
+sha256_read	../crypto/reference/sha256.c	/^sha256_read (void *context)$/;"	f
+sha256_transform	../crypto/reference/sha256.c	/^sha256_transform (SHA256_CONTEXT *hd, uint8_t *data)$/;"	f
+sha256_write	../crypto/reference/sha256.c	/^sha256_write (void *context, uint8_t *inbuf, size_t inlen)$/;"	f
+shift	../crypto/reference/bn.h	/^	int shift;$/;"	m	struct:xbn_recp_ctx_st
+size	../DrmApi.c	/^	uint16_t size;$/;"	m	struct:audioCryptoInfo	file:
+size	../DrmTypes.h	/^	uint32_t size;$/;"	m	struct:drmVideoDDChunk
+size	../common/CuTest/CuTest.h	/^	int size;$/;"	m	struct:__anon1
+sizeInBits	../DrmTypes.h	/^    uint8_t sizeInBits;$/;"	m	struct:drmMessagePacked
+slotNumber	../DrmTypes.h	/^	uint8_t slotNumber;$/;"	m	struct:drmRentalRecord
+slots	../DrmTypes.h	/^    drmPlaySlot_t slots[TOTAL_PLAY_SLOTS];$/;"	m	struct:drmMemory
+snprintf	../common/DivXWchar.h	77;"	d
+snprintf	../common/portab.h	61;"	d
+snwprintf	../common/DivXWchar.h	79;"	d
+sqr	../crypto/reference/bn_lcl.h	299;"	d
+sqr	../crypto/reference/bn_lcl.h	330;"	d
+sqr64	../crypto/reference/bn_lcl.h	367;"	d
+sqr_add_c	../crypto/reference/bn_asm.c	452;"	d	file:
+sqr_add_c	../crypto/reference/bn_asm.c	482;"	d	file:
+sqr_add_c	../crypto/reference/bn_asm.c	513;"	d	file:
+sqr_add_c2	../crypto/reference/bn_asm.c	459;"	d	file:
+sqr_add_c2	../crypto/reference/bn_asm.c	490;"	d	file:
+sqr_add_c2	../crypto/reference/bn_asm.c	518;"	d	file:
+state	../DrmApi.c	/^	drmApiState_t state;$/;"	m	struct:playbackContext	file:
+strcasecmp	../common/DivXWchar.h	81;"	d
+strcasecmp	../common/portab.h	54;"	d
+strcasecmp	../common/portab.h	76;"	d
+strdPtr	../DrmApi.c	/^	uint8_t* strdPtr;$/;"	m	struct:playbackContext	file:
+stricmp	../common/DivXWchar.h	117;"	d
+stricmp	../common/portab.h	107;"	d
+stricmp	../common/portab.h	113;"	d
+stricmp	../common/portab.h	70;"	d
+stricmp	../common/portab.h	83;"	d
+stricmp	../common/portab.h	95;"	d
+strncasecmp	../common/DivXWchar.h	82;"	d
+strncasecmp	../common/portab.h	53;"	d
+strncasecmp	../common/portab.h	75;"	d
+strnicmp	../common/DivXWchar.h	118;"	d
+strnicmp	../common/portab.h	108;"	d
+strnicmp	../common/portab.h	114;"	d
+strnicmp	../common/portab.h	84;"	d
+strnicmp	../common/portab.h	96;"	d
+sub_01_in	../DrmDataLoad.c	88;"	d	file:
+sub_01_out	../DrmDataLoad.c	98;"	d	file:
+sub_02_in	../DrmDataLoad.c	130;"	d	file:
+sub_02_out	../DrmDataLoad.c	140;"	d	file:
+sub_03_in	../DrmDataLoad.c	172;"	d	file:
+sub_03_out	../DrmDataLoad.c	182;"	d	file:
+suites	../common/CuTest/CuTest.h	/^	CuSuite* suites;$/;"	m	struct:CuSuiteRegistry
+swap_01_in	../DrmDataLoad.c	6;"	d	file:
+swap_01_out	../DrmDataLoad.c	35;"	d	file:
+swprintf	../common/DivXWchar.h	78;"	d
+swprintf	../common/portab.h	64;"	d
+targetHeader	../DrmApi.c	/^    drmTargetHeader_t targetHeader;$/;"	m	struct:playbackContext	file:
+targetHeader	../DrmTypes.h	/^	drmTargetHeader_t targetHeader;$/;"	m	struct:drmHeader
+targetHeader2Mem	../HeaderStructs2Mem.c	/^int32_t targetHeader2Mem( const drmTargetHeader_t * targetHeader,$/;"	f
+tearDown	../common/CuTest/CuTestTest.c	/^ADD_TEARDOWN(tearDown);$/;"	v
+tearDown	../common/CuTest/CuTestTest.c	/^static void tearDown(CuTest *tc)$/;"	f	file:
+tearDownFunction	../common/CuTest/CuTest.h	/^	void (*tearDownFunction)();$/;"	m	struct:CuSuite
+tearDownFunction	../common/CuTest/CuTest.h	/^	void (*tearDownFunction)();$/;"	m	struct:CuTest
+too_many	../crypto/reference/bn_lcl.h	/^	int too_many;$/;"	m	struct:xbignum_ctx
+top	../crypto/reference/bn.h	/^	int top;	\/* Index of last used d +1. *\/$/;"	m	struct:xbignum_st
+tos	../crypto/reference/bn_lcl.h	/^	int tos;$/;"	m	struct:xbignum_ctx
+transaction	../DrmTypes.h	/^	drmTransactionInfoHeader_t transaction;$/;"	m	struct:drmHeader
+transactionAuthorityId	../DrmTypes.h	/^	uint16_t transactionAuthorityId;$/;"	m	struct:drmTransactionInfoHeaderStruct_t
+transactionHeader	../DrmApi.c	/^    drmTransactionInfoHeader_t transactionHeader;$/;"	m	struct:playbackContext	file:
+transactionId	../DrmTypes.h	/^	uint8_t transactionId[TRANSACTION_ID_BYTES];$/;"	m	struct:drmTransactionInfoHeaderStruct_t
+u16	../crypto/reference/rijndael-alg-fst.h	/^typedef unsigned short	u16;	$/;"	t
+u32	../crypto/reference/rijndael-alg-fst.h	/^typedef unsigned int	u32;$/;"	t
+u8	../crypto/reference/rijndael-alg-fst.h	/^typedef unsigned char	u8;	$/;"	t
+uint16_t	../common/DivXInt.h	/^    typedef u_int16_t           uint16_t;$/;"	t
+uint16_t	../common/DivXInt.h	/^    typedef unsigned __int16    uint16_t;$/;"	t
+uint16_t	../common/DivXInt.h	/^    typedef unsigned short      uint16_t;$/;"	t
+uint16_t	../common/PortableDivxTypes.h	/^	typedef unsigned __int16 uint16_t;$/;"	t
+uint16_t	../common/PortableDivxTypes.h	/^	typedef unsigned short     uint16_t;$/;"	t
+uint32_t	../common/DivXInt.h	/^    typedef u_int32_t           uint32_t;$/;"	t
+uint32_t	../common/DivXInt.h	/^    typedef unsigned int        uint32_t;$/;"	t
+uint32_t	../common/DivXInt.h	/^    typedef unsigned int uint32_t;$/;"	t
+uint32_t	../common/PortableDivxTypes.h	/^	typedef unsigned int       uint32_t;$/;"	t
+uint32_t	../common/PortableDivxTypes.h	/^	typedef unsigned int uint32_t;$/;"	t
+uint32_t	../common/PortableDivxTypes.h	/^	typedef unsigned long      uint32_t;$/;"	t
+uint64_t	../common/DivXInt.h	/^    typedef u_int64_t           uint64_t;$/;"	t
+uint64_t	../common/DivXInt.h	/^    typedef unsigned __int64    uint64_t;$/;"	t
+uint64_t	../common/DivXInt.h	/^    typedef unsigned long long  uint64_t;$/;"	t
+uint64_t	../common/PortableDivxTypes.h	/^	typedef unsigned __int64 uint64_t;$/;"	t
+uint64_t	../common/PortableDivxTypes.h	/^	typedef unsigned long long uint64_t;$/;"	t
+uint8_t	../common/DivXInt.h	/^    typedef u_int8_t            uint8_t;$/;"	t
+uint8_t	../common/DivXInt.h	/^    typedef unsigned char       uint8_t;$/;"	t
+uint8_t	../common/DivXInt.h	/^    typedef unsigned char uint8_t;$/;"	t
+uint8_t	../common/PortableDivxTypes.h	/^	typedef unsigned char      uint8_t;$/;"	t
+uint8_t	../common/PortableDivxTypes.h	/^	typedef unsigned char uint8_t;$/;"	t
+unwrapSecureMessage	../DrmMessage.c	/^void unwrapSecureMessage( drmMessagePacked_t *transformMessage )$/;"	f
+useLimitId	../DrmTypes.h	/^	uint16_t useLimitId;$/;"	m	struct:drmRentalRecord
+useLimitIdInfo	../DrmApi.c	/^static const drmUseLimitIdInfo_t useLimitIdInfo[USE_LIMITS] =$/;"	v	file:
+userData	../crypto/reference/rijndael-api-fst.h	/^    int   userData;$/;"	m	struct:__anon2
+userId	../DrmTypes.h	/^	uint8_t userId[OWNER_USER_ID_BYTES];$/;"	m	struct:drmTargetHeader_t
+userId	../DrmTypes.h	/^    uint8_t userId[OWNER_USER_ID_BYTES];$/;"	m	struct:drmOwnerSlot
+userIdGuard	../DrmTypes.h	/^    uint8_t userIdGuard[OWNER_GUARD_BYTES];$/;"	m	struct:drmRegistrationRequest
+userKey	../DrmTypes.h	/^	uint8_t userKey[KEY_SIZE_BYTES];$/;"	m	struct:drmActivateRecord
+uses	../DrmTypes.h	/^    uint8_t uses;$/;"	m	struct:drmUseLimitIdInfo
+verbose	../common/CuTest/CuTest.h	/^	int verbose;$/;"	m	struct:CuSuiteRegistry
+version	../DrmTypes.h	/^    uint32_t       version;$/;"	m	struct:drmActivationProtectedMessageStruct
+wcstok	../common/DivXWchar.h	84;"	d
+wcstok	../common/portab.h	59;"	d
+wrapSecureMessage	../DrmMessage.c	/^void wrapSecureMessage( drmMessagePacked_t *transformMessage )$/;"	f
+wsprintf	../common/DivXWchar.h	113;"	d
+wstringToCFString	../common/PortableDivx.h	/^	inline CFStringRef wstringToCFString(std::wstring string)$/;"	f
+xbignum_ctx	../crypto/reference/bn_lcl.h	/^struct xbignum_ctx$/;"	s
+xbignum_st	../crypto/reference/bn.h	/^typedef struct xbignum_st$/;"	s
+xbnContext	../crypto/reference/DivXRsaLocal.h	/^    XBN_CTX *xbnContext;$/;"	m	struct:_DivXRSA
+xbn_add_part_words	../crypto/reference/bn_mul.c	/^XBN_ULONG xbn_add_part_words(XBN_ULONG *r,$/;"	f
+xbn_add_words	../crypto/reference/bn_asm.c	/^XBN_ULONG xbn_add_words(XBN_ULONG *r, const XBN_ULONG *a, const XBN_ULONG *b, int n)$/;"	f
+xbn_blinding_st	../crypto/reference/bn.h	/^typedef struct xbn_blinding_st$/;"	s
+xbn_check_top	../crypto/reference/bn_lcl.h	248;"	d
+xbn_check_top	../crypto/reference/bn_lcl.h	250;"	d
+xbn_cmp_part_words	../crypto/reference/bn_lib.c	/^int xbn_cmp_part_words(const XBN_ULONG *a, const XBN_ULONG *b,$/;"	f
+xbn_cmp_words	../crypto/reference/bn_lib.c	/^int xbn_cmp_words(const XBN_ULONG *a, const XBN_ULONG *b, int n)$/;"	f
+xbn_div_words	../crypto/reference/bn_asm.c	/^XBN_ULONG xbn_div_words(XBN_ULONG h, XBN_ULONG l, XBN_ULONG d)$/;"	f
+xbn_div_words	../crypto/reference/bn_div.c	145;"	d	file:
+xbn_dump	../crypto/reference/bn.h	512;"	d
+xbn_dump	../crypto/reference/bn.h	515;"	d
+xbn_dump1	../crypto/reference/bn_print.c	/^void xbn_dump1(FILE *o, const char *a, const XBN_ULONG *b,int n)$/;"	f
+xbn_dup_expand	../crypto/reference/bn_lib.c	/^XBIGNUM *xbn_dup_expand(const XBIGNUM *b, int words)$/;"	f
+xbn_expand	../crypto/reference/bn.h	485;"	d
+xbn_expand2	../crypto/reference/bn_lib.c	/^XBIGNUM *xbn_expand2(XBIGNUM *b, int words)$/;"	f
+xbn_expand_internal	../crypto/reference/bn_lib.c	/^static XBN_ULONG *xbn_expand_internal(const XBIGNUM *b, int words)$/;"	f	file:
+xbn_fix_top	../crypto/reference/bn.h	491;"	d
+xbn_limit_bits	../crypto/reference/bn.h	/^   int xbn_limit_bits;$/;"	m	struct:_xbn_limits
+xbn_limit_bits_high	../crypto/reference/bn.h	/^   int xbn_limit_bits_high;$/;"	m	struct:_xbn_limits
+xbn_limit_bits_low	../crypto/reference/bn.h	/^   int xbn_limit_bits_low;$/;"	m	struct:_xbn_limits
+xbn_limit_bits_mont	../crypto/reference/bn.h	/^   int xbn_limit_bits_mont;$/;"	m	struct:_xbn_limits
+xbn_limit_num	../crypto/reference/bn.h	/^   int xbn_limit_num;        \/* (1<<xbn_limit_bits) *\/$/;"	m	struct:_xbn_limits
+xbn_limit_num_high	../crypto/reference/bn.h	/^   int xbn_limit_num_high;   \/* (1<<xbn_limit_bits_high) *\/$/;"	m	struct:_xbn_limits
+xbn_limit_num_low	../crypto/reference/bn.h	/^   int xbn_limit_num_low;    \/* (1<<xbn_limit_bits_low) *\/$/;"	m	struct:_xbn_limits
+xbn_limit_num_mont	../crypto/reference/bn.h	/^   int xbn_limit_num_mont;   \/* (1<<xbn_limit_bits_mont) *\/$/;"	m	struct:_xbn_limits
+xbn_limits	../crypto/reference/bn.h	/^    xbn_limits_t xbn_limits;$/;"	m	struct:XBN_Context_t
+xbn_limits_t	../crypto/reference/bn.h	/^typedef struct _xbn_limits xbn_limits_t;$/;"	t	typeref:struct:_xbn_limits
+xbn_mont_ctx_st	../crypto/reference/bn.h	/^typedef struct xbn_mont_ctx_st$/;"	s
+xbn_mul_add_words	../crypto/reference/bn_asm.c	/^XBN_ULONG xbn_mul_add_words(XBN_ULONG *rp, const XBN_ULONG *ap, int num, XBN_ULONG w)$/;"	f
+xbn_mul_comba4	../crypto/reference/bn_asm.c	/^void xbn_mul_comba4(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b)$/;"	f
+xbn_mul_comba4	../crypto/reference/bn_asm.c	425;"	d	file:
+xbn_mul_comba8	../crypto/reference/bn_asm.c	/^void xbn_mul_comba8(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b)$/;"	f
+xbn_mul_comba8	../crypto/reference/bn_asm.c	424;"	d	file:
+xbn_mul_high	../crypto/reference/bn_mul.c	/^void xbn_mul_high(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b, XBN_ULONG *l, int n2,$/;"	f
+xbn_mul_low_normal	../crypto/reference/bn_mul.c	/^void xbn_mul_low_normal(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b, int n)$/;"	f
+xbn_mul_low_recursive	../crypto/reference/bn_mul.c	/^void xbn_mul_low_recursive(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b, int n2,$/;"	f
+xbn_mul_normal	../crypto/reference/bn_mul.c	/^void xbn_mul_normal(XBN_ULONG *r, XBN_ULONG *a, int na, XBN_ULONG *b, int nb)$/;"	f
+xbn_mul_part_recursive	../crypto/reference/bn_mul.c	/^void xbn_mul_part_recursive(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b, int n,$/;"	f
+xbn_mul_recursive	../crypto/reference/bn_mul.c	/^void xbn_mul_recursive(XBN_ULONG *r, XBN_ULONG *a, XBN_ULONG *b, int n2,$/;"	f
+xbn_mul_words	../crypto/reference/bn_asm.c	/^XBN_ULONG xbn_mul_words(XBN_ULONG *rp, const XBN_ULONG *ap, int num, XBN_ULONG w)$/;"	f
+xbn_print	../crypto/reference/bn.h	510;"	d
+xbn_print	../crypto/reference/bn.h	514;"	d
+xbn_recp_ctx_st	../crypto/reference/bn.h	/^typedef struct xbn_recp_ctx_st$/;"	s
+xbn_set_high	../crypto/reference/bn_lcl.h	270;"	d
+xbn_set_low	../crypto/reference/bn_lcl.h	261;"	d
+xbn_set_max	../crypto/reference/bn_lcl.h	255;"	d
+xbn_set_max	../crypto/reference/bn_lcl.h	257;"	d
+xbn_sqr_comba4	../crypto/reference/bn_asm.c	/^void xbn_sqr_comba4(XBN_ULONG *r, XBN_ULONG *a)$/;"	f
+xbn_sqr_comba4	../crypto/reference/bn_asm.c	/^void xbn_sqr_comba4(XBN_ULONG *r, const XBN_ULONG *a)$/;"	f
+xbn_sqr_comba4	../crypto/reference/bn_asm.c	427;"	d	file:
+xbn_sqr_comba4	../crypto/reference/bn_asm.c	798;"	d	file:
+xbn_sqr_comba8	../crypto/reference/bn_asm.c	/^void xbn_sqr_comba8(XBN_ULONG *r, XBN_ULONG *a)$/;"	f
+xbn_sqr_comba8	../crypto/reference/bn_asm.c	/^void xbn_sqr_comba8(XBN_ULONG *r, const XBN_ULONG *a)$/;"	f
+xbn_sqr_comba8	../crypto/reference/bn_asm.c	426;"	d	file:
+xbn_sqr_comba8	../crypto/reference/bn_asm.c	805;"	d	file:
+xbn_sqr_normal	../crypto/reference/bn_sqr.c	/^void xbn_sqr_normal(XBN_ULONG *r, const XBN_ULONG *a, int n, XBN_ULONG *tmp)$/;"	f
+xbn_sqr_recursive	../crypto/reference/bn_sqr.c	/^void xbn_sqr_recursive(XBN_ULONG *r, const XBN_ULONG *a, int n2, XBN_ULONG *t)$/;"	f
+xbn_sqr_words	../crypto/reference/bn_asm.c	/^void xbn_sqr_words(XBN_ULONG *r, const XBN_ULONG *a, int n)$/;"	f
+xbn_sub_part_words	../crypto/reference/bn_mul.c	/^XBN_ULONG xbn_sub_part_words(XBN_ULONG *r,$/;"	f
+xbn_sub_words	../crypto/reference/bn_asm.c	/^XBN_ULONG xbn_sub_words(XBN_ULONG *r, const XBN_ULONG *a, const XBN_ULONG *b, int n)$/;"	f
+xbn_wexpand	../crypto/reference/bn.h	487;"	d
+xor_01_in	../DrmDataLoad.c	64;"	d	file:
+xor_01_out	../DrmDataLoad.c	73;"	d	file:
+zTestFails	../common/CuTest/CuTestTest.c	/^void zTestFails(CuTest* tc)$/;"	f

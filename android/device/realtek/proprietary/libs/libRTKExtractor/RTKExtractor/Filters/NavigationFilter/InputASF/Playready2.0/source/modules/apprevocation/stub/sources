@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmapprevocationstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                   \
+    apprevocationimplstub.c \
+    apprevocationutilstub.c \
+

@@ -1,0 +1,19 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmwmdrmreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                       \
+    drmdevcert.c                \
+    drmwmdrmexprevalreal.c      \
+    drmwmdrmexprfuncreal.c      \
+    drmwmdrmexprvariablereal.c  \
+    drmwmdrmlicacqrespreal.c    \
+    drmwmdrmlicchainreal.c      \
+    drmwmdrmlicenseparserreal.c \
+    drmwmdrmlicevalreal.c       \
+    drmwmdrmoplreal.c           \
+    drmwmdrmutilreal.c          \
+

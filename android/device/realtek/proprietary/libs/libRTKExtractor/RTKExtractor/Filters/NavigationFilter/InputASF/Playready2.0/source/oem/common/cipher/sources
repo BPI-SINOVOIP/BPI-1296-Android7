@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oemcipher
+TARGETTYPE=LIBRARY
+
+SOURCES =       \
+    oemcipher.c
+

@@ -1,0 +1,48 @@
+#=========GPIO_CMD===============#
+key 582   VOICE_ASSIST
+key 84    ALEXA
+
+key 102   HOME
+
+key 115   VOLUME_UP
+key 114   VOLUME_DOWN
+
+key 1     BACK
+key 352   DPAD_CENTER
+
+key 207   MEDIA_PLAY
+key 119   MEDIA_PAUSE
+key 128   MEDIA_STOP
+
+key 103   DPAD_UP           
+key 108   DPAD_DOWN         
+key 106   DPAD_RIGHT        
+key 105   DPAD_LEFT         
+
+#===========VENUS_IR=============#
+
+key 116   POWER
+
+key 357   MENU
+#key 372   SEARCH
+key 217   SEARCH
+
+key 158   BACK
+
+key 168   MEDIA_REWIND
+key 208   MEDIA_FAST_FORWARD
+
+key 412   MEDIA_PREVIOUS
+key 407   MEDIA_NEXT
+
+key 113   VOLUME_MUTE
+#key 372   KEY_ZOOM
+
+key 353   TV_INPUT
+key 154	  WINDOW
+key 377	  TV
+
+key 358   INFO
+key 232   MEDIA_REPEAT
+
+

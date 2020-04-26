@@ -1,0 +1,23 @@
+on property:persist.storage.resizefs=1
+    start verity
+
+on property:persist.security.dmcheck=0
+    start verity_format
+    setprop persist.security.dmcheck 1
+
+service verity_format /sbin/verity_format_kylin.sh
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:realtek:s0
+
+service verity /sbin/verity_kylin.sh
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:realtek:s0
+

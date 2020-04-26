@@ -1,0 +1,85 @@
+ANDROID_SRC_PATH=../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libRtkRpcClientServer.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+################################################################################
+# Framework source code - IPC
+################################################################################
+LOCAL_SRC_FILES += ipc/client/IpcClientFactory.cpp
+LOCAL_SRC_FILES += ipc/client/pipe/IpcClientPipeImpl.cpp
+LOCAL_SRC_FILES += ipc/general/pipe/IpcPipePath.cpp
+LOCAL_SRC_FILES += ipc/general/pipe/IpcStreamerPipeImpl.cpp
+LOCAL_SRC_FILES += ipc/general/pipe/IpcStreamerRefCnt.cpp
+
+################################################################################
+# Framework source code - OS
+################################################################################
+LOCAL_SRC_FILES += os/OSAL.cpp
+
+################################################################################
+# Framework source code - RPC
+################################################################################
+LOCAL_SRC_FILES += rpc/RpcClient.cpp
+LOCAL_SRC_FILES += rpc/RpcCommandDemuxer.cpp
+LOCAL_SRC_FILES += rpc/RpcCommandMuxer.cpp
+LOCAL_SRC_FILES += rpc/RpcExecutorManager.cpp
+
+################################################################################
+
+
+################################################################################
+# Framework source code - Tools
+################################################################################
+LOCAL_SRC_FILES += tools/LogTools.cpp
+LOCAL_SRC_FILES += tools/StrLib.cpp
+LOCAL_SRC_FILES += tools/TimerObject.cpp
+
+################################################################################
+
+
+LOCAL_CFLAGS := -Wall -g
+LOCAL_C_INCLUDES := \
+	$(TOP)/device/realtek/proprietary/libs/RtkRpcClientServer \
+	$(TOP)/external/stlport/stlport \
+	$(TOP)/bionic	
+
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES) )
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

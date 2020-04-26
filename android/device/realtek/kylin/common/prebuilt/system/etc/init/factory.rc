@@ -1,0 +1,40 @@
+# for factory
+service factory_load /system/bin/factory load
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+service factory_save /system/bin/factory save
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+service factory_recovery /system/bin/factory recovery
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+service factory_loadro /system/bin/factory loadro
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+	
+service factory_write /system/bin/factory write
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0

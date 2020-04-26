@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdevicerevocationstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                      \
+    devicerevocationimplstub.c \
+    devicerevocationutilstub.c \
+

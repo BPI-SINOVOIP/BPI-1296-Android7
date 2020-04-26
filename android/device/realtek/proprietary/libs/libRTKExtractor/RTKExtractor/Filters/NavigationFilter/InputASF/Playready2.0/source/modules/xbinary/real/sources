@@ -1,0 +1,18 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmxbinaryreal
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_BUILDING_DRMXB_LIB
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_BUILDING_DRMXB_LIB
+!endif
+
+SOURCES =          \
+    drmxb.c        \
+    drmxbbuilder.c \
+    drmxbparser.c
+

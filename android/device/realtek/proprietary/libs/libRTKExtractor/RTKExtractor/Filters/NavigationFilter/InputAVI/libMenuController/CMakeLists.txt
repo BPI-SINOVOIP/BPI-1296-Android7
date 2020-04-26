@@ -1,0 +1,26 @@
+INCLUDE(common.mk.txt)
+SET(LIBNAME MenuController)
+SET(LIBRARY_OUTPUT_PATH ${LIB_DIR})
+
+
+
+#SET(LIB			: " ${LIB_DIR}/libMenuController.a")
+SET(SRCS    divxMenuControllerAPI.c Memoryalloc.c MenuChunk.c)
+SET(SRCS ${SRCS} wcharutility.c)
+#SET(OBJS 		: " ${foreach src,${SOURCES},${src}.o}")
+
+IF(WCHARUTILITY)
+	SET(SRCS ${SRCS} wcharutility.c)
+ENDIF(WCHARUTILITY)
+
+SET(INCLUDES ${INCLUDES} " ${CMAKE_CURRENT_SOURCE_DIR}/../ADP-4.0.0/common")
+#message(${SRCS})
+INCLUDE_DIRECTORIES(${INCLUDES})
+ADD_DEFINITIONS(${CFLAGS} ${DEBUGFLAG} ${WARNING})
+ADD_LIBRARY(${LIBNAME} ${SRCS})
+string(REGEX REPLACE  ";" " " APCFG_DVR  ${APCFG_DVR})
+string(REGEX REPLACE  ";" " " CHIP_MODEL_DEFS ${CHIP_MODEL_DEFS})
+string(REGEX REPLACE  ";" " " APCFG_DEFS ${APCFG_DEFS})
+#string(REGEX REPLACE  ";" " " BUILD_OPTIONS ${BUILD_OPTIONS})
+string(REGEX REPLACE  ";" " " DEFINES ${DEFINES})
+string(REGEX REPLACE  ";" " " APCFG_FLAGS ${APCFG_FLAGS})

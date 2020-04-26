@@ -1,0 +1,44 @@
+### Apps signed with the media key.
+typealias system_app alias media_app;
+typealias app_data_file alias media_app_data_file;
+#typealias media_app alias system_app;
+#type media_app, domain;
+#app_domain(media_app)
+# Access the network.
+#net_domain(media_app)
+# Access bluetooth.
+#bluetooth_domain(media_app)
+# Set property
+allow media_app property_socket:sock_file { read write };
+allow media_app init:unix_stream_socket { connectto };
+#allow media_app default_prop:property_service set;
+
+#
+# For system_app
+#
+# avc:  denied  { set } for property=rtk.hwc.osd.hide scontext=u:r:system_app:s0 tcontext=u:object_refault_prop:s0 tclass=property_service        
+# avc: denied { create } for name="RTMediaBrowserPlaylist_title.txt" scontext=u:r:system_app:s0 tconxt=u:object_r:system_app_tmpfs:s0 tclass=file         
+#allow system_app default_prop:property_service set;
+allow system_app tmpfs:dir create_dir_perms;
+allow system_app system_app_tmpfs:file create_file_perms;
+#allow system_app system_data_file:dir create_dir_perms; # Android N remove
+allow system_app sysfs_wake_lock:file { read open getattr };
+
+#============= untrusted_app ==============
+allow untrusted_app block_device:dir r_file_perms;
+allow untrusted_app user_device:blk_file getattr;
+allow untrusted_app realtek_service:service_manager find;
+allow system_app ctl_default_prop:property_service set;
+allow system_app cache_file:dir { write add_name };
+allow system_app cache_file:file { create write open };
+allow system_app realtek_tmpfs:file { getattr unlink };
+
+#============== for kodi Sideband =====================
+allow untrusted_app realtek:binder transfer;
+allow untrusted_app realtek:fd use;
+allow untrusted_app sysfs:file { open read };
+
+#============= for RtkDebugTool ==============
+allow system_app system_data_file:dir r_file_perms;
+allow system_app tombstone_data_file:dir rw_file_perms;
+allow system_app anr_data_file:dir rw_file_perms;

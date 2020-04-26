@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmsecureclock
+TARGETTYPE=LIBRARY
+
+SOURCES = \
+	..\secureclockrequest.c \
+	..\secureclockresponse.c \
+

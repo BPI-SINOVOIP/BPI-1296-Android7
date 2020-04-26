@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmwmdrmnetstub
+TARGETTYPE=LIBRARY
+
+SOURCES =              \
+    wmdrmnetimplstub.c \
+    wmdrmnetutilstub.c \
+

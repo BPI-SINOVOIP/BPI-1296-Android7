@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=wmdrmcert
+TARGETTYPE=LIBRARY
+
+SOURCES =              \
+    drmcertparser.c
+
+

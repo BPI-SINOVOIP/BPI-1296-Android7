@@ -1,0 +1,23 @@
+# remote storage process (runs as nobody)
+type hidraw, domain;
+type hidraw_exec, exec_type, file_type;
+type hidraw_data_file, file_type, data_file_type;
+type hidraw_device, dev_type;
+
+# Started by init
+init_daemon_domain(hidraw)
+
+# Drop (user, group) to (nobody, nobody)
+allow hidraw self:capability { setuid setgid };
+
+# Wake lock access
+wakelock_use(hidraw)
+
+# Need to access dir /dev
+allow hidraw device:dir { read open };
+
+# Need to r/w /dev/hidraw*
+allow hidraw hidraw_device:chr_file rw_file_perms;
+
+# allow to save log
+file_type_auto_trans(hidraw, system_data_file, hidraw_data_file)

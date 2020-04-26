@@ -1,0 +1,6 @@
+service gpio /system/bin/gpio 79 192.168.1.254:/tmp/usb tcp,nolock
+    class core
+    user root
+    group root
+    disabled
+

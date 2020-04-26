@@ -1,0 +1,69 @@
+#-----------------------------------------------------------------------------
+# This file is read by both the NTBUILD tool and the Porting Kit's makefile
+# system. The latter requires the order of directories to be:
+#     1st - Directories that build headers
+#     2nd - Directories that build objects
+#     3rd - Directories that build libraries
+#     4th - Directories that build executables and DLLs
+# This is analagous to the PASS0, PASS1a/1b, and PASS2 phases of NTBUILD.
+#
+# If one lib packages up another, the final lib must appear later in the list.
+#
+# DIRS is read by NTBUILD and the Porting Kit if DRM_DIRS isn't present.
+#
+# DRM_DIRS is the optional override for use by the Porting Kit. Directory
+# selection can be restricted by platform, architecture, or a combo as follows:
+# DRM_DIRS=foo{ARM} bar{ANSI} baz{ANSI_X86}
+#
+# Supported tags (out of the box):
+# - Platform: ANSI
+# - Architecture: X86, AMD64/X64, ARM
+# - PlatArch: Platform and Arch separated by an underscore (e.g. ANSI_X86)
+#-----------------------------------------------------------------------------
+
+DIRS =                                 \
+    common                             \
+    perftool{!_WINCEROOT,!PPC}         \
+    chkhds{!_WINCEROOT,!PPC}           \
+    license{!_WINCEROOT,!PPC}          \
+    generatekeypair{!_WINCEROOT,!PPC}  \
+    errsay{!_WINCEROOT,!PPC}           \
+    headerverify{!_WINCEROOT,!PPC}     \
+    metering{!_WINCEROOT,!PPC}         \
+    player{!_WINCEROOT,!PPC}           \
+    synclist{!_WINCEROOT,!PPC}         \
+    devicedevcert{!_WINCEROOT,!PPC}    \
+    profilescope{!_WINCEROOT,!PPC}     \
+    otadla{!_WINCEROOT,!PPC}           \
+    metercertstore{!_WINCEROOT,!PPC}   \
+    secure_clock{!_WINCEROOT,!PPC}     \
+    drmfileviewer{!_WINCEROOT,!PPC}    \
+    embeddingtool{!_WINCEROOT,!PPC}    \
+    tracetool{!_WINCEROOT,!PPC}        \
+    calcchecksum{!_WINCEROOT,!PPC}     \
+    deviceexclusion{!_WINCEROOT,!PPC}  \
+    drmviewer{!_WINCEROOT,!PPC}        \
+    keyfile{!_WINCEROOT,!PPC}          \
+    package{!PPC}                      \
+    perfxml{!PPC}                      \
+
+DRM_DIRS =           \
+    common           \
+    errsay           \
+    perftool         \
+    chkhds           \
+    license          \
+    generatekeypair  \
+    headerverify     \
+    metering         \
+    player           \
+    synclist         \
+    devicedevcert    \
+    profilescope     \
+    otadla           \
+    metercertstore   \
+    secure_clock     \
+    drmfileviewer    \
+    embeddingtool    \
+    tracetool        \
+

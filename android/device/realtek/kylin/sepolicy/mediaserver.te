@@ -1,0 +1,25 @@
+# avc: denied { search } for pid=2196 comm="mediaserver" name="graphics" dev="tmpfs" ino=5319 scontext=u:r:mediaserver:s0 tcontext=u:object_r:graphics_device:s0 tclass=dir
+# avc: denied { ioctl } for path="/dev/graphics/fb0" dev="tmpfs" ino=858 scontext=u:r:mediaserver:s0 tcontext=u:object_r:graphics_device:s0 tclass=chr_file
+allow mediaserver graphics_device:dir search;
+#allow mediaserver default_prop:property_service set;
+allow mediaserver system_data_file:dir  {create add_name setattr };
+allow mediaserver graphics_device:chr_file { read write open ioctl };
+# avc: denied { read } for pid=2216 comm="mediaserver" name="rpc2" dev="rootfs" ino=4288 scontext=u:r:mediaserver:s0 tcontext=u:object_r:rootfs:s0 tclass=chr_file
+allow mediaserver rootfs:chr_file read;
+# avc: denied { read write } for pid=2216 comm="mediaserver" name="uio251" dev="tmpfs" ino=4198 scontext=u:r:mediaserver:s0 tcontext=u:object_r:uio_device:s0 tclass=chr_file
+allow mediaserver uio_device:chr_file rw_file_perms;
+allow mediaserver tmpfs:dir rw_dir_perms;
+# avc: denied { write } for name="MediaPlayRequest" dev="tmpfs" ino=983 scontext=u:r:mediaserver:s0 tcontext=u:object_r:tmpfs:s0 tclass=sock_file
+# avc: denied { create } for pid=4082 comm="Binder_3" name="rvsdsocket" scontext=u:r:mediaserver:s0 tcontext=u:object_r:tmpfs:s0 tclass=sock_file
+allow mediaserver tmpfs:sock_file { write create read getattr setattr unlink };
+
+# avc: denied { unix_write } for key=2432 scontext=u:r:mediaserver:s0 tcontext=u:r:init:s0 tclass=sem
+#allow mediaserver init:sem create_ipc_perms;
+allow mediaserver mnt_media_rw_file:dir getattr;
+
+allow mediaserver system_prop:property_service set;
+
+# Allow to communicate to hidraw's unix_stream_socket
+allow mediaserver hidraw:unix_stream_socket { connectto read write};
+
+allow mediaserver unlabeled:file r_file_perms;

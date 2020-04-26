@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>warning</title>
+<link href="css/boxhome.css" rel="stylesheet" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+<script type="text/javascript">
+</script>
+</head>
+<script type="text/javascript" src="javascript/util.js"></script>
+
+<script type="text/javascript">
+var g_ExtraCancelCmd = new String();
+
+function handleCmd()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("S_OK" == retStr || "OK" == retStr)
+			{
+				// Delete cookie
+				deleteCookie("warningCmd");
+				deleteCookie("warningPrompt")
+				closeWindow();
+			}
+		}
+	}
+}
+
+function handleCancelCmd()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("S_OK" == retStr || "OK" == retStr)
+			{
+				// Delete cookie
+				deleteCookie("warningCmd");
+				deleteCookie("warningPrompt")
+				window.location.assign("setup.html");
+			}
+		}
+	}
+}
+
+function executeCmd()
+{
+	var cmdStr = new String();
+	// Get cmd string from cookie
+
+	cmdStr = getCookie("warningCmd");
+
+	if ("" == cmdStr || null == cmdStr)
+	{
+		if (null != g_ExtraCancelCmd)
+		{
+			sendCommand(g_ExtraCancelCmd, handleCancelCmd);
+		}
+		else
+		{
+			window.location.assign("setup.html");
+		}
+	}
+	else
+	{
+		if ("CgiSetupOnlineUpgradeCancel" == cmdStr)
+		{
+			sendCommand("CgiSetupOnlineUpgradeCancel", handleCancelCmd);
+		}
+		else
+		{
+			sendCommand(cmdStr, handleCmd);
+		}
+	}
+}
+
+function cancelCmd()
+{
+	var cmdStr = new String();
+	cmdStr = getCookie("warningCmd");
+
+	if ("CgiSetupOnlineUpgradeDownload" == cmdStr)
+	{
+		sendCommand("CgiSetupOnlineUpgradeCancel", handleCancelCmd);
+	}
+	else
+	{
+		window.location.assign("setup.html");
+	}
+}
+
+function handleOnlineUpgradeGetVersion()
+{
+	var retStr = new String();
+	var promptStr = new String();
+	var fwInfoArray;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			fwInfoArray = retStr.split("\n");
+
+			if ("N/A" != fwInfoArray[1])
+			{
+				setElementVisible("warnIcon", "true");
+				setElementVisible("warnInput", "true");
+
+				// Net firmware is available
+				promptStr = "Online Upgrade<br>Current:" + fwInfoArray[0] + "<br>New:" + fwInfoArray[1];
+				document.getElementById("promptStr").innerHTML = promptStr;
+
+				// Overwrite cmd cookie
+				setCookie("warningCmd", "CgiSetupOnlineUpgradeDownload");
+			}
+			else
+			{
+			}
+		}
+	}
+}
+
+function handleOnlineUpgradeState()
+{
+	var retStr = new String();
+	var promptStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("CHECK_OK" == retStr)
+			{
+				// Get firmware info
+				sendCommand("CgiSetupOnlineUpgradeGetVersion", handleOnlineUpgradeGetVersion);
+			}
+			else if ("CHECKING" == retStr)
+			{
+				setTimeout(netFwStateCheckTimerHandler, 1000);
+			}
+			else if ("CHECK_ERR" == retStr)
+			{
+				promptStr = "Retry after checking the network condition."
+				document.getElementById("promptStr").innerHTML = promptStr;
+				setElementVisible("promptStr", "true");
+
+				// Clean warningCmd cookie
+				setCookie("warningCmd", "CgiSetupOnlineUpgradeCancel");
+				g_ExtraCancelCmd = "CgiSetupOnlineUpgradeCancel";
+
+				setElementVisible("warnInput", "true");
+				setElementVisible("warnInputCancel", "false");
+			}
+		}
+	}
+}
+
+function netFwStateCheckTimerHandler()
+{
+	sendCommand("CgiSetupOnlineUpgradeGetState", handleOnlineUpgradeState);
+}
+
+function prepareDisplayInfo()
+{
+	var promptStr = new String();
+	var cmdStr = new String();
+
+	g_ExtraCancelCmd = null;
+
+	// Get prompt string from cookie
+	promptStr = getCookie("warningPrompt");
+	if ("" == promptStr || null == promptStr)
+	{
+		// Hide prompt string area
+		setElementVisible("promptStr", "false");
+	}
+	else
+	{
+		document.getElementById("promptStr").innerHTML = promptStr;
+	}
+
+	// Get command
+	cmdStr = getCookie("warningCmd");
+	if ("CgiSetupOnlineUpgradeCheck" == cmdStr)
+	{
+		setElementVisible("warnIcon", "false");
+		setElementVisible("warnInput", "false");
+
+		// Set timer to pulling net fiwmrare state
+		setTimeout(netFwStateCheckTimerHandler, 1000);
+	}
+	else if ("" == cmdStr)
+	{
+		// null cmdStr means this is just a prompt
+		// Display OK button only
+		setElementVisible("warnIcon", "false");
+		setElementVisible("warnInputCancel", "false");
+	}
+}
+</script>
+
+<body onload = "prepareDisplayInfo();">
+	<div class="warn">
+		<div class="warn-icon" id="warnIcon">
+		  <img id="warnIconImg" src="images/warning.png">
+		  <!--<span id="warnString">Wifi connection will be closed!</span>-->
+		</div>
+		<center>
+			<div class="warn-icon" id="promptStr"></div>
+		</center>
+		<div class="warn-input" id="warnInput">
+		  <input type="button" value="OK" id="warnInputOk" onclick="executeCmd();"></input>
+		  <input type="button" value="Cancel" id="warnInputCancel" onclick="cancelCmd();"></input>
+		</div>
+	</div>
+</body>
+</html>

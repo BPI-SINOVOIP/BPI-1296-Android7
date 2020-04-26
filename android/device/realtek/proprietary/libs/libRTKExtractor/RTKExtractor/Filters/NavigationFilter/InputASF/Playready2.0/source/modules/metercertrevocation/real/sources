@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmetercertrevocationreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                         \
+    metercertrevocationutilreal.c \
+

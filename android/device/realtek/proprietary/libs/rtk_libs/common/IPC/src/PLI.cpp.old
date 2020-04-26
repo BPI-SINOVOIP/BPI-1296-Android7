@@ -1,0 +1,1957 @@
+//#include <OSAL.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <time.h>
+#include <string.h>
+
+#ifndef WIN32
+ #include <pthread.h>
+ #include <unistd.h>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+#include <DirectGraphics.h>
+#include <se.h>
+#if !IS_CHIP(VENUS)
+#include <md_api.h>
+#endif
+
+# define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP {0}
+  /* return zero means the command is not issued or issued but failed */
+  SE_CMD_HANDLE se_memcpy(void *lpDst, void *lpSrc, int len, bool forward);
+
+  /* return zero means the command is not issued or issued but failed */
+  SE_CMD_HANDLE se_memset(void *lpDst, uint8_t data, int len);
+
+  /* ture means the cmd is finished */
+  bool se_checkfinish(SE_CMD_HANDLE handle);
+
+#else
+ #include <OSAL/Threads.h>
+ #include <sys/timeb.h>
+#endif
+
+#ifdef	TARGET_BOARD
+	//#include <fcntl.h>
+	#include <sys/ioctl.h>
+	#include <sys/types.h>
+	#include <sys/mman.h>
+
+	#define AUTH_IOC_MAGIC	'k'
+#if IS_CHIP(VENUS)
+	#define MIS_CLK90K_TM_LO_reg		0xB801B53C
+	#define MIS_CLK90K_TM_HI_reg		0xB801B540
+#elif IS_CHIP(NEPTUNE)
+	#define MIS_CLK90K_TM_LO_reg		0xB801B540
+	#define MIS_CLK90K_TM_HI_reg		0xB801B544
+#elif IS_CHIP(MARS) || IS_CHIP(JUPITER)	|| IS_CHIP(SATURN)
+        #define MIS_CLK90K_TM_LO_reg            0xB801B540
+        #define MIS_CLK90K_TM_HI_reg            0xB801B544
+#else
+	#error "No Definition for CHIP Model."
+#endif
+
+
+	#define AUTH_IOCQMAP			_IOW(AUTH_IOC_MAGIC, 1, AUTH_STR)
+	#define AUTH_IOCHDUMP			_IO(AUTH_IOC_MAGIC, 2)
+	#define AUTH_IOCQALLOC			_IO(AUTH_IOC_MAGIC, 3)
+	#define AUTH_IOCQFREE			_IO(AUTH_IOC_MAGIC, 4)
+	#define AUTH_IOCQFREEALL		_IO(AUTH_IOC_MAGIC, 5)
+	#define AUTH_IOCQLISTALL		_IO(AUTH_IOC_MAGIC, 6)
+	#define AUTH_IOCQZONEINFO		_IO(AUTH_IOC_MAGIC, 7)
+	#define AUTH_IOCTDOREMAP		_IO(AUTH_IOC_MAGIC, 8)
+	#define AUTH_IOCQGETASID		_IO(AUTH_IOC_MAGIC, 9)
+
+	#define AUTH_IOCSINITLOGBUF             _IOW(AUTH_IOC_MAGIC, 11, sched_log_struct)
+	#define AUTH_IOCTFREELOGBUF             _IO(AUTH_IOC_MAGIC, 12)
+	#define AUTH_IOCTLOGSTART               _IO(AUTH_IOC_MAGIC, 13)
+	#define AUTH_IOCGLOGSTOP                _IOR(AUTH_IOC_MAGIC, 14, sched_log_struct)
+	#define AUTH_IOCXLOGNAME                _IOWR(AUTH_IOC_MAGIC, 15, COMM_STR)
+	#define AUTH_IOCSTHREADNAME             _IOW(AUTH_IOC_MAGIC, 16, COMM_STR)
+	#define AUTH_IOCTLOGEVENT               _IO(AUTH_IOC_MAGIC, 17)
+	#define AUTH_IOCTINITHWSEM              _IO(AUTH_IOC_MAGIC, 18)
+	#define AUTH_IOCTGETHWSEM               _IO(AUTH_IOC_MAGIC, 19)
+	#define AUTH_IOCTPUTHWSEM               _IO(AUTH_IOC_MAGIC, 20)
+
+	#define AUTH_IOCXDIRTYSTART             _IOWR(AUTH_IOC_MAGIC, 20, dirty_page_struct)
+	#define AUTH_IOCTDIRTYSTOP              _IO(AUTH_IOC_MAGIC, 21)
+	#define AUTH_IOCTSYNCMETADATA           _IO(AUTH_IOC_MAGIC, 22)
+	#define AUTH_IOCTFREEALLMEM		_IO(AUTH_IOC_MAGIC, 23)
+	#define AUTH_IOCTDETECTOCCUPY           _IO(AUTH_IOC_MAGIC, 24)
+
+	typedef	char AUTH_STR[20];
+	typedef struct {
+		int	name;
+		int	code;
+	} record_struct;
+
+	const char *dvr_auth = "Realtek DVR";
+	int			fd = 0;
+	int			start_addr = 0;
+	int			asid = 0;
+	sched_log_struct	log_struct = {0};
+#ifdef KERNEL_2_6_34
+	int			time_scale = 1;
+#endif
+#endif	//	TARGET_BOARD
+
+#ifdef	DEBUG_MODE
+alloc_record	*record_pointer = NULL;
+pthread_mutex_t	record_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+int		total_size = 0;
+int		alloc_size = 0;
+int		alloc_size_s = 0;
+int		alloc_size_a = 0;
+int		alloc_size_v = 0;
+#endif
+
+// for simulation purpose, we put HW semaphore here
+osal_mutex_t g_HwMutex; //@FIXME, remove in real code
+
+// 27MHz counter
+int64_t pli_getSCR()
+{
+#ifndef WIN32
+  struct timeval tv;
+  int64_t PTS;
+
+  /* Obtain the time of day, and convert it to a tm struct. */
+  gettimeofday (&tv, NULL);
+  /* Compute PTS from microseconds. */
+  PTS = (int64_t)tv.tv_sec * 1000000 + tv.tv_usec;
+  PTS *= 27;
+  return PTS;
+#else
+  printf("Not implemented yet\n");
+  return 0;
+#endif
+}
+
+int pli_print_time(char *pTime, int size)
+{
+#ifndef WIN32
+  struct timeval tv;
+  struct tm* ptm;
+  char time_string[40];
+  long milliseconds;
+
+  /* Obtain the time of day, and convert it to a tm struct. */
+  gettimeofday (&tv, NULL);
+  ptm = (struct tm*)localtime (&tv.tv_sec);
+  /* Format the date and time, down to a single second. */
+  strftime (time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
+  /* Compute milliseconds from microseconds. */
+  milliseconds = tv.tv_usec / 1000;
+  /* Print the formatted time, in seconds, followed by a decimal point
+     and the milliseconds. */
+  printf ("%s.%03ld\n", time_string, milliseconds);
+#else
+  printf("Not implemented yet\n");
+#endif
+  return 0;
+}
+
+int pli_getTime(TIME *time)
+{
+#ifndef WIN32
+  struct timeval tv;
+  struct tm* ptm;
+
+  /* Obtain the time of day, and convert it to a tm struct. */
+  gettimeofday (&tv, NULL);
+  ptm = (struct tm*)localtime (&tv.tv_sec);
+  time->tm_sec = ptm->tm_sec;
+  time->tm_min = ptm->tm_min;
+  time->tm_hour = ptm->tm_hour;
+  time->tm_mday = ptm->tm_mday;
+  time->tm_mon = ptm->tm_mon;
+  time->tm_year = ptm->tm_year;
+  time->tm_wday = ptm->tm_wday;
+  time->tm_yday = ptm->tm_yday;
+  time->tm_isdst = ptm->tm_isdst;
+#else
+  printf("Not implemented yet\n");
+#endif
+  return 0;
+}
+
+int64_t pli_getMilliseconds()
+{
+#ifndef WIN32
+    struct timeval tv;
+    gettimeofday (&tv, NULL);
+    return (int64_t)tv.tv_sec*1000 + tv.tv_usec/1000;
+#else
+    struct _timeb tm;
+    _ftime(&tm);
+    return (int64_t)tm.time*1000 + tm.millitm;
+#endif
+}
+
+#ifdef	TARGET_BOARD
+
+
+//#define USE_MEM_CACHE
+//#define USE_GMEM_CACHE
+//#define PLI_MEM_DEBUG_INFO
+#define COMPACT_AUDIO_MEM
+
+#ifdef USE_MEM_CACHE
+#define MEM_CACHE_SIZE 32
+#ifdef PLI_MEM_DEBUG_INFO
+int g_PliMemCacheNum = 0;
+unsigned int g_PliMemCacheSize = 0;
+#endif
+typedef struct pli_mem {
+  void *virAddress;
+  BYTE *nonCachedAddr;
+  unsigned long phyAddr;
+  int  size;
+} pli_mem;
+static pli_mem pli_cache[MEM_CACHE_SIZE];
+#endif
+
+#ifdef USE_GMEM_CACHE
+#define GMEM_CACHE_SIZE 10
+typedef struct pli_gmem {
+  void *virAddress;
+  unsigned long phyAddr;
+  int  size;
+} pli_gmem;
+static pli_gmem pli_gcache[GMEM_CACHE_SIZE];
+#endif
+
+#ifdef COMPACT_AUDIO_MEM
+#ifdef SLIM_AV_FW
+#define AUDIO_MEM_CACHE_SIZE 16
+#define AUDIO_MEM_POOL_SIZE (4*1024*1024)
+#else
+#define AUDIO_MEM_CACHE_SIZE 16
+#define AUDIO_MEM_POOL_SIZE (8*1024*1024)
+#endif
+typedef struct pli_amem {
+	void *virAddress;
+	BYTE *nonCachedAddr;
+	unsigned long phyAddr;
+	int  size;
+} pli_amem;
+static pli_amem pli_acache[AUDIO_MEM_CACHE_SIZE];
+static pli_amem pli_audiomem;
+#endif
+
+int	pli_init()
+{
+	if (fd != 0) {
+		printf("open pli interface twice...\n");
+		return 1;
+	}
+#ifdef USE_GMEM_CACHE
+
+  for (int i=0; i< GMEM_CACHE_SIZE; i++){
+    pli_gcache[i].size = 0;
+    pli_gcache[i].virAddress = 0;
+  }
+#endif
+#ifdef USE_MEM_CACHE
+  for (int i=0; i< MEM_CACHE_SIZE; i++){
+    pli_cache[i].size = 0;
+    pli_cache[i].virAddress = 0;
+  }
+#endif
+#ifdef COMPACT_AUDIO_MEM
+	for (int i=0; i< AUDIO_MEM_CACHE_SIZE; i++){
+		pli_acache[i].size = 0;
+		pli_acache[i].virAddress = 0;
+	}
+	pli_audiomem.size = 0;
+	pli_audiomem.nonCachedAddr = 0;
+	pli_audiomem.phyAddr = 0;
+	pli_audiomem.virAddress = 0;
+#endif
+
+	printf("pli initialization...\n");
+
+#ifdef KERNEL_2_6_34
+	fd = open("/dev/auth", O_RDONLY);
+#else
+	fd = open("/dev/auth/0", O_RDONLY);
+#endif
+	if (fd < 0) {
+		printf("can't open device file...\n");
+		return 1;
+	}
+	fcntl(fd, F_SETFD, 1);
+
+	start_addr = ioctl(fd, AUTH_IOCQMAP, dvr_auth);
+	if (start_addr) {
+		asid = ioctl(fd, AUTH_IOCQGETASID);
+		return 0;
+	} else {
+		asid = 0;
+		return 1;
+	}
+}
+
+int     pli_close()
+{
+	int ret;
+
+	ret = close(fd);
+	fd = 0;
+
+	return ret;
+}
+
+void    pli_showInfo()
+{
+	ioctl(fd, AUTH_IOCQZONEINFO);
+}
+
+void    pli_freeAllMemory()
+{
+#ifdef	DEBUG_MODE
+        alloc_record *ptr1;
+        alloc_record *ptr2;
+
+	pthread_mutex_lock(&record_mutex);
+	ptr1 = record_pointer;
+	while (ptr1 != NULL) {
+		ptr2 = ptr1;
+		ptr1 = ptr1->next;
+		free(ptr2);
+	}
+	record_pointer = NULL;
+	total_size = 0;
+	alloc_size = 0;
+	alloc_size_s = 0;
+	alloc_size_a = 0;
+	alloc_size_v = 0;
+	pthread_mutex_unlock(&record_mutex);
+#endif
+	ioctl(fd, AUTH_IOCQFREEALL);
+}
+
+// free all memory cache in kernel
+void    pli_clearCacheMemory()
+{
+	ioctl(fd, AUTH_IOCTFREEALLMEM);
+}
+
+// start to detect if one thread occupy CPU too long
+void    pli_startDetectOccupy(int ticks)
+{
+	ioctl(fd, AUTH_IOCTDETECTOCCUPY, ticks);
+}
+
+void    pli_listAllMemory()
+{
+#ifdef	DEBUG_MODE
+        alloc_record *ptr;
+
+	pthread_mutex_lock(&record_mutex);
+	ptr = record_pointer;
+	printf("memory allocated by pli:\n");
+
+        while (ptr != NULL) {
+                printf("\taddress: %p, size: %8d, alloc: %8d, message: %s \n", (int *)ptr->addr, ptr->requested_size, ptr->allocated_size, ptr->mesg);
+                ptr = ptr->next;
+        }
+
+#ifdef USE_MEM_CACHE
+	printf("====PLI_CACHE====\n");
+	int i;
+
+	for (i=0; i< MEM_CACHE_SIZE; i++){
+		if (pli_cache[i].size != 0)
+			printf("pli_cache[%d].size = %d\n", i, pli_cache[i].size);
+	}
+#endif
+
+	printf("all memory requested by pli:\t%8d\n", total_size);
+	printf("all memory allocated by pli:\t%8d\n", alloc_size);
+	printf("all memory allocated by system:\t%8d\n", alloc_size_s);
+	printf("all memory allocated by audio:\t%8d\n", alloc_size_a);
+	printf("all memory allocated by video:\t%8d\n", alloc_size_v);
+
+#ifdef COMPACT_AUDIO_MEM
+	int xx;
+	printf("\npli_acache: \n");
+	for (xx = 0; xx < AUDIO_MEM_CACHE_SIZE; xx++){
+		if (pli_acache[xx].size != 0) {
+			printf("\t[%2d] address: %p, size: %8d\n", xx, (unsigned int *)pli_acache[xx].virAddress, pli_acache[xx].size);
+		}
+	}
+#endif
+
+	pthread_mutex_unlock(&record_mutex);
+#else
+	ioctl(fd, AUTH_IOCQLISTALL);
+#endif
+}
+
+void    pli_disableInterrupt()
+{
+	__asm__ __volatile__ (".word 0x41606000; ehb;");
+}
+
+void    pli_enableInterrupt()
+{
+	__asm__ __volatile__ (".word 0x41606020; ehb;");
+}
+
+int*    pli_getIOAddress(int addr)
+{
+#ifdef KERNEL_2_6_34
+	return (int *)(addr-0xb8000000+start_addr+DEF_MEM_SIZE*2-0x100000);
+#else
+	return (int *)(addr-0xb8000000+start_addr+DEF_MEM_SIZE*3);
+#endif
+}
+
+// set the watchpoint register
+int     pli_setWatchPoint(unsigned long addr, unsigned long prot)
+{
+//	unsigned long watchlo = 0, watchhi = 0;
+	watch_struct	ws;
+	int		fd;
+
+	if (asid == 0)
+		return 0;
+
+        fd = open("/dev/watch", O_RDONLY);
+        ws.addr = addr;
+        ws.prot = prot;
+        ioctl(fd, WATCH_IOSSETWATCH, &ws);
+
+/*
+	watchhi = ((asid & 0xff) << 16) | ((mask & 0xff) << 3);
+	watchlo = (addr & 0xfffffff8) | prot;
+	__asm__ __volatile__ ("mtc0 %0, $19;": : "r"(watchhi));
+	__asm__ __volatile__ ("mtc0 %0, $18;": : "r"(watchlo));
+*/
+	return 1;
+}
+
+// clear the watchpoint register
+int     pli_clrWatchPoint()
+{
+#ifdef KERNEL_2_6_34
+	int		fd;
+
+	if (asid == 0)
+		return 0;
+
+        fd = open("/dev/watch", O_RDONLY);
+        ioctl(fd, WATCH_IOTCLRWATCH);
+
+	return 1;
+#else
+	unsigned long watchlo = 0, watchhi = 0;
+
+	__asm__ __volatile__ ("mtc0 %0, $19;": : "r"(watchhi));
+	__asm__ __volatile__ ("mtc0 %0, $18;": : "r"(watchlo));
+
+	return 1;
+#endif
+}
+
+// get the watchpoint register
+int     pli_getWatchPoint(unsigned long *addr, unsigned long *prot)
+{
+	unsigned long watchlo = 0, watchhi = 0;
+
+	if (asid == 0)
+		return 0;
+
+	__asm__ __volatile__ ("mfc0 %0, $19;": "=r"(watchhi));
+	__asm__ __volatile__ ("mfc0 %0, $18;": "=r"(watchlo));
+	*addr = watchlo & 0xfffffff8;
+	*prot = watchlo & 0x7;
+
+	return 1;
+}
+
+void    pli_resetRPC()
+{
+	int fd;
+
+#ifdef KERNEL_2_6_34
+	fd = open("/dev/rpc100", O_RDONLY);
+#else
+	fd = open("/dev/rpc/100", O_RDONLY);
+#endif
+	if (fd == -1)
+		perror("reset rpc:");
+	else
+        	ioctl(fd, RPC_IOCTRESET);
+        close(fd);
+}
+
+static char *getAppName(int pid)
+{
+	static char appname[20];
+	int *ptr = (int *)appname;
+
+	*ptr = pid;
+	ioctl(fd, AUTH_IOCXLOGNAME, &appname);
+
+	return appname;
+}
+
+static int isInRecord(int pid, record_struct *record, int num)
+{
+	int i;
+
+	for (i = 0; i < num; i++) {
+		if (record[i].name == pid)
+			return i;
+	}
+
+	return -1;
+}
+#ifndef ANDROID
+static void createLogFile(const char *filename, unsigned int addr, unsigned int wrap)
+{
+#define	intr_record_number	8
+#define sched_record_number	200
+#define event_record_number	10
+	const char 	date[] = "$date\n Jan 1, 1900 0:00:00\n$end\n\n";
+	const char 	version[] = "$version\n System Performance Graph\n$end\n\n";
+	const char	time[] = "$timescale\n 10 ns\n$end\n\n";
+	const char	scope[] = "$scope module SP $end\n";
+	const char	upscope[] = "$upscope $end\n";
+	const char	enddef[] = "$enddefinitions  $end\n\n";
+	const char	dumpvar[] = "$dumpvars\n";
+	char		buffer[100];
+	int		logfd, index, isout;
+	unsigned int	*ptr;
+	unsigned int	last = 0;
+	long long	curr = 0;
+	int		prev_task = -1;
+	int		pid, code = 0;
+	record_struct	intr_record[intr_record_number];
+	int		intr_num = 0;
+	record_struct	sched_record[sched_record_number];
+	int		sched_num = 0;
+	record_struct	event_record[event_record_number];
+	int		event_num = 0;
+
+	if (wrap)
+		ptr = (unsigned int *)addr;
+	else
+		ptr = (unsigned int *)log_struct.addr;
+
+	// parse the file first...
+	do {
+		ptr++;
+		if (ptr == (unsigned int *)(log_struct.addr+log_struct.size))
+			ptr = (unsigned int *)log_struct.addr;
+
+		if (*ptr & 0xc0000000) {
+			// case sched
+			pid = *ptr & 0x0fffffff;
+			if (isInRecord(pid, sched_record, sched_num) < 0) {
+				sched_record[sched_num].name = pid;
+				sched_record[sched_num].code = code++;
+				sched_num++;
+				if (sched_num == sched_record_number) {
+					printf("too many tasks...\n");
+					return;
+				}
+			}
+		} else if (*ptr & 0x20000000) {
+			// case event
+			pid = *ptr & 0x0fffffff;
+			if (isInRecord(pid, event_record, event_num) < 0) {
+				event_record[event_num].name = pid;
+				event_record[event_num].code = code++;
+				event_num++;
+				if (event_num == event_record_number) {
+					printf("too many events...\n");
+					return;
+				}
+			}
+		} else {
+			// case intr
+			pid = *ptr & 0x0fffffff;
+			if (isInRecord(pid, intr_record, intr_num) < 0) {
+				intr_record[intr_num].name = pid;
+				intr_record[intr_num].code = code++;
+				intr_num++;
+				if (intr_num == intr_record_number) {
+					printf("too many interrupts...\n");
+					return;
+				}
+			}
+		}
+
+		ptr++;
+		if (ptr == (unsigned int *)(log_struct.addr+log_struct.size))
+			ptr = (unsigned int *)log_struct.addr;
+	} while (ptr != (unsigned int *)addr);
+
+	logfd = open(filename, O_CREAT | O_RDWR | O_TRUNC);
+
+	printf("writing log data...");
+	write(logfd, date, strlen(date));
+	write(logfd, version, strlen(version));
+	write(logfd, time, strlen(time));
+
+	write(logfd, scope, strlen(scope));
+	for (pid = 0; pid < intr_num; pid++) {
+		sprintf(buffer, "$var wire 1 %03d intrrupt%d $end\n", intr_record[pid].code, intr_record[pid].name);
+		write(logfd, buffer, strlen(buffer));
+	}
+	for (pid = 0; pid < sched_num; pid++) {
+		sprintf(buffer, "$var wire 1 %03d task[%06d]:%s $end\n", sched_record[pid].code, sched_record[pid].name, getAppName(sched_record[pid].name));
+		write(logfd, buffer, strlen(buffer));
+	}
+	for (pid = 0; pid < event_num; pid++) {
+		sprintf(buffer, "$var wire 1 %03d event%d $end\n", event_record[pid].code, event_record[pid].name);
+		write(logfd, buffer, strlen(buffer));
+	}
+	write(logfd, upscope, strlen(upscope));
+	write(logfd, enddef, strlen(enddef));
+
+	write(logfd, dumpvar, strlen(dumpvar));
+	for (pid = 0; pid < code; pid ++) {
+		sprintf(buffer, "0 %03d\n", pid);
+		write(logfd, buffer, strlen(buffer));
+	}
+
+	if (wrap)
+		ptr = (unsigned int *)addr;
+	else
+		ptr = (unsigned int *)log_struct.addr;
+
+	// parse the file again...
+	last = *ptr;
+	do {
+		if (*ptr >= last) {
+#ifdef KERNEL_2_6_34
+			curr += (*ptr-last)/time_scale;
+#else
+			curr += (*ptr-last);
+#endif
+			last = *ptr;
+		} else {
+#ifdef KERNEL_2_6_34
+			curr += (0xffffffff-last+*ptr)/time_scale;
+#else
+			curr += (0xffffffff-last+*ptr);
+#endif
+			last = *ptr;
+		}
+		sprintf(buffer, "#%lld\n", curr);
+		write(logfd, buffer, strlen(buffer));
+
+		ptr++;
+		if (ptr == (unsigned int *)(log_struct.addr+log_struct.size))
+			ptr = (unsigned int *)log_struct.addr;
+
+		if (*ptr & 0xc0000000) {
+			// case sched
+			pid = *ptr & 0x0fffffff;
+			index = isInRecord(pid, sched_record, sched_num);
+			if (index < 0) {
+				printf("error in record index...\n");
+				abort();
+			}
+			sprintf(buffer, "1 %03d\n", sched_record[index].code);
+			write(logfd, buffer, strlen(buffer));
+			if (prev_task >= 0) {
+				sprintf(buffer, "0 %03d\n", prev_task);
+				write(logfd, buffer, strlen(buffer));
+			}
+			prev_task = sched_record[index].code;
+		} else if (*ptr & 0x20000000) {
+			// case event
+			pid = *ptr & 0x0fffffff;
+			index = isInRecord(pid, event_record, event_num);
+			if (index < 0) {
+				printf("error in record index...\n");
+				abort();
+			}
+			sprintf(buffer, "1 %03d\n", event_record[index].code);
+			write(logfd, buffer, strlen(buffer));
+			sprintf(buffer, "0 %03d\n", event_record[index].code);
+			write(logfd, buffer, strlen(buffer));
+		} else {
+			// case intr
+			pid = *ptr & 0x0fffffff;
+			isout = (*ptr & 0x10000000) >> 28;
+			index = isInRecord(pid, intr_record, intr_num);
+			if (index < 0) {
+				printf("error in record index...\n");
+				abort();
+			}
+			sprintf(buffer, "%d %03d\n", isout, intr_record[index].code);
+			write(logfd, buffer, strlen(buffer));
+		}
+
+		ptr++;
+		if (ptr == (unsigned int *)(log_struct.addr+log_struct.size))
+			ptr = (unsigned int *)log_struct.addr;
+	} while (ptr != (unsigned int *)addr);
+
+	printf("done\n");
+
+	close(logfd);
+}
+#endif
+int     pli_initLog(int bufsize)
+{
+	unsigned long *ptr;
+
+	if (log_struct.addr != 0) {
+		printf("error, log mechanism is in use...\n");
+		return 1;
+	}
+
+	if (bufsize == 0)
+		bufsize = 0x10000;
+	bufsize &= 0xfffffff8;	// ensure the buffer size is 8 bytes aligned
+	ptr = (unsigned long *)pli_allocContinuousMemoryMesg((char *)"log buffer", bufsize, NULL, NULL);
+	log_struct.addr = (unsigned long)ptr;
+	log_struct.size = (unsigned long)bufsize;
+
+#ifdef KERNEL_2_6_34
+	time_scale = ioctl(fd, AUTH_IOCSINITLOGBUF, &log_struct);
+#else
+	ioctl(fd, AUTH_IOCSINITLOGBUF, &log_struct);
+#endif
+
+	return 0;
+}
+
+int     pli_freeLog()
+{
+	if (log_struct.addr == 0) {
+		printf("error, log mechanism must be initialized first...\n");
+		return 1;
+	}
+
+	ioctl(fd, AUTH_IOCTFREELOGBUF);
+
+	pli_freeContinuousMemoryMesg((char *)"log buffer", (void *)log_struct.addr);
+	log_struct.addr = 0;
+	log_struct.size = 0;
+
+	return 0;
+}
+
+int     pli_startLog()
+{
+	ioctl(fd, AUTH_IOCTLOGSTART);
+
+	return 0;
+}
+
+int     pli_logEvent(int event)
+{
+	ioctl(fd, AUTH_IOCTLOGEVENT, event);
+
+	return 0;
+}
+
+int     pli_stopLog(char *logfile)
+{
+	sched_log_struct value;
+//	unsigned int *ptr = (unsigned int *)log_struct.addr;
+
+	ioctl(fd, AUTH_IOCGLOGSTOP, &value);
+/*
+	printf("addr: %x, size: %x \n", value.addr, value.size);
+	printf("[0]: %x \n", (int)ptr[0]);
+	printf("[1]: %x \n", (int)ptr[1]);
+	printf("[2]: %x \n", (int)ptr[2]);
+	printf("[3]: %x \n", (int)ptr[3]);
+	printf("[4]: %x \n", (int)ptr[4]);
+	printf("[5]: %x \n", (int)ptr[5]);
+	printf("[6]: %x \n", (int)ptr[6]);
+	printf("[7]: %x \n", (int)ptr[7]);
+*/
+#ifndef ANDROID
+	createLogFile(logfile, value.addr, value.size&0x2);
+#endif
+
+	return 0;
+}
+
+// start the mechanism of logging dirty pages
+int     pli_startRecordDirty(dirty_page_struct *dirty)
+{
+	return ioctl(fd, AUTH_IOCXDIRTYSTART, dirty);
+}
+
+// end the mechanism of logging dirty pages
+int     pli_endRecordDirty()
+{
+	return ioctl(fd, AUTH_IOCTDIRTYSTOP);
+}
+
+int     pli_syncMetaData(int fd_dev)
+{
+	return ioctl(fd, AUTH_IOCTSYNCMETADATA, fd_dev);
+}
+
+// change the name of calling thread
+int     pli_setThreadName(char *str)
+{
+	ioctl(fd, AUTH_IOCSTHREADNAME, str);
+
+	return 0;
+}
+
+// 90KHz counter
+int64_t pli_getPTS()
+{
+	int64_t ret;
+	volatile unsigned int *ptrlo, *ptrhi;
+
+	ptrlo = (unsigned int *)pli_getIOAddress(MIS_CLK90K_TM_LO_reg);
+	ptrhi = (unsigned int *)pli_getIOAddress(MIS_CLK90K_TM_HI_reg);
+	pli_disableInterrupt();
+	ret = *ptrlo;
+	ret = ret | (((int64_t)*ptrhi) << 32);
+	pli_enableInterrupt();
+
+	return ret;
+}
+
+int	pli_getStartAddress()
+{
+	return start_addr;
+}
+
+int	pli_getGraphicEndAddress()
+{
+#ifdef KERNEL_2_6_34
+	printf("<<< This function is discarded >>>\n");
+	return 0;
+#else
+	return (pli_getStartAddress()+2*DEF_MEM_SIZE);
+#endif
+}
+
+#ifdef	DEBUG_MODE
+static int cal_alloc_size(int num)
+{
+	int val = 16;
+
+        while (num > val)
+                val <<= 1;
+
+        return val;
+}
+
+// function return cached virtual address. nonCachedAddr will be used for single access when flushing is not efficient
+// phyAddress will be used while passing this address to other CPU
+void*   pli_allocContinuousMemoryMesg(char *str, size_t size, BYTE** nonCachedAddr, unsigned long *phyAddr)
+#else
+  void*   pli_allocContinuousMemory(size_t size, BYTE** nonCachedAddr, unsigned long *phyAddr)
+#endif
+{
+  if (size <= 0)
+    return 0;
+#ifdef 	DEBUG_MODE
+        alloc_record *tmp;
+	int cpu = size & CPU_MASK;
+	int tempCpu = cpu;
+#endif
+        char *ptr;
+	//int oldPriority;
+	int iHw_alloc_size;
+	BYTE *nonCachedAddr_local=0;
+	unsigned long phyAddr_local=0;
+
+	//oldPriority = getpriority(PRIO_PROCESS, 0);
+	//setpriority(PRIO_PROCESS, 0, 19);
+
+	size &= 0x0fffffff;
+	iHw_alloc_size = cal_alloc_size(size);
+
+#ifdef USE_MEM_CACHE
+	int i;
+	for (i=0; i< MEM_CACHE_SIZE; i++){
+	  if (pli_cache[i].size == - ((int)size) ||
+			pli_cache[i].size == - ((int)iHw_alloc_size)){
+	    if (nonCachedAddr)
+	      *nonCachedAddr = pli_cache[i].nonCachedAddr;
+	    if (phyAddr)
+	      *phyAddr = pli_cache[i].phyAddr;
+		if (pli_cache[i].size == - ((int)size))
+	    	pli_cache[i].size = size;
+		else
+			pli_cache[i].size = iHw_alloc_size;
+	    printf("MEMCache Hit [%d]! size = %d, address = 0x%x\n", i, pli_cache[i].size, (int)(pli_cache[i].virAddress));
+#ifdef PLI_MEM_DEBUG_INFO
+	printf("[PLI][CACHE]:address:0x%.8x  ,size= %d\n",pli_cache[i].virAddress, size);
+#endif
+	    //setpriority(PRIO_PROCESS, 0, oldPriority);
+	    return pli_cache[i].virAddress;
+	  }
+	}
+#endif
+
+#ifdef COMPACT_AUDIO_MEM
+check_audio_buffer:
+	size_t user_size = size;
+	if ((cpu == AUDIO_FLAG) && (0 == pli_audiomem.size)) {
+		size = AUDIO_MEM_POOL_SIZE;
+		iHw_alloc_size = cal_alloc_size(size);
+	}
+
+	if ((cpu == AUDIO_FLAG) && (0 != pli_audiomem.virAddress)) {
+		int xx, yy;
+		char *aPtr=0;
+		size_t available_space;
+		for (xx = 0; xx < AUDIO_MEM_CACHE_SIZE; xx++) {
+			if (pli_acache[xx].size == 0) {
+				//lower boundary
+				if (xx != 0) {
+					aPtr = (char *)((unsigned int)pli_acache[xx-1].virAddress + pli_acache[xx-1].size);
+					if ((unsigned int)aPtr%0x1000)
+						aPtr = (char *)((unsigned int)(aPtr + 0x1000) & 0xFFFFF000); //4K aligned
+				}
+				else
+					aPtr = (char *)pli_audiomem.virAddress;
+
+				//find higher boundary
+				available_space = ((unsigned int)pli_audiomem.virAddress + pli_audiomem.size) - (unsigned int)aPtr;
+				if (xx < AUDIO_MEM_CACHE_SIZE-1) {
+					for (yy = xx+1; yy < AUDIO_MEM_CACHE_SIZE; yy++) {
+						if (pli_acache[yy].size != 0)
+							break;
+					}
+					if (yy < AUDIO_MEM_CACHE_SIZE) {
+						available_space = (unsigned int)pli_acache[yy].virAddress - (unsigned int)aPtr;
+					}
+				}
+
+				if (((unsigned int)aPtr < ((unsigned int)pli_audiomem.virAddress + pli_audiomem.size)) &&
+					(available_space >= size)) {
+					//if it is found, return directly
+					pli_acache[xx].size = size;
+					pli_acache[xx].virAddress = aPtr;
+					pli_acache[xx].nonCachedAddr = pli_audiomem.nonCachedAddr + ((unsigned int)aPtr - (unsigned int)pli_audiomem.virAddress);
+					pli_acache[xx].phyAddr = pli_audiomem.phyAddr + ((unsigned int)aPtr - (unsigned int)pli_audiomem.virAddress);
+
+					if (nonCachedAddr)
+					  *nonCachedAddr = pli_acache[xx].nonCachedAddr;
+					if (phyAddr)
+					  *phyAddr = pli_acache[xx].phyAddr;
+					if (tempCpu != cpu) { //borrow memory to other CPUs.
+						printf("-=- borrow memory [%02d] to %#x. size=%#x, ptr=%p\n", xx, tempCpu, size, aPtr);
+					}
+					return (aPtr);
+				}
+				else {
+					if (yy < AUDIO_MEM_CACHE_SIZE) { //inner available space is not big enough.
+						xx = yy;
+					}
+					else {
+						printf("-=- audio pre-allocated buffer is full!\n");
+						break;
+					}
+				}
+ 			}
+		}
+		printf("-=- cannot find avaliable space from audio buffer!\n");
+		if (tempCpu != cpu) { //this is not a request from Audio f/w, should not check kernel again.
+			pli_listAllMemory();
+			return 0;
+		}
+ 	}
+#endif
+
+        ptr = (char *)ioctl(fd, AUTH_IOCQALLOC, size);
+
+	if (!ptr){
+	  printf("[PLI] allocation failure... Allocate size = %d\n",size);
+	  //setpriority(PRIO_PROCESS, 0, oldPriority);
+#ifdef COMPACT_AUDIO_MEM
+		cpu = AUDIO_FLAG;
+		goto check_audio_buffer;
+#else
+#ifdef	DEBUG_MODE
+	  pli_listAllMemory();
+#endif
+#endif
+	  return 0;
+	}
+#ifdef KERNEL_2_6_34
+	nonCachedAddr_local = (BYTE *)(ptr+DEF_MEM_SIZE);
+#else
+	nonCachedAddr_local = (BYTE *)(ptr+DEF_MEM_SIZE*2);
+#endif
+	if (*(unsigned long *)ptr != 0)
+		phyAddr_local = *(unsigned long *)ptr;
+	else
+		phyAddr_local = (unsigned long)(ptr-start_addr);
+
+	if (nonCachedAddr)
+	  *nonCachedAddr = nonCachedAddr_local;
+	if (phyAddr)
+	  *phyAddr = phyAddr_local;
+#ifdef DEBUG_MODE
+	if (ptr) {
+	  tmp = (alloc_record *)malloc(sizeof(alloc_record));
+	  tmp->addr = (int)ptr;
+	  tmp->flag = cpu;
+	  tmp->requested_size = (int)size;
+	  tmp->allocated_size = iHw_alloc_size;
+	  strncpy(tmp->mesg, str, MESG_LENGTH);
+	  tmp->mesg[MESG_LENGTH-1] = '\0';
+	  pthread_mutex_lock(&record_mutex);
+	  tmp->next = record_pointer;
+	  record_pointer = tmp;
+	  total_size += tmp->requested_size;
+	  alloc_size += tmp->allocated_size;
+	  if (cpu == AUDIO_FLAG)
+	    alloc_size_a += tmp->allocated_size;
+	  else if (cpu == VIDEO_FLAG)
+	    alloc_size_v += tmp->allocated_size;
+	  else
+	    alloc_size_s += tmp->allocated_size;
+	  pthread_mutex_unlock(&record_mutex);
+        }
+#endif
+	//setpriority(PRIO_PROCESS, 0, oldPriority);
+
+#ifdef USE_MEM_CACHE
+	if (strcmp(str,"PreAlloc") == 0){
+	  for (i=0; i< MEM_CACHE_SIZE; i++){
+	    if (pli_cache[i].virAddress == 0){
+	      pli_cache[i].nonCachedAddr = nonCachedAddr_local;
+	      pli_cache[i].phyAddr = phyAddr_local;
+	      pli_cache[i].virAddress = ptr;
+	      pli_cache[i].size = size;
+#ifdef PLI_MEM_DEBUG_INFO
+	      g_PliMemCacheNum++;
+	      g_PliMemCacheSize += size;
+	      printf("[PLI][CACHE] pli cache num = %d, pli cache size = %x\n",
+		     g_PliMemCacheNum, g_PliMemCacheSize);
+#endif
+	      // printf ("pli_alloc [%d], address = 0x%x\n", i, ptr);
+	      break;
+	    }
+	  }
+	}
+#endif
+#ifdef PLI_MEM_DEBUG_INFO
+	if(cpu ==AUDIO_FLAG){
+		printf("[PLI]:[Aud]   address:0x%.8x  ,size= %d\n",ptr,tmp->allocated_size);
+       }else if (cpu == VIDEO_FLAG){
+       printf("[PLI]:[Video] address:0x%.8x  ,size= %d\n",ptr,tmp->allocated_size);
+       }else
+       printf("[PLI]:[System]address:0x%.8x  ,size= %d\n",ptr,tmp->allocated_size);
+#endif
+#ifdef COMPACT_AUDIO_MEM
+	if ((cpu == AUDIO_FLAG) && (0 == pli_audiomem.virAddress)) {
+		pli_acache[0].size = user_size;
+		pli_acache[0].virAddress = ptr;
+		pli_acache[0].nonCachedAddr = nonCachedAddr_local;
+		pli_acache[0].phyAddr = phyAddr_local;
+
+		pli_audiomem.size = AUDIO_MEM_POOL_SIZE;
+		pli_audiomem.virAddress = ptr;
+		pli_audiomem.nonCachedAddr = nonCachedAddr_local;
+		pli_audiomem.phyAddr = phyAddr_local;
+	}
+#endif
+
+	return ptr;
+}
+
+// flush the cached virtual address. There is no need to call this function if use non-cached virtual address
+void    pli_flushMemory(void* ptr, long size)
+{
+	unsigned long addr = (unsigned long)ptr;
+	int count;
+	unsigned long config1, lsize;
+
+	__asm__ __volatile__ (".set push");
+	__asm__ __volatile__ (".set mips32");
+
+	__asm__ __volatile__ ("mfc0 %0, $16, 1": "=r"(config1));
+	lsize = 2 << ((config1 >> 10) & 7);
+
+	for (count = size; count > 0; count -= lsize) {
+		__asm__ __volatile__ ("cache 0x15, (%0);": :"r"(addr));
+		addr += lsize;
+	}
+
+	// flush the last word
+	addr = ((unsigned long)ptr+(unsigned long)size-1)&0xfffffffc;
+	__asm__ __volatile__ ("cache 0x15, (%0);": :"r"(addr));
+
+	// sync the write buffer
+	__asm__ __volatile__ ("sync;");
+
+	__asm__ __volatile__ (".set pop");
+
+	return;
+}
+
+// flush the cached whose physical address fell between phyStart and phyEnd
+void    pli_flushRange(unsigned long phyStart, unsigned long phyEnd)
+{
+	unsigned int index, taglo;
+	unsigned long config1, csize, lsize, sets, ways;
+
+	__asm__ __volatile__ (".set push");
+	__asm__ __volatile__ (".set mips32");
+
+	__asm__ __volatile__ ("mfc0 %0, $16, 1": "=r"(config1));
+	lsize = 2 << ((config1 >> 10) & 7);
+	sets = 64 << ((config1 >> 13) & 7);
+	ways = 1 + ((config1 >> 7) & 7);
+	csize = lsize * sets * ways;
+
+    //assume lsize is in power of 2
+    phyStart = phyStart & ~(lsize - 1);              //align to lsize bpundary on the left
+    phyEnd = (phyEnd + lsize - 1) & ~(lsize - 1); //align to lsize boundary on the right
+
+	for (index = 0; index < csize; index += lsize) {
+		unsigned int paddr;
+		__asm__ __volatile__ ("cache 0x5, (%1); mfc0 %0, $28, 2;": "=r"(taglo): "r"(index));
+		paddr = (taglo & 0xfffff000) | (index & 0xfff);
+		// printk("index: %d paddr: %x \n", index, paddr);
+		if ((paddr >= phyStart) && (paddr < phyEnd) && (taglo & 0x40))
+			__asm__ __volatile__ ("cache 0x1, (%0);": :"r"(index));
+	}
+
+	__asm__ __volatile__ ("sync;");
+	__asm__ __volatile__ (".set pop");
+
+	return;
+}
+
+void    pli_flushRangeEx(unsigned long* addr, unsigned long *size, int count)
+{
+	unsigned int index, taglo;
+	unsigned long config1, csize, lsize, sets, ways;
+
+	//assume lsize is in power of 2
+	int segIdx;
+	bool isFromMalloc = false;
+
+	unsigned long* phyStart;
+	unsigned long* phyEnd;
+
+	if(count < 100) {
+		phyStart = (unsigned long*)alloca(sizeof(unsigned long*) * count);
+		phyEnd = (unsigned long*)alloca(sizeof(unsigned long*) * count);
+	} else {
+		phyStart = (unsigned long*)malloc(sizeof(unsigned long*) * count);
+		phyEnd = (unsigned long*)malloc(sizeof(unsigned long*) * count);
+		isFromMalloc = true;
+	}
+
+	__asm__ __volatile__ (".set push");
+	__asm__ __volatile__ (".set mips32");
+
+	__asm__ __volatile__ ("mfc0 %0, $16, 1": "=r"(config1));
+	lsize = 2 << ((config1 >> 10) & 7);
+	sets = 64 << ((config1 >> 13) & 7);
+	ways = 1 + ((config1 >> 7) & 7);
+	csize = lsize * sets * ways;
+
+	for(segIdx=0 ; segIdx<count ; segIdx++) {
+	    phyStart[segIdx] = addr[segIdx] & ~(lsize - 1);              //align to lsize bpundary on the left
+	    phyEnd[segIdx] = (addr[segIdx] + size[segIdx] + lsize - 1) & ~(lsize - 1); //align to lsize boundary on the right
+	}
+
+	for (index = 0; index < csize; index += lsize) {
+		unsigned int paddr;
+
+
+		__asm__ __volatile__ ("cache 0x5, (%1); mfc0 %0, $28, 2;": "=r"(taglo): "r"(index));
+		paddr = (taglo & 0xfffff000) | (index & 0xfff);
+		// printk("index: %d paddr: %x \n", index, paddr);
+		for(segIdx=0 ; segIdx<count ; segIdx++) {
+    		if ((paddr >= phyStart[segIdx]) && (paddr < phyEnd[segIdx]) && (taglo & 0x40))
+				__asm__ __volatile__ ("cache 0x1, (%0);": :"r"(index));
+		}
+	}
+
+	__asm__ __volatile__ ("sync;");
+	__asm__ __volatile__ (".set pop");
+
+	if(isFromMalloc) {
+		free(phyStart);
+		free(phyEnd);
+	}
+	return;
+
+}
+
+
+// prefetch the virtual address data. There is no need to call this function if use non-cached virtual address
+void    pli_prefetchCache(void* ptr, long size)
+{
+	unsigned long addr = (unsigned long)ptr;
+	int count;
+	unsigned long config1, lsize;
+
+	__asm__ __volatile__ (".set push");
+	__asm__ __volatile__ (".set mips32");
+
+	__asm__ __volatile__ ("mfc0 %0, $16, 1": "=r"(config1));
+	lsize = 2 << ((config1 >> 10) & 7);
+
+	for (count = size; count > 0; count -= lsize) {
+		__asm__ __volatile__ ("pref 0x0, (%0);": :"r"(addr));
+		addr += lsize;
+	}
+
+	// prefetch the last word
+	addr = ((unsigned long)ptr+(unsigned long)size-1)&0xfffffffc;
+	__asm__ __volatile__ ("pref 0x0, (%0);": :"r"(addr));
+
+	__asm__ __volatile__ (".set pop");
+
+	return;
+}
+
+// hardware accelerated copy from DDR to DDR. Note, this function will not flush the cache
+// the dest and src are physical addresses
+uint64_t pli_ddrCopy(void *dest, void* src, long size)
+{
+	uint64_t handle;
+	unsigned long tmp;
+	unsigned long addrDst, addrSrc;
+
+	addrDst = (unsigned long)dest;
+	addrSrc = (unsigned long)src;
+
+#ifdef KERNEL_2_6_34
+	if ((addrDst >= (unsigned long)start_addr) && (addrDst < (unsigned long)start_addr+DEF_MEM_SIZE)) {
+		addrDst -= start_addr;
+	} else if ((addrDst >= (unsigned long)start_addr+DEF_MEM_SIZE) && (addrDst < (unsigned long)start_addr+DEF_MEM_SIZE*2)) {
+		addrDst -= (DEF_MEM_SIZE+(unsigned long)start_addr);
+	}
+
+	if ((addrSrc >= (unsigned long)start_addr) && (addrSrc < (unsigned long)start_addr+DEF_MEM_SIZE)) {
+		addrSrc -= start_addr;
+	} else if ((addrSrc >= (unsigned long)start_addr+DEF_MEM_SIZE) && (addrSrc < (unsigned long)start_addr+DEF_MEM_SIZE*2)) {
+		addrSrc -= (DEF_MEM_SIZE+(unsigned long)start_addr);
+	}
+#else
+	if ((addrDst >= (unsigned long)start_addr) && (addrDst < (unsigned long)start_addr+DEF_MEM_SIZE)) {
+		addrDst -= start_addr;
+	} else if ((addrDst >= (unsigned long)start_addr+DEF_MEM_SIZE*2) && (addrDst < (unsigned long)start_addr+DEF_MEM_SIZE*3)) {
+		addrDst -= (DEF_MEM_SIZE*2+(unsigned long)start_addr);
+	}
+
+	if ((addrSrc >= (unsigned long)start_addr) && (addrSrc < (unsigned long)start_addr+DEF_MEM_SIZE)) {
+		addrSrc -= start_addr;
+	} else if ((addrSrc >= (unsigned long)start_addr+DEF_MEM_SIZE*2) && (addrSrc < (unsigned long)start_addr+DEF_MEM_SIZE*3)) {
+		addrSrc -= (DEF_MEM_SIZE*2+(unsigned long)start_addr);
+	}
+#endif
+
+	while (size > 0) {
+
+#if !IS_CHIP(VENUS)
+		if (size > (1024*1024))
+			tmp = 1024*1024;
+		else
+			tmp = size;
+		if ((handle = (uint64_t)md_memcpy((void *)addrDst, (void *)addrSrc, tmp, true)) == 0)
+			break;
+#else
+		if (size > 4095)
+			tmp = 4095;
+		else
+			tmp = size;
+		if ((handle = (uint64_t)se_memcpy((void *)addrDst, (void *)addrSrc, tmp, true)) == 0)
+			break;
+#endif
+//		printf("issuing %lld \n", handle);
+		size -= tmp;
+		addrDst += tmp;
+		addrSrc += tmp;
+	}
+
+	return handle;
+}
+
+long    pli_checkTaskCompletion(uint64_t serialNumber)
+{
+#if !IS_CHIP(VENUS)
+	if (md_checkfinish(serialNumber) == true)
+		return 1;
+	else
+		return 0;
+#else
+	if (se_checkfinish(serialNumber) == true)
+		return 1;
+	else
+		return 0;
+#endif
+}
+
+#ifdef	DEBUG_MODE
+int     removeRecord(int address)
+{
+        alloc_record *ptr1;
+        alloc_record *ptr2;
+        int ret = 0;
+
+	pthread_mutex_lock(&record_mutex);
+	if (record_pointer == NULL)
+		goto out;
+        if (record_pointer->addr == address) {
+                ptr1 = record_pointer;
+                record_pointer = ptr1->next;
+		total_size -= ptr1->requested_size;
+		alloc_size -= ptr1->allocated_size;
+		if (ptr1->flag == AUDIO_FLAG)
+			alloc_size_a -= ptr1->allocated_size;
+		else if (ptr1->flag == VIDEO_FLAG)
+			alloc_size_v -= ptr1->allocated_size;
+		else
+			alloc_size_s -= ptr1->allocated_size;
+#ifdef PLI_MEM_DEBUG_INFO
+        if(ptr1->flag ==AUDIO_FLAG){
+        printf("[PLI_free]:[Aud]   address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+        }else if (ptr1->flag == VIDEO_FLAG){
+        printf("[PLI_free]:[Video] address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+        }else
+        printf("[PLI_free]:[System]address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+#endif
+		free(ptr1);
+                ret = 1;
+                goto out;
+        } else {
+                ptr1 = record_pointer->next;
+                ptr2 = record_pointer;
+        }
+        while (ptr1 != NULL) {
+                if (ptr1->addr != address) {
+                        ptr2 = ptr1;
+                        ptr1 = ptr1->next;
+                } else {
+                        ptr2->next = ptr1->next;
+			total_size -= ptr1->requested_size;
+			alloc_size -= ptr1->allocated_size;
+			if (ptr1->flag == AUDIO_FLAG)
+				alloc_size_a -= ptr1->allocated_size;
+			else if (ptr1->flag == VIDEO_FLAG)
+				alloc_size_v -= ptr1->allocated_size;
+			else
+				alloc_size_s -= ptr1->allocated_size;
+#ifdef PLI_MEM_DEBUG_INFO
+        if(ptr1->flag ==AUDIO_FLAG){
+        printf("[PLI_free]:[Aud]   address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+        }else if (ptr1->flag == VIDEO_FLAG){
+        printf("[PLI_free]:[Video] address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+        }else
+        printf("[PLI_free]:[System]address:0x%.8x  ,size=%d  \n",address,ptr1->allocated_size);
+#endif
+                        free(ptr1);
+                        ret = 1;
+                        goto out;
+                }
+        }
+out:
+	pthread_mutex_unlock(&record_mutex);
+        return ret;
+}
+#endif
+
+// use cached virtual address to free the memory
+#ifdef	DEBUG_MODE
+void    pli_freeContinuousMemoryMesg(char *str, void *ptr)
+#else
+void    pli_freeContinuousMemory(void *ptr)
+#endif
+{
+	int tmp = (int)ptr;
+
+
+	if ((tmp >= start_addr) && (tmp < start_addr+DEF_MEM_SIZE)) {
+
+#ifdef KERNEL_2_6_34
+	} else if ((tmp >= start_addr+DEF_MEM_SIZE) && (tmp < start_addr+DEF_MEM_SIZE*2)) {
+		tmp = tmp-DEF_MEM_SIZE;
+#else
+	} else if ((tmp >= start_addr+DEF_MEM_SIZE*2) && (tmp < start_addr+DEF_MEM_SIZE*3)) {
+		tmp = tmp-DEF_MEM_SIZE*2;
+#endif
+	} else {
+		printf("error in pli_freeContinuousMemory()...\n");
+		return;
+	}
+
+#ifdef PLI_MEM_DEBUG_INFO
+        printf("[PLI_free][CACHE]:address:0x%.8x\n",ptr);
+#endif
+#ifdef USE_MEM_CACHE
+	int i;
+	for ( i=0; i< MEM_CACHE_SIZE; i++){
+	  //printf("cached ptr[%d] = 0x%x, size = %d\n",i,(unsigned int) pli_gcache[i].virAddress, pli_gcache[i].size);
+	  if (pli_cache[i].virAddress == (void*) tmp){ // always free cached address
+		if (pli_cache[i].size < 0) {
+			printf("FATAL::free the same pli memory twice...\n");
+			//abort();
+		}
+		else {
+		  pli_cache[i].size = - pli_cache[i].size;
+		}
+	        printf("free [%d] address 0x%x, size = %d to Cache\n", i, (int)(pli_cache[i].virAddress), pli_cache[i].size);
+		return;
+	  }
+	}
+	//printf("Cannot find 0x%x in Cache when freeing pli cache!!!!!!!!!!!!!!\n", (unsigned int) ptr);
+#endif
+
+#ifdef COMPACT_AUDIO_MEM
+	int xx, yy;
+	for (xx = 0; xx < AUDIO_MEM_CACHE_SIZE; xx++) {
+		if (pli_acache[xx].virAddress == (void *)tmp) {
+			pli_acache[xx].size = 0;
+			pli_acache[xx].virAddress = 0;
+			pli_acache[xx].nonCachedAddr = 0;
+			pli_acache[xx].phyAddr = 0;
+
+			for (yy = 0; yy < AUDIO_MEM_CACHE_SIZE; yy++)
+				if (pli_acache[yy].size != 0)
+					break;
+			if (yy == AUDIO_MEM_CACHE_SIZE) {
+#ifdef DEBUG_MODE
+				if (!removeRecord((int)pli_audiomem.virAddress)) {
+					printf("error in removeRecord: %s...\n", str);
+				}
+#endif
+				ioctl(fd, AUTH_IOCQFREE, pli_audiomem.virAddress);
+				pli_audiomem.size = 0;
+				pli_audiomem.virAddress = 0;
+				pli_audiomem.nonCachedAddr = 0;
+				pli_audiomem.phyAddr = 0;
+			}
+			return;
+		}
+	}
+#endif
+
+#ifdef	DEBUG_MODE
+        if (!removeRecord((int)tmp)) {
+                printf("error in removeRecord: %s...\n", str);
+		//assert(0);
+        }
+#endif
+
+	ioctl(fd, AUTH_IOCQFREE, tmp);
+}
+
+static unsigned long reverseInteger(unsigned long value)
+{
+	unsigned long b0 = value & 0x000000ff;
+	unsigned long b1 = (value & 0x0000ff00) >> 8;
+	unsigned long b2 = (value & 0x00ff0000) >> 16;
+	unsigned long b3 = (value & 0xff000000) >> 24;
+
+	return (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
+}
+
+static unsigned long long reverseLongInteger(unsigned long long value)
+{
+  unsigned long long ret;
+  unsigned char *des, *src;
+  src = (unsigned char *)&value;
+  des = (unsigned char *)&ret;
+  des[0] = src[7];
+  des[1] = src[6];
+  des[2] = src[5];
+  des[3] = src[4];
+  des[4] = src[3];
+  des[5] = src[2];
+  des[6] = src[1];
+  des[7] = src[0];
+  return ret;
+}
+
+
+
+
+
+// Inter-processor write memroy, will perform swap 4 bytes (endian swap) and write to the destination if cross CPU with different endianess
+void    pli_IPCWriteULONG(BYTE* des, unsigned long data)
+{
+  volatile unsigned long A;  // prevent gcc -O3 optimization to create non-atomic access
+	if (((int)des & 0x3) != 0)
+		printf("error in pli_IPCWriteULONG()...\n");
+
+	A = reverseInteger(data);
+	*(unsigned long *)des = A;
+}
+void    pli_IPCWriteULONGLONG(BYTE* des, unsigned long long data)
+{
+  volatile unsigned long long A; // prevent gcc -O3 optimization to create non-atomic access
+	if (((int)des & 0x3) != 0)
+		printf("error in pli_IPCWriteULONG()...\n");
+	A = reverseLongInteger(data);
+	*(unsigned long long*)des = A;
+}
+
+// Inter-processor write memroy, will perform swap 4 bytes (endian swap) and write to the destination if cross CPU with different endianess
+unsigned long    pli_IPCReadULONG(BYTE* src)
+{
+  volatile unsigned long A;  // prevent gcc -O3 optimization to create non-atomic access
+	if (((int)src & 0x3) != 0)
+		printf("error in pli_IPCReadULONG()...\n");
+	A = *(unsigned long *)src;
+	return reverseInteger(A);
+}
+unsigned long long  pli_IPCReadULONGLONG(BYTE* src)
+{
+    volatile unsigned long long A;  // prevent gcc -O3 optimization to create non-atomic access
+	if (((int)src & 0x3) != 0)
+		printf("error in pli_IPCReadULONG()...\n");
+
+	A = *(unsigned long long*)src;
+	return reverseLongInteger(A);
+}
+
+
+
+
+
+
+// Inter-processor copy memory, will perform swap each 4 bytes (endian swap) and write to the destination if cross CPU with different endianess
+void    pli_IPCCopyMemory(BYTE* src, BYTE* des, unsigned long len)
+{
+	unsigned long i;
+	unsigned long *psrc, *pdes;
+
+	if ((((int)src & 0x3) != 0) || (((int)des & 0x3) != 0) || ((len & 0x3) != 0))
+		printf("error in pli_IPCCopyMemory()...\n");
+
+	for (i = 0; i < len; i+=4) {
+		psrc = (unsigned long *)&src[i];
+		pdes = (unsigned long *)&des[i];
+		*pdes = reverseInteger(*psrc);
+//		printf("%x, %x...\n", src[i], des[i]);
+	}
+}
+
+// function return virtual memory of framebuffer
+void*   pli_allocGraphicMemory(size_t size, unsigned long *phyAddr)
+{
+#ifdef KERNEL_2_6_34
+	printf("<<< This function is discarded >>>\n");
+	return 0;
+#else
+	char *ptr;
+	//int oldPriority;
+	unsigned long phyAddr_local;
+
+	if (size<= 0)
+	  return 0;
+#ifdef USE_GMEM_CACHE
+	int i;
+	for (i=0; i< GMEM_CACHE_SIZE; i++){
+	  //	  printf("cache[%d].size = %d\n", i, pli_gcache[i].size);
+	  if (pli_gcache[i].size == - ((int)size)){
+	    if (phyAddr)
+	      *phyAddr = pli_gcache[i].phyAddr;
+	    pli_gcache[i].size = (int)size;
+	    printf("GMEMCache Hit [%d]! %d\n", i, pli_gcache[i].size);
+	    return pli_gcache[i].virAddress;
+	  }
+	}
+#endif
+	//oldPriority = getpriority(PRIO_PROCESS, 0);
+	//printf("pli_allocGraphic %d bytes, Old priority = %d\n",size, oldPriority);
+
+	//ptr = (char *)ioctl(fd, AUTH_IOCQALLOC, size);
+    //fu: change to pli_allocContinuousMemoryManage for alloc memory from MemManager
+	ptr = (char*)pli_allocContinuousMemoryManage((char *)"graphics", size, 0, 0);
+
+	if (!ptr) {
+
+	  printf("[PLI] Fail to allocate Graphic buffer\n");
+	  if (phyAddr)
+	    *phyAddr= 0;
+	  return ptr;
+	}
+	if (*(unsigned long *)ptr != 0)
+		phyAddr_local = *(unsigned long *)ptr;
+	else
+		phyAddr_local = (unsigned long)(ptr-start_addr);
+
+	if (phyAddr)
+	  *phyAddr = phyAddr_local;
+
+#ifdef USE_GMEM_CACHE
+	for (i=0; i<GMEM_CACHE_SIZE; i++){
+	  if (pli_gcache[i].virAddress == 0){
+	    pli_gcache[i].phyAddr = phyAddr_local;
+	    pli_gcache[i].virAddress = ptr+DEF_MEM_SIZE;
+	    pli_gcache[i].size = size;
+	    break;
+	  }
+	}
+#endif
+	//setpriority(PRIO_PROCESS, 0, oldPriority);
+
+	return (void *)(ptr+DEF_MEM_SIZE);
+#endif
+}
+
+// use graphic virtual memroy to free the memory
+void    pli_freeGraphicMemory(void *ptr)
+{
+#ifdef KERNEL_2_6_34
+	printf("<<< This function is discarded >>>\n");
+	return;
+#else
+	int tmp = (int)ptr;
+	if ((tmp < start_addr+DEF_MEM_SIZE) || (tmp >= start_addr+DEF_MEM_SIZE*2)) {
+		printf("error in pli_freeGraphicMemory()...\n");
+		return;
+	}
+
+#ifdef USE_GMEM_CACHE
+	int i;
+	for ( i=0; i< GMEM_CACHE_SIZE; i++){
+	  //	  printf("cached ptr[%d] = 0x%x, size = %d\n",i,(unsigned int) pli_gcache[i].virAddress, pli_gcache[i].size);
+	  if (pli_gcache[i].virAddress == (void*) ptr){
+	      pli_gcache[i].size = - pli_gcache[i].size;
+	      printf("GMEM free [%d] = %d\n", i, pli_gcache[i].size);
+	      return;
+	  }
+	}
+	printf("Cannot find 0x%x in Cache when freeing graphics!!!!!!!!!!!!!!\n", (unsigned int) ptr);
+#endif
+
+
+	ioctl(fd, AUTH_IOCQFREE, (int)(tmp-DEF_MEM_SIZE));
+
+	printf("Free Graphic 0x%x\n", (unsigned int) ptr);
+
+#endif
+}
+
+// get hardware semaphore, return 1 when get the semaphore, otherwise return 0
+long pli_lockHWSem()
+{
+	ioctl(fd, AUTH_IOCTGETHWSEM);
+		return 1;
+}
+
+// release the hardware semaphore
+void pli_unlockHWSem()
+{
+	ioctl(fd, AUTH_IOCTPUTHWSEM);
+}
+
+// This function should be called from application to initial hardware
+long pli_initHWSem()
+{
+	ioctl(fd, AUTH_IOCTINITHWSEM);
+		return 1;
+}
+
+#else
+
+// 90KHz counter
+int64_t pli_getPTS()
+{
+  return pli_getSCR()/300;
+}
+
+int     pli_getStartAddress()
+{
+	return 0;
+}
+
+void    pli_listAllMemory()
+{
+}
+
+// function return cached virtual address. nonCachedAddr will be used for single access when flushing is not efficient
+// phyAddress will be used while passing this address to other CPU
+#ifdef	DEBUG_MODE
+void*   pli_allocContinuousMemoryMesg(char *str, size_t size, BYTE** nonCachedAddr, unsigned long *phyAddr)
+#else
+void*   pli_allocContinuousMemory(size_t size, BYTE** nonCachedAddr, unsigned long *phyAddr) // allocate from system reserved memory block
+#endif
+{
+  if (size <= 0)
+    return 0;
+  void *ret;
+  ret = malloc(size);
+  if (phyAddr)
+    *phyAddr = (unsigned long) ret;
+  if (nonCachedAddr)
+    *nonCachedAddr = (BYTE *) ret;
+  return ret;
+}
+// flush the cached virtual address. There is no need to call this function if use non-cached virtual address
+void    pli_flushMemory(void* ptr, long size)
+{
+  return;
+}
+
+// flush the cached whose physical address fell between phyStart and phyEnd
+void    pli_flushRange(unsigned long phyStart, unsigned long phyEnd)
+{
+  return;
+}
+
+// hardware accelerated copy from DDR to DDR. Note, this function will not flush the cache
+// the dest and src are virtual addresses
+uint64_t pli_ddrCopy(void *dest, void* src, long size){
+  memcpy(dest, src, size);
+  return 0;
+}
+
+long    pli_checkTaskCompletion(uint64_t serialNumber){
+  return 1;
+}
+
+// use cached virtual address to free the memory
+#ifdef	DEBUG_MODE
+void    pli_freeContinuousMemoryMesg(char *str, void *ptr)
+#else
+void    pli_freeContinuousMemory(void *ptr)
+#endif
+{
+  free(ptr);
+  return;
+}
+
+// Inter-processor write memroy, will perform swap 4 bytes (endian swap) and write to the destination if cross CPU with different endianess
+void    pli_IPCWriteULONG(BYTE* des, unsigned long data)
+{
+  // byteswap here if IPC between different endianess
+  *((unsigned long *)des) = data;
+
+  return;
+}
+void    pli_IPCWriteULONGLONG(BYTE* des, unsigned long long data)
+{
+  // byteswap here if IPC between different endianess
+  *((unsigned long long*)des) = data;
+
+  return;
+}
+
+// Inter-processor write memroy, will perform swap 4 bytes (endian swap) and write to the destination if cross CPU with different endianess
+unsigned long    pli_IPCReadULONG(BYTE* src)
+{
+  // byteswap here if IPC between different endianess
+
+  return *((unsigned long*)src);
+}
+unsigned long long    pli_IPCReadULONGLONG(BYTE* src)
+{
+  // byteswap here if IPC between different endianess
+
+  return *((unsigned long long*)src);
+}
+
+// get hardware semaphore, return 1 when get the semaphore, otherwise return 0
+long pli_lockHWSem()
+{
+	return 1;
+}
+
+// release the hardware semaphore
+void pli_unlockHWSem()
+{
+	return;
+}
+
+// This function should be called from application to initial hardware
+long pli_initHWSem()
+{
+	return 1;
+}
+#endif	//	TARGET_BOARD
+
+// get hardware semaphore, return 1 when get the semaphore, otherwise return 0
+long pli_hwLock()
+{
+  osal_MutexLock(&g_HwMutex);
+  return 1;
+}
+// release the hardware semaphore
+void pli_hwUnlock()
+{
+  osal_MutexUnlock(&g_HwMutex);
+}
+
+// This function should be called from application to initial hardware
+long pli_hwInit()
+{
+  osal_MutexCreate(&g_HwMutex);
+  return 1;
+}
+#ifdef DEBUG_MODE
+#ifdef MEM_MANAGE
+#define MAX_ENTRIES_ALLOWED_PLI 128
+typedef struct mem_entry_t{
+    BYTE b_in_use;
+    uint32_t mem_addr;
+    uint32_t size;
+} MEM_ENTRY;
+typedef struct MEM_MANAGER{
+	int iLastIndex;
+	int iToatlSize;
+	uint32_t iVirtAddrStart;
+	uint32_t iVirtToPhysOffset;
+	MEM_ENTRY *entry;
+};
+#define MAX_SIZE_MANAGER 4
+static MEM_MANAGER g_MemManager[MAX_SIZE_MANAGER];
+//first, we alloc big size memory.we manage them by ourself for avoid cast away memory.
+//if we use "pli_allocContinuousMemory" to alloc memory, it will calculate total size by power(2,x).
+void *pli_allocContinuousMemoryManage(char *str,size_t size,unsigned long * nonCachedAddr,unsigned long *pPhyAddr){
+#define SIZE_MANAGE_MEM2 	1*1024*1024
+	int iPtrBlock=-1,ii,iLastIdx,i,iSizeSrc;
+	MEM_ENTRY *pMEM_ENTRY=NULL;
+	void *pRet=NULL;
+	MEM_MANAGER *pMEM_MANAGER=NULL;
+
+	iSizeSrc = size;
+	size = iSizeSrc & 0x0FFFFFFF;
+	for (i=0;i<MAX_SIZE_MANAGER;i++){
+		pMEM_MANAGER = &g_MemManager[i];
+		if (pMEM_MANAGER->iVirtAddrStart==0){
+			memset(pMEM_MANAGER,0,sizeof(g_MemManager[i]));
+			pMEM_MANAGER->entry = (MEM_ENTRY*)malloc(sizeof(MEM_ENTRY)*MAX_ENTRIES_ALLOWED_PLI);
+			memset(pMEM_MANAGER->entry,0,sizeof(MEM_ENTRY)*MAX_ENTRIES_ALLOWED_PLI);
+			pMEM_MANAGER->iToatlSize = SIZE_MANAGE_MEM2;
+			pMEM_MANAGER->iVirtAddrStart= (uint32_t)pli_allocContinuousMemoryMesg("allocManag", pMEM_MANAGER->iToatlSize, 0, 0);
+			pMEM_MANAGER->entry[0].mem_addr = pMEM_MANAGER->iVirtAddrStart;
+			pMEM_MANAGER->iVirtAddrStart+= DEF_MEM_SIZE;
+	        pMEM_MANAGER->iVirtToPhysOffset= pMEM_MANAGER->iVirtAddrStart- pli_getStartAddress();
+			pMEM_MANAGER->entry[0].size = pMEM_MANAGER->iToatlSize;
+		}else
+			break;
+	}
+
+	if (size<=0)
+		return NULL;
+
+	iPtrBlock = -1;
+	iLastIdx = -1;
+	for (i=0;i<MAX_SIZE_MANAGER;i++){
+		pMEM_MANAGER = &g_MemManager[i];
+		for(ii=0;pMEM_MANAGER!=NULL && ii<(pMEM_MANAGER->iLastIndex+2) && ii<MAX_ENTRIES_ALLOWED_PLI; ii++){
+			pMEM_ENTRY = &pMEM_MANAGER->entry[ii];
+			iLastIdx = -1;
+			if((!pMEM_ENTRY->b_in_use) && (pMEM_ENTRY->size >= size)){
+				iPtrBlock = i;
+				if (ii>=pMEM_MANAGER->iLastIndex)
+					pMEM_MANAGER->iLastIndex = ii;
+				iLastIdx = ii;
+	            break;
+			}
+		}
+		if (iLastIdx>=0)
+			break;
+	}
+
+	if(iPtrBlock<0){
+		pRet = (void*)pli_allocContinuousMemoryMesg(str, iSizeSrc, (BYTE**)nonCachedAddr, pPhyAddr);
+		return pRet;
+	}else{
+	    pMEM_MANAGER->entry[iLastIdx].b_in_use = true;
+	    if((iLastIdx+1) < MAX_ENTRIES_ALLOWED_PLI)
+	    {
+	        if(!pMEM_MANAGER->entry[iLastIdx+1].b_in_use)
+	        {
+	            pMEM_MANAGER->entry[iLastIdx+1].mem_addr = pMEM_MANAGER->entry[iLastIdx].mem_addr + size;
+	            pMEM_MANAGER->entry[iLastIdx+1].size += pMEM_MANAGER->entry[iLastIdx].size - size;
+	            pMEM_MANAGER->entry[iLastIdx].size = size;
+	        }
+	    }
+		pRet = (unsigned long *)pMEM_MANAGER->entry[iLastIdx].mem_addr;
+	    if (pPhyAddr)
+	    	*pPhyAddr = (unsigned long)((uint32_t)pRet - (uint32_t)pli_getStartAddress());
+		if (nonCachedAddr)
+			*nonCachedAddr = (unsigned long)((uint32_t)pRet+DEF_MEM_SIZE*2);
+if (str==NULL)
+	printf("MemMAnager alloc=> pointer:0x%lx, size:%ld, PtrBloc:%d, idx:%d\n",(long)pRet,(long)size,iPtrBlock,ii);
+else
+	printf("MemMAnager alloc=> %s, pointer:0x%lx, size:%ld, PtrBloc:%d, idx:%d\n",str,(long)pRet,(long)size,iPtrBlock,ii);
+}
+
+
+	return (void*)pRet;
+}
+
+void
+pli_freeContinuousMemoryManage(char *str,void *mem_addr)
+{
+    int ii, jj,iPtrBlock=-1,i,iPreiousUsedIdx;
+	MEM_ENTRY *pMEM_ENTRY=NULL;
+	MEM_MANAGER *pMEM_MANAGER=NULL;
+
+	iPtrBlock = -1;
+	pMEM_ENTRY = NULL;
+	for (i=0;i<MAX_SIZE_MANAGER;i++){
+		pMEM_MANAGER = &g_MemManager[i];
+		iPreiousUsedIdx = 0;
+		for(ii=0;pMEM_MANAGER!=NULL && ii<(pMEM_MANAGER->iLastIndex+1) && ii<MAX_ENTRIES_ALLOWED_PLI; ii++){
+			pMEM_ENTRY = &pMEM_MANAGER->entry[ii];
+			if (pMEM_ENTRY->b_in_use){
+				if((pMEM_ENTRY->mem_addr == (uint32_t)mem_addr)){
+					iPtrBlock = i;
+					break;
+				}else{
+					iPreiousUsedIdx = ii;
+				}
+			}
+		}
+		if (iPtrBlock>=0)
+			break;
+	}
+
+	if(iPtrBlock<0)
+    {
+        pli_freeContinuousMemoryMesg(str,mem_addr);
+        return;
+    }else{
+if (str!=NULL)
+	printf("MemManager free=> %s, pointer:0x%lx, size:%ld, ptrBlock:%d, idx:%d\n",str,(long)mem_addr,(long)pMEM_MANAGER->entry[ii].size,iPtrBlock,ii);
+else
+	printf("MemManager free=> pointer:0x%lx, size:%ld, ptrBlock:%d, idx:%d\n",(long)mem_addr,(long)pMEM_MANAGER->entry[ii].size,iPtrBlock,ii);
+    	pMEM_MANAGER->entry[ii].b_in_use = false;
+	    for(jj=ii-1; jj>=0; jj--)
+		{
+	        if(pMEM_ENTRY[jj].b_in_use)
+	            break;
+		}
+		ii = jj + 1;
+
+	    //merge all adjacent slots into one
+	    for(jj=ii+1; jj<(pMEM_MANAGER->iLastIndex+2)&&jj<MAX_ENTRIES_ALLOWED_PLI; jj++)
+	    {
+	        if(pMEM_MANAGER->entry[jj].b_in_use)
+	        {
+	            break;
+	        }
+	        else
+	 	    {
+	 	        pMEM_MANAGER->entry[ii].size += pMEM_MANAGER->entry[jj].size;
+	 	   	    pMEM_MANAGER->entry[jj].size = 0;
+	 	   	    pMEM_MANAGER->entry[jj].mem_addr = 0;
+	 	    }
+	    }
+		if (ii>=pMEM_MANAGER->iLastIndex)
+			pMEM_MANAGER->iLastIndex = iPreiousUsedIdx;
+		if (pMEM_MANAGER->iLastIndex<0)
+			pMEM_MANAGER->iLastIndex = 0;
+    }
+
+
+}
+#endif//MEM_MANAGE
+#endif//DEBUG_MODE

@@ -1,0 +1,8 @@
+service start_tee_sup /sbin/startTEESup.sh
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:tee:s0
+

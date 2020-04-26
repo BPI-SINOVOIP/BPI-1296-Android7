@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmviewrightsstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                         \
+    drmviewrightsimplstub.c       \
+    drmviewrightsutilstub.c       \
+

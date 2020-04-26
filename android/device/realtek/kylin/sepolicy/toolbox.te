@@ -1,0 +1,8 @@
+#============= toolbox ==============
+#allow toolbox block_device:blk_file {getattr read write open };
+allow toolbox block_device:blk_file getattr;
+allow toolbox self:capability { fowner fsetid };
+allow toolbox sysfs_devices_system_cpu:file setattr;
+#allow toolbox system_data_file:file write;
+allow toolbox user_device:blk_file {read write open getattr};
+

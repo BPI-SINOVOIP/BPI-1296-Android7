@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmxmlhashstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    xmlhashimplstub.c         \
+    xmlhashutilstub.c         \
+

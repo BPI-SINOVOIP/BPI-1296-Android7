@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdevicestorereal
+TARGETTYPE=LIBRARY
+
+SOURCES =                 \
+    devicestoreutilreal.c \
+    drmdevicestore.c      \
+    drmdevstore.c         \
+

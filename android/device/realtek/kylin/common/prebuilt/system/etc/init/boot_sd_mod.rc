@@ -1,0 +1,5 @@
+service boot_sd_mod /sbin/boot_sd_mod.sh
+    class main
+    oneshot
+    seclabel u:r:realtek:s0
+

@@ -1,0 +1,9 @@
+service bootdvfs /sbin/dvfs.sh performance 0 interactive 45
+    class main
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0
+
+on property:persist.rtk.performancemode=1
+    stop bootdvfs
+

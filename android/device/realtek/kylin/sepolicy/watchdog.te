@@ -1,0 +1,26 @@
+# Realtek watch dog daemon
+type watchdogd_exec, exec_type, file_type;
+
+#allow watchdogd self:capability { sys_rawio mknod dac_override};
+# Androind N don't allow properties_device:file { write append };
+#allow watchdogd properties_device:file {rw_file_perms ioctl };  # Original for Android L
+allow watchdogd properties_device:file {r_file_perms open lock ioctl };
+allow watchdogd tmpfs:file rw_file_perms;
+# For /dev/__properties__
+# [    6.301996] type=1400 audit(6.159:5): avc:  denied  { create } for  pid=1270 comm="ueventd" name="__null__" scontext=u:r:ueventd:s0 tcontext=u:object_r:tmpfs:s0 tclass=chr_file
+allow watchdogd tmpfs:chr_file {create rw_file_perms };
+# For denied  { write } for  pid=1272 comm="watchdogd" name="/" dev="tmpfs" ino=1653 scontext=u:r:watchdogd:s0 tcontext=u:object_r:tmpfs:s0 tclass=dir
+allow watchdogd tmpfs:dir rw_dir_perms;
+allow watchdogd null_device:chr_file create;
+# comm="watchdogd" name="__null__" scontext=u:r:watchdogd:s0 tcontext=u:object_r:tmpfs:s0 tclass=chr_file
+allow watchdogd properties_device:chr_file { create rw_file_perms ioctl };
+#allow watchdogd device:chr_file rw_file_perms;
+allow watchdogd null_read_device:chr_file { create rw_file_perms ioctl };
+# avc: denied { execute } for pid=4072 comm="watchdogd" name="sh" dev="mmcblk0p1" ino=309 scontext=u:r:watchdogd:s0 tcontext=u:object_r:shell_exec:s0 tclass=file
+# avc: denied { execute } for name="sh" dev="mmcblk0p1" ino=309 scontext=u:r:watchdogd:s0 tcontext=u:object_r:shell_exec:s0 tclass=file
+# avc: denied { execute_no_trans } for pid=4246 comm="watchdogd" path="/system/bin/sh" dev="mmcblk0p1" ino=309 scontext=u:r:watchdogd:s0 tcontext=u:object_r:shell_exec:s0 tclass=file};
+allow watchdogd shell_exec:file { execute read open execute_no_trans getattr};
+# avc: denied { write } for pid=3979 comm="sh" name="watchdog" dev="proc" ino=4026533737 scontext=u:r:watchdogd:s0 tcontext=u:object_r:proc:s0 tclass=file
+allow watchdogd proc:file { write open };
+allow watchdogd self:capability dac_override;
+

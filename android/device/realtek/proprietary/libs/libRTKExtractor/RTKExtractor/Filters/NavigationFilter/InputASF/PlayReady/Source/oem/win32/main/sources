@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oemmain_win32
+TARGETTYPE=LIBRARY
+
+LINKLIBS=shell32.lib
+
+SOURCES = startup.c
+
+

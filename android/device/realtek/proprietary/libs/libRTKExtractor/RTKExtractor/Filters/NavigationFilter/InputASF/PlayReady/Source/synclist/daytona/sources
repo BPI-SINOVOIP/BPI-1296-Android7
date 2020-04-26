@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmsynclist
+TARGETTYPE=LIBRARY
+
+SOURCES=                       \
+    ..\drmsyncstore.c          \
+    ..\drmgensyncchallenge.c
+

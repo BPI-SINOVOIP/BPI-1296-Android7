@@ -1,0 +1,3 @@
+IF(HOST STREQUAL mipsel-linux)
+SET(DDEF " -DRPC_MECHANISM")
+ENDIF(HOST STREQUAL mipsel-linux)

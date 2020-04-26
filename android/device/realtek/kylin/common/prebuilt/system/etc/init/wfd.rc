@@ -1,0 +1,10 @@
+# for wfd
+service wfd /system/bin/rtk_wfd
+    class main
+    disabled
+    oneshot
+
+service wfd_auto /system/bin/rtk_wfd auto
+    class main
+    disabled
+    oneshot

@@ -1,0 +1,19 @@
+#============= init ==============
+allow mediacodec init:unix_stream_socket connectto;
+
+#============= property_socket ==============
+allow mediacodec property_socket:sock_file write;
+
+#============= realtek ==============
+allow mediacodec realtek:binder { call transfer };
+allow mediacodec realtek:unix_stream_socket { connectto };
+
+#============= system_prop ==============
+allow mediacodec system_prop:property_service set;
+
+#============= tmpfs ==============
+allow mediacodec tmpfs:dir search;
+allow mediacodec tmpfs:sock_file write;
+
+#============= Mediabrowser playback 4k vp9 file =========
+allow mediacodec realtek:fd use;

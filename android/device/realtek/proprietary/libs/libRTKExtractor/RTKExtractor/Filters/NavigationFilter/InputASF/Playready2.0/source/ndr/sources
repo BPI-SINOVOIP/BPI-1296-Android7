@@ -1,0 +1,11 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=ndr
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\ndtinc;
+
+SOURCES = drmndr.c
+
+

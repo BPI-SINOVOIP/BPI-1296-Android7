@@ -1,0 +1,11 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmdevicedevcert_test
+TARGETTYPE=LIBRARY
+
+SOURCES = ..\devicedevcert.c
+
+CDEFINES = $(CDEFINES) \
+    -DDRM_BUILDING_DRMDEVICEDEVCERT_LIB \
+    -DDRM_TEST_IGNORE_UNIQUE_ID=1 \
+

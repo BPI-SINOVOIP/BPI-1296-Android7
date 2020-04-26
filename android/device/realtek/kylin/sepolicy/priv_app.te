@@ -1,0 +1,5 @@
+#============= priv_app ==============
+allow priv_app device:dir { read open };
+allow priv_app system_app_data_file:dir getattr;
+allow priv_app tmpfs:dir { write add_name };
+allow priv_app tmpfs:sock_file { create getattr setattr };

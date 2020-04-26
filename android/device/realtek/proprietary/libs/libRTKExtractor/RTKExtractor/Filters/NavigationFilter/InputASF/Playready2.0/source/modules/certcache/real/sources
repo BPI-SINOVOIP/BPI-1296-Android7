@@ -1,0 +1,12 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcertcachereal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+
+SOURCES =               \
+    certcacheutilreal.c \
+    certcachereal.c     \
+

@@ -1,0 +1,6 @@
+service sideband /system/bin/sideband
+    class core
+    user media
+    group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc mediadrm graphics
+    seclabel u:r:realtek:s0
+    #disabled

@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmlicensesyncreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    drmgensyncchallenge.c     \
+    drmsyncstore.c            \
+    licensesyncutilreal.c
+

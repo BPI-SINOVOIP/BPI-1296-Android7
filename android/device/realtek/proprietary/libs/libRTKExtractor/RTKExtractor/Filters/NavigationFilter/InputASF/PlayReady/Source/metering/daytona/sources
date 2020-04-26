@@ -1,0 +1,10 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmmetering
+TARGETTYPE=LIBRARY
+
+SOURCES=                       \
+    ..\drmmeterconstants.c     \
+    ..\drmmeterimpv1.c         \
+    ..\drmmeterimp.c           \
+    ..\drmmeterapi.c

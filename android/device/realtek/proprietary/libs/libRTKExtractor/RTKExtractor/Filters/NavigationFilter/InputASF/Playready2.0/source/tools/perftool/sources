@@ -1,0 +1,30 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=perftool
+TARGETTYPE=PROGRAM
+UMENTRY=wmain
+UMTYPE=console
+
+SOURCES = \
+    perftool.c
+
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+SOURCES = $(SOURCES) \
+      perftool.rc
+!endif
+
+INCLUDES =                    \
+    $(INCLUDES)               \
+    $(_DRM_SOURCE_PATH)\tools\common
+
+TARGETLIBS = \
+    $(_DRM_COMMON_LIBS)                          \
+    $(_DRM_OEM_MAIN_LIB)                         \
+    $(_DRM_BLACKBOX_LIBS)                        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmtoolscommon.lib \
+
+!if "$(_DRM_BUILD_TOOL)" == "NTBUILD"
+TARGETLIBS = $(TARGETLIBS)                       \
+    $(SDK_LIB_PATH)\strsafe.lib                  \
+!endif

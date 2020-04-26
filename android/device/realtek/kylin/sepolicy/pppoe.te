@@ -1,0 +1,36 @@
+#PPPoE
+type pppoe, domain;
+type pppoe_exec, exec_type, file_type;
+type pppoe_data_file, file_type, data_file_type;
+
+init_daemon_domain(pppoe)
+
+net_domain(pppoe)
+
+#============= init ==============
+#allow init ppp:process { siginh rlimitinh transition noatsecure };
+#allow init pppoe_exec:file rx_file_perms;
+
+#============= pppoe ==============
+allow pppoe devpts:chr_file { read write ioctl open setattr };
+allow pppoe init:unix_stream_socket connectto;
+allow pppoe property_socket:sock_file write;
+allow pppoe rootfs:file { execute execute_no_trans };
+allow pppoe shell_exec:file { read execute open execute_no_trans getattr};
+allow pppoe pppoe_data_file:dir create_dir_perms;
+allow pppoe pppoe_data_file:file create_file_perms;
+allow pppoe ppp_device:chr_file { read write ioctl open };
+allow pppoe pppoe_exec:file rx_file_perms;
+allow pppoe self:capability { net_admin net_raw setuid setgid dac_override kill};
+allow pppoe self:packet_socket { write ioctl setopt read bind create };
+allow pppoe self:udp_socket { create ioctl };
+allow pppoe ppp_exec:file rx_file_perms;
+allow pppoe system_file:file execute_no_trans;
+allow pppoe system_prop:property_service set;
+allow pppoe system_app_tmpfs:file { open read };
+allow pppoe toolbox_exec:file { execute execute_no_trans getattr open read };
+allow pppoe tmpfs:dir search;
+allow pppoe proc_net:file r_file_perms;
+
+#============= shell ==============
+allow shell ppp_exec:file rx_file_perms;

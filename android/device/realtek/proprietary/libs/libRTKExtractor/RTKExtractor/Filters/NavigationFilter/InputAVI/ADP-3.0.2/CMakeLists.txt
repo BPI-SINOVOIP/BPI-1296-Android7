@@ -1,0 +1,3 @@
+ADD_SUBDIRECTORY(libDrmCommon/src)
+ADD_SUBDIRECTORY(libDrmDecrypt/src)
+ADD_SUBDIRECTORY(libAE/src)

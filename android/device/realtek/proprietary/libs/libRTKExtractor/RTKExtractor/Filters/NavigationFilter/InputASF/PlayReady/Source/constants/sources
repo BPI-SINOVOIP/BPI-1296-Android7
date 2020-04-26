@@ -1,0 +1,14 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=drmconstants
+TARGETTYPE=LIBRARY
+
+BUILD_PRODUCES=root_multimedia_PK_WMDRMMD_source_drmconstants
+
+SOURCES = drmconstants.c             \
+          drmlicacqv3constants.c     \
+          drmxmlsigconstants.c       \
+          drmversionconstants.c      \
+          drmsoapxmlconstants.c      \
+          drmpubkeydeviceexclusion.c \
+

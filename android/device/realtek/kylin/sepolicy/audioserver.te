@@ -1,0 +1,9 @@
+#============= tmpfs ==============
+allow audioserver tmpfs:dir search;
+# Allow to communicate to hidraw's unix_stream_socket
+allow audioserver hidraw:unix_stream_socket { connectto read write};
+# Pass CTS tunneled test
+allow audioserver realtek_service:service_manager {find};
+allow audioserver realtek:binder {call};
+allow audioserver realtek:fd {use};
+allow audioserver mediaserver_service:service_manager {find};

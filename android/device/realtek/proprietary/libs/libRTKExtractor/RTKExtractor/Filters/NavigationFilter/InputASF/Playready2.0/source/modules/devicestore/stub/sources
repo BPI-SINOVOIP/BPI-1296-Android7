@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdevicestorestub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    devicestoreutilstub.c     \
+    drmdevicestorestub.c      \
+    drmdevstorestub.c         \
+

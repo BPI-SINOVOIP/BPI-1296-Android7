@@ -1,0 +1,39 @@
+##############################
+# MUST define dtv root dir!!!
+##############################
+DTV_ROOT_DIR	= ../../../../..
+DTV_ROOT = $(DTV_ROOT_DIR)
+INC_DIR  := $(DTV_ROOT)/include
+
+##############################
+# include global config file
+##############################
+# include $(DTV_ROOT_DIR)/include/configGlobal.mips
+include $(DTV_ROOT_DIR)/pvr_make.config
+include $(DTV_ROOT)/librtd/si4/make.config
+
+##############################
+# local includes/defines.
+##############################
+CFLAGS		+= -g -Wall
+#INCLUDES	+= -I../../ -I$(DTV_ROOT_DIR)/include -I$(DTV_ROOT_DIR)/../../../Include/Filters/NavigationFilter/SiDvb/include -I $(DTV_ROOT_DIR)/../../../Include/Filters/NavigationFilter
+ INCLUDES	+= -I ../../ -I$(DTV_ROOT_DIR)/include -I../../../
+
+##############################
+# DVB Libaray ?
+# Objects to Build.
+##############################
+SRCS	:= $(wildcard *.c)
+#SRCS    := ssuFunctionWrapper.c ssuBlock.c ssuDii.c ssuDsi.c ssuDdb.c ssuModule.c ssuGroup.c ssuUnt.c ssuDtr.c ssuDcr.c ssuLib.c
+#SRCS    := ssuFunctionWrapper.c ssuBlock.c ssuDii.c ssuDsi.c ssuDdb.c ssuModule.c ssuGroup.c ssuUnt.c ssuDtr.c ssuDcr.c ssuLib.c
+
+OBJS    := $(patsubst %.c, %.o, $(SRCS))
+
+all: $(OBJS)
+	$(CC) $(SRCS) -c $(CFLAGS) $(INCLUDES)
+
+.c.o:
+	$(CC)  -c $(CFLAGS) $(DEFINES)  $(INCLUDES) $<
+
+clean:
+	rm  *.o *~ -rf

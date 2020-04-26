@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcontractstub
+TARGETTYPE=LIBRARY
+
+SOURCES = \
+    contractutilstub.c \
+    drmcontractstub.c  \
+

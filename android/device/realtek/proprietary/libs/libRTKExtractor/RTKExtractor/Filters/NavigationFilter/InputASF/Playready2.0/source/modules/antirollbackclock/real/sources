@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmantirollbackclockreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                           \
+    antirollbackclockutilreal.c     \
+    antirollbackclockimplreal.c
+

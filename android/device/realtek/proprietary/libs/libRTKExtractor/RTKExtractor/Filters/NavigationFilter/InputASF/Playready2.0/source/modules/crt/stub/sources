@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcrtstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES = $(COMMON_SOURCES)   \
+    crtimplstub.c             \
+    crtutilstub.c             \
+

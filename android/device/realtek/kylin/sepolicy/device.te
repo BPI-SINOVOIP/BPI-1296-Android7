@@ -1,0 +1,4 @@
+# Realtek used
+type user_device, dev_type, mlstrustedobject;
+type null_read_device, dev_type;
+type rtk_bt_device, dev_type; 

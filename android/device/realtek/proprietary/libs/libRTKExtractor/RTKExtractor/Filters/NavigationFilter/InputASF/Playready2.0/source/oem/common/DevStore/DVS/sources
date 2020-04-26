@@ -1,0 +1,10 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_devstore_dvs
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES) \
+           $(_DRM_SOURCE_PATH)\ndtinc;
+
+SOURCES = oemdevstore.c
+

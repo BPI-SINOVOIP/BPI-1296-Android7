@@ -1,0 +1,5 @@
+/dev/ubi0_0     /system     ubifs      defaults        defaults
+/dev/ubi1_0     /data       ubifs      defaults        defaults
+/dev/ubi2_0     /cache      ubifs      defaults        defaults
+/dev/ubi7_0     /boot       raw        defaults        defaults
+/dev/ubi8_0     /recovery   raw        defaults        defaults

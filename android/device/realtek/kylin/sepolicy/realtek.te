@@ -1,0 +1,184 @@
+# For Realtek daemon
+type realtek, domain;
+type realtek_exec, exec_type, file_type;
+type realtek_file, file_type;
+init_daemon_domain(realtek);
+# setcon to init domain.
+allow realtek self:process setcurrent;
+allow realtek self:capability { sys_nice dac_override dac_read_search } ;
+
+# For DvdPlayer when role was realtek
+allow realtek fuse:dir { read search open };
+allow realtek fuse:file { read getattr open };
+allow realtek media_data_file:file { write getattr read lock create open };
+allow realtek mediaserver:binder call;
+allow realtek mnt_media_rw_file:dir { search getattr read };
+allow realtek storage_file:dir { getattr search };
+allow realtek user_device:chr_file { read write };
+allow realtek system_app_tmpfs:file { read open };
+
+#allow realtek realtek:sem create_ipc_perms;
+allow realtek realtek:tcp_socket {create_stream_socket_perms name_bind node_bind};
+allow realtek node:tcp_socket node_bind;
+allow realtek realtek:udp_socket { create setopt bind read };
+allow realtek port:udp_socket { name_bind };
+allow realtek node:udp_socket node_bind;
+allow realtek self:udp_socket getopt;
+#allow realtek device:chr_file read;
+#add open read in device:dir for /sbin/mk_emmc_swap.sh::/sbin/swapon
+allow realtek device:dir { open read write };
+allow realtek port:tcp_socket { name_bind name_connect };
+allow realtek devpts:chr_file { read write getattr setattr write ioctl open};
+allow realtek graphics_device:dir { r_file_perms search };
+allow realtek graphics_device:chr_file rw_file_perms;
+allow realtek uio_device:chr_file rw_file_perms;
+allow realtek block_device:dir r_dir_perms;
+allow realtek tmpfs:dir { rw_dir_perms create setattr rmdir mounton };
+allow realtek cache_file:file { open read };
+allow realtek cache_file:dir { search };
+# avc: denied { write } for pid=2152 comm="gpioproxy" name="export" dev="sysfs" ino=125 scontext=u:r:realtek:s0 tcontext=u:object_r:sysfs:s0 tclass=file
+allow realtek sysfs:file { write getattr open read};
+# For Dvdplayer when role was init
+#allow init realtek:sem create_ipc_perms;
+allow init realtek:tcp_socket {create_stream_socket_perms name_bind node_bind};
+allow init node:tcp_socket node_bind;
+allow init port:tcp_socket name_bind;
+allow init devpts:chr_file { read write getattr setattr write};
+
+allow realtek realtek_tmpfs:file create_file_perms;
+allow realtek shell_exec:file { execute read open execute_no_trans getattr};
+allow realtek servicemanager:binder { call transfer };
+allow realtek user_device:blk_file { read write open ioctl getattr };
+allow realtek rootfs:file { execute execute_no_trans entrypoint getattr open read};
+allow realtek realtek:capability { chown fowner fsetid sys_module sys_admin sys_resource net_raw setgid setuid };
+allow realtek realtek:capability2 { block_suspend };
+allow realtek wifi_data_file:dir { search };
+allow realtek wpa_socket:dir { search write add_name remove_name };
+allow realtek wpa_socket:sock_file { create setattr write unlink };
+allow realtek wpa:unix_dgram_socket { sendto };
+allow realtek sysfs_wake_lock:file { read write open };
+allow realtek input_device:dir {read open search};
+allow realtek input_device:chr_file {read open write ioctl};
+#allow realtek system_file:file { execute_no_trans entrypoint };
+allow realtek system_file:file execute_no_trans;
+allow realtek system_file:dir {read open};
+allow realtek tmpfs:sock_file { create setattr write unlink getattr} ;
+allow realtek tmpfs:fifo_file { create read open unlink};
+allow realtek system_server_service:service_manager { add };
+allow realtek property_socket:sock_file { write };
+allow realtek init:unix_stream_socket { connectto };
+allow realtek system_prop:property_service { set };
+allow realtek mediaserver:unix_stream_socket { connectto };
+allow realtek vfat:dir { search read open};
+allow realtek vfat:file { getattr read open};
+allow shell realtek_exec:file { getattr };
+allow realtek system_server:binder { call };
+allow realtek realtek_exec:file { execute_no_trans };
+allow realtek media_data_file:dir { search write add_name};
+allow system_app realtek:binder { call };
+allow realtek dnsproxyd_socket:sock_file { write };
+allow realtek netd:unix_stream_socket { connectto };
+allow realtek fwmarkd_socket:sock_file { write };
+allow netd realtek:fd { use };
+allow netd realtek:tcp_socket { read write getopt setopt};
+#allow realtek labeledfs:filesystem { remount };
+allow realtek sysfs_devices_system_cpu:file { setattr write};
+allow realtek system_data_file:dir { read open ioctl write add_name create setattr};
+allow realtek kernel:process { setsched };
+
+allow realtek default_android_service:service_manager { find };
+allow realtek mediaserver_service:service_manager { find };
+allow realtek user_device:file {create write append entrypoint};
+allow realtek system_data_file:file open;
+
+#============= bootanim ==============
+allow bootanim unlabeled:dir search;
+allow bootanim unlabeled:file write;
+allow bootanim unlabeled:file open;
+
+#============= init ==============
+allow init sysfs:dir write;
+
+#============= mediaserver ==============
+#allow mediaserver realtek:sem { read write associate unix_read unix_write};
+allow mediaserver realtek:unix_stream_socket { connectto };
+allow mediaserver realtek:fd { use };
+allow mediaserver realtek:binder transfer;
+allow mediaserver unlabeled:dir search;
+allow mediaserver unlabeled:file { write open };
+allow mediaserver realtek_service:service_manager find;
+allow mediaserver realtek_service:service_manager add;
+allow mediaserver realtek:binder call;
+#allow mediaserver default_android_service:service_manager add;
+
+#============= sideband ============== //FIXME: sideband is mediacodec?
+allow mediacodec realtek_service:service_manager find;
+allow mediacodec mediaserver_service:service_manager find;
+
+#============= realtek ==============
+allow realtek realtek_service:service_manager find;
+allow realtek surfaceflinger:binder call;
+allow realtek surfaceflinger:fd use;
+allow realtek tmpfs:file unlink;
+allow realtek unlabeled:dir { search read open getattr };
+allow realtek unlabeled:file { write open read getattr };
+allow realtek mediaserver:fd use;
+allow realtek surfaceflinger:binder transfer;
+allow realtek mediaserver:binder transfer;
+allow realtek surfaceflinger_service:service_manager find;
+allow realtek loop_device:blk_file { open read ioctl };
+allow realtek unlabeled:filesystem { getattr mount unmount };
+allow realtek system_server:binder { transfer };
+allow realtek audioserver:binder { transfer }; # CTS Tunneled test
+allow realtek mediacodec:binder { call }; # CTS Tunneled test
+# avc:  denied  { open } for  pid=2484 comm="swapon" path="/dev" dev="tmpfs" ino=7413 scontext=u:r:realtek:s0 tcontext=u:object_r:device:s0 tclass=dir permissive=0
+# avc:  denied  { read } for  pid=2484 comm="swapon" path="/dev" dev="tmpfs" ino=7413 scontext=u:r:realtek:s0 tcontext=u:object_r:device:s0 tclass=dir permissive=0
+# /sbin/mk_emmc_swap.sh::/sbin/swapon
+allow realtek sysfs:dir { open read };
+allow realtek system_server_tmpfs:file { write open read getattr };
+
+#============= surfaceflinger ==============
+allow surfaceflinger realtek:binder transfer;
+allow surfaceflinger unlabeled:dir search;
+allow surfaceflinger unlabeled:file { write open };
+allow surfaceflinger realtek:binder call;
+allow surfaceflinger realtek_service:service_manager find;
+
+#============= unlabeled ==============
+allow unlabeled self:filesystem associate;
+
+#============= shell ==============
+allow shell system_prop:property_service set;
+allow shell init_exec:file getattr;
+allow shell unlabeled:dir getattr;
+
+type realtek_service , service_manager_type, system_server_service, mlstrustedobject;
+allow realtek realtek_service:service_manager add;
+
+selinux_check_context(realtek)
+selinux_check_access(realtek)
+
+#Samba
+#============= vold ==============
+allow vold self:capability net_raw;
+
+#============= sdcardd ==============
+allow sdcardd unlabeled:filesystem getattr;
+allow sdcardd unlabeled:dir { search write getattr read open add_name remove_name }; 
+
+#============ ion_device ============
+allow realtek ion_device:chr_file { ioctl open read write };
+
+#============ mediacodec ============
+allow realtek mediacodec:binder transfer;
+allow realtek mediacodec:fd use;
+
+#============= proc =================
+allow realtek proc:file { getattr open read };
+allow realtek proc_net:file { getattr open read };
+
+#============= toolbox_exec =========
+allow realtek toolbox_exec:file { execute execute_no_trans getattr open read };
+
+#============= kodi sideband =======
+allow realtek untrusted_app:binder { transfer call };

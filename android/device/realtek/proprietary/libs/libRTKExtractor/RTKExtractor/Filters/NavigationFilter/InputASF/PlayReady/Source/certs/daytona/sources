@@ -1,0 +1,12 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcerts
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES);                 \
+           $(_DRM_CRYPTO_DIR)\bignum;   \
+           $(_DRM_CRYPTO_DIR)\pkcrypto; \
+
+SOURCES =                   \
+    ..\drmbcertbuilder.c    \
+    ..\drmbcertparser.c     \

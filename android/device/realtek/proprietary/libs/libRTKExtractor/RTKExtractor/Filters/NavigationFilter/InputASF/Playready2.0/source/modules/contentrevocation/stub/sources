@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcontentrevocationstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                       \
+    contentrevocationlevlstub.c \
+    contentrevocationlicstub.c  \
+    contentrevocationutilstub.c \
+

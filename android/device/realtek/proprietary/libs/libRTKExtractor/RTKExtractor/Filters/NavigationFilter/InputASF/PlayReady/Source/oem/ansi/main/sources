@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oemmain_ansi
+TARGETTYPE=LIBRARY
+
+SOURCES = startup.c
+
+

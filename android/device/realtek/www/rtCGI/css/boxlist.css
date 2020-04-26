@@ -1,0 +1,211 @@
+﻿/* reset all */
+* { 
+	margin:0;
+	padding:0;
+}
+fieldset,img,abbr,acronym { 
+	border:0;
+}
+
+/* table & list */
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+
+ol,ul {
+	list-style:none;
+}
+
+/* text */
+h1,h2,h3,h4,h5,h6 {
+	font-size:100%;
+	font-weight:normal;
+}
+q:before,q:after {
+	content:'';
+}
+
+/* documents */
+body {
+	min-width:320px;
+	height:100%;
+	text-align: center;
+	position: static;
+	background: url(../images/filelist/bg-main.png) center center fixed no-repeat;
+	-moz-background-size: 100% 100%;
+	background-size: 100% 100%;
+}
+
+/* doc - text */
+.dspLabel{
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* main_area = title + list */
+.mainArea {
+	height: 100%;
+	width: 100%;
+	overflow:hidden;
+	text-align: left;
+}
+.titleSize{
+	height:44px;
+}
+.listSize{/* predefined height = 480 - title_height */
+	height:416px;
+}
+
+/* titlebar = left_area + title_text */
+.titleBarArea {
+	background:  url(../images/filelist/bg-title.png) repeat;
+}
+/* title - left_area */
+.titleBarArea .titleLeftArea {
+	float:left;
+	position:relative;
+	text-align:left;
+	width:80px;
+	height:inherit;
+}
+.Button {
+	position: absolute;
+	overflow: hidden;
+	top: 8px;
+	right: 10px;
+	margin: 0px;
+	border-width: 0 5px;
+	padding: 0 3px;
+	width: auto;
+	height: 30px;
+	line-height: 30px;
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: rgba(0, 0, 0, 0.5) 0px -1px 0;
+	text-overflow: ellipsis;
+	text-decoration: none;
+	white-space: nowrap;
+	background: none;
+	-webkit-border-image: url(../images/filelist/button.png) 0 5 0 5;
+}
+.levelUpBtn {
+	left: 3px;
+	right: auto;
+	padding: 0;
+	max-width: 55px;
+	border-width: 0 8px 0 14px;
+	-webkit-border-image: url(../images/filelist/traverse-up-btn.png) 0 8 0 14;
+}
+
+/* title - text */
+.titleBarArea .titleText {
+	float:left;
+	position:relative;
+	text-align:center;
+	width:160px;
+	height:inherit;
+}
+.titleBarArea h1 {
+	font: normal normal bold 20px/normal Helvetica;
+	color:#fff;
+	margin-top: 10px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+/* doc - list - iScroll */
+.scroller {
+	position:relative;
+	z-index:1;
+	width:100%;
+	overflow:hidden;
+}
+
+/* list - fileList */
+ul.fileElement {
+	margin: 0px;
+	border-width: 1px 0;
+	padding:0;
+
+}
+ul.fileElement li {
+	border-top: 1px solid #a3a3a3;
+	border-bottom: 1px solid #a3a3a3;
+	color: #000;
+	margin-bottom: -1px;
+	height:44px;
+	vertical-align:middle;	
+	display:block;
+	padding-right: 30px;
+	-webkit-transform:translate3d(0,0,0); /* anti-flicker measure: http://cubiq.org/you-shall-not-flicker */
+}
+ul.fileElement li img {/* To align the icon of the item */
+	height:28px;
+	vertical-align:middle;
+	padding: 8px 8px 8px 8px;
+}
+ul.fileElement li.arrow {/* To show an arrow when the item is a container */
+	/* So that the text doesn't go under the arrow */
+	background-image: url(../images/filelist/icon-chevron-right.png);
+	background-position: right;
+	background-repeat: no-repeat;
+}
+ul.fileElement li:active{
+	background-color:#70ABED;
+}
+
+/* list - OTT list */
+ul.ottItemElement li {
+	border-top: 1px solid #a3a3a3;
+	border-bottom: 0px; /*1px solid #a3a3a3; */
+	color: #000;
+	margin-bottom: -1px;
+	height:120px;
+	vertical-align:middle;	
+	display:block;
+	padding-right:10px;
+	-webkit-transform:translate3d(0,0,0); /* anti-flicker measure: http://cubiq.org/you-shall-not-flicker */
+}
+ul.ottItemElement li input {/* To align the icon of the item */
+	height:100px;
+	vertical-align:middle;
+	padding: 8px 8px 8px 8px;
+}
+ul.ottItemElement li input:active {
+	height:100px;
+	vertical-align:middle;
+	padding: 8px 8px 8px 8px;
+	background: #ff6;
+}
+
+/* list - text_style */
+.listItemText {
+	font: normal normal bold 17px/normal Helvetica;
+	text-align:left;
+	display:inline;
+	height: 44px;
+	text-overflow: ellipsis;
+	vertical-align:middle;	
+}
+.itemTextEmpty {
+	text-align: center;
+}
+.itemTextMore {
+	padding-left:120px;
+	font-style: italic;
+}
+.itemTextEmpty:before, .itemTextMore:before {
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	height: 100%;
+}
+

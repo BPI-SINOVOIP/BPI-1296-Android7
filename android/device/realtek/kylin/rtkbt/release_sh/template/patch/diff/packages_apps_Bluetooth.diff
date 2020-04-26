@@ -1,0 +1,766 @@
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+old mode 100644
+new mode 100755
+index 0c71e21..9126300
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -385,5 +385,13 @@
+                 android:name="android.accounts.AccountAuthenticator"
+                 android:resource="@xml/authenticator" />
+         </service>
++        <service
++            android:process="@string/process"
++            android:name = ".rtkbt.RtkbtService"
++            android:enabled="@bool/profile_supported_rtkbt">
++            <intent-filter>
++                <action android:name="android.bluetooth.IBluetoothRtkbt" />
++            </intent-filter>
++        </service>
+     </application>
+ </manifest>
+diff --git a/jni/Android.mk b/jni/Android.mk
+old mode 100644
+new mode 100755
+index 55aa2cc..1647ebf
+--- a/jni/Android.mk
++++ b/jni/Android.mk
+@@ -16,6 +16,14 @@ LOCAL_SRC_FILES:= \
+     com_android_bluetooth_gatt.cpp \
+     com_android_bluetooth_sdp.cpp
+ 
++ifeq ($(BOARD_HAVE_BLUETOOTH_RTK),true)
++LOCAL_CFLAGS += \
++    -DBLUETOOTH_RTK \
++    -DBLUETOOTH_RTK_API
++LOCAL_SRC_FILES += \
++    com_android_bluetooth_rtkbt.cpp
++endif
++
+ LOCAL_C_INCLUDES += \
+     $(JNI_H_INCLUDE) \
+ 
+diff --git a/jni/com_android_bluetooth.h b/jni/com_android_bluetooth.h
+old mode 100644
+new mode 100755
+index 4f55c06..b62c112
+--- a/jni/com_android_bluetooth.h
++++ b/jni/com_android_bluetooth.h
+@@ -54,6 +54,9 @@ int register_com_android_bluetooth_gatt (JNIEnv* env);
+ 
+ int register_com_android_bluetooth_sdp (JNIEnv* env);
+ 
++#ifdef BLUETOOTH_RTK_API
++int register_com_android_bluetooth_rtkbt(JNIEnv* env);
++#endif
+ }
+ 
+ #endif /* COM_ANDROID_BLUETOOTH_H */
+diff --git a/jni/com_android_bluetooth_btservice_AdapterService.cpp b/jni/com_android_bluetooth_btservice_AdapterService.cpp
+index a8d11bb..80fd77f 100755
+--- a/jni/com_android_bluetooth_btservice_AdapterService.cpp
++++ b/jni/com_android_bluetooth_btservice_AdapterService.cpp
+@@ -1383,5 +1383,11 @@ jint JNI_OnLoad(JavaVM *jvm, void *reserved)
+         return JNI_ERR;
+     }
+ 
++#ifdef BLUETOOTH_RTK_API
++    if ((status = android::register_com_android_bluetooth_rtkbt(e)) < 0) {
++        ALOGE("jni rtkbt registration failure: %d", status);
++        return JNI_ERR;
++    }
++#endif
+     return JNI_VERSION_1_6;
+ }
+diff --git a/jni/com_android_bluetooth_rtkbt.cpp b/jni/com_android_bluetooth_rtkbt.cpp
+new file mode 100755
+index 0000000..55eecc7
+--- /dev/null
++++ b/jni/com_android_bluetooth_rtkbt.cpp
+@@ -0,0 +1,213 @@
++/*
++ * Copyright (C) 2012 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#define LOG_TAG "RTKBT"
++
++#define LOG_NDEBUG 0
++
++#include "utils/Log.h"
++#include <string.h>
++#include "com_android_bluetooth.h"
++#include "hardware/bluetooth.h"
++#include "hardware/bt_rtkbt.h"
++#include "android_runtime/AndroidRuntime.h"
++
++namespace android {
++static jmethodID method_onGenericEvent;
++
++static const bt_interface_t* sBtIf;
++static rtkbt_interface_t* sRtkbtIf = NULL;
++
++static jobject mCallbacksObj = NULL;
++static JNIEnv *sCallbackEnv = NULL;
++
++/*
++*utilits function
++*/
++static void dumpData(jbyte* data, int len) {
++       ALOGE(" the len is:%d, the data is : ", len);
++       for(int i=0; i<len; i++)
++              ALOGE("%2x ", data[i]);
++}
++
++
++static bool checkCallbackThread() {
++    // Always fetch the latest callbackEnv from AdapterService.
++    // Caching this could cause this sCallbackEnv to go out-of-sync
++    // with the AdapterService's ENV if an ASSOCIATE/DISASSOCIATE event
++    // is received
++    sCallbackEnv = getCallbackEnv();
++
++    JNIEnv* env = AndroidRuntime::getJNIEnv();
++    if (sCallbackEnv != env || sCallbackEnv == NULL) return false;
++    return true;
++}
++
++static int GenericEvent(int id, int event, unsigned char * data, int len) {
++    jbyteArray evt_data;
++    jbyte lenth = (jbyte)len;
++    ALOGI("%s, data_len = %d", __FUNCTION__, len);
++
++    if (!checkCallbackThread()) {
++        ALOGE("Callback: '%s' is not called on the correct thread", __FUNCTION__);
++        return -1;
++    }
++
++    if(sCallbackEnv == NULL) {
++        ALOGI("%s, sCallbackEnv is NULL!!!!", __FUNCTION__);
++        return -2;
++    }
++
++    evt_data = sCallbackEnv->NewByteArray(lenth);
++    if (!evt_data) {
++        ALOGE("Fail to new jbyteArray GenericEvent");
++        checkAndClearExceptionFromCallback(sCallbackEnv, __FUNCTION__);
++        return -3;
++    }
++
++    sCallbackEnv->SetByteArrayRegion(evt_data, 0, lenth, (jbyte*)data);
++    ALOGI("%s, CallVoidMethod1", __FUNCTION__);
++    if(mCallbacksObj == NULL)
++        ALOGI("%s, mCallbacksObj is NULL", __FUNCTION__);
++    if(method_onGenericEvent == NULL)
++        ALOGI("%s, method_onGenericEvent is NULL", __FUNCTION__);
++    if(mCallbacksObj != NULL && method_onGenericEvent != NULL)
++        sCallbackEnv->CallVoidMethod(mCallbacksObj, method_onGenericEvent, id, event, evt_data, len);
++
++    ALOGI("%s, CallVoidMethod2", __FUNCTION__);
++    checkAndClearExceptionFromCallback(sCallbackEnv, __FUNCTION__);
++    sCallbackEnv->DeleteLocalRef(evt_data);
++    return 0;
++}
++
++/*
++*3dd callback
++*/
++static rtkbt_callbacks_t sRtkbtCallbacks = {
++    sizeof(rtkbt_callbacks_t),
++    GenericEvent,
++};
++static void classInitNative(JNIEnv* env, jclass clazz) {
++    method_onGenericEvent = env->GetMethodID(clazz, "onGenericEvent","(II[BI)V");
++}
++/*
++* native function definition
++*/
++static void InitNative(JNIEnv *env, jobject object) {
++    int status;
++    ALOGI("%s", __FUNCTION__);
++    /*bluetooth interface provide by bluedroid*/
++    if(sBtIf == NULL)  {
++    if ( (sBtIf = getBluetoothInterface()) == NULL) {
++        ALOGE("Bluetooth module is not loaded");
++        return;
++    }
++    }
++
++    if ( (sRtkbtIf = (rtkbt_interface_t *)
++          sBtIf->get_profile_interface(BT_PROFILE_RTKBT_ID)) == NULL) {
++        ALOGE("Failed to get RTKBT Interface");
++        return;
++    }
++    if(sRtkbtIf->init)
++        sRtkbtIf->init(&sRtkbtCallbacks);
++    ALOGE("Bluetooth rtkbt successfully");
++    mCallbacksObj = env->NewGlobalRef(object);
++}
++
++static void CleanupNative(JNIEnv *env, jobject object) {
++    int status;
++
++    if (mCallbacksObj != NULL) {
++        env->DeleteGlobalRef(mCallbacksObj);
++        mCallbacksObj = NULL;
++    }
++    if (!sBtIf) return;
++    if (!sRtkbtIf) return;
++
++    if(sRtkbtIf->cleanup)
++        sRtkbtIf->cleanup();
++
++    sBtIf = NULL;
++    sRtkbtIf = NULL;
++    return;
++}
++
++static int GetFeatureNative(JNIEnv *env, jobject object, jint id) {
++    ALOGI("%s", __FUNCTION__);
++    jbyte *data;
++    uint8_t len;
++    int res;
++    if (!sBtIf) return -1;
++    if (!sRtkbtIf) return -2;
++    if(sRtkbtIf->GetFeature == NULL) return -3;
++    ALOGI("GetFeatureNative,id=%d", id);
++
++    res = sRtkbtIf->GetFeature(id);
++    ALOGE("GetFeatureNative->GetFeature return res: %d", res);
++    return res;
++}
++
++static int GenericCommandNative(JNIEnv *env, jobject object, jint id, jint command,jbyteArray args,jint len) {
++    ALOGI("%s", __FUNCTION__);
++    jbyte * data = NULL;
++    int res;
++    if (!sBtIf) return -1;
++    if (!sRtkbtIf) return -2;
++    if(sRtkbtIf->GenericCommand == NULL) return -3;
++
++    /*get command data and length*/
++    if(len > 0)
++    {
++        data = env->GetByteArrayElements(args, NULL);
++        if (!data) {
++            jniThrowIOException(env, EINVAL);
++            return JNI_FALSE;
++        }
++    }else
++        data = NULL;
++
++    ALOGI("GenericCommandNative,id=%d len = %d", id, len);
++
++    res = sRtkbtIf->GenericCommand(id, command, (uint8_t*)data, len);
++
++    ALOGE("GenericCommandNative->GenericCommand return res: %d", res);
++    if(len > 0)
++        env->ReleaseByteArrayElements(args, data, 0);
++    return res;
++}
++
++/**
++ * JNI function definitinos
++ */
++static JNINativeMethod sMethods[] = {
++    {"classInitNative", "()V", (void *) classInitNative},
++    {"InitNative", "()V", (void *) InitNative},
++    {"CleanupNative", "()V", (void *) CleanupNative},
++    {"GetFeatureNative", "(I)I", (void *) GetFeatureNative},
++    {"GenericCommandNative", "(II[BI)I", (void *) GenericCommandNative},
++};
++
++/*
++* register 3dd native method and get java methods
++*/
++int register_com_android_bluetooth_rtkbt(JNIEnv* env)
++{
++    ALOGE("jniRegisterNativeMethods");
++    return jniRegisterNativeMethods(env, "com/android/bluetooth/rtkbt/RtkbtService",
++                                    sMethods, NELEM(sMethods));
++}
++}
+diff --git a/res/values/config.xml b/res/values/config.xml
+old mode 100644
+new mode 100755
+index c7635bb..78b4d89
+--- a/res/values/config.xml
++++ b/res/values/config.xml
+@@ -13,6 +13,7 @@
+    limitations under the License.
+ -->
+ <resources>
++    <bool name="profile_supported_rtkbt">true</bool>
+     <bool name="profile_supported_a2dp">true</bool>
+     <bool name="profile_supported_a2dp_sink">false</bool>
+     <bool name="profile_supported_hdp">true</bool>
+diff --git a/src/com/android/bluetooth/a2dpsink/A2dpSinkService.java b/src/com/android/bluetooth/a2dpsink/A2dpSinkService.java
+index 82d6d34..314309c 100644
+--- a/src/com/android/bluetooth/a2dpsink/A2dpSinkService.java
++++ b/src/com/android/bluetooth/a2dpsink/A2dpSinkService.java
+@@ -66,6 +66,7 @@ public class A2dpSinkService extends ProfileService {
+         if (DBG) {
+             Log.d(TAG, "stop()");
+         }
++      if(mStateMachine != null)
+         mStateMachine.doQuit();
+         Intent stopIntent = new Intent(this, A2dpMediaBrowserService.class);
+         stopService(stopIntent);
+diff --git a/src/com/android/bluetooth/a2dpsink/A2dpSinkStateMachine.java b/src/com/android/bluetooth/a2dpsink/A2dpSinkStateMachine.java
+old mode 100644
+new mode 100755
+index 07acd6f..5e8c71f
+--- a/src/com/android/bluetooth/a2dpsink/A2dpSinkStateMachine.java
++++ b/src/com/android/bluetooth/a2dpsink/A2dpSinkStateMachine.java
+@@ -388,7 +388,7 @@ final class A2dpSinkStateMachine extends StateMachine {
+                         }
+                     } else if (mTargetDevice != null && mTargetDevice.equals(device)) {
+                         // outgoing connection failed
+-                        broadcastConnectionState(mTargetDevice, BluetoothProfile.STATE_CONNECTED,
++                        broadcastConnectionState(mTargetDevice, BluetoothProfile.STATE_DISCONNECTED,
+                                                  BluetoothProfile.STATE_CONNECTING);
+                         synchronized (A2dpSinkStateMachine.this) {
+                             mTargetDevice = null;
+diff --git a/src/com/android/bluetooth/btservice/AbstractionLayer.java b/src/com/android/bluetooth/btservice/AbstractionLayer.java
+old mode 100644
+new mode 100755
+diff --git a/src/com/android/bluetooth/btservice/AdapterState.java b/src/com/android/bluetooth/btservice/AdapterState.java
+old mode 100644
+new mode 100755
+diff --git a/src/com/android/bluetooth/btservice/Config.java b/src/com/android/bluetooth/btservice/Config.java
+old mode 100644
+new mode 100755
+index 93da040..cc89e03
+--- a/src/com/android/bluetooth/btservice/Config.java
++++ b/src/com/android/bluetooth/btservice/Config.java
+@@ -41,6 +41,7 @@ import com.android.bluetooth.gatt.GattService;
+ import com.android.bluetooth.map.BluetoothMapService;
+ import com.android.bluetooth.sap.SapService;
+ import com.android.bluetooth.pbapclient.PbapClientService;
++import com.android.bluetooth.rtkbt.RtkbtService;
+ 
+ public class Config {
+     private static final String TAG = "AdapterServiceConfig";
+@@ -51,6 +52,7 @@ public class Config {
+     //Do not inclue OPP and PBAP, because their services
+     //are not managed by AdapterService
+     private static final Class[] PROFILE_SERVICES = {
++        RtkbtService.class,
+         HeadsetService.class,
+         A2dpService.class,
+         A2dpSinkService.class,
+@@ -68,6 +70,7 @@ public class Config {
+      * Resource flag to indicate whether profile is supported or not.
+      */
+     private static final int[]  PROFILE_SERVICES_FLAG = {
++        R.bool.profile_supported_rtkbt,
+         R.bool.profile_supported_hs_hfp,
+         R.bool.profile_supported_a2dp,
+         R.bool.profile_supported_a2dp_sink,
+@@ -137,6 +140,8 @@ public class Config {
+             profileIndex = BluetoothProfile.SAP;
+         } else if (profile == PbapClientService.class) {
+             profileIndex = BluetoothProfile.PBAP_CLIENT;
++        }else if (profile == RtkbtService.class) {
++            return false;
+         }
+ 
+         if (profileIndex == -1) {
+diff --git a/src/com/android/bluetooth/btservice/JniCallbacks.java b/src/com/android/bluetooth/btservice/JniCallbacks.java
+old mode 100644
+new mode 100755
+diff --git a/src/com/android/bluetooth/btservice/RemoteDevices.java b/src/com/android/bluetooth/btservice/RemoteDevices.java
+old mode 100644
+new mode 100755
+diff --git a/src/com/android/bluetooth/hid/HidService.java b/src/com/android/bluetooth/hid/HidService.java
+index be769fc..943cab9 100755
+--- a/src/com/android/bluetooth/hid/HidService.java
++++ b/src/com/android/bluetooth/hid/HidService.java
+@@ -374,7 +374,7 @@ public class HidService extends ProfileService {
+             if (service == null) return false;
+             return service.setProtocolMode(device, protocolMode);
+         }
+-        
++
+         public boolean getReport(BluetoothDevice device, byte reportType, byte reportId, int bufferSize) {
+             HidService service = getService();
+             if (service == null) return false;
+@@ -554,7 +554,7 @@ public class HidService extends ProfileService {
+         mHandler.sendMessage(msg);
+         return true ;*/
+     }
+-    
++
+     private void onGetProtocolMode(byte[] address, int mode) {
+         Message msg = mHandler.obtainMessage(MESSAGE_ON_GET_PROTOCOL_MODE);
+         msg.obj = address;
+@@ -596,7 +596,7 @@ public class HidService extends ProfileService {
+     // This method does not check for error conditon (newState == prevState)
+     private void broadcastConnectionState(BluetoothDevice device, int newState) {
+         Integer prevStateInteger = mInputDevices.get(device);
+-        int prevState = (prevStateInteger == null) ? BluetoothInputDevice.STATE_DISCONNECTED : 
++        int prevState = (prevStateInteger == null) ? BluetoothInputDevice.STATE_DISCONNECTED :
+                                                      prevStateInteger;
+         if (prevState == newState) {
+             Log.w(TAG, "no state change: " + newState);
+diff --git a/src/com/android/bluetooth/map/BluetoothMapContentObserver.java b/src/com/android/bluetooth/map/BluetoothMapContentObserver.java
+index ab91ac7..29caa94 100644
+--- a/src/com/android/bluetooth/map/BluetoothMapContentObserver.java
++++ b/src/com/android/bluetooth/map/BluetoothMapContentObserver.java
+@@ -48,6 +48,7 @@ import android.telephony.SmsManager;
+ import android.telephony.SmsMessage;
+ import android.telephony.TelephonyManager;
+ import android.text.format.DateUtils;
++import android.util.EventLog;
+ import android.util.Log;
+ import android.util.Xml;
+ import android.text.TextUtils;
+@@ -3269,6 +3270,7 @@ public class BluetoothMapContentObserver {
+             (context.checkCallingOrSelfPermission("android.Manifest.permission.WRITE_SMS")
+                     != PackageManager.PERMISSION_GRANTED)) {
+             Log.w(TAG, "actionSmsSentDisconnected: Not allowed to delete SMS/MMS messages");
++            EventLog.writeEvent(0x534e4554, "b/22343270", Binder.getCallingUid(), "");
+             return;
+         }
+ 
+diff --git a/src/com/android/bluetooth/opp/BluetoothOppObexServerSession.java b/src/com/android/bluetooth/opp/BluetoothOppObexServerSession.java
+index 2843249..17553d1 100644
+--- a/src/com/android/bluetooth/opp/BluetoothOppObexServerSession.java
++++ b/src/com/android/bluetooth/opp/BluetoothOppObexServerSession.java
+@@ -583,9 +583,7 @@ public class BluetoothOppObexServerSession extends ServerRequestHandler implemen
+ 
+     @Override
+     public void onClose() {
+-        if (V) Log.v(TAG, "release WakeLock");
+-        releaseWakeLocks();
+-
++	PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+         /* onClose could happen even before start() where mCallback is set */
+         if (mCallback != null) {
+             Message msg = Message.obtain(mCallback);
+@@ -593,5 +591,16 @@ public class BluetoothOppObexServerSession extends ServerRequestHandler implemen
+             msg.obj = mInfo;
+             msg.sendToTarget();
+         }
++	
++	
++        boolean isScreenOn = pm.isScreenOn();
++
++        if (!isScreenOn ) {
++            try {
++                Thread.sleep(1000);
++            } catch (InterruptedException e) {
++            }
++        }
++        releaseWakeLocks();
+     }
+ }
+diff --git a/src/com/android/bluetooth/opp/BluetoothOppUtility.java b/src/com/android/bluetooth/opp/BluetoothOppUtility.java
+index ab4613f..f492500 100644
+--- a/src/com/android/bluetooth/opp/BluetoothOppUtility.java
++++ b/src/com/android/bluetooth/opp/BluetoothOppUtility.java
+@@ -323,6 +323,10 @@ public class BluetoothOppUtility {
+         values.put(BluetoothShare.MIMETYPE, transInfo.mFileType);
+         values.put(BluetoothShare.DESTINATION, transInfo.mDestAddr);
+ 
++	Uri uri = Uri.parse(transInfo.mFileUri);
++        putSendFileInfo(uri, BluetoothOppSendFileInfo.generateFileInfo(context, uri, transInfo.mFileType));
++
++
+         final Uri contentUri = context.getContentResolver().insert(BluetoothShare.CONTENT_URI,
+                 values);
+         if (V) Log.v(TAG, "Insert contentUri: " + contentUri + "  to device: " +
+diff --git a/src/com/android/bluetooth/opp/Constants.java b/src/com/android/bluetooth/opp/Constants.java
+index acabb49..c339682 100644
+--- a/src/com/android/bluetooth/opp/Constants.java
++++ b/src/com/android/bluetooth/opp/Constants.java
+@@ -210,6 +210,21 @@ public class Constants {
+         "virus/*",
+     };
+ 
++    //REALTEK ADD START
++    /**
++    RTK: You could update here to support more mime types (file types)
++    e.g.
++    public static final String[] ACCEPTABLE_SHARE_INBOUND_TYPES = new String[] {
++        "*",
++    };
++    means support all mime types (file types)
++    But we suggest not to use this setting for secure issue
++    The better solution is to append the mime type, including aliases into this list
++    Mime types: http://help.dottoro.com/lapuadlp.php
++     */
++    //REALTEK ADD END
++
++
+     /**
+      * The MIME type(s) of we could accept from other device.
+      * This is in essence a "white list" of acceptable types.
+diff --git a/src/com/android/bluetooth/pan/PanService.java b/src/com/android/bluetooth/pan/PanService.java
+index ea9b97e..855945f 100755
+--- a/src/com/android/bluetooth/pan/PanService.java
++++ b/src/com/android/bluetooth/pan/PanService.java
+@@ -268,6 +268,13 @@ public class PanService extends ProfileService {
+ 
+     boolean disconnect(BluetoothDevice device) {
+         enforceCallingOrSelfPermission(BLUETOOTH_PERM, "Need BLUETOOTH permission");
++        //REALTEK ADD START
++        int connectionState = getConnectionState(device);
++        if (connectionState != BluetoothProfile.STATE_CONNECTED &&connectionState != BluetoothProfile.STATE_CONNECTING)
++        {
++            return false;
++        }
++        //REALTEK ADD END
+         Message msg = mHandler.obtainMessage(MESSAGE_DISCONNECT,device);
+         mHandler.sendMessage(msg);
+         return true;
+diff --git a/src/com/android/bluetooth/rtkbt/RtkbtService.java b/src/com/android/bluetooth/rtkbt/RtkbtService.java
+new file mode 100755
+index 0000000..26d7af3
+--- /dev/null
++++ b/src/com/android/bluetooth/rtkbt/RtkbtService.java
+@@ -0,0 +1,234 @@
++/*
++ * Copyright (C) 2012 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.*/
++
++
++package com.android.bluetooth.rtkbt;
++
++import android.bluetooth.BluetoothDevice;
++import android.bluetooth.BluetoothProfile;
++import android.bluetooth.IBluetooth;
++import com.android.bluetooth.Utils;
++import android.content.Intent;
++import android.content.pm.PackageManager;
++import android.os.Bundle;
++import android.os.IBinder;
++import android.os.Handler;
++import android.os.Message;
++import android.os.RemoteException;
++import android.os.ServiceManager;
++import android.provider.Settings;
++import android.util.Log;
++import com.android.bluetooth.btservice.AdapterService;
++import com.android.bluetooth.btservice.ProfileService;
++import com.android.bluetooth.Utils;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++import android.content.pm.PackageManager;
++
++import android.bluetooth.IBluetoothRtkbt;
++import android.bluetooth.BluetoothRtkbt;
++
++
++/**
++ * Provides Bluetooth Gatt Host profile, as a service in
++ * the Bluetooth application.
++ */
++public class RtkbtService extends ProfileService {
++    private static final boolean DBG = true;
++    private static final String TAG = "RtkbtService";
++
++    private static RtkbtService mRtkbtService;
++    public static final String RTKBT_PROFILE = "RtkbtProfile";
++
++    static {
++        classInitNative();
++    }
++
++    public String getName() {
++        return TAG;
++    }
++
++    public IProfileServiceBinder initBinder() {
++        if (DBG) log("initBinder()");
++        return new BluetoothRtkbtBinder(this);
++    }
++
++    protected boolean start() {
++        log("start RTKBT Service");
++        InitNative();
++        setRtkbtService(this);
++        return true;
++    }
++
++    protected boolean stop() {
++        if (DBG) log("Stopping RTKBT Service");
++        return true;
++    }
++
++    protected boolean cleanup() {
++        log("cleanup RTKBT Service");
++        clearRtkbtService();
++        CleanupNative();
++        return true;
++    }
++
++    public static synchronized RtkbtService getRtkbtService() {
++        if(mRtkbtService != null && mRtkbtService.isAvailable()) {
++            if (DBG) Log.d(TAG, "getRtkbtService(): returning " + mRtkbtService);
++            return mRtkbtService;
++        }
++        if(DBG){
++            if(mRtkbtService == null) {
++                Log.d(TAG, "getRtkbtService(): service is NULL");
++            } else if (!(mRtkbtService.isAvailable())) {
++                Log.d(TAG,"getRtkbtService(): service is not available");
++            }
++        }
++        return null;
++    }
++
++    private static synchronized void setRtkbtService(RtkbtService instance) {
++        if (instance != null && instance.isAvailable()) {
++            if (DBG) Log.d(TAG, "setRtkbtService(): set to: " + instance);
++            mRtkbtService = instance;
++        } else {
++            if (DBG){
++                if(mRtkbtService == null) {
++                    Log.d(TAG, "setRtkbtService(): service not available");
++                } else if (!mRtkbtService.isAvailable()) {
++                    Log.d(TAG,"setRtkbtService(): service is cleaning up");
++                }
++            }
++        }
++    }
++
++    private static synchronized void clearRtkbtService() {
++        mRtkbtService = null;
++    }
++
++
++    /**
++     * Handlers for incoming service calls
++     */
++    private static class BluetoothRtkbtBinder extends IBluetoothRtkbt.Stub implements IProfileServiceBinder
++    {
++        private RtkbtService mService;
++        public BluetoothRtkbtBinder(RtkbtService svc) {
++            mService = svc;
++        }
++
++        public boolean cleanup() {
++            mService = null;
++            return true;
++        }
++
++        private RtkbtService getService() {
++            if (!Utils.checkCaller()) {
++                Log.w(TAG,"InputDevice call not allowed for non-active user");
++                return null;
++            }
++
++            if (mService  != null && mService.isAvailable()) {
++                return mService;
++            }
++            return getRtkbtService();
++        }
++
++        public int GetFeature(int id) {
++            Log.d(TAG, "GetFeature");
++            RtkbtService service = getService();
++            int result = 0;
++            if (service == null) {
++                Log.w(TAG, "service is null");
++                return -9999;
++            }
++
++            try{
++                result =  service.GetFeature(id);
++            } catch(RemoteException e) {
++                Log.w(TAG, "GetFeature catch remote exception!");
++            }
++            return result;
++        }
++        public int GenericCommand(int id, int command, byte[] data, int len) {
++            Log.d(TAG, "GenericCommand");
++            RtkbtService service = getService();
++            int result = 0;
++            if (service == null) {
++                Log.w(TAG, "service is null");
++                return -9999;
++            }
++
++            try{
++                result =  service.GenericCommand(id, command, data, len);
++            } catch(RemoteException e) {
++                Log.w(TAG, "GenericCommand catch remote exception!");
++            }
++            return result;
++        }
++    };
++
++    //Methods
++    public int GetFeature(int id) throws RemoteException {
++        log("GetFeature id=" + id);
++        return GetFeatureNative(id);
++    }
++    public int GenericCommand(int id, int command, byte[] data, int len) throws RemoteException {
++        log("onGenericEvent id=" + id + " command="+ command +" len=" + len);
++        return GenericCommandNative(id, command, data, len);
++    }
++
++    //Events
++    public void onGenericEvent(int id , int event, byte[] data, int len) {
++        log("onGenericEvent id=" + id + " event="+ event +" len=" + len);
++        if(data == null)
++        {
++            Intent intent = new Intent(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_id, id);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_event, event);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_len, 0);
++            intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
++            sendBroadcast(intent, BLUETOOTH_PERM);
++            return;
++        }
++        if(len <= data.length)
++        {
++            Intent intent = new Intent(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_id, id);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_event, event);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_data, data);
++            intent.putExtra(BluetoothRtkbt.ACTION_RTKBT_GENERIC_EVENT_len, len);
++            intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
++            sendBroadcast(intent, BLUETOOTH_PERM);
++        }else
++            log("onGenericEvent id=" + id + " event="+ event +" len=" + len +" Discard!!!");
++    }
++
++    public void log(String message){
++        if(DBG) Log.d(TAG, message);
++    }
++
++    //private native static void bt3ddClassInitNative();
++    private native static void classInitNative();
++    private native void InitNative();
++    private native void CleanupNative();
++    private native int GetFeatureNative(int id);
++    private native int GenericCommandNative(int id, int command, byte[] data, int len);
++}
++
++

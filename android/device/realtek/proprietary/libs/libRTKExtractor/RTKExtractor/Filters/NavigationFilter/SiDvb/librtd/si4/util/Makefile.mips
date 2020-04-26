@@ -1,0 +1,4 @@
+
+MK_EXT		:= mips
+
+include makefile.inc

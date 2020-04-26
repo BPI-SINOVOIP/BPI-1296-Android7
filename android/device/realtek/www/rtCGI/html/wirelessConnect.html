@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<!--
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	-->
+	<title>WLAN Connect</title>
+	<link href="css/boxhome.css" rel="stylesheet" type="text/css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+<script type="text/javascript" src="javascript/util.js"></script>
+<script type="text/javascript">
+var DEBUG_FLAG = false;
+var gMode; // AP / PROFILE
+var gActiveSSID, ssidDspStr, ssidEncoded;
+// Securty:
+// WL_SECURITY_OPEN	= 0,
+// WL_SECURITY_WEP	= 1,
+// WL_SECURITY_WPA	= 2,
+// WL_SECURITY_WEP_SHAREKEY = 3,
+// WL_SECURITY_UNKNOWN	= 4,
+var gActiveSecurity;
+var gProfileSSIDArray;
+var gbReplaceProfile = "false";
+
+// Parameter:
+// mode=profile&index=0
+// mode=ap&ssid="realtek"&security=2
+
+function getConnectState()
+{
+	sendCommand("wlanGetConnectState", handleConnectState);
+}
+
+function handleConnectState()
+{
+/*
+	var state = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve state from the response text
+			state = handleResponseText(command_xmlhttp.responseText);
+
+			if ("NONE" == state)
+			{
+			}
+			else if ("START" == state || "PROCESS" == state)
+			{
+				// Set timer to check the connection state periodically
+				setTimeout("getConnectState()", 1000);
+			}
+			else if ("OK" == state)
+			{
+				// Stop wireless connection with command "COMPLETE"
+				stopConnection("COMPLETE");
+			}
+			else if ("FAIL" == state)
+			{
+				// Stop wireless connection  with command "CANCEL"
+				stopConnection("CANCEL");
+				// clear active SSID
+				gActiveSSID = "";
+			}
+		}
+	}
+*/
+}
+
+function stopConnection(text)
+{
+	var cmd = new String();
+
+	cmd = "wlanStopConnect:" + text;
+	if ("COMPLETE" == text)
+	{
+		sendCommand(cmd, handlStopConnectionWithComplete);
+	}
+	else
+	{
+		sendCommand(cmd, handlStopConnectionWithCancel);
+	}
+}
+
+function handlStopConnectionWithComplete()
+{
+	var result = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve result from the response text
+			result = handleResponseText(command_xmlhttp.responseText);
+			if ("OK" == result)
+			{
+				if ("AP" == gMode)
+				{
+					getProfileSSID();
+				}
+				else
+				{
+					getConnectInfo();
+				}
+			}
+		}
+	}
+}
+
+function handlStopConnectionWithCancel()
+{
+	var result = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve result from the response text
+			result = handleResponseText(command_xmlhttp.responseText);
+			promptConnectInfo(result, "listProfile");
+		}
+	}
+}
+
+function setNewProfile(index)
+{
+	var cmd = new String();
+
+	cmd = "wlanSetProfile:" + index;
+	sendCommand(cmd, handleSetNewProfile);
+}
+
+function handleSetNewProfile()
+{
+}
+
+function showConnectInfo(text)
+{
+	document.getElementById("ShowInfo").innerHTML = text;
+}
+
+function promptConnectInfo(text, nextAction)
+{
+	alert(text);
+
+	if ("replaceProfile" == nextAction)
+	{
+		// Go to profile page to replace an existing profile
+		window.location.assign("wirelessProfile.html?mode=REPLACE");
+	}
+	else
+	{
+		// Go to profile page
+		window.location.assign("wirelessProfile.html?mode=CONNECT");
+	}
+}
+
+function getProfileSSID()
+{
+	// Get SSID of each profile
+	sendCommand("wlanGetProfileSSID", handleProfileSSID);
+}
+
+function handleProfileSSID()
+{
+	var profileSSID = new String();
+	var profileNum;
+	var activeProfileIndex;
+	var i, j = 0;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			profileSSID = handleResponseText(command_xmlhttp.responseText);
+
+			// Response format:
+			// ProfilesNum\nActiveIndex\nProfileName-1\nProfileName-2\nProfileName-3........\nProfileName-X
+
+			// Split profile SSID information into array
+			gProfileSSIDArray = profileSSID.split("\n");
+
+			for (i = 0; i < gProfileSSIDArray[0]; i++)
+			{
+				// Find empty profile slot for storing new SSID
+				// Otherwise, select a profile slot to be replaced with new SSID
+				if (gProfileSSIDArray[2 + i] == "")
+				{
+					setNewProfile(i);
+					break;
+				}
+				else if (gProfileSSIDArray[2 + i] == gActiveSSID)
+				{
+					// Existing profile. Do nothing
+					break;
+				}
+			}
+
+			if (i == gProfileSSIDArray[0])
+			{
+				// No free slot, need to replace an existing profile with the new one
+				gbReplaceProfile = "true";
+			}
+			getConnectInfo();
+		}
+	}
+}
+
+function getWifiPasswordFormValue(formObj)
+{
+	var i;
+	var cmd;
+	var radioObj = formObj.elements['WifiPasswordFormat'];
+	var passwordObj = formObj.elements['WifiPassword'];
+	var radioValue = "";
+	var bValidFormat = false;
+	var bValidPassword = false;
+	var passwordLength = 0;
+	var promptStr = new String();
+	var deviceNameStr = new String();
+
+	if (1 == gActiveSecurity || 3 == gActiveSecurity)
+	{
+		radioValue = getRadioCheckedValue(radioObj);
+		if ("" != radioValue)
+		{
+			bValidFormat = true;
+		}
+	}
+	else if (2 == gActiveSecurity)
+	{
+		radioValue = "none";
+		bValidFormat = true;
+	}
+
+	// WL_SECURITY_OPEN	= 0,
+	// WL_SECURITY_WEP	= 1,
+	// WL_SECURITY_WPA	= 2,
+	// WL_SECURITY_WEP_SHAREKEY = 3,
+
+	passwordLength = passwordObj.value.length;
+	if (0 < passwordLength)
+	{
+		if (1 == gActiveSecurity || 3 == gActiveSecurity)
+		{
+			// WEP / WEP Sharekey
+			if ("ascii" == radioValue)
+			{
+				// ASCII format, password length is 5 or 13
+				if (5 == passwordLength || 13 == passwordLength)
+				{
+					bValidPassword = true;
+				}
+			}
+			else
+			{
+				// HEX format, password length is 10 or 26
+				if (10 == passwordLength || 26 == passwordLength)
+				{
+					bValidPassword = true;
+				}
+			}
+		}
+		else if (2 == gActiveSecurity)
+		{
+			// WPA->only accept 8~64 characters
+			if (8 <= passwordLength && 64 >= passwordLength)
+			{
+				bValidPassword = true;
+			}
+		}
+		else
+		{
+			bValidPassword = true;
+		}
+	}
+
+	if (false == bValidFormat)
+	{
+		alert("Please select ASCII or HEX!");
+	}
+	else if (false == bValidPassword)
+	{
+		alert("Invalid password!");
+	}
+	else
+	{
+		// Send command
+		var devType = getUserDeviceType();
+		deviceNameStr = getCookie("cookieDeviceName");
+		promptStr = deviceNameStr + " is connecting to " + ssidDspStr + ". Make sure your " + devType + " is also connected to the same network, (" + ssidDspStr + ").";
+		cmd = "wlanConnectAp:" + ssidEncoded + ":" + ssidEncoded + ":" + gActiveSecurity + ":" + radioValue + ":" + encodeURIComponent(passwordObj.value);
+		gotoWarningPageWithCookie(promptStr, cmd);
+		//sendCommand(cmd, handleConnectApProfile);
+	}
+}
+
+function checkApSecurity(queryString)
+{
+	var cmd;
+	var pwd = "";
+	var bInputPassword = true;
+
+	var security = getParameter(queryString, 'security');
+	var SSID = getParameter(queryString, 'ssid');
+	if (DEBUG_FLAG) {
+		printStrCode("urlSSID", SSID);
+	}
+	gActiveSSID = SSID;
+	ssidDspStr = getSSIDDspStr(gActiveSSID);
+	ssidEncoded = escape(ssidStrToUtf8(gActiveSSID));
+	gActiveSecurity = security;
+
+	return security;
+}
+
+// Common funciton to handle the response of AP or Profile connection
+function handleConnectApProfile()
+{
+	var result = new String();
+	var resultArray;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve result from the response text
+			result = handleResponseText(command_xmlhttp.responseText);
+			resultArray = result.split(":");
+			if ("OK"  == resultArray[0])
+			{
+				var backToPage = "index.html";
+				if (isParamMatched(WIFISET_ENTRY_MODE, VAL_ENTRY_REMOTE, WIFISET_COOKIE_ENTRY_MODE) === true)
+				{
+					backToPage = "network.html";
+				}
+				// Go back to remote controll main page
+				window.location.assign(backToPage);
+			}
+		}
+	}
+}
+
+function connectProfile(queryString)
+{
+	var cmd;
+	var index = getParameter(queryString, 'index');
+	cmd = "wlanConnectProfile:" + index;
+	sendCommand(cmd, handleConnectApProfile);
+}
+
+
+function getConnectInfo()
+{
+	sendCommand("wlanGetConnectInfo", handleGetConnectInfo);
+}
+
+function handleGetConnectInfo()
+{
+	var info = new String();
+	var infoArray;
+	var i;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve connection info from the response text
+			info = handleResponseText(command_xmlhttp.responseText);
+
+			if ("AP" == gMode && "true" == gbReplaceProfile)
+			{
+				promptConnectInfo(info, "replaceProfile");
+			}
+			else
+			{
+				promptConnectInfo(info, "listProfile");
+			}
+		}
+	}
+}
+
+function prepareDisplayInfo()
+{
+	//var queryString = window.top.location.search.substring(1);
+	var queryString = window.location.href;
+	gMode = getParameter(queryString, 'mode');
+	var security = 0;
+	setTitleFontSize("mainArea", "titleArea");
+
+	if ("AP" == gMode)
+	{
+		var promptObj = document.getElementById("PromptString");
+
+		security = checkApSecurity(queryString);
+		// Securty:
+		// WL_SECURITY_OPEN	= 0,
+		// WL_SECURITY_WEP	= 1,
+		// WL_SECURITY_WPA	= 2,
+		// WL_SECURITY_WEP_SHAREKEY = 3,
+		if (0 == security)
+		{
+			// Hide password related fileds
+			setElementVisible("mainArea", "false");
+			var devType = getUserDeviceType();
+			var deviceNameStr = getCookie("cookieDeviceName");
+			var promptStr = deviceNameStr + " is connecting to " + ssidDspStr + ". Make sure your " + devType + " is also connected to the same network, (" + ssidDspStr + ").";
+			cmd = "wlanConnectAp:" + ssidEncoded + ":" + ssidEncoded + ":" + gActiveSecurity;
+			gotoWarningPageWithCookie(promptStr, cmd);
+		}
+		else if (1 == security)
+		{
+			// Hide password related fileds
+			setElementVisible("wifiPassword", "false");
+			setElementVisible("radioAscii", "false");
+			setElementVisible("radioHex", "false");
+
+			setElementVisible("submitButton", "false");
+			setElementVisible("backButton", "true");
+		}
+		else if (2 == security)
+		{
+			// Hide radio buttons
+			setElementVisible("radioAscii", "false");
+			setElementVisible("radioHex", "false");
+			setElementVisible("backButton", "false");
+		}
+
+		if (1 == security)
+		{
+			promptObj.innerHTML = "Your WEP AP is not supported";
+		}
+		else
+		{
+			promptObj.innerHTML = "Connect to:" + ssidDspStr;
+		}
+	}
+	else if ("PROFILE" == gMode)
+	{
+		connectProfile(queryString);
+	}
+}
+
+function catchEnter(evt)
+{
+	var code = 0;
+
+	if (!e) var e = window.event;
+	if (e.keyCode) code = e.keyCode;
+	else if (e.which) code = e.which;
+
+	if (13 == code)
+	{
+		//submit the form, do your validation, or whatever
+		getWifiPasswordFormValue(document.forms['WifiPasswordForm']);
+
+		return false;
+	}
+}
+
+function gotoWarningPageWithCookie(promptStr, cmdStr)
+{
+	deleteCookie("warningPrompt");
+	deleteCookie("warningCmd");
+	if (null != promptStr)
+	{
+		setCookie("warningPrompt", promptStr);
+	}
+
+	// null cmdStr means that this is just a prompt
+	if (null != cmdStr)
+	{
+		setCookie("warningCmd", cmdStr);
+	}
+	else
+	{
+		setCookie("warningCmd", null);
+	}
+	window.location.assign("warning.html");
+}
+
+function backToScanWiFi()
+{
+	window.location.assign("select-ap.html");
+}
+
+</script>
+<body id="mainArea" class="gray-bg" onload = "prepareDisplayInfo();">
+	<div class="Input-bg">
+		<div class="topic">
+			<div id="password-back" onClick="self.location.href='select-ap.html';">
+				<a></a>
+			</div>
+			<span>Please input password</span>
+			<span style="display:inline" id="PromptString">Connect to:</span>
+		</div>
+		<div class="setup-input">
+			<form name="WifiPasswordForm">
+				<p id="radioAscii"><input type="radio" name="WifiPasswordFormat" value="ascii"> ASCII </input></p>
+				<p id="radioHex"><input type="radio" name="WifiPasswordFormat" value="hex"> HEX </input></p>
+				<input id="wifiPassword" type="password" class="input-text" name="WifiPassword" onkeypress="return catchEnter(event)"/>
+				<input id="submitButton" type="button" class="input-btn" value="Submit" onClick="getWifiPasswordFormValue(document.forms['WifiPasswordForm'])"/>
+				<input id="backButton" type="button" class="input-btn" value="Back" style="display:inline" onClick="backToScanWiFi()"/>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

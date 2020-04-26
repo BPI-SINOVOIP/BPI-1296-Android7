@@ -1,0 +1,19 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemsha1
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEMSHA1_LIB      \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEMSHA1_LIB      \
+!endif
+
+
+
+
+SOURCES=       \
+    oemsha1.c  \
+

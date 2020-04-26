@@ -1,0 +1,7 @@
+DIRS = \
+	timeutility \
+	packagecontent \
+	CRLParsing     \
+	deviceauthentication \
+	LicenseTool          \
+

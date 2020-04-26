@@ -1,0 +1,669 @@
+
+body {
+	background-color: #3A3A3A;
+	margin: 0;
+	overflow-x:hidden;
+}
+a {
+	text-decoration: none;
+	color:#fff;
+} 
+.main-bg {
+	background: url(../images/background.png) repeat-x;
+}
+.remote-bg {
+	background: url(../images/remote-background.png) repeat-x;
+	height: 600px;
+}
+#main-area {
+	background: url(../images/main-center-bg.jpg) no-repeat;
+	width: 349px;
+	margin: auto;
+}
+#logo {
+	height: 150px;
+	width: 349px;
+}
+.main-content {
+	margin: auto;
+	width: 340px;
+	color: #fff;
+}
+.airfun-info{
+	width: 350px;
+	font-family: Arial;
+}
+#slogan{
+	font-size: 1.3em;
+	color: #BAE300;
+	font-weight: bold;
+	vertical-align: bottom;
+	padding: 10px 0 0 10px;
+}
+.airfun-desc{
+	text-align : left;
+	font-size: 0.78em;
+	vertical-align: top;
+	padding: 0 0 0 10px;
+}
+.google-market{
+	background: url(../images/market-icon_unfocus.png) no-repeat;
+	width:70px;
+	height:89px;
+	display: block;
+}
+.google-market:hover{
+	background: url(../images/market-icon_focus.png) no-repeat;
+}
+.google-market-dummy{
+	width:10px;
+	height:89px;
+	display: block;
+}
+.download-btn a{
+	background: url(../images/download-btn_unfocus.png) no-repeat;
+	width: 230px;
+	height: 66px;
+	display: block;
+	margin:10px 0 0 0;
+}
+.download-btn a:hover {
+	background: url(../images/download-btn_focus.png) no-repeat;
+}
+.download-pc-btn a{
+	background: url(../images/download-PC_unfocus.png) no-repeat;
+	width: 230px;
+	height: 66px;
+	display: block;
+	margin:10px 0 0 0;
+}
+.download-pc-btn a:hover {
+	background: url(../images/download-PC_focus.png) no-repeat;
+}
+.home-function td{
+	vertical-align: top;
+}
+.btn-remote{
+	background: url(../images/remote-btn_unfocus.png) no-repeat;
+	width:113px;
+	height:38px;
+	display: block;
+}
+.btn-remote:hover {
+	background: url(../images/remote-btn_focus.png) no-repeat;
+}
+.btn-setup{
+	background: url(../images/setup-btn_unfocus.png) no-repeat;
+	width:113px;
+	height:38px;
+	display: block;
+}
+.btn-setup:hover {
+	background: url(../images/setup-btn_focus.png) no-repeat;
+}
+
+#footer-logo{
+	background: url(../images/RT-logo.png) no-repeat;
+	height: 30px;
+	width: 233px;
+	vertical-align : middle;
+}
+ /*---------------remote---------------*/
+#title-bar{
+	width: 100%;
+	height: 40px;
+	background: url(../images/title-bg.png) repeat-x;
+}
+#btn-back{
+	width: 123 px;
+	height: 40px;
+	display: block;
+	background: url(../images/btn-back.png) no-repeat;
+}
+#btn-back:hover{
+	width: 123 px;
+	height: 40px;
+	display: block;
+	background: url(../images/btn-back_hover.png) no-repeat;
+}
+
+#remote-main {
+	background: url(../images/remote-main.png) no-repeat;
+	width: 349px;
+	margin: auto;
+}
+#remote-key {
+	height: 508px;
+	width: 349px;
+}
+.option{
+	background: url(../images/remote-option_unfocus.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left:24px;
+	cursor: pointer;
+}
+.option:hover{
+	background: url(../images/remote-option_hover.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left:24px;
+	cursor: pointer;
+}
+.up{
+	background: url(../images/remote-up_unfocus.png) no-repeat;
+	width: 126px;
+	height: 60px;
+	position: relative;
+	left: 112px;
+	top: -45px;
+	cursor: pointer;
+}
+.up:hover{
+	background: url(../images/remote-up_hover.png) no-repeat;
+	width: 126px;
+	height: 60px;
+	position: relative;
+	left: 112px;
+	top: -45px;
+}
+.guide{
+	background: url(../images/remote-guide_unfocus.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left: 238px;
+	top: -146px;
+	cursor: pointer;
+}
+.guide:hover{
+	background: url(../images/remote-guide_hover.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left: 238px;
+	top: -146px;
+}
+.left{
+	background: url(../images/remote-left_unfocus.png) no-repeat;
+	width: 58px;
+	height: 80px;
+	position: relative;
+	left: 74px;
+	top: -131px;
+	cursor: pointer;
+}
+.left:hover{
+	background: url(../images/remote-left_hover.png) no-repeat;
+	width: 58px;
+	height: 80px;
+	position: relative;
+	left: 74px;
+	top: -131px;
+}
+.ok-key{
+	background: url(../images/remote-OKkey_unfocus.png) no-repeat;
+	width: 84px;
+	height: 85px;
+	position: relative;
+	left: 131px;
+	top: -211px;
+	cursor: pointer;
+}
+.ok-key:hover{
+	background: url(../images/remote-OKkey_hover.png) no-repeat;
+	width: 84px;
+	height: 85px;
+	position: relative;
+	left: 131px;
+	top: -211px;
+}
+.right{
+	background: url(../images/remote-right_unfocus.png) no-repeat;
+	width: 58px;
+	height: 80px;
+	position: relative;
+	left: 216px;
+	top: -296px;
+	cursor: pointer;
+}
+.right:hover{
+	background: url(../images/remote-right_hover.png) no-repeat;
+	width: 58px;
+	height: 80px;
+	position: relative;
+	left: 216px;
+	top: -296px;
+}
+.return{
+	background: url(../images/remote-return_unfocus.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left:24px;
+	top: -280px;
+	cursor: pointer;
+}
+.return:hover{
+	background: url(../images/remote-return_hover.png) no-repeat;
+	width: 88px;
+	height: 86px;
+	position: relative;
+	left:24px;
+	top: -280px;
+	cursor: pointer;
+}
+.down{
+	background: url(../images/remote-down_unfocus.png) no-repeat;
+	width: 126px;
+	height: 60px;
+	position: relative;
+	left:112px;
+	top: -382px;
+	cursor: pointer;
+}
+.down:hover{
+	background: url(../images/remote-down_hover.png) no-repeat;
+	width: 126px;
+	height: 60px;
+	position: relative;
+	left:112px;
+	top: -382px;
+	cursor: pointer;
+}
+.setup{
+	background: url(../images/remote-setup_unfocus.png) no-repeat;
+	width: 99px;
+	height: 52px;
+	position: relative;
+	left:229px;
+	top: -382px;
+	cursor: pointer;
+}
+.setup:hover{
+	background: url(../images/remote-setup_hover.png) no-repeat;
+	width: 99px;
+	height: 52px;
+	position: relative;
+	left:229px;
+	top: -382px;
+	cursor: pointer;
+}
+.playback-play{
+	background: url(../images/remote-playing_unfocus.png) no-repeat;
+	width: 101px;
+	height: 53px;
+	position: relative;
+	left:23px;
+	top: -384px;
+	cursor: pointer;
+}
+.playback-play:hover{
+	background: url(../images/remote-playing_hover.png) no-repeat;
+	width: 101px;
+	height: 53px;
+	position: relative;
+	left:23px;
+	top: -384px;
+	cursor: pointer;
+}
+.playback-stop{
+	background: url(../images/remote-stop_unfocus.png) no-repeat;
+	width: 101px;
+	height: 53px;
+	position: relative;
+	left:125px;
+	top: -437px;
+	cursor: pointer;
+}
+.playback-stop:hover{
+	background: url(../images/remote-stop_hover.png) no-repeat;
+	width: 101px;
+	height: 53px;
+	position: relative;
+	left:125px;
+	top: -437px;
+	cursor: pointer;
+}
+.zoom{
+	background: url(../images/remote-zoom_unfocus.png) no-repeat;
+	width: 99px;
+	height: 49px;
+	position: relative;
+	left:229px;
+	top: -487px;
+	cursor: pointer;
+}
+.zoom:hover{
+	background: url(../images/remote-zoom_hover.png) no-repeat;
+	width: 99px;
+	height: 49px;
+	position: relative;
+	left:229px;
+	top: -487px;
+	cursor: pointer;
+}
+.playback-frwd{
+	background: url(../images/remote-frwd_unfocus.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:23px;
+	top: -486px;
+	cursor: pointer;
+}
+.playback-frwd:hover{
+	background: url(../images/remote-frwd_hover.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:23px;
+	top: -486px;
+	cursor: pointer;
+}
+.playback-ffwd{
+	background: url(../images/remote-ffwd_unfocus.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:125px;
+	top: -535px;
+	cursor: pointer;
+}
+.playback-ffwd:hover{
+	background: url(../images/remote-ffwd_hover.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:125px;
+	top: -535px;
+	cursor: pointer;
+}
+.playback-prev{
+	background: url(../images/remote-prev_unfocus.png) no-repeat;
+	width: 101px;
+	height: 52px;
+	position: relative;
+	left:23px;
+	top: -536px;
+	cursor: pointer;
+}
+.playback-prev:hover{
+	background: url(../images/remote-prev_hover.png) no-repeat;
+	width: 101px;
+	height: 52px;
+	position: relative;
+	left:23px;
+	top: -536px;
+	cursor: pointer;
+}
+.playback-next{
+	background: url(../images/remote-next_unfocus.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:125px;
+	top: -588px;
+	cursor: pointer;
+}
+.playback-next:hover{
+	background: url(../images/remote-next_hover.png) no-repeat;
+	width: 101px;
+	height: 49px;
+	position: relative;
+	left:125px;
+	top: -588px;
+	cursor: pointer;
+}
+.red-key{
+	background: url(../images/remote-redKey_unfocus.png) no-repeat;
+	width: 101px;
+	height: 51px;
+	position: relative;
+	left:23px;
+	top: -574px;
+	cursor: pointer;
+}
+.red-key:hover{
+	background: url(../images/remote-redKey_hover.png) no-repeat;
+	width: 101px;
+	height: 51px;
+	position: relative;
+	left:23px;
+	top: -574px;
+	cursor: pointer;
+}
+.green-key{
+	background: url(../images/remote-greenKey_unfocus.png) no-repeat;
+	width: 101px;
+	height: 51px;
+	position: relative;
+	left:125px;
+	top: -626px;
+	cursor: pointer;
+}
+.green-key:hover{
+	background: url(../images/remote-greenKey_hover.png) no-repeat;
+	width: 101px;
+	height: 51px;
+	position: relative;
+	left:125px;
+	top: -626px;
+	cursor: pointer;
+}
+.volume-up{
+	background: url(../images/remote-volup_unfocus.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+.volume-up:hover{
+	background: url(../images/remote-volup_hover.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+.volume-down{
+	background: url(../images/remote-voldown_unfocus.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+.volume-down:hover{
+	background: url(../images/remote-voldown_hover.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+.volume-mute{
+	background: url(../images/remote-mute_unfocus.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+.volume-mute:hover{
+	background: url(../images/remote-mute_hover.png) no-repeat;
+	width: 99px;
+	height: 54px;
+	position: relative;
+	left:229px;
+	top: -788px;
+	cursor: pointer;
+}
+
+
+ /*---------------setup---------------*/
+.setup-main {
+	background: url(../images/setup-main.jpg) no-repeat center;
+	height: 500px;
+	width: 100%;
+	position: absolute;
+}
+.setup-list {
+	padding-top: 10px;
+	color: #fff;
+	font-family: Arial;
+	font-size: 1.1em;
+	font-weight: bold;
+}
+.focus{
+	cursor: pointer;
+	width: 100%;
+	height: 30px;
+	padding: 6px 6px;
+	background: url(../images/setup-list_listbg.png);
+}
+.focus:active{
+	background: url(../images/setup-list_listbg_hover.png);
+}
+.setup-g{
+	margin: 6px 0 0 0;
+	-webkit-transform:translate3d(0,0,0);
+}
+table{
+	width: 100%;
+	height: 30px;
+}
+.edit{
+	text-align: center;
+	padding: 20px 10px;
+	background: url(../images/setup-list_listbg-open.png);
+}
+.text-mode{
+	text-align: right;
+	color: #ABFF61;
+}
+.text-input{
+	height: 36px;
+	width: 70%;
+	margin: 5px 0;
+	text-align: center;
+	font-size: 1.1em;
+	font-family: Arial;
+	font-weight: bold;
+	background-color: #fff;
+	border: #fff;
+	color: #4d4d4d;
+}
+.confirm{
+	width: 20%;
+}
+.button{
+	margin: 5px 0;
+	width: 135px;
+}
+.radio-open{
+	text-align: left;
+	padding: 10px 6px;
+}
+li{
+	list-style: none inside; 
+}
+.language li:active{
+	background-color: #475736;
+}
+.language a{
+	display: block;
+	width: 100%;
+	height: 38px;
+	vertical-align: middle;
+}
+.setup-info{
+	padding: 10px 16px;
+	line-height: 26px;
+	color: #111;
+}
+
+
+
+ /*---------------setup - wifi Connection---------------*/
+.ap-list{
+	padding-top: 10px;
+}
+#wifi_off table{
+	background: none;
+}
+#wifi_off table:active{
+	background: url(../images/setup-list_listbg_hover.png) ;
+}
+.ap-list table{
+	cursor: pointer;
+	width: 100%;
+	height: 30px;
+	background: url(../images/ap-list-bg.png) ;
+	margin: 6px 0;
+	padding: 6px;
+}
+.ap-list table:active{
+	background: url(../images/setup-list_listbg_hover.png);
+}
+.ap-list div{
+	color: #fff;
+	font-size: 1.1em;
+	font-family: Arial;
+	font-weight: bold;
+}
+.ap-mode{
+	text-align: right;
+	color: #ABFF61;
+	width: 50px;
+	background: url(../images/wifi-icon-security-none.png) no-repeat;
+}
+.ap-security-none{
+	text-align: right;
+	color: #ABFF61;
+	width: 50px;
+	background: url(../images/wifi-icon.png) no-repeat;
+}
+.ap-security{
+	text-align: right;
+	color: #ABFF61;
+	width: 50px;
+	background: url(../images/wifi-icon-security.png) no-repeat;
+}
+
+/*---------------warning---------------*/
+.warn{
+	width: 333px;
+	margin: 0 auto;
+	padding: 50px 0;
+	background: url(../images/warning-main-bg.png) no-repeat;
+} 
+.warn-icon{
+	color: #fff;
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 1em;
+}
+.warn-icon img{
+	vertical-align: middle;
+}
+.warn-input{
+	text-align: center;
+	margin: 16px 0 0 16px;
+}
+.warn-input input{
+	width: 130px;
+	height: 35px;
+	color: #666;
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 1em;
+}

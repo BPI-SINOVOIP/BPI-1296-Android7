@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmxmlhashreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    xmlhashimplreal.c         \
+    xmlhashutilreal.c         \
+

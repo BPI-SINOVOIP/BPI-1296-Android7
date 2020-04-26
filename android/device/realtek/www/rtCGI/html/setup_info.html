@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Setup info</title>
+
+<script type="text/javascript" src="javascript/util.js"></script>
+<script type="text/javascript">
+function handleDeviceName()
+{
+	var deviceName = new String();
+	var text = new String();
+	var deviceNameArray;
+	var i;
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			deviceName = handleResponseText(command_xmlhttp.responseText);
+			deviceNameArray = deviceName.split(":");
+			for (i = 0; i < deviceNameArray.length; i++)
+			{
+				deviceNameArray[i] = "<td>" + deviceNameArray[i] + "</td>";		
+				text += deviceNameArray[i];
+			}
+			showDeviceName(text);
+		}
+	}
+}
+
+function showDeviceName(text)
+{
+	document.getElementById("DeviceName").innerHTML=text;
+}
+function getDeviceName()
+{
+    sendCommand("getDeviceFriendlyName", handleDeviceName);
+}
+
+function handleMAC()
+{
+	var MAC = new String();
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			MAC = handleResponseText(command_xmlhttp.responseText);
+			showMAC(MAC);
+		}
+	}
+}
+
+function showMAC(text)
+{
+	document.getElementById("MACInfo").innerHTML=text;
+}
+function getMAC()
+{
+    sendCommand("getMAC", handleMAC);
+}
+
+function handleIP()
+{
+	var IP = new String();
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			IP = handleResponseText(command_xmlhttp.responseText);
+			showIPInfo(IP);
+		}
+	}
+}
+
+function showIPInfo(text)
+{
+	document.getElementById("IPInfo").innerHTML=text;
+}
+function getIP()
+{
+    sendCommand("getIP", handleIP);
+}
+
+function handleSecurity()
+{
+	var Security = new String();
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			Security = handleResponseText(command_xmlhttp.responseText);
+			showSecurity(Security);
+		}
+	}
+}
+
+function showSecurity(text)
+{
+	document.getElementById("Security").innerHTML=text;
+}
+function getSecurity()
+{
+    sendCommand("getSecurity", handleSecurity);
+}
+
+function handleFWInfo()
+{
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+    	var FWInfomation = new String();
+	    var i;
+      var gFWArray;
+	    var tmpArray = new String();
+
+		  FWInfomation = handleResponseText(command_xmlhttp.responseText);
+  		gFWArray = FWInfomation.split("\n");
+   		showFWInfo(gFWArray);
+  	}	   
+	}
+}
+
+function showFWInfo(text)
+{
+	document.getElementById("FWInfo").innerHTML=text; 
+}
+function getFWInfo()
+{
+    sendCommand("getFWInfo", handleFWInfo);
+}
+
+function handleWPSPin()
+{
+	var WpsPinNumber = new String();
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			WpsPinNumber = handleResponseText(command_xmlhttp.responseText);
+			showWpsPin(WpsPinNumber);
+		}
+	}
+}
+
+function showWpsPin(text)
+{
+	document.getElementById("WpsPinInfo").innerHTML=text;
+}
+//---------------------------------------------------------------------
+function ChangeSSID()
+{
+	var SSIDcmd;
+  var inputSSID = "";
+  inputSSID = prompt('ChangeSSID','');
+  
+	SSIDcmd = "ChangeSSID:" + inputSSID;
+
+	sendCommandDef(SSIDcmd);
+}
+//----------------------------------------------------------------------------
+function SecurityON()
+{
+	var SECUcmd;
+  var inputPassword = "";
+  inputPassword = prompt('Input Password','');
+  
+	SECUcmd = "SecurityON:" + inputPassword;
+
+	sendCommandDef(SECUcmd);
+}
+//----------------------------------------------------------------------------
+function handleSecurityPassword()
+{
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+    	var WPAKeyNumber = new String();
+	    var i;
+
+		  WPAKeyNumber = handleResponseText(command_xmlhttp.responseText);
+   		showWPAKey(WPAKeyNumber);
+  	}	   
+	}
+}
+
+function showWPAKey(text)
+{
+	document.getElementById("WPAKey").innerHTML=text; 
+}
+function getWPAKey()
+{
+    sendCommand("SecurityPassword", handleSecurityPassword);
+}
+//------------------------------------------------------------------------------
+function prepareSetupInfo()
+{
+	//getDeviceName();
+  //getMAC();
+  //getIP();
+  //getSecurity();
+  //getFWInfo();
+  getWPAKey();
+}
+</script></head>
+<body leftmargin="10%" bgcolor = "#C2C2A8" onload="prepareSetupInfo();">
+<hr width="95%" size="5" color="green" align="center"/>
+<table align="center" border="1" >
+<tr><th>Device(SSID)</th></tr>
+<tr><td id="DeviceName"></td></tr>
+</table>
+<hr width="95%" size="5" color="green" align="center"/>
+<table align="center" border="1" >
+<tr><th>MAC address</th></tr>
+<tr><td id="MACInfo"></td></tr>
+</table>
+<hr width="95%" size="5" color="green" align="center"/>
+<table align="center" border="1" >
+<tr><th>IP address</th></tr>
+<tr><td id="IPInfo"></td></tr>
+</table>
+<hr width="95%" size="5" color="green" align="center"/>
+<table align="center" border="1" >
+<tr><th>Security info</th></tr>
+<tr><td id="Security"></td></tr>
+</table>
+<hr width="95%" size="5" color="green" align="center"/>
+<table align="center" border="1" >
+<tr><th>FW version</th></tr>
+<tr><td id="FWInfo"></td></tr>
+</table>
+<font size="6pt" color="blue"><p align="center"><cite>WPS Setup</cite></p></font>
+<input type="button" value="WPS PBC" onClick="sendCommandDef('setWpsPbc');"/>
+<hr width="95%" size="5" color="green" align="center"/>
+<input type="button" value="WPS PIN" onClick="sendCommand('setWpsPin',handleWPSPin);"/>
+<table align="center" border="1">
+<tr><th>WPS Number</th></tr>
+<tr><td id="WpsPinInfo"></td></tr>
+</table>
+<hr width="95%" size="5" color="green" align="center"/>
+<input type="button" value="Change SSID" onClick="ChangeSSID();"/>
+<hr width="95%" size="5" color="green" align="center"/>
+<input type="button" value="WPA Security" onClick="SecurityON();"/>
+<input type="button" value="Security OFF" onClick="sendCommandDef('SecurityOFF');"/>
+<table align="center" border="1" >
+<tr><th>WPA KEY</th></tr>
+<tr><td id="WPAKey"></td></tr>
+</table>
+</body>
+</html>

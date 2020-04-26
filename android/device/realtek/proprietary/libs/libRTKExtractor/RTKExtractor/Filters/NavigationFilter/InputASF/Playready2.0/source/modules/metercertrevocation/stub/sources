@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmetercertrevocationstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                         \
+    metercertrevocationutilstub.c \
+

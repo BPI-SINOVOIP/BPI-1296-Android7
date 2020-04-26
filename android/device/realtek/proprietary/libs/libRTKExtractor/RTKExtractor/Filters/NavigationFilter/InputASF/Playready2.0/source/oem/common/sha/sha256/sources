@@ -1,0 +1,19 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemsha256
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEMSHA256_LIB    \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEMSHA256_LIB    \
+!endif
+
+
+
+
+SOURCES=         \
+    oemsha256.c  \
+

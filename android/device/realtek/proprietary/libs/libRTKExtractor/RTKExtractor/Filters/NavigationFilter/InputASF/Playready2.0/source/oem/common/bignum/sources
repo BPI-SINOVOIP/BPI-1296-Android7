@@ -1,0 +1,41 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oembignum
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_BIGNUM_LIB       \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_BIGNUM_LIB       \
+!endif
+
+
+SOURCES =            \
+    bignum.c         \
+    digitogcd.c      \
+    divide.c         \
+    divisibility.c   \
+    ecex2001.c       \
+    ecexpon.c        \
+    ecppq.c          \
+    ecurve.c         \
+    field.c          \
+    kdiv.c           \
+    kinitpr.c        \
+    kinvert.c        \
+    kmuladd.c        \
+    lucas.c          \
+    modexp.c         \
+    modmulch1.c      \
+    modsqrt.c        \
+    modular.c        \
+    mpaddsubcmp.c    \
+    mpalloc.c        \
+    mpgcdex.c        \
+    mpmul22.c        \
+    mprand.c         \
+    multlow.c        \
+    bignumnoinline.c \
+

@@ -1,0 +1,24 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcipher_test
+TARGETTYPE=PROGRAM
+UMTYPE=console
+
+SOURCES = \
+    main.c \
+        
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+SOURCES = $(SOURCES) \
+      cipher.rc
+!endif
+
+INCLUDES =                    \
+    $(INCLUDES)               \
+
+TARGETLIBS =                                  \
+    $(LIBRARY_LIBS)                           \
+    $(_DRM_COMMON_LIBS)                       \
+    $(_DRM_OEM_MAIN_LIB)                      \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib      \
+    $(_DRM_BLACKBOX_LIBS)                     \
+

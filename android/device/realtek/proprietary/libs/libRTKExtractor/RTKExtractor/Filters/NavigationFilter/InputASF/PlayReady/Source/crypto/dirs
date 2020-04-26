@@ -1,0 +1,5 @@
+DIRS =        \
+    bignum    \
+    drmcrypto \
+    drmsha256 \
+    pkcrypto  \

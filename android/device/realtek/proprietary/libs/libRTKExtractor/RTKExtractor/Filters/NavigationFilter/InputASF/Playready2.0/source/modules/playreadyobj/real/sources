@@ -1,0 +1,17 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmplayreadyobjreal
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_BUILDING_DRMPLAYREADYOBJ_LIB
+
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_BUILDING_DRMPLAYREADYOBJ_LIB
+!endif
+
+SOURCES =             \
+    drmplayreadyobj.c
+

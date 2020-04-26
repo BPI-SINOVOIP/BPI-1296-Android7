@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdlareal
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    dlautilreal.c             \
+    drmdlaimplreal.c
+

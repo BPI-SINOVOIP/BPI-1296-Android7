@@ -1,0 +1,7 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_trace_ansi
+TARGETTYPE=LIBRARY
+
+SOURCES =      \
+    oemtrace.c

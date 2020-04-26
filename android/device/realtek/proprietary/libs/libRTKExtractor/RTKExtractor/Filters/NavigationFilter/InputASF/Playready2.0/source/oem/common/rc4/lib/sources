@@ -1,0 +1,17 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemrc4
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_DRMCRYPTO_LIB    \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_DRMCRYPTO_LIB    \
+!endif
+
+SOURCES = \
+    rc4.c
+
+

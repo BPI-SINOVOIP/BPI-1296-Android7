@@ -1,0 +1,17 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcrypto
+TARGETTYPE=LIBRARY
+
+C_DEFINES = $(C_DEFINES) -DDRM_USE_RSA_IMPL=0
+
+!if exist(..\rc4.c)
+COMMON_SOURCE = ..\deskey.c ..\rc4.c 
+!else
+COMMON_SOURCE = ..\deskey.c
+!endif
+
+SOURCES =            \
+    $(COMMON_SOURCE)
+
+

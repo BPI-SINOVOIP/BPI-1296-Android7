@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_common
+TARGETTYPE=LIBRARY
+
+SOURCES = 	               \
+	..\oemprofile_common.c \
+	..\oeminfo_common.c    \
+	..\oemimpl_common.c    \
+        ..\oemndt.c

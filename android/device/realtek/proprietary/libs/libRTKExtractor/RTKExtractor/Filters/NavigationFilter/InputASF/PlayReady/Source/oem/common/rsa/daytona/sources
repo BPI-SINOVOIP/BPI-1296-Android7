@@ -1,0 +1,12 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemrsa
+TARGETTYPE=LIBRARY
+
+INCLUDES = \
+    $(_DRM_CRYPTO_DIR)\bignum; \
+    $(INCLUDES)
+
+SOURCES = 	          \
+	..\oemrsa.c       \
+	..\oemrsakeygen.c

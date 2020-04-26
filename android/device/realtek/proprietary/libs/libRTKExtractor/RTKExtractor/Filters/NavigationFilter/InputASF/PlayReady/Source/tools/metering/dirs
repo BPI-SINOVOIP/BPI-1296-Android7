@@ -1,0 +1,7 @@
+DIRS = \
+    meteringsigncertificate      \
+    meteringgeneratechallenge    \
+    meteringcreateresponse   \
+    meteringprocessresponse
+
+    

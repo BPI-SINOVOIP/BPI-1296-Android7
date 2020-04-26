@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmperformancestub
+TARGETTYPE=LIBRARY
+
+SOURCES =                \
+    drmperformancestub.c
+

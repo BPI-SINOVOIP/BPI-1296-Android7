@@ -1,0 +1,14 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmpkcrypto
+TARGETTYPE=LIBRARY
+
+INCLUDES =                         \
+    $(INCLUDES);                   \
+    $(_DRM_CRYPTO_DIR)\bignum;     \
+    $(_DRM_CRYPTO_DIR)\drmsha256;  \
+
+
+SOURCES =                     \
+    ..\drmeccp160.c           \
+    ..\drmeccp256.c           \

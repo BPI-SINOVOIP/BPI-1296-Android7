@@ -1,0 +1,46 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: MACDll - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"Debug/Resource Script.res" /d "_DEBUG" "C:\Documents and Settings\stanely\桌面\APE_SDK_407\Source\MACDll\Resource Script.rc"" 
+Creating temporary file "C:\DOCUME~1\stanely\LOCALS~1\Temp\RSP6BC.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\MACLib\\" /I "..\Shared\\" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MACDLL_EXPORTS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Documents and Settings\stanely\桌面\APE_SDK_407\Source\Shared\APEInfoDialog.cpp"
+"C:\Documents and Settings\stanely\桌面\APE_SDK_407\Source\MACDll\MACDll.cpp"
+"C:\Documents and Settings\stanely\桌面\APE_SDK_407\Source\Shared\WAVInfoDialog.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\stanely\LOCALS~1\Temp\RSP6BC.tmp" 
+Creating temporary file "C:\DOCUME~1\stanely\LOCALS~1\Temp\RSP6BD.tmp" with contents
+[
+maclib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"Debug/MACDll.pdb" /debug /machine:I386 /def:".\MACDll.def" /out:"Debug/MACDll.dll" /implib:"Debug/MACDll.lib" /pdbtype:sept /libpath:"..\MACLib\Debug" 
+".\Debug\APEInfoDialog.obj"
+".\Debug\MACDll.obj"
+".\Debug\WAVInfoDialog.obj"
+".\Debug\Resource Script.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\stanely\LOCALS~1\Temp\RSP6BD.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+
+
+C:\Documents and Settings\stanely\??\APE_SDK_407\Source\MACDll\Resource Script.rc (100): error RC2135 : file not found: res\Monkey Head.ico
+
+
+C:\Documents and Settings\stanely\??\APE_SDK_407\Source\MACDll\Resource Script.rc (101): error RC2135 : file not found: res\Monkey Head (1).ico
+
+
+C:\Documents and Settings\stanely\??\APE_SDK_407\Source\MACDll\Resource Script.rc (291): error RC2135 : file not found: res\Compression Level.bmp
+Error executing rc.exe.
+
+
+
+<h3>Results</h3>
+MACDll.dll - 3 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

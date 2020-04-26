@@ -1,0 +1,21 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmxmrparser
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)                   \
+    -DDRM_BUILDING_DRMXMRPARSER_LIB     \
+
+!else
+C_DEFINES= $(C_DEFINES)                 \
+    -DDRM_BUILDING_DRMXMRPARSER_LIB     \
+
+!endif
+
+
+SOURCES =                   \
+    ..\drmxmrparser.c
+
+
+OBJLIBFILES = $(DRM_PK_SOURCE_LIB_PATH)\drmxmrcommon.lib

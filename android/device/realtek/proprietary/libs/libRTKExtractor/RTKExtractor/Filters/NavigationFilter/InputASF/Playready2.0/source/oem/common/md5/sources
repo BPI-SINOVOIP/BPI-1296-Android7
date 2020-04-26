@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oemmd5
+TARGETTYPE=LIBRARY
+
+SOURCES =    \
+    oemmd5.c
+

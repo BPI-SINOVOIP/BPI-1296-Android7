@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmsymoptstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    symoptdevicedevcertstub.c \
+    symoptlacqstub.c          \
+    symoptlicstub.c           \
+    symoptutilstub.c          \
+

@@ -1,0 +1,5 @@
+
+MK_EXT		:= pc
+
+include makefile.inc
+

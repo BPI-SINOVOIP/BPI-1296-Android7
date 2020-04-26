@@ -1,0 +1,15 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_win32
+TARGETTYPE=LIBRARY
+
+
+SOURCES = 		            \
+    ..\oemdebug.c           \
+    ..\oemfileio.c          \
+    ..\oemimpl.c            \
+    ..\oeminfo.c            \
+    ..\oemtime.c            \
+    ..\oemprofile.c         \
+    ..\oemcriticalsection.c \
+    ..\oemdatastoreredundancy.c \

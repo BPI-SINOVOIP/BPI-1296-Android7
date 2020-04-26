@@ -1,0 +1,17 @@
+# For Realtek kernel thread do mknod
+# For mount system, data, cache
+allow kernel device:file rw_file_perms;
+allow kernel device:capability mknod;
+# For denied  { mknod } for  pid=16 comm="kdevtmpfs" capability=27  scontext=u:r:kernel:s0 tcontext=u:r:kernel:s0 tclass=capability
+allow kernel self:capability mknod;
+# For denied  { create } for  pid=16 comm="kdevtmpfs" name="sda" scontext=u:r:kernel:s0 tcontext=u:object_r:device:s0 tclass=blk_file
+allow kernel block_device:blk_file { open read create write };
+allow kernel device:blk_file { open read create write setattr getattr unlink};
+# Mount ntfs.
+#allow kernel ufsd:filesystem mount;
+allow kernel user_device:blk_file { setattr rw_file_perms };
+
+allow kernel device:chr_file { create setattr getattr unlink };
+allow kernel device:dir { write create add_name remove_name rmdir };
+
+allow kernel self:capability net_raw;

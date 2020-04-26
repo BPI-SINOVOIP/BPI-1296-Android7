@@ -1,0 +1,19 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemrsaoaeppssimpl
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)                       \
+    -DDRM_BUILDING_OEMRSAOAEPPSSIMPL_LIB    \
+!else
+C_DEFINES= $(C_DEFINES)                     \
+    -DDRM_BUILDING_OEMRSAOAEPPSSIMPL_LIB    \
+!endif
+
+
+
+
+SOURCES =               \
+    oemrsaoaeppssimpl.c
+

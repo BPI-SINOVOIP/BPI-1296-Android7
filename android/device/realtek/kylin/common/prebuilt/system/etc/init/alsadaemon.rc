@@ -1,0 +1,7 @@
+service ALSADaemon /system/vendor/bin/ALSADaemon
+    class core
+    user root
+    group root
+    oneshot
+    seclabel u:r:realtek:s0
+

@@ -1,0 +1,12 @@
+rtk.net.wifi.ext.actions                u:object_r:system_prop:s0
+rtk.                                    u:object_r:system_prop:s0
+net.pppoe.                              u:object_r:system_prop:s0
+persist.rtk.                            u:object_r:system_prop:s0
+persist.media.MMS_USE_RTPLAYER          u:object_r:system_prop:s0
+persist.media.RTKMediaProvider          u:object_r:system_prop:s0
+persist.media.RTSP_USE_RTPLAYER         u:object_r:system_prop:s0
+persist.media.USE_RTMediaPlayer         u:object_r:system_prop:s0
+persist.sys.RunRTKIniSettings           u:object_r:system_prop:s0
+persist.gralloc.afbc.fb                 u:object_r:system_prop:s0
+persist.gralloc.afbc.texture            u:object_r:system_prop:s0
+persist.bluetooth.disableabsvol         u:object_r:system_prop:s0

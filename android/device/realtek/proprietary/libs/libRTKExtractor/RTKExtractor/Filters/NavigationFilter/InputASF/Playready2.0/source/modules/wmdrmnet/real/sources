@@ -1,0 +1,12 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmwmdrmnetreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                  \
+    drmndcertbuilder.c     \
+    drmnddevicecert.c      \
+    drmxmlrsakeys.c        \
+    wmdrmnetimplreal.c     \
+    wmdrmnetutilreal.c
+

@@ -1,0 +1,17 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemrsabase
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEMRSALIB_LIB    \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEMRSALIB_LIB    \
+!endif
+
+SOURCES =          \
+    oemrsa.c       \
+    oemrsakeygen.c
+

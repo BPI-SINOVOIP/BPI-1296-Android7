@@ -1,0 +1,564 @@
+// 2009.10.29 copied from InputLPCM as an example for porting APE.
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>     /* for strncasecmp */
+#include <AudioRPCBaseDS_data.h>
+#include <AudioRPC_System.h>
+#include "InputAPE.h"
+#include "InputAPEDef.h"
+
+// The following header files are provided from APE_SDK_407/
+//#include "All.h"
+//#include "MACLib.h"
+
+HRESULT ape_send_command(ape_input_plugin_t *this, NAVBUF* pBuffer)
+{
+    if(IS_SET(this->cmdFlag, CMD_APE_AUDIO_MEDIA_REMOVED)) {
+        this->fatalErrCode = FATALERR_SYSTEM_MEDIA_REMOVED;
+
+        pBuffer->type = NAVBUF_EVENT;
+        pBuffer->event.eventId = FE_Playback_FatalError;
+        pBuffer->event.eventSize = sizeof(unsigned int);
+        pBuffer->event.eventData = (unsigned char *)&(this->fatalErrCode);
+
+        SetFlag(this->statusFlag, STATUS_APE_DEVICE_REMOVED);
+        ClearFlag(this->cmdFlag, CMD_APE_AUDIO_MEDIA_REMOVED);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_SET_AUDIO_FORMAT)) {
+        pBuffer->type = NAVBUF_DATA;
+        pBuffer->data.channelIndex = 0;
+        pBuffer->data.payloadSize = 0;
+        pBuffer->data.infoId = PRIVATEINFO_AUDIO_FORMAT;
+//TODO
+        this->audioFormat.systemType = MEDIASUBTYPE_PCM;	//TODO: should be verified....
+//        this->audioFormat.systemType = MEDIASUBTYPE_PCM_LITTLE_ENDIAN;
+//        this->audioFormat.type = MEDIASUBTYPE_PCM_LITTLE_ENDIAN;
+        this->audioFormat.type = MEDIASUBTYPE_PCM;
+        this->audioFormat.emphasis      = 0;
+        this->audioFormat.mute          = 0;
+        this->audioFormat.dynamicRange      = 0;
+        pBuffer->data.infoData = (unsigned char*)&(this->audioFormat);
+        pBuffer->data.infoSize = sizeof(AUDIOFORMAT);
+
+        ClearFlag(this->cmdFlag, CMD_APE_SET_AUDIO_FORMAT);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_NEW_SEGMENT)) {
+        pBuffer->type = NAVBUF_NEW_SEGMENT;
+        pBuffer->segment.channelIndex = 0;
+        ClearFlag(this->cmdFlag, CMD_APE_NEW_SEGMENT);
+
+        SetFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_SEG_END);
+        SetFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_SEQ_END);
+        SetFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_STOP);
+
+        return S_OK;
+    }
+    if(IS_SET(this->cmdFlag, CMD_APE_DECODE_INIT)) {
+        pBuffer->type = NAVBUF_DATA;
+        pBuffer->data.payloadSize = 0;
+        pBuffer->data.channelIndex = 0;
+        pBuffer->data.infoId = PRIVATEINFO_VIDEO_MIXER_RPTS;
+
+        this->decodeInitCMD = 0;
+        pBuffer->data.infoData = (unsigned char *)(&this->decodeInitCMD);
+        pBuffer->data.infoSize = sizeof(this->decodeInitCMD);
+
+        ClearFlag(this->cmdFlag, CMD_APE_DECODE_INIT);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_BLEND)) {
+        pBuffer->type = NAVBUF_DATA;
+        pBuffer->data.payloadSize = 0;
+        pBuffer->data.channelIndex = 0;
+        pBuffer->data.infoId = PRIVATEINFO_VIDEO_MIXER_BLEND;
+
+        pBuffer->data.infoData = (unsigned char *)(&this->blendCMD);
+        pBuffer->data.infoSize = sizeof(this->blendCMD);
+
+        ClearFlag(this->cmdFlag, CMD_APE_BLEND);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_DECODE)) {
+        pBuffer->type = NAVBUF_DATA;
+        pBuffer->data.payloadSize = 0;
+        pBuffer->data.channelIndex = 0;
+        pBuffer->data.infoId = PRIVATEINFO_VIDEO_DECODE_COMMAND;
+
+        pBuffer->data.infoData = (unsigned char *)(&this->decodeCMD);
+        pBuffer->data.infoSize = sizeof(this->decodeCMD);
+
+        ClearFlag(this->cmdFlag, CMD_APE_DECODE);
+        return S_OK;    
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_PRESENTATION_TIME)) {
+        ClearFlag(this->cmdFlag, CMD_APE_PRESENTATION_TIME);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_END_OF_SEQUENCE)) {
+        pBuffer->type = NAVBUF_DATA;
+        pBuffer->data.payloadSize = 0;
+        pBuffer->data.channelIndex = 0;
+        pBuffer->data.infoId = PRIVATEINFO_VIDEO_END_OF_SEQUENCE;
+        pBuffer->data.infoData = 0;
+        pBuffer->data.infoSize = 0;
+        ClearFlag(this->cmdFlag, CMD_APE_END_OF_SEQUENCE);
+
+        ClearFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_SEQ_END);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_END_OF_SEGMENT)) {
+        pBuffer->type = NAVBUF_END_SEGMENT;
+        pBuffer->segment.channelIndex = 0;
+        ClearFlag(this->cmdFlag, CMD_APE_END_OF_SEGMENT);
+        ClearFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_SEG_END);
+        return S_OK;
+    }
+
+    if(IS_SET(this->cmdFlag, CMD_APE_STOP)) {
+        pBuffer->type = NAVBUF_STOP;
+        pBuffer->stop.lastChannelIndex = 0;
+        ClearFlag(this->cmdFlag, CMD_APE_STOP);
+        ClearFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_STOP);
+        return S_OK;
+    }
+
+    return S_OK;
+}
+
+static HRESULT _ape_plugin_read_block (ape_input_plugin_t *this,
+        NAVBUF* pBuffer,
+        unsigned int prohibitedChannelMask,
+        NAV_STREAM_TYPE* channelFullnessInfo)
+{
+    if(prohibitedChannelMask != 0) {
+        pBuffer->type = NAVBUF_WAIT;
+        pBuffer->wait.waitTime = 10;
+        return S_OK;
+    }
+
+    if(IS_SET(this->statusFlag, STATUS_APE_DEVICE_REMOVED))
+        return E_FAIL;
+
+    pBuffer->type = NAVBUF_DATA;
+    pBuffer->bDoNotInterruptWithUserCmd = 0;
+    pBuffer->data.payloadSize = 0;
+    pBuffer->data.infoId = PRIVATEINFO_NONE;
+    pBuffer->data.channelIndex = 0;
+    pBuffer->data.startAddress = 0xFFFFFFFF;
+    pBuffer->data.pts = -1;
+
+    if(this->cmdFlag != 0 && ape_send_command(this, pBuffer) == S_OK)
+        return S_OK;
+
+    if(!IS_SET(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT)) {
+        SetFlag(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT);
+        pBuffer->data.pts = this->baseAudioPTS;
+    }
+
+    if(this->currFilePos < this->fileSize) {
+        int readSize = ((this->fileSize - this->currFilePos)>APE_BUFSIZE)?APE_BUFSIZE:(this->fileSize-this->currFilePos);
+//TODO, this should be modified
+        if (readSize == 0){
+            pBuffer->type = NAVBUF_WAIT;
+            pBuffer->wait.waitTime = 100;
+            return S_OK;
+        }
+        if( this->ioPlugin && this->ioPlugin->read(this->fileHandler, this->ioBuffer, readSize, NULL) == readSize)
+        {
+            pBuffer->data.payloadData = (unsigned char*)this->ioBuffer;
+            pBuffer->data.payloadSize = readSize;
+            pBuffer->data.infoId = PRIVATEINFO_DEMUX_AUDIO_TARGET;
+            this->currFilePos += pBuffer->data.payloadSize;
+        }
+        else
+            goto eos_handling;
+    }
+    else { // eos has been reached
+        if(this->repeatMode == NAV_REPEAT_TITLE) {
+            this->currFilePos = 0;//this->dataStart;
+            if(IS_SET(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT)) {
+                ClearFlag(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT);
+                this->baseAudioPTS = 0;
+            }
+        }
+        else {
+eos_handling:
+            if(HAS_FLAG(this->statusFlag, STATUS_APE_SHOULD_SEND_SEQ_END))
+                SetFlag(this->cmdFlag, CMD_APE_END_OF_SEQUENCE);
+
+            if(IS_SET(this->statusFlag, STATUS_APE_SHOULD_SEND_SEG_END))
+                SetFlag(this->cmdFlag, CMD_APE_END_OF_SEGMENT);
+
+            if(IS_SET(this->statusFlag, STATUS_APE_SHOULD_SEND_STOP))
+                SetFlag(this->cmdFlag, CMD_APE_STOP);
+        }
+        pBuffer->type = NAVBUF_WAIT;
+        pBuffer->wait.waitTime = 100;
+    }
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_identify(void* pInstance,
+    char* path,
+    unsigned char* streamBuffer,
+    unsigned int streamBufferBytes,
+    unsigned int streamBufferOffset)
+{
+    return S_FALSE;
+}
+
+static HRESULT ape_plugin_load_media(void* pInstance,
+        char* path, bool* pbContinue, NAVLOADFAILURE* pFailure)
+{
+    ape_input_plugin_t *this = (ape_input_plugin_t *) pInstance;
+//    RIFFLIST bufferList;
+//    RIFFCHUNK bufferChunk;
+    /* initialize member data */
+    this->streamTotalBytes  = 0;
+
+    this->statusFlag    = 0;
+    this->cmdFlag       = 0;
+    this->fileHandler   = NULL;
+
+    this->decodeInitCMD = 0;
+    this->blendCMD.mode = 1;    //A only
+    this->blendCMD.duration = -1;
+    this->blendCMD.alphaA_Y = 255;
+    this->blendCMD.alphaB_Y = 0;
+    this->blendCMD.alphaA_UV = 255;
+    this->blendCMD.alphaB_UV = 0;
+
+    this->decodeCMD.relativePTS = 0;
+    this->decodeCMD.duration    = -1;
+    this->decodeCMD.skip_GOP    = 0;
+    this->decodeCMD.mode        = NORMAL_DECODE;
+
+    this->ioOffset = 0;
+    this->ioBufferStart = -1;
+    this->currFilePos = 0LL;
+
+    /* load file */
+    DASSERT(this->ioPlugin);
+    this->bDirectIO = true;
+    this->fileHandler = this->ioPlugin->open(path, 1);
+
+    if(this->fileHandler == NULL) {
+        this->bDirectIO = false;
+        this->fileHandler = this->ioPlugin->open(path, 0);
+    }
+    if(this->fileHandler == NULL)
+        return E_FAIL;
+    else {
+        this->ioPlugin->getIOInfo(this->fileHandler, &(this->ioInfo));
+        this->streamTotalBytes = this->ioInfo.totalBytes;
+    }
+
+    this->audioFormat.bitsPerSample     = 0;//(this->apeformat).wBitsPerSample;
+    this->audioFormat.numberOfChannels  = 0;//(this->apeformat).nChannels;
+    this->audioFormat.samplingRate      = 0;//(this->apeformat).nSamplesPerSec;
+
+// TODO    this->currFilePos += (8 + bufferChunk.cb);
+
+    this->baseAudioPTS = 0;
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_read_block (void *pInstance,
+        NAVBUF* pBuffer,
+        unsigned int prohibitedChannelMask,
+        NAV_STREAM_TYPE* channelFullnessInfo)
+{
+    HRESULT res;
+    ape_input_plugin_t *this = (ape_input_plugin_t*)pInstance;
+    osal_MutexUnlock(this->ioMutex);
+    res = _ape_plugin_read_block(this, pBuffer, prohibitedChannelMask, channelFullnessInfo);
+    osal_MutexLock(this->ioMutex);
+    return res;
+}
+
+static HRESULT ape_plugin_handle_events(void* pInstance,
+        NAV_CMD_ID id,
+        void* cmdData,
+        unsigned int cmdDataSize,
+        unsigned int* pIsFlushRequired)
+{
+    ape_input_plugin_t *this = (ape_input_plugin_t*)pInstance;
+    *pIsFlushRequired = 0;
+
+    switch(id) {
+        case NAV_COMMAND_RUN:
+            SetFlag(this->statusFlag, STATUS_APE_AT_RUN_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_PAUSE_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_STOP_STATE);
+            break;
+        case NAV_COMMAND_PAUSE:
+            SetFlag(this->statusFlag, STATUS_APE_AT_PAUSE_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_RUN_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_STOP_STATE);
+            break;
+        case NAV_COMMAND_STOP:
+            this->currFilePos = 0;//this->dataStart;
+            if(IS_SET(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT)) {
+                ClearFlag(this->statusFlag, STATUS_APE_INITIAL_PTS_SENT);
+                this->baseAudioPTS = 0;
+            }
+            SetFlag(this->statusFlag, STATUS_APE_AT_STOP_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_PAUSE_STATE);
+            ClearFlag(this->statusFlag, STATUS_APE_AT_RUN_STATE);
+            this->repeatMode = NAV_REPEAT_NONE;
+            break;
+        case NAV_COMMAND_PLAYATTIME:
+                return E_FAIL;
+            break;
+        default:
+            return E_FAIL;
+    }
+    return S_OK;
+}
+
+static HRESULT ape_plugin_updatePlaybackPosition(void* pInstance,
+        PRESENTATION_POSITIONS* pPosition,
+        NAVDEMUXPTSINFO* pDemuxPTSInfo)
+{
+    ape_input_plugin_t  *this = (ape_input_plugin_t*) pInstance;
+
+    if(pPosition->audioSystemPTS != -1)
+        this->currPlaybackPosition = *pPosition;
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_propertySetGet(void* pInstance,
+        NAV_PROP_ID id,
+        void* inData,
+        unsigned int inDataSize,
+        void* outData,
+        unsigned int outDataSize,
+        unsigned int* returnedSize)
+{
+    ape_input_plugin_t  *this = (ape_input_plugin_t *) pInstance;
+
+    switch (id) {
+        case NAVPROP_INPUT_GET_CMD_BLK_FLAGS:
+            *((int*)outData) = NAV_CMDBLK_PLAYTITLE
+                    | NAV_CMDBLK_PLAYCHAPTER
+                    | NAV_CMDBLK_PLAYNEXTCHAPTER
+                    | NAV_CMDBLK_PLAYPREVCHAPTER
+                    | NAV_CMDBLK_BACKWARDSCAN
+                    | NAV_CMDBLK_SETANGLE
+                    | NAV_CMDBLK_SETAUDIOSTREAM
+                    | NAV_CMDBLK_SETAUDIODOWNMIXMODE
+                    | NAV_CMDBLK_SETSUBPICTURESTREAM;
+            return S_OK;
+        case NAVPROP_INPUT_SET_REPEAT_MODE:
+            this->repeatMode = *((NAV_REPEAT_MODE*) inData);
+            return S_OK;
+        case NAVPROP_INPUT_GET_PLAYBACK_STATUS:
+            {
+            NAVPLAYBACKSTATUS* status = (NAVPLAYBACKSTATUS*)outData;
+            memset(status, 0, sizeof(NAVPLAYBACKSTATUS));
+
+            status->domain = IS_SET(this->statusFlag, STATUS_APE_AT_STOP_STATE) ? NAV_DOMAIN_STOP : NAV_DOMAIN_TITLE;
+            status->numTitles = 1;
+            status->currentTitle = 1;
+            status->numAngles = 1;
+            status->currentAngle = 1;
+            status->numButtons = 0;
+            status->bStill  = false;
+            status->bPaused = IS_SET(this->statusFlag, STATUS_APE_AT_PAUSE_STATE);
+
+            status->elapsedTime.seconds = (int) (this->currPlaybackPosition.audioSystemPTS / 90000LL);
+            if(this->audioFormat.bitsPerSample != 0 && this->audioFormat.numberOfChannels != 0 && this->audioFormat.samplingRate)
+                status->totalTime.seconds = (int) (this->fileSize * 8 / this->audioFormat.bitsPerSample / this->audioFormat.numberOfChannels / this->audioFormat.samplingRate);
+            else
+                status->totalTime.seconds = 0;
+
+            status->repeatMode = this->repeatMode;
+            //status->mediaType = MEDIASUBTYPE_PCM_LITTLE_ENDIAN;
+            status->mediaType = MEDIASUBTYPE_PCM;
+
+            return S_OK;
+            }
+        case NAVPROP_INPUT_GET_AUDIO_STATUS:
+            {
+            NAVAUDIOSTATUS* status = (NAVAUDIOSTATUS*)outData;
+            memset(status, 0, sizeof(NAVAUDIOSTATUS));
+            status->streamAttr[0].type = this->audioFormat.type;
+            status->streamAttr[0].languageCode = 0x0;
+            status->streamAttr[0].countryCode = 0x00;
+            status->streamAttr[0].typeCode = 0x00;
+            status->streamAttr[0].bitsPerSample = this->audioFormat.bitsPerSample;
+            status->streamAttr[0].samplingRate = this->audioFormat.samplingRate;
+            status->streamAttr[0].numChannels = this->audioFormat.numberOfChannels;
+            status->streamAttr[0].bEnabled = true;
+            status->numStreams = 1;
+            status->indexCurrentStream = 0;
+            }
+            return S_OK;
+/* 20091029 commented.
+        case NAVPROP_INPUT_SET_APE_INFO:
+            {
+//            if(this->audioFormat.bitsPerSample != 0 && this->audioFormat.numberOfChannels != 0 && this->audioFormat.samplingRate)
+            NAVAPEINFO *mediaInfo = (NAVAPEINFO *)inData;
+            this->audioFormat.bitsPerSample = mediaInfo ->bitsPerSample;
+            this->audioFormat.numberOfChannels = mediaInfo->numChannels;
+            this->audioFormat.samplingRate = mediaInfo->samplingRate;
+            this->fileSize = mediaInfo->fileSize;
+	    SetFlag(this->cmdFlag, CMD_APE_SET_AUDIO_FORMAT);
+            SetFlag(this->cmdFlag, CMD_APE_NEW_SEGMENT);
+            SetFlag(this->cmdFlag, CMD_APE_DECODE_INIT);
+            SetFlag(this->cmdFlag, CMD_APE_BLEND);
+            SetFlag(this->cmdFlag, CMD_APE_DECODE);
+	    ClearFlag(this->statusFlag, STATUS_APE_SHOULD_SEND_SEG_END);
+            return S_OK;
+            }
+*/
+        default:
+            return S_FALSE;
+    }
+
+    return E_FAIL;
+}
+
+static HRESULT ape_plugin_register_io(void* pInstance, IOPLUGIN* ioPlugin, bool b_opening, bool b_direct_io, void* fh)
+{
+    ape_input_plugin_t  *this = (ape_input_plugin_t *) pInstance;
+
+    if(ioPlugin == NULL)
+    {
+        DASSERT(0);
+        return E_FAIL;
+    }
+
+	if(b_opening == true)
+		ioPlugin->close(fh);
+
+    this->ioPlugin = ioPlugin;
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_getMediaInfo(void* pInstance, NAVMEDIAINFO* pMediaInfo)
+{
+    ape_input_plugin_t  *this = (ape_input_plugin_t *) pInstance;
+
+//    pMediaInfo->mediaType  = MEDIASUBTYPE_PCM_LITTLE_ENDIAN;
+    pMediaInfo->mediaType  = MEDIASUBTYPE_PCM;
+    pMediaInfo->videoType  = MEDIATYPE_None;
+//    pMediaInfo->audioType  = MEDIASUBTYPE_PCM_LITTLE_ENDIAN;
+    pMediaInfo->audioType  = MEDIASUBTYPE_PCM;
+    pMediaInfo->spicType   = MEDIATYPE_None;
+    pMediaInfo->AVSyncMode = NAV_AVSYNC_AUDIO_ONLY;
+
+    pMediaInfo->AVSyncStartupFullness = 0;
+    pMediaInfo->bSmoothReverseCapable = 0;
+    pMediaInfo->minForwardSkip = pMediaInfo->maxForwardSkip = 0; // forward scan not supported
+    pMediaInfo->minReverseSkip = pMediaInfo->maxReverseSkip = 0; // reverse scan not supported
+    pMediaInfo->bUseDDRCopy = true;
+
+    if(this->bDirectIO == true)
+        pMediaInfo->bFlushBeforeDelivery = false;
+    else
+        pMediaInfo->bFlushBeforeDelivery = true;
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_unload_media(void* pInstance)
+{
+    ape_input_plugin_t  *this = (ape_input_plugin_t *) pInstance;
+    //TODO: audioFormat info reset
+    if(this->fileHandler)
+    {
+        DASSERT(this->ioPlugin);
+        this->ioPlugin->close(this->fileHandler);
+        this->fileHandler = NULL;
+    }
+
+    return S_OK;
+}
+
+static HRESULT ape_plugin_privateDataFeedback(void* pInstance,
+    unsigned int id,
+    unsigned char* data,
+    unsigned int size,
+    int64_t lastPTS
+    )
+{
+    return S_OK;
+}
+
+static HRESULT ape_plugin_dispose(void* pInstance)
+{
+    ape_input_plugin_t* this = (ape_input_plugin_t*)pInstance;
+
+    if(this->fileHandler)
+    {
+        DASSERT(this->ioPlugin);
+        this->ioPlugin->close(this->fileHandler);
+        this->fileHandler = NULL;
+    }
+
+    pli_freeContinuousMemory(this->ioBuffer);
+    free(this);
+    return S_OK;
+}
+
+
+#ifdef __NAV_USE_DLL_PLUGIN__
+HRESULT FUNCNAME_OPEN_INPUT_PLUGIN
+#else
+HRESULT openInputPluginAPE
+#endif
+    (ENUM_MEDIA_TYPE majorType, ENUM_MEDIA_TYPE subType, osal_mutex_t* mutex, INPUTPLUGIN* pInputPlugin)
+{
+    unsigned long phyAddr;
+    BYTE* nonCachedAddr;
+
+    ape_input_plugin_t* this = calloc(sizeof(ape_input_plugin_t),1);
+
+    pInputPlugin->pInstance = (void*)this;
+
+    pInputPlugin->loadMedia              = ape_plugin_load_media;
+    pInputPlugin->unloadMedia            = ape_plugin_unload_media;
+    pInputPlugin->getMediaInfo           = ape_plugin_getMediaInfo;
+    pInputPlugin->read                   = ape_plugin_read_block;
+    pInputPlugin->updatePlaybackPosition = ape_plugin_updatePlaybackPosition;
+    pInputPlugin->privateDataFeedback    = ape_plugin_privateDataFeedback;
+    pInputPlugin->execUserCmd            = ape_plugin_handle_events;
+    pInputPlugin->propertySetGet         = ape_plugin_propertySetGet;
+    pInputPlugin->dispose                = ape_plugin_dispose;
+    pInputPlugin->registerIOPlugin       = ape_plugin_register_io;
+    pInputPlugin->identify               = ape_plugin_identify;
+
+    // ape_input_plugin_t initialize
+    this->ioMutex = mutex;
+
+    this->ioBuffer = (unsigned char*)pli_allocContinuousMemory(APE_IO_SIZE, &nonCachedAddr, &phyAddr); // 32k bytes
+
+    if(this->ioBuffer == NULL)
+        goto fail_path;
+    else
+        return S_OK;
+
+fail_path:
+
+    if(this->ioBuffer != NULL)
+        pli_freeContinuousMemory(this->ioBuffer);
+
+    if(this != NULL)
+        free(this);
+
+    return E_FAIL;
+}

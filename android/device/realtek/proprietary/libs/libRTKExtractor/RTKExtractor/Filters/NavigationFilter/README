@@ -1,0 +1,278 @@
+
+# Command Line Commands
+
+    help     - Show the list of commands
+               (operand) none
+
+    load     - Load media from a path (INavControl::LoadMedia)
+               (operand) @path : the absolute path to where the media is stored
+               (example) load /dev/dvd
+
+    unload   - Release the currently loaded media (INavControl::UnloadMedia)
+               (operand) none
+
+    setget   - The generic property set/get function (INavControl::SetGetProperty)
+               (operand) @id       : a number to identify which property to set/get
+                         @property : a number to assign to the property (for set only)
+               (example) set 0 1
+               (NOTE***) use "help setget" for definitions of property id and values
+
+    setget_a - The asynchronous version of setget (INavControl::SetGetProperty_Async)
+
+    getps    - Print out the current playback status (INavControl::GetPlaybackStatus)
+               (operand) none
+               (example) a sample print out
+
+                   domain               = 1    # 0:STOP, 1:TITLE, 2:MENU, 3:VR_PG, 4:VR_PL
+                   numTitles            = 36   # number of titles in the whole media
+                   currentTitle         = 25   # current title index (1 ~ number of titles)
+                   numChapters          = 1    # number of chapters in the current title
+                   currentChapter       = 1    # current chapter index (1 ~ number of chapters)
+                   numAngles            = 9    # number of angles in the current title
+                   currentAngle         = 1    # current angle index (1 ~ number of angles)
+                   elapsedTime          = 1/15 # current elapsed time (see NOTE*** below)
+                   totalTime            = 80/0 # total time of current title (see NOTE*** below)
+                   currChapterStartTime = 0/0  # start time of current chapter (see NOTE*** below)
+                   currChapterEndTime   = 80/0 # end time of current chapter (see NOTE*** below)
+                   bPaused              = 0    # 1:playback is PAUSED, 0:otherwise
+                   bInAngleBlock        = 0    # 1:in multi-angle block, 0:otherwise
+                   speed                = 256  # current speed setting (256 = 1X)
+                   skip                 = 0    # current skip setting (definition to be clarified)
+                   repeatMode           = 0    # 0:none, 1:Title-Repeat, 2:Chapter-Repeat, 3:AB-Repeat
+                   mediaType            = 34   # media-type number (an ENUM value defined elsewhere)
+                   languageCode         = 'en' # preferred menu language code (ISO-639 2-letter-lowercase symbols)
+
+               (NOTE***) the TIME format (m/n) consists of two values
+                         m: total number of seconds (0~), for example, 3600 is for a hour
+                         n: the frame index within a second. For NTSC, it can be 0~29, and for PAL it's 0~24
+
+    getvs    - Print out the video stream(s) status (INavControl::GetVideoStatus)
+               (operand) none
+               (example) a sample print out
+
+                   numStreams         = 1 # total number of video streams (for now, it should be always 1)
+                   indexCurrentStream = 1 # current stream index (1 ~ number of streams)
+                   presentationMode   = 0 # video presentation mode (0:NORMAL, 1:WIDE, 2:PAN-SCAN, 3:LETTER-BOX)
+                   stream #1
+                       type                = 29      # video media-type number (an ENUM value defined elsewhere)
+                       tvSystem            = 0       # TV system (0:NTSC, 1:PAL)
+                       aspectRatio         = 4/3     # aspect ratio (width/height)
+                       frameSize           = 720/480 # video frame size (width/height)
+                       srcLtrBox           = 0       # whether it came with original letter box (0:NONE, 1~7:otherwise)
+                       line21Switch1       = 0       # 1:line-21 user data recorded for field 1, 0:otherwise
+                       line21Switch2       = 0       # 1:line-21 user data recorded for field 2, 0:otherwise
+                       bAllowPanScanMode   = 0       # 1:PAN-SCAN presentation mode should be allowed, 0:otherwise
+                       bAllowLetterBoxMode = 0       # 1:LETTER-BOX presentation mode should be allowed, 0:otherwise
+
+    getas    - Print out the audio stream(s) status (INavControl::GetAudioStatus)
+               (operand) none
+               (example) a sample print out
+
+                   numStreams         = 8 # total number of audio streams (1~8)
+                   indexCurrentStream = 1 # current stream index (1 ~ number of streams)
+                   stream #1
+                       type          = 17    # audio media-type number (an ENUM value defined elsewhere)
+                       languageCode  = 'jp'  # audio stream language (ISO-639 2-letter-lowercase symbols)
+                       description   = 0     # audio stream description (see NOTE*** below)
+                       bitsPerSample = 16    # number of bits per sample (0:unknown)
+                       samplingRate  = 48000 # sampling rate (0:unknown)
+                       numChannels   = 2     # number of audio channels (0:unknown)
+                   stream #2
+                       ...
+
+               (NOTE***) audio stream description codes
+
+                   0: not specified
+                   1: normal audio
+                   2: audio for visually impaired
+                   3: director's comments
+
+    getss    - Print out the sub-picture stream(s) status (INavControl::GetSubpictureStatus)
+               (operand) none
+               (example) a sample print out
+
+                   numStreams         = 32 # total number of sub-picture streams (1~32)
+                   indexCurrentStream = 0  # current stream index (1 ~ number of streams)
+                   bDummyStream       = 0  # 1:Dummy stream is selected, 0:otherwise
+                   bDisplay           = 0  # 1:Sub-picture display is ON, 0:OFF
+                   stream #1
+                       type          = 22   # sub-picture media-type number (an ENUM value defined elsewhere)
+                       languageCode  = 'en' # sub-picture stream language (ISO-639 2-letter-lowercase symbols)
+                       description   = 0    # sub-picture stream description (see NOTE*** below)
+                   stream #2
+                       ...
+
+               (NOTE***) sub-picture stream description codes
+
+                   0:  not specified
+                   1:  normal sub-picture
+                   2:  bigger sub-picture
+                   3:  sub-picture for children
+                   4:  normal closed-captioning sub-picture
+                   5:  bigger closed-captioning sub-picture
+                   6:  closed-captioning sub-picture for children
+                   7:  forced sub-picture
+                   8:  normal director's comments sub-picture
+                   9:  bigger director's comments sub-picture
+                   10: director's comments sub-picture for children
+
+    getms    - Print out status of available menus (INavControl::GetMenuStatus)
+               (operand) none
+               (example) a sample print out
+
+                   numMenus = 6   # total number of available menus
+                       menuID = 2 # available menu ID (see NOTE*** below)
+                       menuID = 3 # available menu ID (see NOTE*** below)
+                       menuID = 4 # available menu ID (see NOTE*** below)
+                       menuID = 5 # available menu ID (see NOTE*** below)
+                       menuID = 6 # available menu ID (see NOTE*** below)
+                       menuID = 7 # available menu ID (see NOTE*** below)
+
+               (NOTE***) meaning of defined DVD-Video menu IDs
+
+                   2: title menu
+                   3: root menu
+                   4: sub-picture menu
+                   5: audio menu
+                   6: angle menu
+                   7: chapter menu
+
+    getds    - Print out the current disc (media) status (INavControl::GetDiscStatus)
+               (operand) none
+               (example) a sample print out
+
+                   allowedRegions = FFh # bit-mask to indicate playback is allowed for which regions (see NOTE*** below)
+                   discType       = 23  # main media-type number (an ENUM value defined elsewhere)
+                   discSubtype    = 34  # sub media-type number (an ENUM value defined elsewhere)
+
+               (NOTE***) bit 0 (LSB) shows the status of region 1, bit 1 for region 2, and so force.
+                         DVD-Video spec divided th world into 8 regions.
+                         For example, allowedRegions 05h (0000 0101b) means disc playable in region 1 (US) and 3 (Taiwan)
+
+    getts    - Print out the status of a specific title (INavControl::GetTitleStatus)
+               (operand) @titleNum : index number of the specific title of interest
+               (example) getts 3
+                         a sample print out
+
+                   numChapters = 1    # number of chapters in the specific title
+                   numAngles   = 1    # number of angles in the specific title
+                   totalTime   = 60/0 # total time of the specific title (see NOTE*** of "getps" command above)
+
+    getcs    - Print out the status of the latest executed command (INavControl::GetLatestCmdStatus)
+               (operand) none
+               (example) a sample print out
+
+                   executedCmdType   = 13                  # type ID of the latest executed command (defined elsewhere)
+                   executedCmdID     = 8                   # ID (serial numbering) of the latest executed command
+                   executedCmdResult = SUCCESS (10000000h) # result of the latest executed command
+                   numOfPendingCmds  = 0                   # number of commands waiting in the queue (not yet executed)
+
+    getns    - Get binary block that represents current navigator state (INavControl::GetNavState)
+               (operand) filename of bookmark file
+               (example) getns test.bmk
+
+    setns    - Assign a saved binary block for navigator to restore its previous state (INavControl::SetNavState)
+               (operand) filename of bookmark file
+                         bForced : 1 to force accept bookmark regardless of parental setting, 0 otherwise
+               (example) setns test.bmk 0
+
+    playt    - Play from the start of a specific title (INavControl::PlayTitle)
+               (operand) @titleNum : title index number (-1: the current title)
+               (example) playt 3  # play from the start of title 3
+                         playt -1 # play from the start of the current title
+               (NOTE***) if current domain is not TITLE (such as MENU or STOP), use -1 for the operands would result in
+                         rejection of command.
+
+    playc    - Play from the start of a specific chapter (INavControl::PlayChapter)
+               (operand) @titleNum   : title index number (-1: the current title)
+                         @chapterNum : chapter index number (-1: the current chapter)
+               (example) playc 3 8   # play from the start of title 3 chapter 8
+                         playc -1 5  # play from the start of chapter 5 of current title
+                         playc -1 -1 # play from the start of current chapter
+                         playc 3 -1  # ILLEGAL FORMAT!
+               (NOTE***) if current domain is not TITLE (such as MENU or STOP), use -1 for the operands would result in
+                         rejection of command.
+
+    next     - Play from the start of next chapter (INavControl::PlayNextChapter)
+               (operand) none
+
+    prev     - Play from the start of previous chapter (INavControl::PlayPrevChapter)
+               (operand) none
+
+    time     - Play from a specific frame (specified by elapsed time) of a title (INavControl::PlayAtTime)
+               (operand) @titleNum      : title index number (-1: the current title)
+                         @startSeconds  : elapsed time in seconds
+                         @startFrameIdx : frame index within a second (0~29 for NTSC, 0~24 for PAL)
+               (example) time 3 1234 0  # play from the 1st frame since 20th minute 34th second, of title 3
+                         time -1 3600 3 # play from the 4th frame since 1st hour, of the current title
+
+    seg      - Play from a specific frame to another (both specified by elapsed time) of a title (INavControl::PlaySegment)
+               Used to play a segment for once or looping within the segment (AB repeat)
+               (operand) @titleNum      : title index number (-1: the current title)
+                         @startSeconds  : elapsed time in seconds for starting point (point A)
+                         @startFrameIdx : frame index within a second (0~29 for NTSC, 0~24 for PAL)
+                         @endSeconds    : elapsed time in seconds for ending point (point B)
+                         @endFrameIdx   : frame index within a second (0~29 for NTSC, 0~24 for PAL)
+                         @bRepeat       : use 'true' for AB repeat, 'false' for play once
+
+    menu     - Jump into a menu (INavControl::MenuShow)
+               (operand) @menuID : the destination menu ID (see NOTE*** of "getms" command above)
+
+    menuesc  - Go back to where we were before jumping into menu (TITLE or STOP) (INavControl::MenuEscape)
+               (operand) none
+
+    selnum   - Select a menu button (highlight it) with numeric keys (INavControl::ButtonSelectNumeric)
+               (operand) @buttonNum : index number of the specific button
+
+    selpt    - Select a menu button (highlight it) with (x,y) coordinate (pointing device) (INavControl::ButtonSelectPoint)
+               (operand) @x : x coordinate
+                         @y : y coordinate
+               (example) select 360 240 # select the point in the middle of a NTSC TV
+               (NOTE***) NOT SUPPORTED YET !!!
+
+    actnum   - Activate a menu button (click it) with numeric keys (INavControl::ButtonActivateNumeric)
+               (operand) @buttonNum : index number of the specific button
+
+    actpt    - Activate a menu button (click it) with (x,y) coordinate (pointing device) (INavControl::ButtonActivatePoint)
+               (operand) @x : x coordinate
+                         @y : y coordinate
+               (NOTE***) NOT SUPPORTED YET !!!
+
+    act      - Activate the menu button (click it) which is currently selected (highlighted) (INavControl::ButtonActivate)
+               (operand) none
+
+    move     - Change selected menu button by specifying direction of highlight movement (INavControl::ButtonMoveSelection)
+               (operand) @direction : 0:UP, 1:DOWN, 2:RIGHT, 3:LEFT
+               (example) move 3 # move menu highlight to the left
+
+    return   - Go back to the parent layer of menu (or title content) hierarchy (INavControl::GoUp)
+               (operand) none
+               (example) return # we may go back to root menu from chapter menu
+
+    stillesc - Break the STILL (where audio/video presentation froze intentionally) and keep on playing (INavControl::StillEscape)
+               (operand) none
+
+    setas    - Select active audio stream (INavControl::SetAudioStream)
+               (operand) @streamNum : audio stream number (1~8)
+               (example) setas 2 # switch to audio stream number 2
+
+    setss    - Select active sub-picture stream, or turn it on/off (INavControl::SetSubpictureStream)
+               (operand) @streamNum    : sub-picture stream number (1~32)
+                         @displayState : 0:OFF, 1:ON, 2:UNCHANGED
+                         @bDummyStream : 1:use dummy stream, 0:otherwise
+               (example) setss 8 0 0  # switch to sub-picture stream number 8, keep display OFF
+                         setss 3 1 0  # switch to sub-picture stream number 3, turn ON display
+                         setss 7 2 0  # don't change display state, simply switch to sub-picture stream number 7
+                         setss -1 2 1 # don't change display state, use "dummy" stream mode (the 1st operand "streamNum" is ignored)
+
+    angle    - Switch to a specific angle (INavControl::SetAngle)
+               (operand) @angleNum : target angle number (1~9)
+               (example) angle 6 # switch to angle 6
+               (NOTE***) the switch-angle behavior may be different depending on the multi-angle media characteristics
+
+                   If the current position is NOT within a multi-angle block (please refer to "bInAngleBlock" in "getps" command)
+                       Nothing happens
+                   Else If the multi-angle stuff is created as "non-seamless"
+                       Angle switches immediately, video may stutter, and it may jump backward a couple seconds in the new angle
+                   Else If the multi-angle stuff is created as "seamless"
+                       Angle may not switch immediately but in a couple seconds. Audio/video transition between angles should be smooth

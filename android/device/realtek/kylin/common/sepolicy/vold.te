@@ -1,0 +1,7 @@
+allow vold self:capability {sys_resource setgid setuid };
+allow vold sdcardd_exec:file rx_file_perms;
+#allow vold install_data_file:file rw_file_perms;
+allow vold fuse_device:chr_file rw_file_perms;
+allow vold ufsd:filesystem { mount unmount };
+allow vold system_data_file:file rw_file_perms;
+

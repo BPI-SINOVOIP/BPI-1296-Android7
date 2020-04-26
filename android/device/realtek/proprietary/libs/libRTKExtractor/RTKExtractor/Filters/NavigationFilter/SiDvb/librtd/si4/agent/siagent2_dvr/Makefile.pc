@@ -1,0 +1,48 @@
+##############################
+# MUST define dtv root dir!!!
+##############################
+DTV_ROOT_DIR	= ../..
+
+
+##############################
+# include global config file
+##############################
+include $(DTV_ROOT_DIR)/include/configGlobal.pc
+
+
+##############################
+# local includes/defines.
+##############################
+CFLAGS		+= -D_RUN_ON_TP_MODEL_ -pthread -fprofile-arcs -ftest-coverage
+INCLUDES	+=
+
+
+##############################
+# DVB Libaray ?
+# Objects to Build.
+##############################
+SI_AGENT2_DVR_LIB	:= siAgent2Dvr_$(ARCH).lib
+SRCS		:= $(wildcard *.c)
+ARCH_OBJS	:= $(patsubst %.c, %_$(ARCH).o, $(SRCS))
+
+
+
+
+ifeq ($(ENABLE_DVB), Y)
+all: $(ARCH_OBJS)
+	$(AR) $(SI_AGENT2_DVR_LIB) $(ARCH_OBJS)
+	$(RANLIB) $(SI_AGENT2_DVR_LIB)
+	@echo -= $(SI_AGENT2_DVR_LIB) is built. =-
+	
+%_$(ARCH).o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $@	
+endif
+
+
+
+##############################
+# Clean up.
+##############################
+clean:
+	@rm -f *.o *.gcno *.gcda *.bak *.lib
+	@rm -f *~

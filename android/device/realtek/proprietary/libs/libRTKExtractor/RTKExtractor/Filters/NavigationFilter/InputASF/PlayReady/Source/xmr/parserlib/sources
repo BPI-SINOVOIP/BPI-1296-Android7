@@ -1,0 +1,11 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmxmrparser
+TARGETTYPE=LIBRARY
+
+BUILD_CONSUMES=root_multimedia_PK_WMDRMMD_source_xmr_commonlib
+
+SOURCES =                   \
+    ..\drmxmrparser.c
+
+OBJLIBFILES = $(_DRM_SOURCE_PATH)\xmr\commonlib\$(_DRM_OBJ_DIR)\drmxmrcommon.lib

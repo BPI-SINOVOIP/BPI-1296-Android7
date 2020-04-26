@@ -1,0 +1,19 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=oem_ansi_test
+TARGETTYPE=LIBRARY
+
+C_DEFINES = $(C_DEFINES)                     \
+            -DDRM_TEST_USE_OFFSET_CLOCK=1    \
+
+_DRM_C_DEFINES=$(_DRM_C_DEFINES) DRM_TEST_USE_OFFSET_CLOCK=1
+
+SOURCES =                   \
+    ..\oemdebug.c           \
+    ..\oemimpl.c            \
+    ..\oemfileio.c          \
+    ..\oeminfo.c            \
+    ..\oemtime.c            \
+    ..\oemprofile.c         \
+    ..\oemcriticalsection.c
+

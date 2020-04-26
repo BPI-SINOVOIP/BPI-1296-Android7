@@ -1,0 +1,8 @@
+service gpioproxy /system/bin/gpioproxy
+    class core
+    socket rtk_gpio stream 0660 system system
+    user root
+    group root
+    disabled
+    seclabel u:r:realtek:s0
+

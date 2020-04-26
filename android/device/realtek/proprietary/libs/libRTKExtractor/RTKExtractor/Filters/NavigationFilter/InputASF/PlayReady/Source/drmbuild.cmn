@@ -1,0 +1,313 @@
+#**@@@+++@@@@*********************************************************
+#*
+#* Microsoft PlayReady
+#* Copyright (c) Microsoft Corporation. All rights reserved.
+#*
+#**@@@---@@@@********************************************************/
+
+#**********************************************************************
+#*
+#*
+#* Description:
+#*    Defines options specific to i386 required for compiling/linking 
+#*    DRMPK source code
+#*
+#*
+#*********************************************************************/
+
+!IF "$(UNICODE)" == ""
+UNICODE=1
+!endif
+
+!IF EXIST($(_DRM_SOURCE_PATH)\crypto\drmcrypto\rc4.c)
+_DRM_USE_BUILT_CRYPTO=1
+!ELSE
+_DRM_USE_BUILT_CRYPTO=0
+!ENDIF
+
+_DRM_CRYPTO_DIR = $(_DRM_SOURCE_PATH)\crypto
+_DRM_TARGET_DIR=$(DRM_PK_ROOT)\bin\obj
+
+INCLUDES = $(INCLUDES) \
+    .; \
+    ..; \
+    $(_DRM_SOURCE_PATH)\inc;                   \
+    $(_DRM_SOURCE_PATH)\crypto\bignum;         \
+    $(_DRM_SOURCE_PATH)\crypto\drmsha256;      \
+    $(_DRM_SOURCE_PATH)\crypto\pkcrypto;       \
+    $(_DRM_SOURCE_PATH)\certs;                 \
+    $(_DRM_SOURCE_PATH)\certs\nd;              \
+    $(_DRM_SOURCE_PATH)\xmr;                   \
+    $(_DRM_SOURCE_PATH)\ndtinc;                \
+
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+INCLUDES = $(INCLUDES) \
+           $(_DRM_SOURCE_PATH)\oem\common\inc; \
+           $(_DRM_SOURCE_PATH)\oem\win32\inc;  \
+           $(_DRM_SOURCE_PATH)\oem\win32\securetrace;
+!else
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+INCLUDES = $(INCLUDES) \
+           $(_DRM_SOURCE_PATH)\oem\common\inc; \
+           $(_DRM_SOURCE_PATH)\oem\wince\inc;  \
+           $(_DRM_SOURCE_PATH)\oem\wince\trace;
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+INCLUDES = $(INCLUDES) \
+           $(_DRM_SOURCE_PATH)\oem\common\inc; \
+           $(_DRM_SOURCE_PATH)\oem\win32\inc;  \
+           $(_DRM_SOURCE_PATH)\oem\win32\trace;
+!else
+INCLUDES = $(INCLUDES) \
+           $(_DRM_SOURCE_PATH)\oem\common\inc; \
+           $(_DRM_SOURCE_PATH)\oem\ansi\inc;   \
+           $(_DRM_SOURCE_PATH)\oem\ansi\trace;
+!endif
+!endif
+
+
+################################################
+#### Target subdirectories          ############
+################################################
+
+PLATFORM=daytona
+
+_DRM_BACKUPRESTORE_DIR=           $(_DRM_SOURCE_PATH)\BackupRestore\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_BLACKBOX_DIR=                $(_DRM_SOURCE_PATH)\blackbox\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_CERTS_DIR=                   $(_DRM_SOURCE_PATH)\certs\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_CERTS_ND_DIR=                $(_DRM_SOURCE_PATH)\certs\nd\$(_DRM_OBJ_DIR)
+_DRM_BCRL_DIR=                    $(_DRM_SOURCE_PATH)\bcrl\$(_DRM_OBJ_DIR)
+_DRM_DEVICEDEVCERT_DIR=           $(_DRM_SOURCE_PATH)\devicedevcert\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_CMDLINE_PARSER_DIR=          $(_DRM_SOURCE_PATH)\cmdlnpars\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_MANAGER_DIR=                 $(_DRM_SOURCE_PATH)\drmmanager\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_DEVCERT_PARSER_DIR=          $(_DRM_SOURCE_PATH)\devcertparser\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_DEVCERTINDIV_DIR=            $(_DRM_SOURCE_PATH)\devcertindiv\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_OEM_ANSI_DIR=                $(_DRM_SOURCE_PATH)\oem\ansi\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_OEM_ANSI_MAIN_DIR=           $(_DRM_SOURCE_PATH)\oem\ansi\main\$(_DRM_OBJ_DIR)
+_DRM_OEM_ANSI_TRACE_DIR=          $(_DRM_SOURCE_PATH)\oem\ansi\trace\$(_DRM_OBJ_DIR)
+_DRM_OEM_COMMON_DIR=              $(_DRM_SOURCE_PATH)\oem\common\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_RSA_DIR=                     $(_DRM_SOURCE_PATH)\oem\common\rsa\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_AES_DIR=                     $(_DRM_SOURCE_PATH)\oem\common\aes\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_OEM_MSDB_DIR=                $(_DRM_SOURCE_PATH)\oem\common\msdb\$(_DRM_OBJ_DIR)
+_DRM_OEM_WIN32_DIR=               $(_DRM_SOURCE_PATH)\oem\win32\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_OEM_WIN32_MAIN_DIR=          $(_DRM_SOURCE_PATH)\oem\win32\main\$(_DRM_OBJ_DIR)
+_DRM_OEM_WIN32_TRACE_DIR=         $(_DRM_SOURCE_PATH)\oem\win32\trace\$(_DRM_OBJ_DIR)
+_DRM_OEM_WIN32_SECTRACE_DIR=      $(_DRM_SOURCE_PATH)\oem\win32\securetrace\$(_DRM_OBJ_DIR)
+_DRM_OEM_WINCE_DIR=               $(_DRM_SOURCE_PATH)\oem\wince\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_OEM_WINCE_MAIN_DIR=          $(_DRM_SOURCE_PATH)\oem\wince\main\$(_DRM_OBJ_DIR)
+_DRM_OEM_WINCE_TRACE_DIR=         $(_DRM_SOURCE_PATH)\oem\wince\trace\$(_DRM_OBJ_DIR)
+_DRM_METERING_DIR=                $(_DRM_SOURCE_PATH)\metering\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_SYNCLIST_DIR=                $(_DRM_SOURCE_PATH)\synclist\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_CORE_DIR=                    $(_DRM_SOURCE_PATH)\core\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_SECURECLOCK_DIR=             $(_DRM_SOURCE_PATH)\secure_clock\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_WMDRMCERT_DIR=               $(_DRM_SOURCE_PATH)\wmdrmcert\certparser\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_DOMAIN_DIR =                 $(_DRM_SOURCE_PATH)\domain\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_DOMAINSTORE_DIR =            $(_DRM_SOURCE_PATH)\domainstore\$(_DRM_OBJ_DIR)
+_DRM_RECENTEXPIRED_DIR =          $(_DRM_SOURCE_PATH)\recentexpired\$(_DRM_OBJ_DIR)
+_DRM_TOOLS_DIR=                   $(_DRM_SOURCE_PATH)\tools\$(_DRM_OBJ_DIR)
+_DRM_XMR_PARSER_DIR=              $(_DRM_SOURCE_PATH)\xmr\parserlib\$(_DRM_OBJ_DIR)
+_DRM_XMR_BUILDER_DIR=             $(_DRM_SOURCE_PATH)\xmr\builderlib\$(_DRM_OBJ_DIR)
+_DRM_MSDB_CORE_DIR=               $(_DRM_SOURCE_PATH)\msdb\$(_DRM_OBJ_DIR)
+_DRM_ASF_DIR=                     $(_DRM_SOURCE_PATH)\asf\$(_DRM_OBJ_DIR)
+_DRM_ASFMMSTR_DIR=                $(_DRM_SOURCE_PATH)\asfmmstr\$(_DRM_OBJ_DIR)
+_DRM_NDTASF_DIR=                  $(_DRM_SOURCE_PATH)\ndtasf\$(_DRM_OBJ_DIR)
+_DRM_INITPARSER_DIR=              $(_DRM_SOURCE_PATH)\initiators\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_TRACE_DIR=                   $(_DRM_SOURCE_PATH)\tracing\$(PLATFORM)\$(_DRM_OBJ_DIR)
+_DRM_CHKHDS_DIR=                  $(_DRM_TOOLS_DIR)\chkhds\$(_DRM_OBJ_DIR)
+_DRM_DRMPKG_DIR=                  $(_DRM_TOOLS_DIR)\package\drmpackage\$(_DRM_OBJ_DIR)
+_DRM_PKGINIT_DIR=                 $(_DRM_TOOLS_DIR)\package\packageinit\$(_DRM_OBJ_DIR)
+_DRM_GENCHALLENGE_DIR=            $(_DRM_TOOLS_DIR)\license\licensegeneratechallenge\$(_DRM_OBJ_DIR)
+_DRM_LICDUMP_DIR=                 $(_DRM_TOOLS_DIR)\license\licenseviewstore\$(_DRM_OBJ_DIR)
+_DRM_PROCESSRESPONSE_DIR=         $(_DRM_TOOLS_DIR)\license\licenseprocessresponse\$(_DRM_OBJ_DIR)
+_DRM_PLAYER_DIR=                  $(_DRM_TOOLS_DIR)\player\$(_DRM_OBJ_DIR)
+_DRM_DEVCERT_DIR=                 $(_DRM_TOOLS_DIR)\devcertindiv\devcert\$(_DRM_OBJ_DIR)
+_DRM_DAC_DIR=                     $(_DRM_TOOLS_DIR)\devcertindiv\dac\$(_DRM_OBJ_DIR)
+_DRM_DEVCERTCREATERESPONSE_DIR=   $(_DRM_TOOLS_DIR)\devcertindiv\devcertcreateresponse\$(_DRM_OBJ_DIR)
+_DRM_DEVCERTGENCHALLENGE_DIR=     $(_DRM_TOOLS_DIR)\devcertindiv\devcertgeneratechallenge\$(_DRM_OBJ_DIR)
+_DRM_DEVCERTPROCESSRESPONSE_DIR=  $(_DRM_TOOLS_DIR)\devcertindiv\devcertprocessresponse\$(_DRM_OBJ_DIR)
+_DRM_DEVCERTTEMPLATE_DIR=         $(_DRM_TOOLS_DIR)\devcertindiv\devcerttemplate\$(_DRM_OBJ_DIR)
+_DRM_NONCESTORE_DIR=              $(_DRM_SOURCE_PATH)\noncestore\$(_DRM_OBJ_DIR)
+
+_DRM_COMMON_LIBS = \
+    $(_DRM_CORE_DIR)\drmcore.lib               \
+    $(_DRM_CMDLINE_PARSER_DIR)\cmdlnpars.lib   \
+    $(_DRM_CERTS_DIR)\drmcerts.lib             \
+    $(_DRM_CERTS_ND_DIR)\drmndcerts.lib        \
+    $(_DRM_XMR_PARSER_DIR)\drmxmrparser.lib    \
+    $(_DRM_XMR_BUILDER_DIR)\drmxmrbuilder.lib  \
+    $(_DRM_INITPARSER_DIR)\drminitiators.lib   \
+    $(_DRM_NONCESTORE_DIR)\drmnoncestore.lib   \
+
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_WINCE_DIR)\oem_wince.lib
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_WIN32_DIR)\oem_win32.lib
+!else
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_ANSI_DIR)\oem_ansi.lib
+!endif
+
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_COMMON_DIR)\oem_common.lib
+
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_WIN32_SECTRACE_DIR)\oem_securetrace_win32.lib
+!else
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_WINCE_TRACE_DIR)\oem_trace_wince.lib
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_WIN32_TRACE_DIR)\oem_trace_win32.lib
+!else
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_OEM_ANSI_TRACE_DIR)\oem_trace_ansi.lib
+!endif
+!endif
+
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+_DRM_OEM_MAIN_LIB = $(_DRM_OEM_WINCE_MAIN_DIR)\oemmain_wince.lib
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_OEM_MAIN_LIB = $(_DRM_OEM_WIN32_MAIN_DIR)\oemmain_win32.lib
+!else
+_DRM_OEM_MAIN_LIB = $(_DRM_OEM_ANSI_MAIN_DIR)\oemmain_ansi.lib
+!endif
+
+
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_DOMAIN_DIR)\drmdomain.lib \
+    $(_DRM_DOMAINSTORE_DIR)\drmdomainstore.lib \
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+    $(_DRM_RECENTEXPIRED_DIR)\drmrecentexpired.lib \
+!endif
+
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_CRYPTO_DIR)\bignum\daytona\$(_DRM_OBJ_DIR)\drmbignum.lib   \
+    $(_DRM_CRYPTO_DIR)\pkcrypto\daytona\$(_DRM_OBJ_DIR)\drmpkcrypto.lib \
+    $(_DRM_CRYPTO_DIR)\drmsha256\daytona\$(_DRM_OBJ_DIR)\drmsha256.lib \
+    $(_DRM_CRYPTO_DIR)\drmcrypto\daytona\$(_DRM_OBJ_DIR)\drmcrypto.lib   \
+    $(_DRM_RSA_DIR)\oemrsa.lib \
+
+
+!if "$(_DRM_USE_BUILT_CRYPTO)" == "0"
+_DRM_COMMON_LIB_DIR=$(SDXROOT)\multimedia\pk\common\lib
+
+_DRM_COMMON_LIBS = \
+    $(_DRM_COMMON_LIBS) \
+    $(_DRM_COMMON_LIB_DIR)\*\rc4.obj   \
+!endif
+
+
+_DRM_OEM_ANSI_ALT_DIR= $(_DRM_SOURCE_PATH)\oem\ansi_alt\$(PLATFORM)\$(_DRM_OBJ_DIR)
+
+
+#
+# The following variable used to generated a "roll-up" lib for all of the PK code under "source".
+# This, in turn, is used to create a single DLL for all of this PK code.
+#
+_DRM_ALL_SOURCE_LIBS = \
+                       $(_DRM_DROP_PATH)drmbignum.lib \
+                       $(_DRM_DROP_PATH)drmblackbox.lib \
+                       $(_DRM_DROP_PATH)drmcerts.lib \
+                       $(_DRM_DROP_PATH)drmcore.lib \
+                       $(_DRM_DROP_PATH)drmcrypto.lib \
+                       $(_DRM_DROP_PATH)drmdevcert.lib \
+                       $(_DRM_DROP_PATH)drmdevicedevcert.lib \
+                       $(_DRM_DROP_PATH)drmdomain.lib \
+                       $(_DRM_DROP_PATH)drmdomainstore.lib \
+                       $(_DRM_DROP_PATH)drmmanager.lib \
+                       $(_DRM_DROP_PATH)drmmetering.lib \
+                       $(_DRM_DROP_PATH)drmndcerts.lib \
+                       $(_DRM_DROP_PATH)drmpkcrypto.lib \
+                       $(_DRM_DROP_PATH)drmsecureclock.lib \
+                       $(_DRM_DROP_PATH)drmsha256.lib \
+                       $(_DRM_DROP_PATH)drmsynclist.lib \
+                       $(_DRM_DROP_PATH)drmtoolscommon.lib \
+                       $(_DRM_DROP_PATH)drmxmrparser.lib \
+                       $(_DRM_DROP_PATH)drmxmrbuilder.lib \
+                       $(_DRM_DROP_PATH)oem_common.lib \
+                       $(_DRM_DROP_PATH)oemaes.lib \
+                       $(_DRM_DROP_PATH)oemrsa.lib \
+                       $(_DRM_DROP_PATH)wmdrmcert.lib \
+                       $(_DRM_DROP_PATH)ndt.lib \
+                       $(_DRM_DROP_PATH)ndtmgr.lib \
+                       $(_DRM_DROP_PATH)ndtasf.lib \
+                       $(_DRM_DROP_PATH)oem_devstore_dvs.lib \
+                       $(_DRM_DROP_PATH)ndr.lib \
+                       $(_DRM_DROP_PATH)drminitiators.lib \
+                       $(_DRM_DROP_PATH)oem_msdb.lib \
+                       $(_DRM_DROP_PATH)msdbcore.lib \
+                       $(_DRM_DROP_PATH)drmnoncestore.lib \
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+                       $(_DRM_DROP_PATH)drmrecentexpired.lib \
+!endif
+
+
+#
+# Pick up .libs specific to the platform being built
+#
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)DRMManagerCe.lib  \
+    $(_DRM_DROP_PATH)oem_wince.lib
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_win32.lib
+!else
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_ansi.lib
+!endif
+
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_securetrace_win32.lib
+!else
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP50"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_trace_wince.lib
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_trace_win32.lib
+!else
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS)            \
+    $(_DRM_DROP_PATH)oem_trace_ansi.lib
+!endif
+!endif
+
+#
+# If the rc4.c file does not exist, and therefore is not a part of the drmcrypto.lib, 
+# we pick up its pre-build .obj file.
+# This should only be the case for non-PK builds of the PK code; i.e. the PC and Server teams.
+#
+!if "$(_DRM_USE_BUILT_CRYPTO)" == "0"
+_DRM_ALL_SOURCE_LIBS = \
+    $(_DRM_ALL_SOURCE_LIBS) \
+    $(SDXROOT)\multimedia\pk\common\lib\*\rc4.obj
+!endif
+
+
+# .lib(s) not included at this time:
+
+
+#                      $(_DRM_DROP_PATH)cmdlnpars.lib \   # DLL can't link to external func DRM_Main()
+
+

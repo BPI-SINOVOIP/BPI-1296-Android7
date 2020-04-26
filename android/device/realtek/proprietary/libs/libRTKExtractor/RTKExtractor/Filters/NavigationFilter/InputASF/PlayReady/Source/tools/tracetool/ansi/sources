@@ -1,0 +1,23 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=tracetool
+TARGETTYPE=PROGRAM
+UMENTRY=wmain
+UMTYPE=console
+
+SOURCES = \
+	tracetool.c
+
+INCLUDES =                    \
+    $(INCLUDES)               \
+    $(_DRM_SOURCE_PATH)\tools\common; \
+    $(_DRM_SOURCE_PATH)\oem\ansi\trace \
+
+TARGETLIBS = \
+    $(_DRM_COMMON_LIBS)                      \
+    $(_DRM_OEM_MAIN_LIB)                     \
+    $(_DRM_BLACKBOX_DIR)\drmblackbox.lib     \
+    $(_DRM_AES_DIR)\oemaes.lib               \
+    $(_DRM_SOURCE_PATH)\tools\common\$(_DRM_OBJ_DIR)\drmtoolscommon.lib \
+
+

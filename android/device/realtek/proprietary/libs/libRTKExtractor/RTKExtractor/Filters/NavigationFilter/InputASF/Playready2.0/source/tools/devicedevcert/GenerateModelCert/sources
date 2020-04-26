@@ -1,0 +1,31 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=generatemodelcert
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+TARGETLIBS =                                        \
+    $(_DRM_COMMON_LIBS)                             \
+    $(_DRM_OEM_MAIN_LIB)                            \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmtoolscommon.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\wmdrmcert.lib         \
+    $(_DRM_BLACKBOX_LIBS)                           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib            \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbaseimpl.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbase.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppssimpl.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppss.lib     \
+
+
+SOURCES = \
+    generatemodelcert.c
+
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+SOURCES = $(SOURCES) \
+      generatemodelcert.rc
+!endif
+
+INCLUDES = $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\tools\common;
+

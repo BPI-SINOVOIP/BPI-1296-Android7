@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmestreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =            \
+    drmestimplreal.c
+

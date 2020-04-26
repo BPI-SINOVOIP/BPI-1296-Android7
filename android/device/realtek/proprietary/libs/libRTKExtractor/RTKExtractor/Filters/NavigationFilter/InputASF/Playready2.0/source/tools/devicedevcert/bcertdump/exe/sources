@@ -1,0 +1,35 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=bcertdump
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+SOURCES = \
+    ..\bcertdump.c
+
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+SOURCES = $(SOURCES) \
+      ..\bcertdump.rc
+!endif
+
+_DRM_C_DEFINES=$(_DRM_C_DEFINES) BUILD_EXE=1
+
+INCLUDES =                             \
+    $(INCLUDES)                        \
+    $(_DRM_SOURCE_PATH)\tools\common;  \
+    $(_DRM_SOURCE_PATH)\certs
+
+TARGETLIBS =                                        \
+    $(_DRM_COMMON_LIBS)                             \
+    $(_DRM_OEM_MAIN_LIB)                            \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmtoolscommon.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\wmdrmcert.lib         \
+    $(_DRM_BLACKBOX_LIBS)                           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib            \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcerts.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbaseimpl.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbase.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppssimpl.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppss.lib     \
+

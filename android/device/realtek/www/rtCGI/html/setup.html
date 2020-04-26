@@ -1,0 +1,1322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Setup¡¦s Option</title>
+<link href="css/boxhome.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="javascript/util.js"></script>
+
+<script type="text/javascript">
+var gCurrentLanguage = new String();
+var gCurrentTextEncoding = new String();
+var g_bMenuLanguageExpanded = new String();
+var g_bTextEncodingExpanded = new String();
+var g_bDeviceNameExpanded = new String();
+var g_bSoftApSecurityExpanded = new String();
+var g_bWiredConnectionExpanded = new String();
+var g_videoAspectRatioExpanded = new String();
+var g_WifiStatus = new String();
+var g_GetDisplayInfo = "false";
+
+function handleSetupGetEth0Status()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve video zoom from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("OFF" == retStr)
+			{
+				setElementVisible("wiredConnection", "false");
+			}
+			
+			// Get WiFi status
+			sendCommand("CgiSetupGetWlan0Status", handleSetupGetWlan0Status);
+		}
+	}
+}
+
+function handleSetupGetWlan0Status()
+{
+var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve video zoom from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("OFF" == retStr)
+			{
+				setElementVisible("wirelessConnection", "false");
+				setElementVisible("wirelessWps", "false");
+			}
+		}
+	}
+}
+
+function handleSetupVerInfo()
+{
+	var tblBody = document.getElementById("versionInfo");
+	var rows = tblBody.rows.length;
+	var verInfo = new String();
+	var verInfoArray;
+	var infoStr = new String();
+	var i = 0;
+	var newRow;
+	var newVerCell;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve version from the response text
+			verInfo = handleResponseText(command_xmlhttp.responseText);
+
+			verInfoArray = verInfo.split("\n");
+
+			for (i = 0; i < rows - 1; i++)
+			{
+				tblBody.deleteRow(-1);
+			}
+
+			for (i = 0; i < verInfoArray.length - 1; i++)
+			{
+				newRow = tblBody.insertRow(-1);
+				newVerCell = newRow.insertCell(0);
+				newVerCell.innerHTML = "<li>" + verInfoArray[i] + "</li>";
+			}
+
+			if ("true" == g_GetDisplayInfo)
+			{
+				g_GetDisplayInfo = "false";
+			}
+
+			// Get Ethernet status
+			sendCommand("CgiSetupGetEth0Status", handleSetupGetEth0Status);
+		}
+	}
+}
+
+function setupGetVerInfo()
+{
+    sendCommand("CgiSetupGetVersionInfo", handleSetupVerInfo);
+}
+
+function handleSetupGetVideoZoom()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve video zoom from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("$[OFF]" == retStr)
+			{
+				infoStr = "Off";
+			}
+			else
+			{
+				infoStr = "On";
+			}
+			document.getElementById("videoZoom").innerHTML = infoStr;
+			// Get next information
+			setupGetVerInfo();
+		}
+	}
+}
+
+function setupGetVideoZoom()
+{
+	sendCommand("CgiSetupGetVideoZoom", handleSetupGetVideoZoom);
+}
+
+function handleSetupGetAudioNightMode()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve audio night mode from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("$[OFF]" == retStr)
+			{
+				infoStr = "Off";
+			}
+			else
+			{
+				infoStr = "On";
+			}
+			document.getElementById("audioNightMode").innerHTML = infoStr;
+			// Get next information
+			setupGetAspectRatio();
+		}
+	}
+}
+
+function setupGetAudioNightMode()
+{
+	sendCommand("CgiSetupGetAudioNightMode", handleSetupGetAudioNightMode);
+}
+
+function handleSetupGetTextEncoding()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve text encoding from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			document.getElementById("textEncoding").innerHTML = retStr;
+
+			if ("true" == g_GetDisplayInfo)
+			{
+				// Get next information
+				setupGetAudioNightMode();
+			}
+		}
+	}
+}
+
+function setupGetTextEncoding()
+{
+	sendCommand("CgiSetupGetTextEncoding", handleSetupGetTextEncoding);
+}
+
+function handleSetupGetTextEncodingList()
+{
+	var tblBody = document.getElementById("textEncodingTbl");
+	var rows = tblBody.rows.length;
+	var retStr = new String();
+	var infoStr = new String();
+	var textEncodingArray;
+	var textEncodingInfoArray;
+	var i = 0;
+	var newRow;
+	var newTextEncoding;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve audio night mode from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			textEncodingArray = retStr.split("\n");
+
+			for (i = 0; i < rows; i++)
+			{
+				tblBody.deleteRow(-1);
+			}
+
+			newRow = tblBody.insertRow(-1);
+			newTextEncoding = newRow.insertCell(0);
+			newTextEncoding.innerHTML = '<div class="language">';
+			for (i = 0 ; i < textEncodingArray.length; i++)
+			{
+				newRow = tblBody.insertRow(-1);
+				newTextEncoding = newRow.insertCell(0);
+				infoStr = textEncodingArray[i];
+				textEncodingInfoArray = infoStr.split(":");
+				newTextEncoding.innerHTML = '<ol><li><a href="#" onclick="setSelectedTextEncoding('+textEncodingInfoArray[0]+');">'+textEncodingInfoArray[1]+'</a></li></ol>';
+			}
+			newRow = tblBody.insertRow(-1);
+			newTextEncoding = newRow.insertCell(0);
+			newTextEncoding.innerHTML = '</div>';
+
+			// Get next information
+			setupGetTextEncoding();
+		}
+	}
+}
+
+function setupGetTextEncodingList()
+{
+	sendCommand("CgiSetupGetTextEncodingList", handleSetupGetTextEncodingList);
+}
+
+function handleSetupGetMenuLanguageList()
+{
+	var tblBody = document.getElementById("menuLanguageTbl");
+	var rows = tblBody.rows.length;
+	var retStr = new String();
+	var infoStr = new String();
+	var menuLanguageArray;
+	var menuLanguageInfoArray;
+	var i = 0;
+	var newRow;
+	var newMenuLanguage;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve audio night mode from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			menuLanguageArray = retStr.split("\n");
+
+			for (i = 0; i < rows; i++)
+			{
+				tblBody.deleteRow(-1);
+			}
+
+			newRow = tblBody.insertRow(-1);
+			newMenuLanguage = newRow.insertCell(0);
+			newMenuLanguage.innerHTML = '<div class="language">';
+			for (i = 0 ; i < menuLanguageArray.length; i++)
+			{
+				newRow = tblBody.insertRow(-1);
+				newMenuLanguage = newRow.insertCell(0);
+				infoStr = menuLanguageArray[i];
+				menuLanguageInfoArray = infoStr.split(":");
+				newMenuLanguage.innerHTML = '<ol><li><a href="#" onclick="setSelectedMenuLanguage('+menuLanguageInfoArray[0]+');">' + menuLanguageInfoArray[1] + '</a></li></ol>';
+			}
+			newRow = tblBody.insertRow(-1);
+			newMenuLanguage = newRow.insertCell(0);
+			newMenuLanguage.innerHTML = '</div>';
+
+			// Get next information
+			setupGetMenuLanguage();
+		}
+	}
+}
+
+function setupGetMenuLanguageList()
+{
+	sendCommand("CgiSetupGetMenuLanguageList", handleSetupGetMenuLanguageList);
+}
+
+function handleSetupGetMenuLanguage()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve menu language from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			document.getElementById("menuLanguage").innerHTML = retStr;
+
+			if ("true" == g_GetDisplayInfo)
+			{
+				// Get next information
+				setupGetTextEncodingList();
+			}
+		}
+	}
+}
+
+function setupGetMenuLanguage()
+{
+	sendCommand("CgiSetupGetMenuLanguage", handleSetupGetMenuLanguage);
+}
+
+function handleSetSelectedMenuLanguage()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve response string from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			setupGetMenuLanguage();
+		}
+	}
+}
+
+function setSelectedMenuLanguage(menuLanguageEnum)
+{
+	var cmdStr = new String();
+
+	cmdStr = "CgiSetupSetMenuLanguage" + ":" + menuLanguageEnum;
+	sendCommand(cmdStr, handleSetSelectedMenuLanguage);
+
+	g_bMenuLanguageExpanded = "false";
+	setElementVisible("menuLanguageTbl", g_bMenuLanguageExpanded);
+}
+
+function handleSetSelectedTextEncoding()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve response string from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			setupGetTextEncoding();
+		}
+	}
+}
+
+function setSelectedTextEncoding(textEncodingEnum)
+{
+	var cmdStr = new String();
+
+	cmdStr = "CgiSetupSetTextEncoding" + ":" + textEncodingEnum;
+	sendCommand(cmdStr, handleSetSelectedTextEncoding);
+
+	g_bTextEncodingExpanded = "false";
+	setElementVisible("textEncodingTbl", g_bTextEncodingExpanded);
+}
+
+function handleSetupGetSoftAPStatus()
+{
+	var retStr = new String();
+	
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("ON" == retStr)
+			{
+				setupGetSoftApSecurity();
+			}
+			else
+			{
+				setElementVisible("softApSecuritySetup", "false");
+				setupGetMenuLanguageList();
+			}
+		}
+	}
+}
+
+function setupGetSoftAPStatus()
+{
+	sendCommand("CgiSetupGetSoftAPStatus", handleSetupGetSoftAPStatus);
+}
+
+function handleSetupGetSoftApSecurity()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("$[NETWL_SEC_OPEN]" == retStr)
+			{
+				infoStr = "Open";
+			}
+			else if ("$[NETWL_SEC_WPAKEY]" == retStr)
+			{
+				infoStr = "WPA Key";
+			}
+
+			document.getElementById("softApSecurity").innerHTML = infoStr;
+
+			// Get next information
+			setupGetMenuLanguageList();
+		}
+	}
+}
+
+function setupGetSoftApSecurity()
+{
+	sendCommand("CgiSetupGetSoftwareApSecurity", handleSetupGetSoftApSecurity);
+}
+
+function handleSetupGetDeviceName()
+{
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			infoStr = handleResponseText(command_xmlhttp.responseText);
+
+			document.getElementById("deviceName").innerHTML = infoStr;
+			setCookie("cookieDeviceName", infoStr);
+			// Get next information
+			setupGetSoftAPStatus();
+		}
+	}
+}
+
+function setupGetDeviceName()
+{
+	sendCommand("CgiSetupGetSystemDeviceName", handleSetupGetDeviceName);
+}
+
+function handleSetupCheckWlanStatus()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			if ("$[OFF]" == retStr)
+			{
+				g_WifiStatus = "Off";
+				infoStr = "Off";
+			}
+			else
+			{
+				g_WifiStatus = "On";
+				infoStr = "On";
+			}
+
+			document.getElementById("wlanStatus").innerHTML = infoStr;
+
+			// Get next information
+			setupGetDeviceName();
+		}
+	}
+}
+
+function setupCheckDeviceStatus(device)
+{
+	cmdStr = new String();
+
+	cmdStr = "CgiSetupCheckDeviceStatus" + ":" + device;
+
+	if ("WLAN0" == device)
+	{
+		sendCommand(cmdStr, handleSetupCheckWlanStatus);
+	}
+}
+
+function handleSetupSetVideoZoom()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve video zoom from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+		}
+	}
+}
+
+function setupSetVideoZoom()
+{
+	var infoStr = document.getElementById("videoZoom").innerHTML;
+	var cmdStr = new String();
+	var paramStr = new String();
+
+	if ("On" == infoStr)
+	{
+		paramStr = "$[OFF]";
+		infoStr = "Off";
+	}
+	else
+	{
+		paramStr = "$[ON]";
+		infoStr = "On";
+	}
+
+	cmdStr = "CgiSetupSetVideoZoom" + ":" + paramStr;
+	sendCommand(cmdStr, handleSetupSetVideoZoom);
+
+	document.getElementById("videoZoom").innerHTML = infoStr;
+}
+
+function handleSetupSetAudioNightMode()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve video zoom from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+		}
+	}
+}
+
+function setupSetAudioNightMode()
+{
+	var infoStr = document.getElementById("audioNightMode").innerHTML;
+	var cmdStr = new String();
+	var paramStr = new String();
+
+	if ("On" == infoStr)
+	{
+		paramStr = "$[OFF]";
+		infoStr = "Off";
+	}
+	else
+	{
+		paramStr = "$[ON]";
+		infoStr = "On";
+	}
+
+	cmdStr = "CgiSetupSetAudioNightMode" + ":" + paramStr;
+	sendCommand(cmdStr, handleSetupSetVideoZoom);
+
+	document.getElementById("audioNightMode").innerHTML = infoStr;
+}
+
+function handleSetupDeviceName()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			// Get next information
+			setupGetDeviceName();
+
+			checkDeviceNameHidden();
+		}
+	}
+}
+
+function setupSetDeviceNameByFormValue(formObj)
+{
+	var nameObj = formObj.elements['newDeviceName'];
+	var nameLength = 0;
+	var cmdStr = new String();
+	var promptStr = new String();
+
+	nameLength = countStringUtf8Length(nameObj.value);
+
+	if (0 == nameLength)
+	{
+		promptStr = "Device Name(SSID) is empty.";
+		gotoWarningPageWithCookie(promptStr, cmdStr);
+	}
+	else if (0 < nameLength && 32 >= nameLength)
+	{
+		cmdStr = "CgiSetupSetSystemDeviceName" + ":" + encodeURIComponent(nameObj.value);
+		promptStr = "Device Name(SSID):" + nameObj.value;
+		gotoWarningPageWithCookie(promptStr, cmdStr);
+	}
+	else
+	{
+		promptStr = "Device Name(SSID):" + nameObj.value + " is too long.";
+		gotoWarningPageWithCookie(promptStr, cmdStr);
+	}
+}
+
+function handleSetupSetWiredFixIp()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			checkWiredConnectionHidden();
+		}
+	}
+}
+
+function setupSetWiredFixIpByFormValue(formObj)
+{
+	var ip1Obj = formObj.elements['IpAddress1'];
+	var ip2Obj = formObj.elements['IpAddress2'];
+	var ip3Obj = formObj.elements['IpAddress3'];
+	var ip4Obj = formObj.elements['IpAddress4'];
+	var mask1Obj = formObj.elements['SubnetMask1'];
+	var mask2Obj = formObj.elements['SubnetMask2'];
+	var mask3Obj = formObj.elements['SubnetMask3'];
+	var mask4Obj = formObj.elements['SubnetMask4'];
+	var gateway1Obj = formObj.elements['DefaultGateway1'];
+	var gateway2Obj = formObj.elements['DefaultGateway2'];
+	var gateway3Obj = formObj.elements['DefaultGateway3'];
+	var gateway4Obj = formObj.elements['DefaultGateway4'];
+	var dns1Obj = formObj.elements['DnsIpAddress1'];
+	var dns2Obj = formObj.elements['DnsIpAddress2'];
+	var dns3Obj = formObj.elements['DnsIpAddress3'];
+	var dns4Obj = formObj.elements['DnsIpAddress4'];
+
+	var ipStr = new String();
+	var maskStr = new String();
+	var gatewayStr = new String();
+	var dnsStr = new String();
+
+	do
+	{
+		if (0 == ip1Obj.value.length || 0 == ip2Obj.value.length || 0 == ip3Obj.value.length || 0 == ip4Obj.value.length)
+		{
+			break;
+		}
+		ipStr = ip1Obj.value + "." + ip2Obj.value + "." + ip3Obj.value + "." + ip4Obj.value;
+
+		if (0 == mask1Obj.value.length || 0 == mask2Obj.value.length || 0 == mask3Obj.value.length || 0 == mask4Obj.value.length)
+		{
+			break;
+		}
+		maskStr = mask1Obj.value + "." + mask2Obj.value + "." + mask3Obj.value + "." + mask4Obj.value;
+
+		if (0 == gateway1Obj.value.length || 0 == gateway2Obj.value.length || 0 == gateway3Obj.value.length || 0 == gateway4Obj.value.length)
+		{
+			break;
+		}
+		gatewayStr = gateway1Obj.value + "." + gateway2Obj.value + "." + gateway3Obj.value + "." + gateway4Obj.value;
+
+		if (0 == dns1Obj.value.length || 0 == dns2Obj.value.length || 0 == dns3Obj.value.length || 0 == dns4Obj.value.length)
+		{
+			break;
+		}
+		dnsStr = dns1Obj.value + "." + dns2Obj.value + "." + dns3Obj.value + "." + dns4Obj.value;
+
+		cmdStr = "CgiSetupSetEth0Ip" + ":" + ipStr + ":" + maskStr + ":" + gatewayStr + ":" + dnsStr;
+		sendCommand(cmdStr, handleSetupSetWiredFixIp);
+	} while (0);
+}
+
+function handleSetupSetSoftApSecurity()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			checkSoftApSecurityHidden();
+
+			setupGetSoftApSecurity();
+		}
+	}
+}
+
+function setupSetSoftApSecurityByFormValue(formObj)
+{
+	var cmdStr = new String();
+	var promptStr = new String();
+	var radioObj = formObj.elements['softApSecurityType'];
+	var passwordObj = formObj.elements['wpaPassword'];
+	var radioValue = "";
+	var passwordLength = 0;
+	var bValid = "true";
+
+	radioValue = getRadioCheckedValue(radioObj);
+
+	if ("WPA" == radioValue)
+	{
+		passwordLength = passwordObj.value.length;
+		if (8 <= passwordLength && 63 >= passwordLength)
+		{
+			// The WpA specification demands a key length of between 8 and 63 keys.
+			cmdStr = "CgiSetupSetSoftwareApSecurity" + ":" + "$[NETWL_SEC_WPAKEY]" + ":" + passwordObj.value;
+		}
+		else
+		{
+			bValid = "false";
+		}
+	}
+	else if ("Open" == radioValue)
+	{
+		cmdStr = "CgiSetupSetSoftwareApSecurity" + ":" + "$[NETWL_SEC_OPEN]";
+	}
+
+	if ("true" == bValid)
+	{
+		promptStr = "Virtual AP Security:" + radioValue;
+		gotoWarningPageWithCookie(promptStr, cmdStr);
+		//sendCommand(cmdStr, handleSetupSetSoftApSecurity);
+	}
+}
+
+function handleSetupUsbUpgradeCheck()
+{
+	var retStr = new String();
+	var fwInfoArray;
+	var promptStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			fwInfoArray = retStr.split("\n");
+
+			if ("E_FAIL" == retStr)
+			{
+				promptStr = "No update is found";
+				gotoWarningPageWithCookie(promptStr, "");
+			}
+			else
+			{
+				fwInfoArray = retStr.split("\n");
+				if ("N/A" != fwInfoArray[1])
+				{
+					// USB install image is available
+					promptStr = "USB Upgrade<br>Current:" + fwInfoArray[0] + "<br>New:" + fwInfoArray[1];
+					gotoWarningPageWithCookie(promptStr, "CgiSetupUsbUpgrade");
+				}
+			}
+		}
+	}
+}
+
+function setupUsbUpgradeCheck()
+{
+	sendCommand("CgiSetupUsbUpgradeCheck", handleSetupUsbUpgradeCheck);
+}
+
+function handleSetupUsbUpgrade()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+		}
+	}
+}
+
+function setupUsbUpgrade()
+{
+	sendCommand("CgiSetupUsbUpgrade", handleSetupUsbUpgrade);
+}
+
+function handleSetupOnlineUpgradeCheck()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			if ("S_OK" == retStr)
+			{
+				gotoWarningPageWithCookie("Please wait...", "CgiSetupOnlineUpgradeCheck");
+			}
+		}
+	}
+}
+
+function setupOnlineUpgradeCheck()
+{
+	sendCommand("CgiSetupOnlineUpgradeCheck", handleSetupOnlineUpgradeCheck);
+}
+
+function handleSetupResetToDefault()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+		}
+	}
+}
+
+function setupResetToDefault()
+{
+	gotoWarningPageWithCookie("Reset to Default", "CgiSetupResetToDefault");
+	//sendCommand("CgiSetupResetToDefault", handleSetupResetToDefault);
+}
+
+function setupGetVideoAspectRatioList()
+{
+	sendCommand("CgiSetupGetVideoAspectRatioList", handleSetupGetVideoAspectRatioList);
+}
+
+function handleSetupGetVideoAspectRatioList()
+{
+	var tblBody = document.getElementById("videoAspectRatioTbl");
+	var rows = tblBody.rows.length;
+	var retStr = new String();
+	var infoStr = new String();
+	var aspectRatioArray;
+	var aspectRatioInfoArray;
+	var i = 0;
+	var newRow;
+	var newAspectRatio;
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve audio night mode from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			aspectRatioArray = retStr.split("\n");
+
+			for (i = 0; i < rows; i++)
+			{
+				tblBody.deleteRow(-1);
+			}
+
+			newRow = tblBody.insertRow(-1);
+			newAspectRatio = newRow.insertCell(0);
+			newAspectRatio.innerHTML = '<div class="language">';
+			for (i = 0 ; i < aspectRatioArray.length; i++)
+			{
+				newRow = tblBody.insertRow(-1);
+				newAspectRatio = newRow.insertCell(0);
+				infoStr = aspectRatioArray[i];
+				aspectRatioInfoArray = infoStr.split("|");
+				newAspectRatio.innerHTML = '<ol><li><a href="#" onclick="setSelectedVideoAspectRatio('+aspectRatioInfoArray[0]+');">'+aspectRatioInfoArray[1]+'</a></li></ol>';
+			}
+			newRow = tblBody.insertRow(-1);
+			newAspectRatio = newRow.insertCell(0);
+			newAspectRatio.innerHTML = '</div>';
+
+			// Get next information
+			setupGetVideoZoom();
+		}
+	}
+}
+
+function handleSetupGetAspectRatio()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve text encoding from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			document.getElementById("videoAspectRatio").innerHTML = retStr;
+
+			if ("true" == g_GetDisplayInfo)
+			{
+				// Get next information
+				setupGetVideoAspectRatioList();
+			}
+		}
+	}
+}
+
+function setupGetAspectRatio()
+{
+	sendCommand("CgiSetupGetVideoAspectRatio", handleSetupGetAspectRatio);
+}
+
+function setSelectedVideoAspectRatio(videoAspectRatioEnum)
+{
+	var cmdStr = new String();
+
+	cmdStr = "CgiSetupSetVideoAspectRatio" + ":" + videoAspectRatioEnum
+	sendCommand(cmdStr, handleSetSelectedVideoAspectRatio);
+
+	g_videoAspectRatioExpanded = "false";
+	setElementVisible("videoAspectRatioTbl", g_videoAspectRatioExpanded);
+}
+
+function handleSetSelectedVideoAspectRatio()
+{
+	var retStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve response string from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+
+			setupGetAspectRatio();
+		}
+	}
+}
+
+function checkMenuLanguageHidden()
+{
+	var param = new String();
+
+	if ("true" == g_bMenuLanguageExpanded)
+	{
+		g_bMenuLanguageExpanded = "false";
+	}
+	else
+	{
+		g_bMenuLanguageExpanded = "true";
+	}
+	setElementVisible("menuLanguageTbl", g_bMenuLanguageExpanded);
+}
+
+function checkTextEncodingHidden()
+{
+	if ("true" == g_bTextEncodingExpanded)
+	{
+		g_bTextEncodingExpanded = "false";
+	}
+	else
+	{
+		g_bTextEncodingExpanded = "true";
+	}
+	setElementVisible("textEncodingTbl", g_bTextEncodingExpanded);
+}
+
+function checkVideoAspectRatioHidden()
+{
+	if ("true" == g_videoAspectRatioExpanded)
+	{
+		g_videoAspectRatioExpanded = "false";
+	}
+	else
+	{
+		g_videoAspectRatioExpanded = "true";
+	}
+	setElementVisible("videoAspectRatioTbl", g_videoAspectRatioExpanded);
+}
+
+function checkMenuLanguageHidden()
+{
+	if ("true" == g_bMenuLanguageExpanded)
+	{
+		g_bMenuLanguageExpanded = "false";
+	}
+	else
+	{
+		g_bMenuLanguageExpanded = "true";
+	}
+	setElementVisible("menuLanguageTbl", g_bMenuLanguageExpanded);
+}
+
+function checkDeviceNameHidden()
+{
+	if ("true" == g_bDeviceNameExpanded)
+	{
+		g_bDeviceNameExpanded = "false";
+	}
+	else
+	{
+		g_bDeviceNameExpanded = "true";
+	}
+	setElementVisible("deviceNameTbl", g_bDeviceNameExpanded);
+}
+
+function checkSoftApSecurityHidden()
+{
+	if ("true" == g_bSoftApSecurityExpanded)
+	{
+		g_bSoftApSecurityExpanded = "false";
+	}
+	else
+	{
+		g_bSoftApSecurityExpanded = "true";
+	}
+	setElementVisible("softApSecurityTbl", g_bSoftApSecurityExpanded);
+}
+
+function checkWiredConnectionHidden()
+{
+	if ("true" == g_bWiredConnectionExpanded)
+	{
+		g_bWiredConnectionExpanded = "false";
+	}
+	else
+	{
+		g_bWiredConnectionExpanded = "true";
+	}
+	setElementVisible("wiredConnectionTbl", g_bWiredConnectionExpanded);
+}
+
+function gotoSelectAp()
+{
+	window.location.assign("select-ap.html?wifi=" + g_WifiStatus);
+}
+
+function gotoEnableWps()
+{	
+	var cmdStr = new String();
+	var promptStr = new String();
+	var devType = getUserDeviceType();
+	var deviceNameStr = getCookie("cookieDeviceName");
+	
+	cmdStr = "CgiSetupSetWlanWps";
+	promptStr = deviceNameStr + " is connecting to Wireless AP. Make sure your " + devType + " is also connected to the same network.";
+	gotoWarningPageWithCookie(promptStr, cmdStr);
+}
+
+function gotoWarningPageWithCookie(promptStr, cmdStr)
+{
+	deleteCookie("warningPrompt");
+	deleteCookie("warningCmd");
+	if (null != promptStr)
+	{
+		setCookie("warningPrompt", promptStr);
+	}
+
+	// null cmdStr means that this is just a prompt
+	if (null != cmdStr)
+	{
+		setCookie("warningCmd", cmdStr);
+	}
+	else
+	{
+		setCookie("warningCmd", null);
+	}
+	window.location.assign("warning.html");
+}
+
+function catchEnter(formName, evt)
+{
+	var code = 0;
+
+	if (!e) var e = window.event;
+	if (e.keyCode) code = e.keyCode;
+	else if (e.which) code = e.which;
+
+	if (13 == code)
+	{
+		//submit the form, do your validation, or whatever
+		if ("deviceNameForm" == formName)
+		{
+			setupSetDeviceNameByFormValue(document.forms['deviceNameForm']);
+		}
+		else if ("softApSecurityForm" == formName)
+		{
+			setupSetSoftApSecurityByFormValue(document.forms['softApSecurityForm']);
+		}
+
+		return false;
+	}
+}
+
+function prepareDisplayInfo()
+{
+	if (isParamMatched(HOME_ENTRY_MODE, VAL_ENTRY_REMOTE, HOME_COOKIE_ENTRY_MODE) === true)
+	{
+		// android airfun
+	}
+    hideEleIfMatched("title-bar", SETUP_ENTRY_MODE, VAL_ENTRY_REMOTE, SETUP_COOKIE_ENTRY_MODE);
+	g_GetDisplayInfo = "true";
+
+	g_bMenuLanguageExpanded = "false";
+	g_bTextEncodingExpanded = "false";
+	g_bDeviceNameExpanded = "false";
+	g_bSoftApSecurityExpanded = "false";
+	g_bWiredConnectionExpanded = "false";
+	g_videoAspectRatioExpanded = "false";
+	setElementVisible("menuLanguageTbl", g_bMenuLanguageExpanded);
+	setElementVisible("textEncodingTbl", g_bTextEncodingExpanded);
+	setElementVisible("deviceNameTbl", g_bDeviceNameExpanded);
+	setElementVisible("softApSecurityTbl", g_bSoftApSecurityExpanded);
+	setElementVisible("wiredConnectionTbl", g_bWiredConnectionExpanded);
+	setElementVisible("videoAspectRatioTbl", g_videoAspectRatioExpanded);
+
+	setupCheckDeviceStatus("WLAN0");
+}
+
+var UNLOCK_TRICK_LIMIT = 7;
+var tapTrickCount = 0;
+function goEngineering()
+{
+	tapTrickCount++;
+	// if (tapTrickCount % UNLOCK_TRICK_LIMIT == 0)
+	if (tapTrickCount >= UNLOCK_TRICK_LIMIT)
+	{
+		self.location.href='engineering_mode.html';
+	}
+}
+</script>
+
+</head>
+<body onload = "prepareDisplayInfo();">
+<div id="title-bar" onClick="self.location.href='remote.html';">
+	<a href="#" id="btn-back"></a>
+</div>
+<div class="remote-bg">
+  <div class="setup-main">
+	<div class="setup-list">
+
+	<div class="setup-g">
+        <a href="#" onclick="gotoSelectAp()">
+		<table class="focus"><tr><td>WiFi Connection</td>
+		<td class="text-mode" id="wlanStatus"></td></tr></table></a>
+	</div>
+
+	<div class="setup-g" id="wirelessWps">
+        <a href="#" onclick="gotoEnableWps()">
+		<table class="focus"><tr><td>WiFi WPS</td>
+		<td class="text-mode" id="wlanWpsStatus"></td></tr></table></a>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus" onclick="checkDeviceNameHidden();"><tr><td>Device Name(SSID)</td>
+		<td class="text-mode" id="deviceName"></td></tr>
+		</table>
+		<table class="edit" id="deviceNameTbl" style="display:inline"><tr><td>
+		<div>
+			<form name="deviceNameForm">
+			<input type="text" name="newDeviceName" class="text-input" onkeypress="return catchEnter('deviceNameForm', event)"></input></br>
+			<img name="device-name" class="button" src="images/ok-btn.png" onClick="setupSetDeviceNameByFormValue(document.forms['deviceNameForm']);"></img>
+			<input type="image" name="device-name" class="button" src="images/cancel-btn.png" onClick="document.deviceNameForm.reset();"></input>
+			</form>
+		</div>
+		</td></tr></table>
+	</div>
+
+	<div class="setup-g" id="softApSecuritySetup">
+		<table class="focus"  onclick="checkSoftApSecurityHidden();"><tr><td>Virtual AP Security</td>
+		<td class="text-mode" id="softApSecurity"></td></tr></table>
+		<table class="edit" id="softApSecurityTbl" style="display:inline"><tr><td>
+		<div class="radio-open">
+		<form name="softApSecurityForm">
+			<input type="radio" name="softApSecurityType" value="Open">Open</input></br>
+			<input type="radio" name="softApSecurityType" value="WPA">WPA</input>
+			<input type="text" name="wpaPassword" class="text-input" onkeypress="return catchEnter('softApSecurityForm', event)"></input>
+		</form>
+		</div>
+		<div>
+			<img name="device-name" class="button" src="images/ok-btn.png" onClick="setupSetSoftApSecurityByFormValue(document.forms['softApSecurityForm']);"></img>
+			<input type="image" name="device-name" class="button" src="images/cancel-btn.png" onClick="document.softApSecurityForm.reset();"></input>
+		</div>
+		</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus" id="wiredConnection" onclick="checkWiredConnectionHidden();">
+			<tr><td>Wired Connection (Fix IP)</td></tr>
+		</table>
+		<table class="edit" id="wiredConnectionTbl" style="display:inline"><tr><td>
+		<div>
+			<form name="wiredFixIpForm" style="display:inline">
+				<table class="edit">
+				<tr><td class="list-right">IP Address</td>
+					<td class="list-left"><input type="number" name="IpAddress1" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="IpAddress2" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="IpAddress3" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="IpAddress4" class="text-input"></input></td>
+				</tr>
+				<tr><td class="list-right">Subnet Mask</td>
+					<td class="list-left"><input type="number" name="SubnetMask1" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="SubnetMask2" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="SubnetMask3" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="SubnetMask4" class="text-input"></input></td>
+				</tr>
+				<tr><td class="list-right">Default Gateway</td>
+					<td class="list-left"><input type="number" name="DefaultGateway1" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DefaultGateway2" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DefaultGateway3" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DefaultGateway4" class="text-input"></input></td>
+				</tr>
+				<tr><td class="list-right">DNS Server IP Address</td>
+					<td class="list-left"><input type="number" name="DnsIpAddress1" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DnsIpAddress2" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DnsIpAddress3" class="text-input"></input></td>
+					<td class="list-left"><input type="number" name="DnsIpAddress4" class="text-input"></input></td>
+				</tr>
+				</table>
+			</form>
+			<input type="image" name="wired-ip" class="button" src="images/ok-btn.png" onClick="setupSetWiredFixIpByFormValue(document.forms['wiredFixIpForm']);"></input>
+			<input type="image" name="wired-ip" class="button" src="images/cancel-btn.png" onClick="document.wiredFixIpForm.reset();"></input>
+		</div>
+		</table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus" onclick="checkMenuLanguageHidden();"><tr><td>Menu Language</td>
+			<td class="text-mode" id="menuLanguage"></td></tr></table>
+		<table class="edit" id="menuLanguageTbl" style="display:inline"><tr><td>
+		</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus" onclick="checkTextEncodingHidden();"><tr><td>Text Encoding</td>
+		<td class="text-mode" id="textEncoding"></td></tr></table>
+		<table class="edit" id="textEncodingTbl" style="display:inline"><tr><td>
+		</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus"><tr><td onclick="setupSetAudioNightMode();">Night Mode(Audio)</td>
+		<td class="text-mode" id="audioNightMode" onclick="setupSetAudioNightMode();"></td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus" onclick="checkVideoAspectRatioHidden();"><tr><td>Aspect Ratio(Video)</td>
+		<td class="text-mode" id="videoAspectRatio"></td></tr></table>
+		<table class="edit" id="videoAspectRatioTbl" style="display:inline"><tr><td>
+		</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus"><tr><td onclick="setupSetVideoZoom();">Scale Video Output to 90%</td>
+		<td class="text-mode" id="videoZoom" onclick="setupSetVideoZoom();"></td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus"><tr><td onclick="setupOnlineUpgradeCheck();">Online Upgrade</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus"><tr><td onclick="setupUsbUpgradeCheck();">USB Upgrade</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="focus"><tr><td onclick="setupResetToDefault();">Reset to Default</td></tr></table>
+	</div>
+
+	<div class="setup-g">
+		<table class="setup-info" id="versionInfo">
+		<tr><td onClick="goEngineering();">Version Info:</td></tr>
+		</table>
+	</div>
+
+	</div>
+  </div>
+
+
+</div>
+</body>
+
+
+
+</html>
+
+
+
+
+

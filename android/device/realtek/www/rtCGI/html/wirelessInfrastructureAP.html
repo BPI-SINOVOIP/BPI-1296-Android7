@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Wireless Infrastructure AP</title>
+</head>
+<script type="text/javascript" src="javascript/util.js"></script>
+<script type="text/javascript">
+
+var gApArray;
+var gApHyperLinkArray;
+var gSSIDArray = new Array();
+var gSecurityStringArray = new Array();
+var gSecurityLevelArray = new Array();
+
+function handleWlanSecurityString()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);		
+			gSecurityLevelArray = retStr.split("\n");
+			getApList();
+		}
+	}	
+}
+
+function getWlanSecurityString()
+{
+	cmdStr = new String();
+
+	cmdStr = "wlanGetSecurityString";
+
+	sendCommand(cmdStr, handleWlanSecurityString);
+}
+
+function handleApList()
+{
+	var apList = new String();
+	var i;
+	var hyperLink;
+	var tmpArray;
+	var dspName;
+
+	if(command_xmlhttp.readyState==4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve AP list from the response text
+			apList = handleResponseText(command_xmlhttp.responseText);
+
+			// ApInfo:
+			// SSID:Security:SignalStrength
+			// Response string:
+			// ApListSize\nReScanAP string\nApInfo-1\nApInfo-2\nApInfo-3.....\nApInfo-x
+
+			// Split AP information into array
+			// gApArray[0] => AP list size
+			// gApArray[1] => Re-Scan AP string
+			// gApArray[2]~gApArray[x] => ApInfo (SSID:Security:Security string:Signal strength)
+
+			// Securty:
+			// WL_SECURITY_OPEN	= 0,
+			// WL_SECURITY_WEP	= 1,
+			// WL_SECURITY_WPA	= 2,
+			// WL_SECURITY_WEP_SHAREKEY = 3,
+			// WL_SECURITY_UNKNOWN	= 4,
+
+			gApArray = apList.split("\n");
+			gApHyperLinkArray = apList.split("\n");
+			for (i = 0; i < gApArray[0]; i++)
+			{
+				tmpArray = gApHyperLinkArray[2+i].split(":");
+				hyperLink = "javascript:connectAp(" + i + ")";
+				dspName = getSSIDDspStr(tmpArray[0]);
+				
+				gSSIDArray[i] = addHyperlinkToText(dspName, hyperLink);
+				gSecurityStringArray[i] = gSecurityLevelArray[tmpArray[1]];
+			}
+
+			if (0 < gApArray[0])
+			{
+				showApListTable(gSSIDArray, gSecurityStringArray);
+			}
+		}
+	}
+}
+
+function connectAp(index)
+{
+	var apInfo = gApArray[2+index].split(":");
+
+	// ApInfo:
+	// SSID:Security:Security string:SignalStrength
+
+	// Go to connect page to connect to wireless AP
+	window.location.assign("wirelessConnect.html?mode=AP&ssid=" + apInfo[0] + "&security=" + apInfo[1]);
+}
+
+function getApList()
+{
+	sendCommand("wlanGetApList", handleApList);
+}
+
+function timeoutHandler()
+{
+	setElementVisible("PromptString", "false");
+}
+
+function showApListTable(SSIDArray, securityStringArray)
+{
+	var i;
+	var tblBody = document.getElementById("ApList");
+	var newRow;
+	var newCellSSID;
+	var newCellSecurityString;
+
+	for (i = 0; i < SSIDArray.length; i++)
+	{
+		newRow = tblBody.insertRow(-1);
+		newCellSSID = newRow.insertCell(0);
+		newCellSSID.innerHTML = SSIDArray[i];
+		newCellSecurityString = newRow.insertCell(1);
+		newCellSecurityString.innerHTML = securityStringArray[i];
+	}
+
+	// A tricky method to fouce browser redraw to avoid ApList table content display issue
+	setElementVisible("PromptString", "false");
+	setTimeout(timeoutHandler, 3000);
+}
+
+function showApList(gApHyperLinkArray)
+{
+	var text = new String();
+	var i;
+
+	for (i = 0; i < gApHyperLinkArray[0]; i++)
+	{
+		text += gApHyperLinkArray[2+i];
+	}
+
+	document.getElementById("ApList").innerHTML = text;
+
+	if (0 < text.length)
+	{
+		setElementVisible("ApList", "true");
+	}
+	else
+	{
+		setElementVisible("ApList", "false");
+	}
+}
+
+function showReScanAp(text)
+{
+	var ele = document.getElementById("ReScanAP");
+	if (ele)
+		ele.innerHTML = text;
+}
+
+function prepareDisplayInfo()
+{
+    hideEleIfMatched("BackToRemoteCtlBtn", WIFISET_ENTRY_MODE, VAL_ENTRY_REMOTE, WIFISET_COOKIE_ENTRY_MODE);
+    
+	getWlanSecurityString();
+	
+	setTitleFontSize("mainArea", "titleArea");
+	/*
+	var heightEle = Math.max( bodyEle.scrollHeight, bodyEle.offsetHeight, 
+               htmlEle.clientHeight, htmlEle.scrollHeight, htmlEle.offsetHeight );
+    */
+}
+
+</script>
+<body id="mainArea" leftmargin="10%" bgcolor="#B8B8B8" onload = "prepareDisplayInfo();">
+<font id="titleArea" color="blue"><p align="center"><cite id="titleTxt">AP List</cite></p></font>
+<input type="button" value="Back" onClick="self.location.href='network.html';"/>
+<input type="button" id="BackToRemoteCtlBtn" value="Remote Control" onClick="self.location.href='index.html';"/>
+<hr width="95%" size="3" color="#939393" align="center"/>
+<center><p style="display:inline" id="PromptString">Please Wait</p></center>
+<center><table border="0"width="70%" style="display:inline" id="ApList"></table></center>
+<hr width="95%" size="3" color="#939393" align="center"/>
+<input type="button" value="Re-Scan AP" onClick="self.location.href='wirelessInfrastructureAP.html';"/>
+<p id="ShowInfo"></p>
+</body>
+</html>

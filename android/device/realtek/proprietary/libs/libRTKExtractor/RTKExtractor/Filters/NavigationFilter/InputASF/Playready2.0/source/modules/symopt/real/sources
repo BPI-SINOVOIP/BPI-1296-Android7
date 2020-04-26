@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmsymoptreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    symoptdevicedevcertreal.c \
+    symoptlacqreal.c          \
+    symoptlicreal.c           \
+    symoptutilreal.c          \
+

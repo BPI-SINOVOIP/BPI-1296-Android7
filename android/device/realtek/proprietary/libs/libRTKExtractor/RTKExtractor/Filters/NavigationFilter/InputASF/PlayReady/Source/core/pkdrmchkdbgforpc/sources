@@ -1,0 +1,10 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=PKDrmChkDbgForPC
+TARGETTYPE=LIBRARY
+
+BUILD_PRODUCES=root_multimedia_PK_WMDRMMD_source_PKDrmChkDbg
+
+SOURCES =              \
+    ..\drmchkdebug.c   \
+

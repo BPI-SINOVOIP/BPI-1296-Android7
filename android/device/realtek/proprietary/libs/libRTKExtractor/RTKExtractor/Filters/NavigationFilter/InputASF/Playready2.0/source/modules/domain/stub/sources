@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdomainstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =           \
+    drmdomainstub.c
+

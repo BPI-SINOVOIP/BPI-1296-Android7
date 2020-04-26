@@ -1,0 +1,305 @@
+#**@@@+++@@@@*********************************************************
+#*
+#* Microsoft PlayReady
+#* Copyright (c) Microsoft Corporation. All rights reserved.
+#*
+#**@@@---@@@@********************************************************/
+
+#**********************************************************************
+#*
+#*
+#* Description:
+#*    Defines options specific to i386 required for compiling/linking
+#*    DRMPK source code
+#*
+#*
+#*********************************************************************/
+
+
+######################################################################
+#
+# Do work for MS internal builds
+#
+######################################################################
+
+#---------------------------------------------------------------------
+# _DRM_BUILD_TOOL is not set when something outside of the PK includes
+# drmbuild.cmn (we know as they missed our project.mk, which would've
+# already ensured _DRM_BUILD_TOOL was set by this point). This *only*
+# happens in MS internal builds.
+#---------------------------------------------------------------------
+!if "$(_DRM_BUILD_TOOL)" == ""
+
+# Don't auto-binplace libs for any code outside of \pk
+DRM_SKIP_COREXT_AUTOBINPLACE=1
+
+!    if "$(DRM_ROOT_PATH)" == "" && defined(BASEDIR)
+DRM_ROOT_PATH=$(BASEDIR)\source\pk\WMDRM-MD^\
+!    endif
+!include "$(DRM_ROOT_PATH)DrmMakefile.def"
+!endif
+
+#---------------------------------------------------------------------
+# _DRM_BUILD_TOOL is set to NMAKE for customer builds.
+#---------------------------------------------------------------------
+!if "$(_DRM_BUILD_TOOL)" != "NMAKE"
+
+!include $(BASEDIR)\source\project.mk
+
+USER_C_FLAGS = $(USER_C_FLAGS) /TP
+!    if "$(PK_CODECOVERAGE_BUILD)" != ""
+_DRM_C_DEFINES = $(_DRM_C_DEFINES) DRM_EXPORT_APIS_TO_DLL=1
+!    endif
+
+!    if "$(_WINCEROOT)" != "" && "$(_PLAYREADY_DRM_DIR)" == ""
+_PLAYREADY_DRM_DIR=$(_WINCEROOT)\private\directx\wmt40\filters\PlayReady
+!    endif
+
+!endif
+
+######################################################################
+#
+# Begin directives needed for all builds (including customer builds).
+#
+######################################################################
+
+#
+# These should really happen in project.mk, but there's a catch: doing so
+# requires any feature flag overrides to happen in project.mk's, never
+# sources files. All such overrides will need to move to project.mk's if
+# sources files are to shared with gnuSources (that implicitly disallows any
+# !includes or !ifs.)
+#
+!include "$(DRM_ROOT_PATH)DrmOverrideFeatureDefaults.mk"
+!include "$(DRM_ROOT_PATH)drmmodules.inc"
+
+#
+# Select OEM libraries (test or regular) depending on support for tests.
+# This logic will be needed for deciding which lib to add to DRM_COMMON_LIBS,
+# and to _DRM_ALL_SOURCE_LIBS
+#
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP60"
+_DRM_OEM_PLATFORM_SUBDIR=wince
+!elseif "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_OEM_PLATFORM_SUBDIR=win32
+!elseif "$(DRM_BUILD_PLATFORM)" == "XBOX"
+_DRM_OEM_PLATFORM_SUBDIR=xbox
+!else
+_DRM_OEM_PLATFORM_SUBDIR=ansi
+!endif
+
+!if "$(DRM_BUILD_PROFILE)" == "PC"
+_DRM_OEM_PLATFORM_TRACE_SUBDIR=securetrace
+!else
+_DRM_OEM_PLATFORM_TRACE_SUBDIR=trace
+!endif
+
+!IF "$(UNICODE)" == ""
+UNICODE=1
+!endif
+
+INCLUDES = $(INCLUDES) \
+    .; \
+    ..; \
+    $(PUBLIC_ROOT)\sdk\include; \
+    $(PUBLIC_ROOT)\sdk\crt\include; \
+    $(_DRM_SOURCE_PATH)inc;                   \
+    $(_DRM_SOURCE_PATH)results;               \
+    $(_DRM_SOURCE_PATH)certs;                 \
+    $(_DRM_SOURCE_PATH)xmr;                   \
+    $(_DRM_SOURCE_PATH)ndtinc;                \
+    $(_DRM_SOURCE_PATH)keyfile;               \
+    $(_DRM_SOURCE_PATH)keyfileformat;         \
+    $(_DRM_SOURCE_PATH)oem\common\inc;        \
+    $(_DRM_SOURCE_PATH)oem\$(_DRM_OEM_PLATFORM_SUBDIR)\inc;   \
+    $(_DRM_SOURCE_PATH)oem\$(_DRM_OEM_PLATFORM_SUBDIR)\$(_DRM_OEM_PLATFORM_TRACE_SUBDIR);
+
+
+!if "$(_WINCEROOT)" != ""
+
+CDEFINES=$(CDEFINES)    \
+    -D_MULTI_THREADING_SUPPORT=1          \
+    -DSET_FREE_MEMORY=1                   \
+    -DDRM_NO_OBFUS=1 \
+    -DDRM_BUILD_PROFILE=500 \
+
+!endif
+
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP60"
+INCLUDES = $(INCLUDES) \
+           $(_PLAYREADY_DRM_DIR)\secure\shared\inc;
+!endif
+
+
+
+
+################################################
+#### Target subdirectories          ############
+################################################
+
+!if "$(DRM_SUPPORT_TEST_SETTINGS)"=="1"
+_DRM_OEM_TEST_OR_REGULAR_LIBS = $(DRM_PK_SOURCE_LIB_PATH)\oem_$(_DRM_OEM_PLATFORM_SUBDIR)_test.lib
+!else
+_DRM_OEM_TEST_OR_REGULAR_LIBS = $(DRM_PK_SOURCE_LIB_PATH)\oem_$(_DRM_OEM_PLATFORM_SUBDIR).lib
+!endif
+
+_DRM_COMMON_LIBS = \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcore.lib             \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmconstants.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\cmdlnpars.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcerts.lib            \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrparser.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrbuilder.lib       \
+    $(DRM_PK_SOURCE_LIB_PATH)\drminitiators.lib       \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmkeyfile.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmkeyfileformat.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_common.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_$(_DRM_OEM_PLATFORM_TRACE_SUBDIR)_$(_DRM_OEM_PLATFORM_SUBDIR).lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oembignum.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemcipher.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemmd5.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oempkcrypto.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemshahmac.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemshahash.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemsha1.lib             \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemsha256.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemcbc.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemdes.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrc4.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsabase.lib          \
+    $(_DRM_OEM_TEST_OR_REGULAR_LIBS)                  \
+    $(DRM_MODULES_LIBS) \
+
+!if "$(_WINCEROOT)" != ""
+_DRM_COMMON_LIBS =                              \
+    $(_DRM_COMMON_LIBS)                         \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrcommon.lib  \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib        \
+    $(_COREDLL)                                 \
+    $(_WININET)                                 \
+
+
+#
+#  The ccf functions are all lumped into one source file.
+#  As a result, any where that drmcbnccfstubs.lib is is used
+#  there may now be dependencies on extra libs.  Define those
+#  libs in _DRM_CCF_LIBS and add _DRM_CCF_LIBS to
+#  _DRM_BLACKBOX_LIBS etc.
+#
+_DRM_CCF_LIBS =                                    \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrparser.lib     \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmmanager.lib       \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcore.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\wmdrmcert.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmdevicedevcert.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcerts.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmmanagerce.lib     \
+
+#
+#  Use the obfuscated version of drmblackbox on Win CE
+#
+
+_DRM_BLACKBOX_LIBS= \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmblackbox_obfus.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_keyfile.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmvbnccfstubs.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmvbnsupport.lib     \
+    $(DRM_PK_SOURCE_LIB_PATH)\eccwbp160.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\eccwbp256.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\robustness.lib        \
+    $(_DRM_CCF_LIBS)                                \
+
+_DRM_BLACKBOX_NOOBFUS_LIBS= \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmblackbox_wb.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmvbnccfstubs.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmccfcore.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmccfwbplain.lib     \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmvbnsupport.lib     \
+    $(DRM_PK_SOURCE_LIB_PATH)\eccwbp160.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\eccwbp256.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\robustness.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcedbgcore.lib      \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcedbgwbplain.lib   \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_keyfile.lib    \
+    $(_DRM_CCF_LIBS)                                \
+
+!elseif "$(DRM_BUILD_PLATFORM)" == "XBOX"
+
+!include $(_DRM_SOURCE_PATH)drmbuild_xbox.cmn
+
+!else
+
+_DRM_BLACKBOX_LIBS= \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmblackbox.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_keyfile.lib         \
+
+_DRM_BLACKBOX_NOOBFUS_LIBS= \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmblackbox.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_keyfile.lib         \
+
+!endif
+
+_DRM_OEM_MAIN_LIB = $(DRM_PK_SOURCE_LIB_PATH)\oemmain_$(_DRM_OEM_PLATFORM_SUBDIR).lib
+
+!if "$(DRM_BUILD_PLATFORM)" == "WIN32"
+_DRM_OEM_MAIN_LIB = $(_DRM_OEM_MAIN_LIB) \
+                    $(SDK_LIB_PATH)\advapi32.lib \
+                    $(SDK_LIB_PATH)\shell32.lib
+!endif
+
+#
+# The following variable used to generated a "roll-up" lib for all of the PK code under "source".
+# This, in turn, is used to create a single DLL for all of this PK code.
+#
+_DRM_ALL_SOURCE_LIBS = \
+    $(DRM_PK_SOURCE_LIB_PATH)\oembignum.lib \
+    $(_DRM_BLACKBOX_LIBS) \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcerts.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmcore.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmdevicedevcert.lib  \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmmanager.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbaseimpl.lib    \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemeccbase.lib        \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppssimpl.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsaoaeppss.lib     \
+    $(DRM_MODULES_LIBS) \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemcipher.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemmd5.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oempkcrypto.lib         \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemshahmac.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemshahash.lib          \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemsha1.lib             \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemsha256.lib           \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemcbc.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemdes.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrc4.lib              \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmtoolscommon.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrparser.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmxmrbuilder.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_common.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemaes.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oemrsabase.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\wmdrmcert.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\ndt.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\ndtmgr.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\ndtasf.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_devstore_dvs.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\ndr.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drminitiators.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmerror.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmkeyfile.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\drmkeyfileformat.lib \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_keyfile.lib \
+    $(_DRM_OEM_TEST_OR_REGULAR_LIBS) \
+    $(DRM_PK_SOURCE_LIB_PATH)\oem_$(_DRM_OEM_PLATFORM_TRACE_SUBDIR)_$(_DRM_OEM_PLATFORM_SUBDIR).lib
+
+#
+# Pick up .libs specific to the platform being built
+#
+
+!if "$(DRM_BUILD_PLATFORM)" == "WMSP60"
+_DRM_ALL_SOURCE_LIBS = \
+     $(_DRM_ALL_SOURCE_LIBS)            \
+     $(DRM_PK_SOURCE_LIB_PATH)\DRMManagerCe.lib
+!endif
+

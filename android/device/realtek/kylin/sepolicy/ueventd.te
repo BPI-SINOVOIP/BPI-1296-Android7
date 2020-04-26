@@ -1,0 +1,22 @@
+# For Realtek ueventd daemon
+allow ueventd self:capability { sys_rawio mknod };
+# Android N don't allow properties_device:file { write append };
+#allow ueventd properties_device:file rw_file_perms; # Original for Android L
+allow ueventd properties_device:file {r_file_perms open lock };
+allow ueventd tmpfs:file rw_file_perms;
+allow ueventd tmpfs:dir rw_dir_perms;
+allow ueventd null_device:chr_file { create unlink };
+allow ueventd klog_device:chr_file { create unlink };
+allow ueventd device:chr_file rw_file_perms;
+#allow ueventd block_device:blk_file { open read create write };
+allow ueventd null_read_device:chr_file { create rw_file_perms unlink };
+allow ueventd tmpfs:chr_file { create rw_file_perms setattr };
+# For /dev/block
+allow ueventd block_device:dir { create rw_dir_perms };
+# For /dev/xxxx
+allow ueventd device:dir { create rw_dir_perms };
+# For /dev/ttySx
+allow ueventd serial_device:dir { create rw_dir_perms };
+allow ueventd usb_device:chr_file { relabelfrom relabelto };
+allow ueventd video_device:chr_file { relabelfrom relabelto };
+allow ueventd audio_device:chr_file { relabelfrom relabelto };

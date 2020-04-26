@@ -1,0 +1,7 @@
+DIRS = \
+    PKDrmChkDbgForPC     \
+    daytona              \
+    PKUtilsForPCTest     \
+    PKCoreNoCertCache    \
+    PKCoreFakeCertCache  \
+    PKCoreXMLBuilderLite \

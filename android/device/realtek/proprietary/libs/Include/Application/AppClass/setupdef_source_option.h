@@ -1,0 +1,20 @@
+#ifndef __SETUP_DEF_SOURCE_OPTION_
+#define __SETUP_DEF_SOURCE_OPTION_
+
+typedef enum {
+    SOURCE_Tuner 	= 0,	// SOURCE_CVBS0
+    SOURCE_CVBS1 	= 1,
+	SOURCE_CVBS2 	= 2,
+    SOURCE_SVIDEO0 	= 3,
+	SOURCE_SVIDEO1 	= 4,
+    SOURCE_YPbPr0	= 5,
+	SOURCE_YPbPr1	= 6,
+	SOURCE_SCART	= 7,
+	SOURCE_DV   	= 8,
+	SOURCE_PAYTV	= 9,
+	SOURCE_DTV		= 10,
+	SOURCE_HDMI		= 11,
+	SOURCE_MAX_NUM	= 12
+} SourceOption;
+
+#endif

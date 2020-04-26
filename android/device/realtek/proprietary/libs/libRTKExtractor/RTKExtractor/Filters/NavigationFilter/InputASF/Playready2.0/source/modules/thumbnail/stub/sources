@@ -1,0 +1,8 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmthumbnailstub
+TARGETTYPE=LIBRARY
+
+SOURCES =               \
+    thumbnailutilstub.c \
+

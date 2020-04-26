@@ -1,0 +1,1268 @@
+# includes
+REFCODE_INC        = ./inc
+!IF "$(_DRM_CRYPTO_DIR)" == ""
+_DRM_CRYPTO_DIR    = crypto
+!ENDIF
+CRYPTO_INC         = $(_DRM_CRYPTO_DIR)/bignum
+TOOLS_INC          = ./tools/common
+
+DRM_TOOLS_DIR      = tools
+DRM_TEST_DIR       = test
+
+HEADERS            = $(REFCODE_INC)/*
+CRYPTO_HEADERS     = $(CRYPTO_INC)/*.h
+
+MAKEFILES          = makefile.msc makefile.cmn
+
+CRYPTO_LIBS = \
+	$(BINDIR)/drmcrypto.$(LIBEXT)  \
+	$(BINDIR)/drmbignum.$(LIBEXT)  \
+	$(BINDIR)/drmpkcrypto.$(LIBEXT)
+
+
+#####################################################################
+#        BIGNUM PROJECT
+#####################################################################
+
+DRM_BGN_DIR = $(_DRM_CRYPTO_DIR)/bignum
+
+BGN_OBJ  = $(DRM_BGN_DIR)/$(OBJDIR)
+BGN_LIB  = $(BINDIR)/drmbignum.$(LIBEXT)
+
+BGN_OBJS = \
+	$(BGN_OBJ)/bigerrno.$(OBJEXT)		\
+	$(BGN_OBJ)/bignum.$(OBJEXT)		\
+	$(BGN_OBJ)/divide.$(OBJEXT)		\
+	$(BGN_OBJ)/ecex2001.$(OBJEXT)		\
+	$(BGN_OBJ)/ecexpon.$(OBJEXT)		\
+	$(BGN_OBJ)/ecppq.$(OBJEXT)		\
+	$(BGN_OBJ)/ecurve.$(OBJEXT)		\
+	$(BGN_OBJ)/field.$(OBJEXT)		\
+	$(BGN_OBJ)/kdiv.$(OBJEXT)		\
+	$(BGN_OBJ)/kinitpr.$(OBJEXT)		\
+	$(BGN_OBJ)/kinvert.$(OBJEXT)		\
+	$(BGN_OBJ)/kmuladd.$(OBJEXT)		\
+	$(BGN_OBJ)/lucas.$(OBJEXT)		\
+	$(BGN_OBJ)/modexp.$(OBJEXT)		\
+	$(BGN_OBJ)/modmulch1.$(OBJEXT)		\
+	$(BGN_OBJ)/modsqrt.$(OBJEXT)		\
+	$(BGN_OBJ)/modular.$(OBJEXT)		\
+	$(BGN_OBJ)/mpaddsubcmp.$(OBJEXT)	\
+	$(BGN_OBJ)/mpalloc.$(OBJEXT)		\
+	$(BGN_OBJ)/mpgcdex.$(OBJEXT)		\
+	$(BGN_OBJ)/mpinit.$(OBJEXT)		\
+	$(BGN_OBJ)/mpmul22.$(OBJEXT)		\
+	$(BGN_OBJ)/mprand.$(OBJEXT)		\
+	$(BGN_OBJ)/multlow.$(OBJEXT)
+
+$(BGN_OBJS) : $(CRYPTO_HEADERS) $(MAKEFILES)
+
+$(BGN_OBJ)/bigerrno.$(OBJEXT) : $(DRM_BGN_DIR)/bigerrno.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/bigerrno.c $(OBJOUT)$@
+
+$(BGN_OBJ)/bignum.$(OBJEXT) : $(DRM_BGN_DIR)/bignum.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/bignum.c $(OBJOUT)$@
+
+$(BGN_OBJ)/divide.$(OBJEXT) : $(DRM_BGN_DIR)/divide.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/divide.c $(OBJOUT)$@
+
+$(BGN_OBJ)/ecex2001.$(OBJEXT) : $(DRM_BGN_DIR)/ecex2001.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/ecex2001.c $(OBJOUT)$@
+
+$(BGN_OBJ)/ecexpon.$(OBJEXT) : $(DRM_BGN_DIR)/ecexpon.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/ecexpon.c $(OBJOUT)$@
+
+$(BGN_OBJ)/ecppq.$(OBJEXT) : $(DRM_BGN_DIR)/ecppq.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/ecppq.c $(OBJOUT)$@
+
+$(BGN_OBJ)/ecurve.$(OBJEXT) : $(DRM_BGN_DIR)/ecurve.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/ecurve.c $(OBJOUT)$@
+
+$(BGN_OBJ)/field.$(OBJEXT) : $(DRM_BGN_DIR)/field.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/field.c $(OBJOUT)$@
+
+$(BGN_OBJ)/kdiv.$(OBJEXT) : $(DRM_BGN_DIR)/kdiv.c 
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/kdiv.c $(OBJOUT)$@
+
+$(BGN_OBJ)/kinitpr.$(OBJEXT) : $(DRM_BGN_DIR)/kinitpr.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/kinitpr.c $(OBJOUT)$@
+
+$(BGN_OBJ)/kinvert.$(OBJEXT) : $(DRM_BGN_DIR)/kinvert.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/kinvert.c $(OBJOUT)$@
+
+$(BGN_OBJ)/kmuladd.$(OBJEXT) : $(DRM_BGN_DIR)/kmuladd.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/kmuladd.c $(OBJOUT)$@
+
+$(BGN_OBJ)/lucas.$(OBJEXT) : $(DRM_BGN_DIR)/lucas.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/lucas.c $(OBJOUT)$@
+
+$(BGN_OBJ)/modexp.$(OBJEXT) : $(DRM_BGN_DIR)/modexp.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/modexp.c $(OBJOUT)$@
+
+$(BGN_OBJ)/modmulch1.$(OBJEXT) : $(DRM_BGN_DIR)/modmulch1.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/modmulch1.c $(OBJOUT)$@
+
+$(BGN_OBJ)/modsqrt.$(OBJEXT) : $(DRM_BGN_DIR)/modsqrt.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/modsqrt.c $(OBJOUT)$@
+
+$(BGN_OBJ)/modular.$(OBJEXT) : $(DRM_BGN_DIR)/modular.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/modular.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mpaddsubcmp.$(OBJEXT) : $(DRM_BGN_DIR)/mpaddsubcmp.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mpaddsubcmp.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mpalloc.$(OBJEXT) : $(DRM_BGN_DIR)/mpalloc.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mpalloc.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mpgcdex.$(OBJEXT) : $(DRM_BGN_DIR)/mpgcdex.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mpgcdex.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mpinit.$(OBJEXT) : $(DRM_BGN_DIR)/mpinit.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mpinit.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mpmul22.$(OBJEXT) : $(DRM_BGN_DIR)/mpmul22.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mpmul22.c $(OBJOUT)$@
+
+$(BGN_OBJ)/mprand.$(OBJEXT) : $(DRM_BGN_DIR)/mprand.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/mprand.c $(OBJOUT)$@
+
+$(BGN_OBJ)/multlow.$(OBJEXT) : $(DRM_BGN_DIR)/multlow.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BGN_DIR)/multlow.c $(OBJOUT)$@
+
+$(BGN_LIB) : $(BGN_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+#####################################################################
+#        PKCRYPTO PROJECT
+#####################################################################
+
+DRM_PKC_DIR = $(_DRM_CRYPTO_DIR)/pkcrypto	
+
+PKC_OBJ  = $(DRM_PKC_DIR)/$(OBJDIR)
+PKC_LIB  = $(BINDIR)/drmpkcrypto.$(LIBEXT)
+PKC_OBJS = \
+	$(PKC_OBJ)/pkcrypto.$(OBJEXT)		\
+
+$(PKC_OBJS) : $(CRYPTO_HEADERS) $(MAKEFILES)
+
+$(PKC_OBJ)/pkcrypto.$(OBJEXT) : $(DRM_PKC_DIR)/pkcrypto.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PKC_DIR)/pkcrypto.c $(OBJOUT)$@
+
+$(PKC_LIB) : $(PKC_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+#####################################################################
+#        DRMCRYPTO PROJECT
+#####################################################################
+
+DRM_DRC_DIR = $(_DRM_CRYPTO_DIR)/drmcrypto	
+
+DRC_OBJ  = $(DRM_DRC_DIR)/$(OBJDIR)
+DRC_LIB  = $(BINDIR)/drmcrypto.$(LIBEXT)
+DRC_OBJS = \
+	$(DRC_OBJ)/deskey.$(OBJEXT)		\
+	$(DRC_OBJ)/rc4.$(OBJEXT)		
+
+$(DRC_OBJS) : $(CRYPTO_HEADERS) $(MAKEFILES)
+
+$(DRC_OBJ)/deskey.$(OBJEXT) : $(DRM_DRC_DIR)/deskey.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_DRC_DIR)/deskey.c $(OBJOUT)$@
+
+$(DRC_OBJ)/rc4.$(OBJEXT) : $(DRM_DRC_DIR)/rc4.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_DRC_DIR)/rc4.c $(OBJOUT)$@
+
+$(DRC_LIB) : $(DRC_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+#####################################################################
+#        OEM PROJECT
+#####################################################################
+
+DRM_OEM_DIR	= oem/ansi
+
+OEM_OBJ  = $(DRM_OEM_DIR)/$(OBJDIR)
+OEM_LIB  = $(BINDIR)/oem_ansi.$(LIBEXT)
+OEM_OBJS = \
+	$(OEM_OBJ)/oemcriticalsection.$(OBJEXT)		\
+	$(OEM_OBJ)/oemfileio.$(OBJEXT)			\
+	$(OEM_OBJ)/oemimpl.$(OBJEXT)			\
+	$(OEM_OBJ)/oeminfo.$(OBJEXT)			\
+	$(OEM_OBJ)/oemtime.$(OBJEXT)			\
+    	$(OEM_OBJ)/DrmRsa.$(OBJEXT) \
+    	$(OEM_OBJ)/rsaimpl.$(OBJEXT) 
+
+$(OEM_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(OEM_OBJ)/oemcriticalsection.$(OBJEXT) : $(DRM_OEM_DIR)/oemcriticalsection.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/oemcriticalsection.c $(OBJOUT)$@
+
+$(OEM_OBJ)/oemfileio.$(OBJEXT) : $(DRM_OEM_DIR)/oemfileio.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/oemfileio.c $(OBJOUT)$@
+
+$(OEM_OBJ)/oemimpl.$(OBJEXT) : $(DRM_OEM_DIR)/oemimpl.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/oemimpl.c $(OBJOUT)$@
+
+$(OEM_OBJ)/oeminfo.$(OBJEXT) : $(DRM_OEM_DIR)/oeminfo.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/oeminfo.c $(OBJOUT)$@
+
+$(OEM_OBJ)/oemtime.$(OBJEXT) : $(DRM_OEM_DIR)/oemtime.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/oemtime.c $(OBJOUT)$@
+
+#RSA
+$(OEM_OBJ)/DrmRsa.$(OBJEXT) : $(DRM_OEM_DIR)/rsa/DrmRsa.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/rsa/DrmRsa.c $(OBJOUT)$@
+
+$(OEM_OBJ)/rsaimpl.$(OBJEXT) : $(DRM_OEM_DIR)/rsa/rsaimpl.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_OEM_DIR)/rsa/rsaimpl.c $(OBJOUT)$@
+
+
+$(OEM_LIB) : $(OEM_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+#####################################################################
+#        CORE PROJECT
+#####################################################################
+
+DRM_COR_DIR = core
+
+COR_OBJ  = $(DRM_COR_DIR)/$(OBJDIR)
+COR_LIB  = $(BINDIR)/drmcore.$(LIBEXT)
+COR_OBJS = \
+	$(COR_OBJ)/drmbase64.$(OBJEXT)			\
+	$(COR_OBJ)/drmbytemanip.$(OBJEXT)               \
+	$(COR_OBJ)/drmcbc.$(OBJEXT)			\
+	$(COR_OBJ)/drmchain.$(OBJEXT)			\
+	$(COR_OBJ)/drmcipher.$(OBJEXT)			\
+	$(COR_OBJ)/drmcleanstore.$(OBJEXT)		\
+	$(COR_OBJ)/drmconstants.$(OBJEXT)		\
+	$(COR_OBJ)/drmcrt.$(OBJEXT)			\
+	$(COR_OBJ)/drmdebug.$(OBJEXT)			\
+	$(COR_OBJ)/drmexpreval.$(OBJEXT)		\
+	$(COR_OBJ)/drmexprfunc.$(OBJEXT)		\
+	$(COR_OBJ)/drmexprvariable.$(OBJEXT)		\
+	$(COR_OBJ)/drmhdrbuilder.$(OBJEXT)		\
+	$(COR_OBJ)/drmhdrparser.$(OBJEXT)		\
+	$(COR_OBJ)/drmhds.$(OBJEXT)			\
+	$(COR_OBJ)/drmhmac.$(OBJEXT)			\
+	$(COR_OBJ)/drmint64.$(OBJEXT)			\
+	$(COR_OBJ)/drmkeygen.$(OBJEXT)			\
+	$(COR_OBJ)/drmlicacqreq.$(OBJEXT)		\
+	$(COR_OBJ)/drmlicacqresp.$(OBJEXT)		\
+	$(COR_OBJ)/drmliceval.$(OBJEXT)			\
+	$(COR_OBJ)/drmlicparser.$(OBJEXT)		\
+	$(COR_OBJ)/drmlicstore.$(OBJEXT)		\
+	$(COR_OBJ)/drmmd5.$(OBJEXT)			\
+	$(COR_OBJ)/drmoutputlevels.$(OBJEXT)		\
+	$(COR_OBJ)/drmprofile.$(OBJEXT)		    	\
+	$(COR_OBJ)/drmsecstore.$(OBJEXT)		\
+	$(COR_OBJ)/drmsha1.$(OBJEXT)			\
+	$(COR_OBJ)/drmstkalloc.$(OBJEXT)		\
+	$(COR_OBJ)/drmutilities.$(OBJEXT)		\
+	$(COR_OBJ)/drmviewrights.$(OBJEXT)		\
+	$(COR_OBJ)/drmxmlbuilder.$(OBJEXT)		\
+	$(COR_OBJ)/drmxmlutilities.$(OBJEXT)		\
+	$(COR_OBJ)/drmrevocation.$(OBJEXT)		\
+	$(COR_OBJ)/drmxmlparser.$(OBJEXT)		\
+	$(COR_OBJ)/drmrsaex.$(OBJEXT)			\
+	$(COR_OBJ)/drmdevicestore.$(OBJEXT)
+
+
+$(COR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(COR_OBJ)/drmbase64.$(OBJEXT) : $(DRM_COR_DIR)/drmbase64.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmbase64.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmbytemanip.$(OBJEXT) : $(DRM_COR_DIR)/drmbytemanip.c
+    $(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmbytemanip.c $(OBJOUT)$@
+    
+$(COR_OBJ)/drmcbc.$(OBJEXT) : $(DRM_COR_DIR)/drmcbc.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmcbc.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmchain.$(OBJEXT) : $(DRM_COR_DIR)/drmchain.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmchain.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmcipher.$(OBJEXT) : $(DRM_COR_DIR)/drmcipher.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmcipher.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmcleanstore.$(OBJEXT) : $(DRM_COR_DIR)/drmcleanstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmcleanstore.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmconstants.$(OBJEXT) : $(DRM_COR_DIR)/drmconstants.c 
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmconstants.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmcrt.$(OBJEXT) : $(DRM_COR_DIR)/drmcrt.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmcrt.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmdebug.$(OBJEXT) : $(DRM_COR_DIR)/drmdebug.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmdebug.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmexpreval.$(OBJEXT) : $(DRM_COR_DIR)/drmexpreval.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmexpreval.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmexprfunc.$(OBJEXT) : $(DRM_COR_DIR)/drmexprfunc.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmexprfunc.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmexprvariable.$(OBJEXT) : $(DRM_COR_DIR)/drmexprvariable.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmexprvariable.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmhdrbuilder.$(OBJEXT) : $(DRM_COR_DIR)/drmhdrbuilder.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmhdrbuilder.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmhdrparser.$(OBJEXT) : $(DRM_COR_DIR)/drmhdrparser.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmhdrparser.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmhds.$(OBJEXT) : $(DRM_COR_DIR)/drmhds.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmhds.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmhmac.$(OBJEXT) : $(DRM_COR_DIR)/drmhmac.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmhmac.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmint64.$(OBJEXT) : $(DRM_COR_DIR)/drmint64.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmint64.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmkeygen.$(OBJEXT) : $(DRM_COR_DIR)/drmkeygen.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmkeygen.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmlicacqreq.$(OBJEXT) : $(DRM_COR_DIR)/drmlicacqreq.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmlicacqreq.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmlicacqresp.$(OBJEXT) : $(DRM_COR_DIR)/drmlicacqresp.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmlicacqresp.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmliceval.$(OBJEXT) : $(DRM_COR_DIR)/drmliceval.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmliceval.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmlicparser.$(OBJEXT) : $(DRM_COR_DIR)/drmlicparser.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmlicparser.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmlicstore.$(OBJEXT) : $(DRM_COR_DIR)/drmlicstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmlicstore.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmmd5.$(OBJEXT) : $(DRM_COR_DIR)/drmmd5.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmmd5.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmoutputlevels.$(OBJEXT) : $(DRM_COR_DIR)/drmoutputlevels.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmoutputlevels.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmprofile.$(OBJEXT) : $(DRM_COR_DIR)/drmprofile.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmprofile.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmrevocation.$(OBJEXT) : $(DRM_COR_DIR)/drmrevocation.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmrevocation.c $(OBJOUT)$@
+$(COR_OBJ)/drmsecstore.$(OBJEXT) : $(DRM_COR_DIR)/drmsecstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmsecstore.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmsha1.$(OBJEXT) : $(DRM_COR_DIR)/drmsha1.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmsha1.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmstkalloc.$(OBJEXT) : $(DRM_COR_DIR)/drmstkalloc.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmstkalloc.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmutilities.$(OBJEXT) : $(DRM_COR_DIR)/drmutilities.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmutilities.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmviewrights.$(OBJEXT) : $(DRM_COR_DIR)/drmviewrights.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmviewrights.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmxmlbuilder.$(OBJEXT) : $(DRM_COR_DIR)/drmxmlbuilder.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmxmlbuilder.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmxmlparser.$(OBJEXT) : $(DRM_COR_DIR)/drmxmlparser.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmxmlparser.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmxmlutilities.$(OBJEXT) : $(DRM_COR_DIR)/drmxmlutilities.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmxmlutilities.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmrsaex.$(OBJEXT) : $(DRM_COR_DIR)/drmrsaex.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmrsaex.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmcertparser.$(OBJEXT) : $(DRM_COR_DIR)/drmcertparser.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmcertparser.c $(OBJOUT)$@
+
+$(COR_OBJ)/drmdevicestore.$(OBJEXT) : $(DRM_COR_DIR)/drmdevicestore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_COR_DIR)/drmdevicestore.c $(OBJOUT)$@
+
+$(COR_LIB) : $(COR_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+
+#####################################################################
+#        BLACKBOX PROJECT
+#####################################################################
+
+DRM_BBX_DIR = blackbox
+
+BBX_OBJ  = $(DRM_BBX_DIR)/$(OBJDIR)
+BBX_LIB  = $(BINDIR)/drmblackbox.$(LIBEXT)
+BBX_OBJS = \
+	$(BBX_OBJ)/blackbox.$(OBJEXT)		\
+
+$(BBX_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(BBX_OBJ)/blackbox.$(OBJEXT) : $(DRM_BBX_DIR)/blackbox.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_BBX_DIR)/blackbox.c $(OBJOUT)$@
+
+$(BBX_LIB) : $(BBX_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#        CMDPRSR PROJECT
+#####################################################################
+
+DRM_CMD_DIR = cmdlnpars
+
+CMD_OBJ  = $(DRM_CMD_DIR)/$(OBJDIR)
+CMD_LIB  = $(BINDIR)/cmdlnpars.$(LIBEXT)
+CMD_OBJS = $(CMD_OBJ)/cmdlnpars.$(OBJEXT)
+
+$(CMD_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(CMD_OBJ)/cmdlnpars.$(OBJEXT) : $(DRM_CMD_DIR)/cmdlnpars.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_CMD_DIR)/cmdlnpars.c $(OBJOUT)$@
+
+$(CMD_LIB) : $(CMD_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+#####################################################################
+#        DRM MANAGER PROJECT
+#####################################################################
+
+DRM_MGR_DIR	= drmmanager
+
+MGR_OBJ  = $(DRM_MGR_DIR)/$(OBJDIR)
+MGR_LIB  = $(BINDIR)/drmmanager.$(LIBEXT)
+MGR_OBJS = $(MGR_OBJ)/drmmanager.$(OBJEXT)
+
+$(MGR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(MGR_OBJ)/drmmanager.$(OBJEXT) : $(DRM_MGR_DIR)/drmmanager.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_MGR_DIR)/drmmanager.c $(OBJOUT)$@
+
+$(MGR_LIB) : $(MGR_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+#####################################################################
+#        DEVICE DEVCERT (NON-INDIV) PROJECT
+#####################################################################
+DRM_DDC_DIR	= devicedevcert
+
+DDC_OBJ  = $(DRM_DDC_DIR)/$(OBJDIR)
+DDC_LIB  = $(BINDIR)/drmdevicedevcert.$(LIBEXT)
+DDC_OBJS = $(DDC_OBJ)/devicedevcert.$(OBJEXT)
+
+$(DDC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(DDC_OBJ)/devicedevcert.$(OBJEXT) : $(DRM_DDC_DIR)/devicedevcert.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_DDC_DIR)/devicedevcert.c $(OBJOUT)$@
+
+$(DDC_LIB) : $(DDC_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#        DEVCERT PARSER PROJECT
+#####################################################################
+
+DRM_DCP_DIR = devcertparser
+
+DCP_OBJ  = $(DRM_DCP_DIR)/$(OBJDIR)
+DCP_LIB  = $(BINDIR)/drmdevcert.$(LIBEXT)
+DCP_OBJS = $(DCP_OBJ)/devcert.$(OBJEXT)
+
+$(DCP_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(DCP_OBJ)/devcert.$(OBJEXT) : $(DRM_DCP_DIR)/devcert.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_DCP_DIR)/devcert.c $(OBJOUT)$@
+
+$(DCP_LIB) : $(DCP_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#        METERING PROJECT
+#####################################################################
+DRM_MTR_DIR = metering
+
+
+MTR_OBJ  = $(DRM_MTR_DIR)/$(OBJDIR)
+MTR_LIB  = $(BINDIR)/drmmetering.$(LIBEXT)
+MTR_OBJS = \
+	$(MTR_OBJ)/drmmetering.$(OBJEXT)	\
+	$(MTR_OBJ)/drmmgrmeter.$(OBJEXT)
+
+$(MTR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(MTR_OBJ)/drmmetering.$(OBJEXT) : $(DRM_MTR_DIR)/drmmetering.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_MTR_DIR)/drmmetering.c $(OBJOUT)$@
+
+$(MTR_OBJ)/drmmgrmeter.$(OBJEXT) : $(DRM_MTR_DIR)/drmmgrmeter.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_MTR_DIR)/drmmgrmeter.c $(OBJOUT)$@
+
+$(MTR_LIB) : $(MTR_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#        SECURE CLOCK PROJECT
+#####################################################################
+DRM_SCK_DIR	= secure_clock
+
+SCK_OBJ  = $(DRM_SCK_DIR)/$(OBJDIR)
+SCK_LIB  = $(BINDIR)/drmsecureclock.$(LIBEXT)
+SCK_OBJS = \
+	$(SCK_OBJ)/secureclockrequest.$(OBJEXT)	\
+	$(SCK_OBJ)/secureclockresponse.$(OBJEXT)
+
+$(SCK_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(SCK_OBJ)/secureclockrequest.$(OBJEXT) : $(DRM_SCK_DIR)/secureclockrequest.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SCK_DIR)/secureclockrequest.c $(OBJOUT)$@
+
+$(SCK_OBJ)/secureclockresponse.$(OBJEXT) : $(DRM_SCK_DIR)/secureclockresponse.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SCK_DIR)/secureclockresponse.c $(OBJOUT)$@
+
+$(SCK_LIB) : $(SCK_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+#####################################################################
+#        SYNCLIST PROJECT
+#####################################################################
+DRM_SYN_DIR = synclist
+
+SYN_OBJ  = $(DRM_SYN_DIR)/$(OBJDIR)
+SYN_LIB  = $(BINDIR)/drmsynclist.$(LIBEXT)
+SYN_OBJS = \
+	$(SYN_OBJ)/drmgensyncchallenge.$(OBJEXT)	\
+	$(SYN_OBJ)/drmsyncstore.$(OBJEXT)
+
+$(SYN_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(SYN_OBJ)/drmgensyncchallenge.$(OBJEXT) : $(DRM_SYN_DIR)/drmgensyncchallenge.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SYN_DIR)/drmgensyncchallenge.c $(OBJOUT)$@
+
+$(SYN_OBJ)/drmsyncstore.$(OBJEXT) : $(DRM_SYN_DIR)/drmsyncstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SYN_DIR)/drmsyncstore.c $(OBJOUT)$@
+
+$(SYN_LIB) : $(SYN_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#                      WMDRMCERT PROJECT
+#####################################################################
+DRM_WMC_DIR = wmdrmcert
+
+WMC_OBJ  = $(DRM_WMC_DIR)/$(OBJDIR)
+WMC_LIB  = $(BINDIR)/wmdrmcert.$(LIBEXT)
+WMC_OBJS = \
+	$(WMC_OBJ)/drmcertparser.$(OBJEXT)
+
+$(WMC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(WMC_OBJ)/drmcertparser.$(OBJEXT) : $(DRM_WMC_DIR)/certparser/drmcertparser.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_WMC_DIR)/certparser/drmcertparser.c $(OBJOUT)$@
+
+$(WMC_LIB) : $(WMC_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+
+#####################################################################
+#        TOOLS COMMON PROJECT
+#####################################################################
+
+DRM_TCM_DIR = $(DRM_TOOLS_DIR)/common
+
+TCM_OBJ  = $(DRM_TCM_DIR)/$(OBJDIR)
+TCM_LIB  = $(BINDIR)/drmtoolscommon.$(LIBEXT)
+TCM_OBJS = \
+	$(TCM_OBJ)/drmtoolsconstants.$(OBJEXT)	\
+	$(TCM_OBJ)/drmtoolsutils.$(OBJEXT)
+
+$(TCM_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(TCM_OBJ)/drmtoolsconstants.$(OBJEXT) : $(DRM_TCM_DIR)/drmtoolsconstants.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_TCM_DIR)/drmtoolsconstants.c $(OBJOUT)$@
+
+$(TCM_OBJ)/drmtoolsutils.$(OBJEXT) : $(DRM_TCM_DIR)/drmtoolsutils.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_TCM_DIR)/drmtoolsutils.c $(OBJOUT)$@
+
+$(TCM_LIB) : $(TCM_OBJS)
+	$(CLIB) $(LIBFLAGS) $(LIBOUT)$@ $**
+
+
+#####################################################################
+#        CHKHDS TOOL PROJECT
+#####################################################################
+
+DRM_HDS_DIR	= $(DRM_TOOLS_DIR)/chkhds
+
+HDS_OBJ  = $(DRM_HDS_DIR)/$(OBJDIR)
+HDS_EXE  = $(BINDIR)/chkhds.$(EXEEXT)
+HDS_OBJS = $(HDS_OBJ)/chkhds.$(OBJEXT)
+
+$(HDS_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(HDS_OBJ)/chkhds.$(OBJEXT) : $(DRM_HDS_DIR)/chkhds.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_HDS_DIR)/chkhds.c $(OBJOUT)$@
+
+$(HDS_EXE) :	\
+	$(HDS_OBJS)	\
+	$(OEM_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)      \
+	$(BBX_LIB)	\
+	$(CRYPTO_LIBS)
+	@echo Linking tool $@...
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+####################################################################
+#        CLEANUP STORE TOOL PROJECT
+#####################################################################
+
+DRM_CUS_DIR	= $(DRM_TOOLS_DIR)/license/licensecleanstore
+
+CUS_OBJ  = $(DRM_CUS_DIR)/$(OBJDIR)
+CUS_EXE  = $(BINDIR)/licensecleanstore.$(EXEEXT)
+CUS_OBJS = $(CUS_OBJ)/licensecleanstore.$(OBJEXT)
+
+$(CUS_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(CUS_OBJ)/licensecleanstore.$(OBJEXT) : $(DRM_CUS_DIR)/licensecleanstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_CUS_DIR)/licensecleanstore.c $(OBJOUT)$@
+
+$(CUS_EXE) :	\
+	$(CUS_OBJS)	\
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	\
+	$(BBX_LIB)	\
+	$(MGR_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(CMD_LIB)	\
+	$(WMC_LIB)	\
+	$(COR_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        DRMPKG TOOL PROJECT
+#####################################################################
+
+DRM_PKG_DIR	= $(DRM_TOOLS_DIR)/package/drmpackage
+
+PKG_OBJ  = $(DRM_PKG_DIR)/$(OBJDIR)
+PKG_EXE  = $(BINDIR)/package.$(EXEEXT)
+PKG_OBJS = $(PKG_OBJ)/drmpkg.$(OBJEXT)
+
+$(PKG_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(PKG_OBJ)/drmpkg.$(OBJEXT) : $(DRM_PKG_DIR)/drmpkg.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PKG_DIR)/drmpkg.c $(OBJOUT)$@
+
+$(PKG_EXE) :	\
+	$(PKG_OBJS)	\
+	$(CRYPTO_LIBS)	\
+	$(MGR_LIB)	\
+	$(BBX_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(OEM_LIB)	\
+	$(COR_LIB)	\
+	$(TCM_LIB)	\
+	$(WMC_LIB)	\
+	$(CMD_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENCHALLENGE TOOL PROJECT
+#####################################################################
+
+DRM_GCL_DIR	= $(DRM_TOOLS_DIR)/license/licensegeneratechallenge
+
+GCL_OBJ  = $(DRM_GCL_DIR)/$(OBJDIR)
+GCL_EXE  = $(BINDIR)/licensegeneratechallenge.$(EXEEXT)
+GCL_OBJS = $(GCL_OBJ)/licensegeneratechallenge.$(OBJEXT)
+
+$(GCL_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GCL_OBJ)/licensegeneratechallenge.$(OBJEXT) : $(DRM_GCL_DIR)/licensegeneratechallenge.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GCL_DIR)/licensegeneratechallenge.c $(OBJOUT)$@
+
+$(GCL_EXE) :	\
+	$(GCL_OBJS)	\
+	$(CRYPTO_LIBS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(MGR_LIB)	\
+	$(WMC_LIB)	\
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+
+#####################################################################
+#        LICDUMP TOOL PROJECT
+#####################################################################
+
+DRM_LCD_DIR	= $(DRM_TOOLS_DIR)/license/licenseviewstore
+
+LCD_OBJ  = $(DRM_LCD_DIR)/$(OBJDIR)
+LCD_EXE  = $(BINDIR)/licenseviewstore.$(EXEEXT)
+LCD_OBJS = $(LCD_OBJ)/licenseviewstore.$(OBJEXT)
+
+$(LCD_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(LCD_OBJ)/licenseviewstore.$(OBJEXT) : $(DRM_LCD_DIR)/licenseviewstore.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_LCD_DIR)/licenseviewstore.c $(OBJOUT)$@
+
+$(LCD_EXE) :	\
+	$(LCD_OBJS)	\
+	$(BBX_LIB)	\
+	$(COR_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	\
+	$(WMC_LIB)	\
+	$(CMD_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        PKGINIT TOOL PROJECT
+#####################################################################
+
+DRM_PKI_DIR	= $(DRM_TOOLS_DIR)/package/packageinit
+
+PKI_OBJ  = $(DRM_PKI_DIR)/$(OBJDIR)
+PKI_EXE  = $(BINDIR)/packageinit.$(EXEEXT)
+PKI_OBJS = $(PKI_OBJ)/packageinit.$(OBJEXT)
+
+$(PKI_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(PKI_OBJ)/packageinit.$(OBJEXT) : $(DRM_PKI_DIR)/packageinit.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PKI_DIR)/packageinit.c $(OBJOUT)$@
+
+$(PKI_EXE) :	\
+	$(PKI_OBJS)	\
+	$(OEM_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(COR_LIB)	\
+	$(TCM_LIB)	\
+	$(BBX_LIB)	\
+	$(WMC_LIB)	\
+	$(CMD_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        PLAYER TOOL PROJECT
+#####################################################################
+
+DRM_PLA_DIR	= $(DRM_TOOLS_DIR)/player
+
+PLA_OBJ  = $(DRM_PLA_DIR)/$(OBJDIR)
+PLA_EXE  = $(BINDIR)/player.$(EXEEXT)
+PLA_OBJS = $(PLA_OBJ)/player.$(OBJEXT)
+
+$(PLA_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(PLA_OBJ)/player.$(OBJEXT) : $(DRM_PLA_DIR)/player.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PLA_DIR)/player.c $(OBJOUT)$@
+
+$(PLA_EXE) :	\
+	$(PLA_OBJS)	\
+	$(BBX_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(MGR_LIB)	\
+	$(WMC_LIB)	\
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+
+#####################################################################
+#        PROCESS LICENSE REPONSE TOOL PROJECT
+#####################################################################
+
+DRM_PLR_DIR	= $(DRM_TOOLS_DIR)/license/licenseprocessresponse
+
+PLR_OBJ  = $(DRM_PLR_DIR)/$(OBJDIR)
+PLR_EXE  = $(BINDIR)/licenseprocessresponse.$(EXEEXT)
+PLR_OBJS = $(PLR_OBJ)/licenseprocessresponse.$(OBJEXT)
+
+$(PLR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(PLR_OBJ)/licenseprocessresponse.$(OBJEXT) : $(DRM_PLR_DIR)/licenseprocessresponse.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PLR_DIR)/licenseprocessresponse.c $(OBJOUT)$@
+
+$(PLR_EXE) :	\
+	$(PLR_OBJS)	\
+	$(CRYPTO_LIBS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(MGR_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+
+#####################################################################
+#        GENERATE METER CHALLENGE TOOL PROJECT
+#####################################################################
+
+DRM_GMC_DIR	 = $(DRM_TOOLS_DIR)/metering/meteringgeneratechallenge
+
+GMC_OBJ  = $(DRM_GMC_DIR)/$(OBJDIR)
+GMC_EXE  = $(BINDIR)/meteringgeneratechallenge.$(EXEEXT)
+GMC_OBJS = $(GMC_OBJ)/meterview.$(OBJEXT)
+
+$(GMC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GMC_OBJ)/meterview.$(OBJEXT) : $(DRM_GMC_DIR)/meterview.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GMC_DIR)/meterview.c $(OBJOUT)$@
+
+$(GMC_EXE) :	\
+	$(GMC_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        RESPOND TO METER CHALLENGE TOOL PROJECT
+#####################################################################
+
+DRM_RMC_DIR	 = $(DRM_TOOLS_DIR)/metering/meteringcreateresponse
+
+RMC_OBJ  = $(DRM_RMC_DIR)/$(OBJDIR)
+RMC_EXE  = $(BINDIR)/meteringcreateresponse.$(EXEEXT)
+RMC_OBJS = $(RMC_OBJ)/meterrespond.$(OBJEXT)
+
+$(RMC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(RMC_OBJ)/meterrespond.$(OBJEXT) : $(DRM_RMC_DIR)/meterrespond.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_RMC_DIR)/meterrespond.c $(OBJOUT)$@
+
+$(RMC_EXE) :	\
+	$(RMC_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        PROCESS METER RESPONSE TOOL PROJECT
+#####################################################################
+
+DRM_PMR_DIR	 = $(DRM_TOOLS_DIR)/metering/meteringprocessresponse
+
+PMR_OBJ  = $(DRM_PMR_DIR)/$(OBJDIR)
+PMR_EXE  = $(BINDIR)/meteringprocessresponse.$(EXEEXT)
+PMR_OBJS = $(PMR_OBJ)/meterresponse.$(OBJEXT)
+
+$(PMR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(PMR_OBJ)/meterresponse.$(OBJEXT) : $(DRM_PMR_DIR)/meterresponse.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_PMR_DIR)/meterresponse.c $(OBJOUT)$@
+
+$(PMR_EXE) :	\
+	$(PMR_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENERATE SECURE CLOCK CHALLENGE TOOL PROJECT
+#####################################################################
+
+DRM_SCGC_DIR	 = $(DRM_TOOLS_DIR)/secure_clock/secureclockgeneratechallenge
+
+SCGC_OBJ  = $(DRM_SCGC_DIR)/$(OBJDIR)
+SCGC_EXE  = $(BINDIR)/secureclockgeneratechallenge.$(EXEEXT)
+SCGC_OBJS = $(SCGC_OBJ)/secureclockgeneratechallenge.$(OBJEXT)
+
+$(SCGC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(SCGC_OBJ)/secureclockgeneratechallenge.$(OBJEXT) : $(DRM_SCGC_DIR)/secureclockgeneratechallenge.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SCGC_DIR)/secureclockgeneratechallenge.c $(OBJOUT)$@
+
+$(SCGC_EXE) :	\
+	$(SCGC_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        PROCESS SECURE CLOCK RESPONSE TOOL PROJECT
+#####################################################################
+
+DRM_SCPR_DIR	 = $(DRM_TOOLS_DIR)/secure_clock/secureclockprocessresponse
+
+SCPR_OBJ  = $(DRM_SCPR_DIR)/$(OBJDIR)
+SCPR_EXE  = $(BINDIR)/secureclockprocessresponse.$(EXEEXT)
+SCPR_OBJS = $(SCPR_OBJ)/secureclockprocessresponse.$(OBJEXT)
+
+$(SCPR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(SCPR_OBJ)/secureclockprocessresponse.$(OBJEXT) : $(DRM_SCPR_DIR)/secureclockprocessresponse.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SCPR_DIR)/secureclockprocessresponse.c $(OBJOUT)$@
+
+$(SCPR_EXE) :	\
+	$(SCPR_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        CREATE SECURE CLOCK RESPONSE TOOL PROJECT
+#####################################################################
+
+DRM_SCCR_DIR	 = $(DRM_TOOLS_DIR)/secure_clock/secureclockcreateresponse
+
+SCCR_OBJ  = $(DRM_SCCR_DIR)/$(OBJDIR)
+SCCR_EXE  = $(BINDIR)/secureclockcreateresponse.$(EXEEXT)
+SCCR_OBJS = $(SCCR_OBJ)/secureclockcreateresponse.$(OBJEXT)
+
+$(SCCR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(SCCR_OBJ)/secureclockcreateresponse.$(OBJEXT) : $(DRM_SCCR_DIR)/secureclockcreateresponse.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_SCCR_DIR)/secureclockcreateresponse.c $(OBJOUT)$@
+
+$(SCCR_EXE) :	\
+	$(SCCR_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(TCM_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(CRYPTO_LIBS)	\
+	$(OEM_LIB)	
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENERATE SYNC CHALLENGE TOOL PROJECT
+#####################################################################
+
+DRM_GSC_DIR	 = $(DRM_TOOLS_DIR)/synclist/synclistgeneratechallenge
+
+GSC_OBJ  = $(DRM_GSC_DIR)/$(OBJDIR)
+GSC_EXE  = $(BINDIR)/synclistgeneratechallenge.$(EXEEXT)
+GSC_OBJS = $(GSC_OBJ)/synclistgeneratechallenge.$(OBJEXT)
+
+$(GSC_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GSC_OBJ)/synclistgeneratechallenge.$(OBJEXT) : $(DRM_GSC_DIR)/synclistgeneratechallenge.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GSC_DIR)/synclistgeneratechallenge.c $(OBJOUT)$@
+
+$(GSC_EXE) :	\
+	$(GSC_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(OEM_LIB)	\
+	$(DCP_LIB)	\
+	$(DDC_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(CRYPTO_LIBS)	
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENERATE KEY PAIR TOOL PROJECT
+#####################################################################
+
+DRM_GKP_DIR	 = $(DRM_TOOLS_DIR)/generatekeypair
+
+GKP_OBJ  = $(DRM_GKP_DIR)/$(OBJDIR)
+GKP_EXE  = $(BINDIR)/generatekeypair.$(EXEEXT)
+GKP_OBJS = $(GKP_OBJ)/generatekeypair.$(OBJEXT)
+
+$(GKP_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GKP_OBJ)/generatekeypair.$(OBJEXT) : $(DRM_GKP_DIR)/generatekeypair.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GKP_DIR)/generatekeypair.c $(OBJOUT)$@
+
+$(GKP_EXE) :	\
+	$(GKP_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(TCM_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(WMC_LIB)	\
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENERATE DAC REQUEST TOOL PROJECT
+#####################################################################
+
+DRM_GDR_DIR	 = $(DRM_TOOLS_DIR)/devicedevcert/generatedacrequest
+
+GDR_OBJ  = $(DRM_GDR_DIR)/$(OBJDIR)
+GDR_EXE  = $(BINDIR)/generatedacrequest.$(EXEEXT)
+GDR_OBJS = $(GDR_OBJ)/generatedacrequest.$(OBJEXT)
+
+$(GDR_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GDR_OBJ)/generatedacrequest.$(OBJEXT) : $(DRM_GDR_DIR)/generatedacrequest.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GDR_DIR)/generatedacrequest.c $(OBJOUT)$@
+
+$(GDR_EXE) :	\
+	$(GDR_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(TCM_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(WMC_LIB)	\
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        GENERATE DEVCERT TEMPLATE TOOL PROJECT
+#####################################################################
+
+DRM_GDT_DIR	 = $(DRM_TOOLS_DIR)/devicedevcert/generatedevcerttemplate
+
+GDT_OBJ  = $(DRM_GDT_DIR)/$(OBJDIR)
+GDT_EXE  = $(BINDIR)/generatedevcerttemplate.$(EXEEXT)
+GDT_OBJS = $(GDT_OBJ)/generatedevcerttemplate.$(OBJEXT)
+
+$(GDT_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(GDT_OBJ)/generatedevcerttemplate.$(OBJEXT) : $(DRM_GDT_DIR)/generatedevcerttemplate.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_GDT_DIR)/generatedevcerttemplate.c $(OBJOUT)$@
+
+$(GDT_EXE) :	\
+	$(GDT_OBJS)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(TCM_LIB)	\
+	$(CRYPTO_LIBS)	\
+	$(WMC_LIB)	\
+	$(OEM_LIB)
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        CIPHER TEST PROJECT
+#####################################################################
+
+DRM_CPR_TST_DIR	= $(DRM_TEST_DIR)/cipher
+
+CPR_TST_OBJ  = $(DRM_CPR_TST_DIR)/$(OBJDIR)
+CPR_TST_EXE  = $(BINDIR)/drmcipher_test.$(EXEEXT)
+CPR_TST_OBJS = $(CPR_TST_OBJ)/main.$(OBJEXT)
+
+$(CPR_TST_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(CPR_TST_OBJ)/main.$(OBJEXT) : $(DRM_CPR_TST_DIR)/main.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_CPR_TST_DIR)/main.c $(OBJOUT)$@
+
+$(CPR_TST_EXE) :	\
+	$(CPR_TST_OBJS)	\
+	$(OEM_LIB)	\
+	$(CMD_LIB)	\
+	$(COR_LIB)      \
+	$(WMC_LIB)	\
+	$(CRYPTO_LIBS)
+	@echo Linking tool $@...
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+#####################################################################
+#        CRYPTO TEST PROJECT
+#####################################################################
+
+DRM_CRP_TST_DIR	= $(DRM_TEST_DIR)/crypto
+
+CRP_TST_OBJ  = $(DRM_CRP_TST_DIR)/$(OBJDIR)
+CRP_TST_EXE  = $(BINDIR)/drmcrypto_test.$(EXEEXT)
+CRP_TST_OBJS = $(CRP_TST_OBJ)/main.$(OBJEXT)
+
+$(CRP_TST_OBJS) : $(HEADERS) $(MAKEFILES)
+
+$(CRP_TST_OBJ)/main.$(OBJEXT) : $(DRM_CRP_TST_DIR)/main.c
+	$(CC) $(CFLAGS) $(C_DEFINES) -c $(DRM_CRP_TST_DIR)/main.c $(OBJOUT)$@
+
+$(CRP_TST_EXE) :	\
+	$(CRP_TST_OBJS)	\
+	$(OEM_LIB)	\
+	$(CMD_LIB)	\
+	$(BBX_LIB)	\
+	$(COR_LIB)      \
+	$(WMC_LIB)	\
+	$(CRYPTO_LIBS)
+	@echo Linking tool $@...
+	$(LINK) $(LNKFLAGS) $(EXEOUT)$@ $(LIBPATH) $(SYS_LIBS) $**
+
+
+#####################################################################
+#        PROJECTS LISTS
+#####################################################################
+
+LIB_DIRS = \
+	$(DRM_BGN_DIR)  \
+	$(DRM_PKC_DIR)  \
+	$(DRM_DRC_DIR)  \
+	$(DRM_OEM_DIR)  \
+	$(DRM_COR_DIR)  \
+	$(DRM_BBX_DIR)  \
+	$(DRM_CMD_DIR)  \
+	$(DRM_MGR_DIR)  \
+	$(DRM_DCA_DIR)  \
+	$(DRM_DCP_DIR)  \
+	$(DRM_MTR_DIR)  \
+	$(DRM_SCK_DIR)  \
+	$(DRM_MCE_DIR)  \
+	$(DRM_SYN_DIR)  \
+	$(DRM_DDC_DIR)  \
+	$(DRM_TCM_DIR)	\
+	$(DRM_WMC_DIR)
+
+EXE_DIRS = \
+	$(DRM_HDS_DIR) \
+	$(DRM_CUS_DIR) \
+	$(DRM_PKG_DIR) \
+	$(DRM_GCL_DIR) \
+	$(DRM_LCD_DIR) \
+	$(DRM_PKI_DIR) \
+	$(DRM_PLA_DIR) \
+	$(DRM_PLR_DIR) \
+	$(DRM_DEX_DIR) \
+	$(DRM_LDE_DIR) \
+	$(DRM_GMC_DIR) \
+	$(DRM_RMC_DIR) \
+	$(DRM_PMR_DIR) \
+	$(DRM_SCGC_DIR) \
+	$(DRM_SCPR_DIR) \
+	$(DRM_SCCR_DIR) \
+	$(DRM_GSC_DIR) \
+	$(DRM_JDL_DIR) \
+	$(DRM_GKP_DIR) \
+	$(DRM_GDR_DIR) \
+	$(DRM_GDT_DIR) \
+	$(DRM_PRT_DIR) \
+	$(DRM_CPR_TST_DIR) \
+	$(DRM_CRP_TST_DIR)
+
+
+FORCE: \
+
+
+#####################################################################
+#        COMMANDLINE TARGETS
+#####################################################################
+
+projects: \
+	$(BGN_LIB)	\
+	$(PKC_LIB)	\
+	$(DRC_LIB)      \
+	$(OEM_LIB)	\
+	$(COR_LIB)	\
+	$(BBX_LIB)	\
+	$(CMD_LIB)	\
+	$(MGR_LIB)	\
+	$(DCP_LIB)	\
+	$(MCE_LIB)	\
+	$(TCM_LIB)	\
+	$(WMC_LIB)	\
+	$(DRMOPTIONALTARGETLIBS) \
+	$(HDS_EXE)	\
+	$(CUS_EXE)	\
+	$(PKG_EXE)	\
+	$(GCL_EXE)	\
+	$(LCD_EXE)	\
+	$(PKI_EXE)	\
+	$(PLA_EXE)	\
+	$(PLR_EXE)	\
+	$(DEX_EXE)	\
+	$(LDE_EXE)	\
+	$(GKP_EXE)	\
+	$(GDR_EXE)	\
+	$(GDT_EXE)	\
+	$(DRMOPTIONALTARGETEXES) \
+	$(CPR_TST_EXE)  \
+	$(CRP_TST_EXE)
+
+chk:   FORCE
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) "BUILDTYPE=CHK" projects
+
+free:  FORCE
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) "BUILDTYPE=FREE" projects
+
+fre:  FORCE
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) "BUILDTYPE=FREE" projects
+
+all:   FORCE
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) init
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) clean
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) chk
+	-$(MAKE) -f $(ORIGINAL_MAKEFILE) free

@@ -1,0 +1,9 @@
+#service macaddr /sbin/busybox ifconfig eth0 hw ether 08:60:6e:3d:40:99
+service macaddr /system/bin/update_mac.sh
+    class core
+    user root
+    group root
+    oneshot
+    #seclabel u:r:realtek:s0
+    disabled
+

@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcrtreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES = $(COMMON_SOURCES)   \
+    crtimplreal.c             \
+    crtutilreal.c             \
+

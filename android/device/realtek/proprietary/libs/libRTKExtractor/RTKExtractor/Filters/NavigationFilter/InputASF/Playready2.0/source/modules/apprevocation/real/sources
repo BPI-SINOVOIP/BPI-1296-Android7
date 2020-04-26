@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmapprevocationreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                   \
+    apprevocationimplreal.c \
+    apprevocationutilreal.c \
+

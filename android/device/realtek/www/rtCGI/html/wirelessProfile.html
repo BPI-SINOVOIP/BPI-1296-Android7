@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Wireless Profiles</title>
+</head>
+<script type="text/javascript" src="javascript/util.js"></script>
+<script type="text/javascript">
+var gMaxProfileNum = 3; // Global variable for max number of profiles
+var gProfileNames; // Array to store profile name
+var gMode; // CONNECT:Select a profile for connection / REPLACE:Select an existing profile to be replaced with the new one
+
+function handleProfileName()
+{
+	var profileName = new String();
+	var profileNum;
+	var activeProfileIndex;
+	
+	if(command_xmlhttp.readyState==4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			profileName = handleResponseText(command_xmlhttp.responseText);
+
+			// Response format:
+			// ProfilesNum\nActiveIndex\nProfileName-1\nProfileName-2\nProfileName-3........\nProfileName-X
+
+			// Split profile name information into array
+			gProfileNames = profileName.split("\n");
+
+			// Display profiles
+			if ("Connection1" != gProfileNames[2])
+			{
+				gProfileNames[2] = addHyperlinkToText(gProfileNames[2], "javascript:connectProfile(0)");
+			}
+			if ("Connection2" != gProfileNames[3])
+			{
+				gProfileNames[3] = addHyperlinkToText(gProfileNames[3], "javascript:connectProfile(1)");
+			}
+			if ("Connection3" != gProfileNames[4])
+			{
+				gProfileNames[4] = addHyperlinkToText(gProfileNames[4], "javascript:connectProfile(2)");
+			}
+			
+			gProfileNames[5] = addHyperlinkToText(gProfileNames[5], "wirelessInfrastructureAP.html");
+
+			// Make active profile bold text
+			if (gProfileNames[1] < gProfileNames[0])
+			{
+				i = 2 + Number(gProfileNames[1]);			
+				gProfileNames[i] = "<b>" + gProfileNames[i] + "</b>";
+			}
+			
+			showProfileName(gProfileNames);
+		}
+	}
+}
+
+function getProfileName()
+{
+	sendCommand("wlanGetProfileName", handleProfileName);
+}
+
+function connectProfile(index)
+{
+	// Go to connect page to connect an existing profile
+	window.location.assign("wirelessConnect.html?mode=PROFILE&index=" + index);	
+}
+
+function handleReplaceProfile()
+{
+	var result = new String();
+
+	if(command_xmlhttp.readyState==4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve result from the response text
+			result = handleResponseText(command_xmlhttp.responseText);
+			if ("OK" == result)
+			{
+				window.location.assign("wirelessProfile.html?mode=CONNECT");
+			}
+		}
+	}
+}
+
+function replaceProfile(index)
+{
+	var cmd;
+	cmd = "wlanReplaceProfile:" + index;
+	sendCommand(cmd, handleReplaceProfile);
+}
+
+function showProfileName(profileName)
+{
+	document.getElementById("Profile1").innerHTML=profileName[2];
+	document.getElementById("Profile2").innerHTML=profileName[3];
+	document.getElementById("Profile3").innerHTML=profileName[4];
+	var ele = document.getElementById("ReScanAP");
+	if (ele)
+		ele.innerHTML=profileName[5];
+}
+
+function showProfileNameToReplace(profileName)
+{
+	document.getElementById("Info").innerHTML=profileName[5];
+	document.getElementById("Profile1").innerHTML=profileName[2];
+	document.getElementById("Profile2").innerHTML=profileName[3];
+	document.getElementById("Profile3").innerHTML=profileName[4];
+}
+
+function handleProfileNameToReplace()
+{
+	var profileName = new String();
+	var profileNum;
+	var activeProfileIndex;
+	var i, j = 0;
+
+	if(command_xmlhttp.readyState==4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve device name from the response text
+			profileName = handleResponseText(command_xmlhttp.responseText);
+
+			// Response format:
+			// ProfilesNum\nActiveIndex\nProfileName-1\nProfileName-2\nProfileName-3........\nProfileName-X
+
+			// Split profile name information into array
+			gProfileNames = profileName.split("\n");
+
+			// Display profiles
+			gProfileNames[2] = addHyperlinkToText(gProfileNames[2], "javascript:replaceProfile(0)");
+			gProfileNames[3] = addHyperlinkToText(gProfileNames[3], "javascript:replaceProfile(1)");
+			gProfileNames[4] = addHyperlinkToText(gProfileNames[4], "javascript:replaceProfile(2)");			
+			showProfileNameToReplace(gProfileNames);
+		}
+	}
+}
+
+function getProfileNameToReplace()
+{
+	sendCommand("wlanGetProfileNameToReplace", handleProfileNameToReplace);
+}
+
+function prepareDisplayInfo()
+{
+	//var queryString = window.top.location.search.substring(1);
+	hideEleIfMatched("BackToRemoteCtlBtn", WIFISET_ENTRY_MODE, VAL_ENTRY_REMOTE, WIFISET_COOKIE_ENTRY_MODE);
+	
+    var queryString = window.location.href;
+	gMode = getParameter(queryString, 'mode');
+	if ("CONNECT" == gMode)
+	{
+		getProfileName();
+	}
+	else
+	{
+		getProfileNameToReplace();
+	}
+	
+	setTitleFontSize("mainArea", "titleArea");
+}
+</script>
+<body id="mainArea" leftmargin="10%" bgcolor="#B8B8B8" onload = "prepareDisplayInfo();">
+<font color="blue"><p id="titleArea" align="center"><cite>Selecting AP</cite></p></font>
+<input type="button" value="Back" onClick="self.location.href='network.html';"/>
+<input id="BackToRemoteCtlBtn" type="button" value="Remote Control" onClick="self.location.href='index.html';"/>
+<hr width="95%" size="3" color="#939393" align="center"/>
+<p id="Info"/><p>
+<center><p id="Profile1"/><p></center>
+<center><p id="Profile2"></p></center>
+<center><p id="Profile3"></p></center>
+<hr width="95%" size="3" color="#939393" align="center"/>
+<input type="button" value="Re-Scan AP" onClick="self.location.href='wirelessInfrastructureAP.html';"/>  
+</body>
+</html>

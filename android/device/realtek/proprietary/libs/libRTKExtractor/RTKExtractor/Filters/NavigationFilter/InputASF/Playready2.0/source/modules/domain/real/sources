@@ -1,0 +1,13 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdomainreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                   \
+    drmdomainapi.c          \
+    drmdomainimp.c          \
+    drmdomainkeyxmrparser.c \
+    drmdomainstore.c
+

@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmlicensesyncstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    licensesyncutilstub.c     \
+    drmgensyncchallengestub.c \
+    drmsyncstorestub.c        \
+

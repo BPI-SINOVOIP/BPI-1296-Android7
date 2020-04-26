@@ -1,0 +1,42 @@
+# mediaserver 
+vendor.realtek.se                   u:object_r:mediaserver_service:s0
+vendor.realtek.RecordBuffer         u:object_r:mediaserver_service:s0
+vendor.realtek.AudioRedirect        u:object_r:mediaserver_service:s0
+vendor.realtek.md		    u:object_r:mediaserver_service:s0
+realtek.transcodeplayerservice u:object_r:mediaserver_service:s0
+
+# system_server
+tv                                  u:object_r:realtek_service:s0
+RtkHDMIService                      u:object_r:realtek_service:s0
+RtkHDMIRxService                    u:object_r:realtek_service:s0
+RtkVoutUtilService                  u:object_r:realtek_service:s0
+RtkGPIOService                      u:object_r:realtek_service:s0
+RtkAoutUtilService                  u:object_r:realtek_service:s0
+ToGoProxy                           u:object_r:realtek_service:s0
+MediaQueryService                   u:object_r:realtek_service:s0
+pppoe                               u:object_r:realtek_service:s0
+SettingsService                     u:object_r:realtek_service:s0
+factory                             u:object_r:realtek_service:s0
+android.hwmbindermanager            u:object_r:realtek_service:s0
+android.inbandmanager               u:object_r:realtek_service:s0
+airfun                              u:object_r:realtek_service:s0
+chkufsd                             u:object_r:realtek_service:s0
+Sideband                            u:object_r:realtek_service:s0
+RtkDPTxService                      u:object_r:realtek_service:s0
+
+
+# From init.x.rc
+# Service alsadaemon needs a SELinux domain defined; please fix!
+#alsadaemon                          u:object_r:realtek:s0
+#vpuinit                             u:object_r:realtek:s0
+#jpuinit                             u:object_r:realtek:s0
+#DvdPlayer                           u:object_r:realtek:s0
+#boot_sd_mod                         u:object_r:realtek:s0
+#RtkHWMBinder                        u:object_r:realtek:s0
+#logwrapper                          u:object_r:init:s0
+#bootdvfs                            u:object_r:system_server_service:s0
+#ext4resize                          u:object_r:rootfs:s0
+#rtw_fwloader                        u:object_r:realtek:s0
+#settingsproxy                       u:object_r:realtek:s0
+
+

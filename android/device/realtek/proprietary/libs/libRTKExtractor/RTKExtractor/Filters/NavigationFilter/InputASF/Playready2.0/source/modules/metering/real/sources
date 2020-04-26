@@ -1,0 +1,14 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmeteringreal
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES = \
+    drmmeterapi.c                 \
+    drmmetercertstore.c           \
+    drmmeterimp.c                 \
+    drmmeterimpv1.c               \
+    meteringutilreal.c
+

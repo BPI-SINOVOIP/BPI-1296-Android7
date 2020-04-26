@@ -1,0 +1,4 @@
+
+ifeq ($(HOST), mipsel-linux)
+DEFS += -DRPC_MECHANISM
+endif

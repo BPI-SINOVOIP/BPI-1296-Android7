@@ -1,0 +1,18 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmstkallocreal
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_BUILDING_DRMSTKALLOC_LIB
+
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_BUILDING_DRMSTKALLOC_LIB
+
+!endif
+
+SOURCES =                   \
+      drmstkallocimplreal.c
+

@@ -1,0 +1,12 @@
+# For avc: denied { read write } for pid=2134 comm="surfaceflinger" name="mali" dev="tmpfs" ino=4830 scontext=u:r:surfaceflinger:s0 tcontext=u:object_r:device:s0 tclass=chr_file
+allow surfaceflinger realtek_file:chr_file {read write};
+allow surfaceflinger realtek_file:dir r_dir_perms;
+allow surfaceflinger realtek_file:file rw_file_perms;
+# avc: denied { read } for pid=2134 comm="surfaceflinger" name="rpc2" dev="rootfs" ino=451 scontext=u:r:surfaceflinger:s0 tcontext=u:object_r:rootfs:s0 tclass=chr_file
+# avc: denied { open } for pid=2134 comm="surfaceflinger" path="/rtk/rpc2" dev="rootfs" ino=460 scontext=u:r:surfaceflinger:s0 tcontext=u:object_r:rootfs:s0 tclass=chr_file
+allow surfaceflinger rootfs:chr_file r_file_perms;
+# avc:  denied  { set } for property=rtk.hwc.v1.x scontext=u:r:surfaceflinger:s0 tcontext=u:object_r:default_prop:s0 tclass=property_service
+#allow surfaceflinger default_prop:property_service set;
+allow surfaceflinger sysfs_wake_lock:file {read open getattr};
+allow surfaceflinger system_data_file:dir {write add_name create};
+allow surfaceflinger shell_exec:file { execute execute_no_trans getattr open read };

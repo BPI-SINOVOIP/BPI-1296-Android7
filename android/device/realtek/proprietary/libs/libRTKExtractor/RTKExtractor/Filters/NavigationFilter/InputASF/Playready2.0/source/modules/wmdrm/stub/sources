@@ -1,0 +1,19 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmwmdrmstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                         \
+    drmdevcertstub.c              \
+    drmwmdrmexprevalstub.c        \
+    drmwmdrmexprfuncstub.c        \
+    drmwmdrmexprvariablestub.c    \
+    drmwmdrmlicacqrespstub.c      \
+    drmwmdrmlicchainstub.c        \
+    drmwmdrmlicenseparserstub.c   \
+    drmwmdrmlicevalstub.c         \
+    drmwmdrmoplstub.c             \
+    drmwmdrmutilstub.c            \
+

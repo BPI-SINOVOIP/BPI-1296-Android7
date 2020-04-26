@@ -1,0 +1,25 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=generatecompanycertrequest
+TARGETTYPE=PROGRAM
+UMTYPE=console
+UMENTRY=wmain
+
+SOURCES = \
+	generatecompanycertrequest.c
+
+INCLUDES = \
+    $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\tools\common; 
+
+TARGETLIBS = \
+    $(_DRM_COMMON_LIBS)                        \
+    $(_DRM_OEM_MAIN_LIB)                       \
+    $(_DRM_DEVCERT_PARSER_DIR)\drmdevcert.lib  \
+    $(_DRM_SOURCE_PATH)\tools\common\$(_DRM_OBJ_DIR)\drmtoolscommon.lib \
+    $(_DRM_WMDRMCERT_DIR)\wmdrmcert.lib        \
+    $(_DRM_BLACKBOX_DIR)\drmblackbox.lib       \
+    $(_DRM_AES_DIR)\oemaes.lib                 \
+    $(_DRM_CERTS_ND_DIR)\drmndcerts.lib        
+
+	

@@ -1,0 +1,9 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmxmrcommon
+TARGETTYPE=LIBRARY
+
+BUILD_PRODUCES=root_multimedia_PK_WMDRMMD_source_xmr_commonlib
+
+SOURCES =                   \
+    ..\drmxmr.c

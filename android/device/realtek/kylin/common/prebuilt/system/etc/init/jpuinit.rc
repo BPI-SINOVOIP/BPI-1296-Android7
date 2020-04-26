@@ -1,0 +1,7 @@
+service jpuinit /system/bin/jpuinit
+    class main
+    user root
+    group root
+    oneshot
+    #disabled
+

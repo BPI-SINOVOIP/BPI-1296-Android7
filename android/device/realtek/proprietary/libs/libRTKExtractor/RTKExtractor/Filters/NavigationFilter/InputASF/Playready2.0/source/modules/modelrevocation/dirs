@@ -1,0 +1,30 @@
+#-----------------------------------------------------------------------------
+# This file is read by both the NTBUILD tool and the Porting Kit's makefile
+# system. The latter requires the order of directories to be:
+#     1st - Directories that build headers
+#     2nd - Directories that build objects
+#     3rd - Directories that build libraries
+#     4th - Directories that build executables and DLLs
+# This is analagous to the PASS0, PASS1a/1b, and PASS2 phases of NTBUILD.
+#
+# If one lib packages up another, the final lib must appear later in the list.
+#
+# DIRS is read by NTBUILD and the Porting Kit if DRM_DIRS isn't present.
+#
+# DRM_DIRS is the optional override for use by the Porting Kit. Directory
+# selection can be restricted by platform, architecture, or a combo as follows:
+# DRM_DIRS=foo{ARM} bar{ANSI} baz{ANSI_X86}
+#
+# Supported tags (out of the box):
+# - Platform: ANSI
+# - Architecture: X86, AMD64/X64, ARM
+# - PlatArch: Platform and Arch separated by an underscore (e.g. ANSI_X86)
+#-----------------------------------------------------------------------------
+
+DIRS =   \
+    real \
+    stub \
+
+DRM_DIRS = \
+    stub   \
+

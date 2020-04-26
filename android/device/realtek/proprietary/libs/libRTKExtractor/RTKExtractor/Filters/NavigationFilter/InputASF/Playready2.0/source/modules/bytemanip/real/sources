@@ -1,0 +1,17 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmbytemanipreal
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_DRMBYTEMANIP_LIB \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_DRMBYTEMANIP_LIB \
+!endif
+
+
+SOURCES =                    \
+      drmbytemanipimplreal.c
+

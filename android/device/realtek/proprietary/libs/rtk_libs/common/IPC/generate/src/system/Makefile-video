@@ -1,0 +1,52 @@
+##----------------------------------------------------------------------------
+# Created with genmake.pl v1.1 on Thu Oct 28 13:37:18 2004
+# genmake.pl home: http://muquit.com/muquit/software/
+# Copryright: GNU GPL (http://www.gnu.org/copyleft/gpl.html)
+##----------------------------------------------------------------------------
+
+rm=/bin/rm -f
+cp=/bin/cp -f
+mkdir=/bin/mkdir -p
+include ../../../../../system/include/MakeConfig
+
+LINK= -=LINK=-
+DEFS=
+CC= $(MYCC)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= ../../../lib/libsystemvideorpc.a
+#INSTALLHEADER= ../../../../Include/AudioFilter
+
+
+INCLUDES=  -I. -I../../../include -I../../include -I../../include/system
+
+ifeq ($(ENABLE_USE_BIONIC),YES)
+DEFINES += $(INCLUDES) $(DEFS)
+else
+DEFINES= $(INCLUDES) $(DEFS)
+endif
+CFLAGS= -g $(DEFINES) $(COMPILE_OPT)
+
+ifeq ($(RTD_1195),YES)
+CFLAGS+= -DRTD_1195
+endif
+ifeq ($(RPC_PROGRAM_REGISTER),YES)
+CFLAGS+= -DRPC_PROGRAM_REGISTER
+endif
+
+SRCS = VideoRPC_Agent_svc.c VideoRPC_System_clnt.c VideoRPC_Agent_xdr.c VideoRPC_System_xdr.c VideoRPCBaseDS_xdr.c RPCBaseDS_xdr.c
+OBJS = VideoRPC_Agent_svc.o VideoRPC_System_clnt.o VideoRPC_Agent_xdr.o VideoRPC_System_xdr.o VideoRPCBaseDS_xdr.o RPCBaseDS_xdr.o
+
+HEADERS= defs.h
+
+%.o : %.c
+	$(rm) -f $@
+	$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJS)
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+clean:
+	$(rm) $(OBJS) $(LIBNAME) core *~

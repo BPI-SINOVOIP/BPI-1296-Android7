@@ -1,0 +1,12 @@
+This legal agreement (“License”) between you and Realtek Semiconductor Corporation (“Realtek”)
+covers distributions under Realtek’s a license grant by with ARM to third parties who are developing 
+applications for use on the Realtek’s System on Chip (“SoC”). Realtek is only willing to license the 
+deliverables to you on the condition that you accept all of the terms in this License. By installing 
+or otherwise using or copying the software delivered with this License (“Software”), you indicate 
+that you agree to be bound by all the terms of this License. If you do not agree to the terms of this 
+License, Realtek is unwilling to License the Software to you and you may not install, use or copy the 
+Software. You agree that ARM Limited is a third party beneficiary of this License and therefore able 
+to enforce on the terms of the License in the event of a breach by you. You agree: (i) not to reverse 
+engineer, decompile, adapt or alter any part of the object code of the Software, (ii) to only use the 
+object code of the Software for the purposes of developing or executing applications which are targeted 
+for use on an Realtek SoC, solely for use with silicon manufactured by or for Realtek

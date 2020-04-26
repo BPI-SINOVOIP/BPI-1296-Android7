@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdlastub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    dlautilstub.c             \
+    drmdlaimplstub.c          \
+

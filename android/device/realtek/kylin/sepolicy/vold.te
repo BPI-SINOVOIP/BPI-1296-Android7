@@ -1,0 +1,7 @@
+allow vold user_device:blk_file create_file_perms;
+allow vold install_data_file:file rw_file_perms;
+allow vold unlabeled:filesystem { mount unmount };
+
+# Workaround for full disk encryption
+allow vold cache_file:dir {write add_name};
+allow vold cache_file:file {create open rw_file_perms};

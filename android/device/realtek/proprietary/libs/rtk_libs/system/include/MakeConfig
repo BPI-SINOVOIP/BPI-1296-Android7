@@ -1,0 +1,3455 @@
+TARGET_BOARD = YES
+DEFINES = -DDVR
+##########################################################################################
+# TOOLCHAIN Settings                                                                     #
+##########################################################################################
+HOST = mipsel-linux
+
+##########################################################################################
+#TOOLCHAIN_VER=344
+#TOOLCHAIN_VER=435
+#TOOLCHAIN_VER=435_fpu
+##########################################################################################
+TOOLCHAIN_VER=435
+
+##########################################################################################
+#KERNEL_VER=2.6.12.6
+#KERNEL_VER=2.6.34
+##########################################################################################
+KERNEL_VER=2.6.12.6
+
+##########################################################################################
+# QUICK CONFIG                                                                           #
+##########################################################################################
+# AVAILBLE MODELS:                                                                       #
+#  CONFIG_01 : RTD1073 + EWHA       + PLAYER + RTD1073-DEMO                              #
+#  CONFIG_02 : RTD1283 + EWHA       + AVHDD  + RTD1283-DEMO + DVB_T                      #
+#  CONFIG_03 : RTD1283 + EWHA       + AVHDD  + RTD1283-DEMO + ATSC_T                     #
+#  CONFIG_04 : RTD1073 + CASABLANCA + PLAYER + RTD1073-DEMO                              #
+#  CONFIG_05 : RTD1283 + CASABLANCA + AVHDD  + RTD1283-DEMO + DVB_T                      #
+#  CONFIG_06 : RTD1283 + CASABLANCA + AVHDD  + RTD1283-DEMO + ATSC_T                     #
+#  CONFIG_07 : RTD1283 + CASABLANCA + PLAYER + RTD1283-DEMO                              #
+#  CONFIG_08 : RTD1283 + EWHA       + AVHDD  + RTD1283-QA   + DVB_T + CI                 #
+#  CONFIG_09 : RTD1283 + EWHA       + AVHDD  + RTD1283-DEMO + DVB_T + CI                 #
+#  CONFIG_0A : RTD1283 + CASABLANCA + AVHDD  + RTD1283-QA   + DVB_T + CI                 #
+#  CONFIG_0B : RTD1283 + CASABLANCA + AVHDD  + RTD1283-DEMO + DVB_T + CI                 #
+##########################################################################################
+#  CONFIG_11 : RTD1055 + CASABLANCA + PLAYER + RTD1055-DEMO                              #
+#  CONFIG_11S: RTD1055 + CASABLANCA(Slim) + PLAYER + RTD1005-DEMO                        #
+#  CONFIG_12 : RTD1085 + CASABLANCA + PLAYER + RTD1185-DEMO                              #
+#  CONFIG_12S: RTD1085 + CASABLANCA + PLAYER + RTD1185-DEMO                              #
+#  CONFIG_13 : RTD1185 + CASABLANCA + AVHDD  + RTD1185-DEMO + DVB_T                      #
+#  CONFIG_14 : RTD1185 + CASABLANCA + AVHDD  + RTD1185-DEMO + ATSC_T                     #
+#  CONFIG_15 : RTD1185 + CASABLANCA + AVHDD  + RTD1185-DEMO + DVB_S                      #
+#  CONFIG_16 : RTD1185 + CASABLANCA + PLAYER + RTD1185-DEMO                              #
+#  CONFIG_17 : RTD1085 + CASABLANCA + PLAYER + RTD1185-DEMO + Android                    #
+#  CONFIG_18 : RTD1185 + CASABLANCA + AVHDD  + RTD1185-DEMO + DVB_C                      #
+#  CONFIG_19 : RTD1035 + CASABLANCA + PLAYER + RTD1185-WDP                               #
+#  CONFIG_19M: RTD1035 + CASABLANCA + PLAYER + RTD1185-WDP (Miracast)                    #
+#  CONFIG_19W: RTD1035 + CASABLANCA + PLAYER + RTD1185-WDP (WiDi)                        #
+#  CONFIG_1A : RTD1085 + CASABLANCA + PLAYER + RTD1185-WDP + OTT_CN                      #
+#  CONFIG_1B : RTD1085 + CASABLANCA + PLAYER + RTD1185-WDP + OTT_UK                      #
+#  CONFIG_1C : RTD1085 + CASABLANCA + PLAYER + RTD1185-WDP + OTT_US                      #
+#  CONFIG_1D : RTD1085 + CASABLANCA + PLAYER + RTD1185-WDP + OTT                         #
+##########################################################################################
+#  CONFIG_21 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA                                #
+#  CONFIG_22 : RTD1186 + CASABLANCA + AVHDD  + RTD1186-QA                                #
+#  CONFIG_22S: RTD1186 + CASABLANCA + AVHDD  + RTD1186-QA                                #
+#  CONFIG_23 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + 3D Graphic                   #
+#  CONFIG_24 : RTD1186 + CASABLANCA + AVHDD  + RTD1186-QA + 3D Graphic + SKYPE           #
+#  CONFIG_25 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + Android                      #
+#  CONFIG_27 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + 3D Graphic + FunHouse V3     #
+#  CONFIG_28 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + OTT_CN                       #
+#  CONFIG_29 : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + OTT_UK                       #
+#  CONFIG_2A : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + OTT_US                       #
+#  CONFIG_2B : RTD1186 + CASABLANCA + PLAYER + RTD1186-QA + OTT                          #
+#  CONFIG_2C : RTD1186 + CASABLANCA + PLAYER + RTD1186-WDP                               #
+##########################################################################################
+#  CONFIG_31 : RTD1882 + CASABLANCA + PLAYER + RTD1882-DEMO                              #
+#  CONFIG_32 : RTD1882 + CASABLANCA + AVHDD  + RTD1882-DEMO + DVB_T (advanced)           #
+#  CONFIG_33 : RTD1882 + CASABLANCA + AVHDD  + RTD1882-DEMO + DVB_T (baseline)           #
+#  CONFIG_34 : RTD1882 + CASABLANCA + AVHDD  + RTD1882-DEMO + DVB_S                      #
+##########################################################################################
+#  CONFIG_F1 : RTD1186 + CmdLineDvdPlayer + PLAYER + RTD1186-QA                          #
+#  CONFIG_F2 : RTD1185 + CmdLineDvdPlayer + PLAYER + RTD1185-DEMO                        #
+##########################################################################################
+#QUICK_CONFIG = CONFIG_19M
+QUICK_CONFIG = CONFIG_2B
+
+
+##########################################################################################
+# CHIP MODEL SELECTION                                                                   #
+##########################################################################################
+# AVAILBLE MODELS:                                                                       #
+#  0x1073 Mars QFP                                                                       #
+#  0x1283 Mars BGA                                                                       #
+##########################################################################################
+ifeq ($(QUICK_CONFIG), CONFIG_01)
+  CHIP_MODEL = 0x1073
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_02)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_03)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_04)
+  CHIP_MODEL = 0x1073
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_05)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_06)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_07)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_08)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_09)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0A)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0B)
+  CHIP_MODEL = 0x1283
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11)
+  CHIP_MODEL = 0x1055
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11S)
+  CHIP_MODEL = 0x1055
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12S)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_13)
+  CHIP_MODEL = 0x1185
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_14)
+  CHIP_MODEL = 0x1185
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_15)
+  CHIP_MODEL = 0x1185
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_16)
+  CHIP_MODEL = 0x1185
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_17)
+  CHIP_MODEL = 0x1085
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_18)
+  CHIP_MODEL = 0x1185
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19)
+  CHIP_MODEL = 0x1035
+  WDP_3IN1 = YES
+  WIDI3.5_AUTH = NO
+  DISABLE_DEEP_COLOR=YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19M)
+  CHIP_MODEL = 0x1035
+  WDP_3IN1 = YES
+  WIDI3.5_AUTH = NO
+  DISABLE_DEEP_COLOR=YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19W)
+  CHIP_MODEL = 0x1035
+  WDP_3IN1 = YES
+  WIDI3.5_AUTH = NO
+  DISABLE_DEEP_COLOR=YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1A)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1B)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1C)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1D)
+  CHIP_MODEL = 0x1085
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_21)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22S)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_23)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_24)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_25)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_27)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_28)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_29)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2A)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2B)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2C)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+  WDP_3IN1 = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_31)
+  CHIP_MODEL = 0x1185
+  REAL_CHIP_MODEL = 0x1882
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_32)
+  CHIP_MODEL = 0x1185
+  REAL_CHIP_MODEL = 0x1882
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_33)
+  CHIP_MODEL = 0x1185
+  REAL_CHIP_MODEL = 0x1882
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_34)
+  CHIP_MODEL = 0x1185
+  REAL_CHIP_MODEL = 0x1882
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F1)
+  CHIP_MODEL = 0x1186
+  TOOLCHAIN_VER=435_fpu
+  KERNEL_VER=2.6.34
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F2)
+  CHIP_MODEL = 0x1185
+endif
+
+ifeq ($(TOOLCHAIN_VER), 344)
+    TOOLCHAIN_NAME = toolchain_mipsel
+    TOOLCHAIN_ROOT = /usr/local/$(TOOLCHAIN_NAME)/bin
+    MYCC = $(TOOLCHAIN_ROOT)/mipsel-linux-gcc
+    MYCXX = $(TOOLCHAIN_ROOT)/mipsel-linux-g++
+    MYAR = $(TOOLCHAIN_ROOT)/mipsel-linux-ar
+    MYRANLIB = $(TOOLCHAIN_ROOT)/mipsel-linux-ranlib
+    MYLD = $(TOOLCHAIN_ROOT)/mipsel-linux-ld
+    MYSTRIP = $(TOOLCHAIN_ROOT)/mipsel-linux-strip
+    DEFINES += -mips32r2
+endif
+ifeq ($(TOOLCHAIN_VER), 435)
+    TOOLCHAIN_NAME = msdk-4.3.6-mips-EL-$(KERNEL_VER)-0.9.30.3
+    TOOLCHAIN_ROOT = /usr/local/$(TOOLCHAIN_NAME)/bin
+    MYCC = $(TOOLCHAIN_ROOT)/msdk-linux-gcc
+    MYCXX = $(TOOLCHAIN_ROOT)/msdk-linux-g++
+    MYAR = $(TOOLCHAIN_ROOT)/msdk-linux-ar
+    MYRANLIB = $(TOOLCHAIN_ROOT)/msdk-linux-ranlib
+    MYLD = $(TOOLCHAIN_ROOT)/msdk-linux-ld
+    MYSTRIP = $(TOOLCHAIN_ROOT)/msdk-linux-strip
+    DEFINES += -mips32r2
+endif
+ifeq ($(TOOLCHAIN_VER), 435_fpu)
+#    TOOLCHAIN_NAME = msdk-4.3.6-mips-EL-$(KERNEL_VER)-0.9.30.3_hwfpu
+#    TOOLCHAIN_ROOT = /usr/local/$(TOOLCHAIN_NAME)/bin
+#    MYCC = $(TOOLCHAIN_ROOT)/msdk-linux-gcc
+#    MYCXX = $(TOOLCHAIN_ROOT)/msdk-linux-g++
+#    MYAR = $(TOOLCHAIN_ROOT)/msdk-linux-ar
+#    MYRANLIB = $(TOOLCHAIN_ROOT)/msdk-linux-ranlib
+#    MYLD = $(TOOLCHAIN_ROOT)/msdk-linux-ld
+#    MYSTRIP = $(TOOLCHAIN_ROOT)/msdk-linux-strip
+#    DEFINES += -mips32r2
+
+    TOOLCHAIN_NAME = msdk-4.3.6-mips-EL-$(KERNEL_VER)-0.9.30.3_hwfpu
+    TOOLCHAIN_ROOT = ${PWD}/../../../../../prebuilts/gcc/linux-x86/mips/mipsel-linux-android-4.6/bin
+    MYCC = $(TOOLCHAIN_ROOT)/mipsel-linux-android-gcc
+    MYCXX = $(TOOLCHAIN_ROOT)/mipsel-linux-android-g++
+    MYAR = $(TOOLCHAIN_ROOT)/mipsel-linux-android-ar
+    MYRANLIB = $(TOOLCHAIN_ROOT)/mipsel-linux-android-ranlib
+    MYLD = $(TOOLCHAIN_ROOT)/mipsel-linux-android-ld
+    MYSTRIP = $(TOOLCHAIN_ROOT)/mipsel-linux-android-strip
+    #DEFINES += -mips32r2
+endif
+
+CHIP_MODEL_DEFS =  "-DIS_CHIP(MODEL)=((CHIP_MODEL & 0x100F) == MODEL)"
+CHIP_MODEL_DEFS += "-DCHIP_MODEL=$(CHIP_MODEL)"
+CHIP_MODEL_DEFS +=   "-DVENUS=0x1001"
+CHIP_MODEL_DEFS += "-DNEPTUNE=0x1002"
+CHIP_MODEL_DEFS +=    "-DMARS=0x1003"
+CHIP_MODEL_DEFS += "-DJUPITER=0x1005"
+CHIP_MODEL_DEFS +=  "-DSATURN=0x1006"
+
+
+#######################################################################
+# MAIN_PROJECT: Ewha_MK1, Casablanca
+# SUB_PROJECT: NONE, Libra_MS
+#######################################################################
+MAIN_PROJECT = Casablanca
+ifeq ($(QUICK_CONFIG), CONFIG_01)
+  MAIN_PROJECT = Ewha_MK1
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_02)
+  MAIN_PROJECT = Ewha_MK1
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_03)
+  MAIN_PROJECT = Ewha_MK1
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_08)
+  MAIN_PROJECT = Ewha_MK1
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_09)
+  MAIN_PROJECT = Ewha_MK1
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1A)
+  ENABLE_OTT = YES
+  ENABLE_CN_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1B)
+  ENABLE_OTT = YES
+  ENABLE_UK_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1C)
+  ENABLE_OTT = YES
+  ENABLE_US_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1D)
+  ENABLE_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_28)
+  ENABLE_OTT = YES
+  ENABLE_CN_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_29)
+  ENABLE_OTT = YES
+  ENABLE_UK_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2A)
+  ENABLE_OTT = YES
+  ENABLE_US_OTT = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2B)
+  ENABLE_OTT = YES
+endif
+SUB_PROJECT = NONE
+
+
+##########################################################################################
+# AP CONFIG DEFINE                                                                       #
+##########################################################################################
+APCFG_DEFS = "-DAP_CONFIG_WITH(MODULE)=((APCFG_FLAGS)&(MODULE))"
+
+# Modulized Application Setting
+
+# -- By Hardware
+APCFG_DEFS+=                     "-DAPCFG_LIMIT=0x0000000000000000LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_USB=0x0000000000000001LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_HDD=0x0000000000000002LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_DVD=0x0000000000000004LL"
+APCFG_DEFS+=                   "-DAPCFG_HW_1394=0x0000000000000008LL"
+APCFG_DEFS+=                  "-DAPCFG_HW_SCART=0x0000000000000010LL"
+APCFG_DEFS+=           "-DAPCFG_HW_ANALOG_INPUT=0x0000000000000020LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_ATV=0x0000000000000040LL"
+APCFG_DEFS+=                "-DAPCFG_HW_ATV_MTS=0x0000000000000080LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_DTV=0x0000000000000100LL"
+APCFG_DEFS+=                    "-DAPCFG_HW_VGA=0x0000000000000200LL"
+APCFG_DEFS+=               "-DAPCFG_HW_NET_ETH0=0x0000000000000400LL"
+APCFG_DEFS+=              "-DAPCFG_HW_NET_WLAN0=0x0000000000000800LL"
+APCFG_DEFS+=                   "-DAPCFG_HW_CARD=0x0000000000001000LL"
+APCFG_DEFS+=             "-DAPCFG_HW_NET_WL_WPA=0x0000000000002000LL"
+APCFG_DEFS+=                    "-DAPCFG_DTV_CC=0x0000000000004000LL"
+APCFG_DEFS+=                    "-DAPCFG_DTV_TT=0x0000000000008000LL"
+APCFG_DEFS+=                     "-DAPCFG_HW_CI=0x0000000000010000LL"
+
+# -- By Component
+APCFG_DEFS+=         "-DAPCFG_USE_SW_JPEG_IMAGE=0x0000000000020000LL"
+APCFG_DEFS+=         "-DAPCFG_HW_STRETCH_SW_IMG=0x0000000000040000LL"
+APCFG_DEFS+=             "-DAPCFG_USE_PNG_IMAGE=0x0000000000080000LL"
+APCFG_DEFS+=             "-DAPCFG_USE_GIF_IMAGE=0x0000000000100000LL"
+APCFG_DEFS+=            "-DAPCFG_APP_RECORDABLE=0x0000000000200000LL"
+APCFG_DEFS+=                "-DAPCFG_MODULE_IMS=0x0000000000400000LL"
+APCFG_DEFS+=                 "-DAPCFG_FONT_BIDI=0x0000000000800000LL"
+
+# -- By User Input
+APCFG_DEFS+=      "-DAPCFG_INPUT_USBKBD_CONTROL=0x0000000001000000LL"
+APCFG_DEFS+=         "-DAPCFG_INPUT_TTY_CONTROL=0x0000000002000000LL"
+APCFG_DEFS+=         "-DAPCFG_INPUT_TTS_CONTROL=0x0000000004000000LL"
+APCFG_DEFS+=          "-DAPCFG_INPUT_IR_CONTROL=0x0000000008000000LL"
+APCFG_DEFS+=       "-DAPCFG_INPUT_PANEL_CONTROL=0x0000000010000000LL"
+APCFG_DEFS+=         "-DAPCFG_INPUT_IPC_CONTROL=0x0000000020000000LL"
+APCFG_DEFS+=    "-DAPCFG_INPUT_USBMOUSE_CONTROL=0x0000000040000000LL"
+
+# -- By Design
+APCFG_DEFS+=             "-DAPCFG_REC_FORMAT_VR=0x0000000100000000LL"
+APCFG_DEFS+=           "-DAPCFG_REC_FORMAT_FILE=0x0000000200000000LL"
+APCFG_DEFS+=          "-DAPCFG_JPG_TRANS_EFFECT=0x0000000400000000LL"
+APCFG_DEFS+=            "-DAPCFG_READONLY_SETUP=0x0000000800000000LL"
+APCFG_DEFS+=      "-DAPCFG_GUIFRAMEWORK_BY_TOOL=0x0000001000000000LL"
+APCFG_DEFS+=              "-DAAPCFG_APP_RSS_EPG=0x0000002000000000LL"
+APCFG_DEFS+=         "-DAPCFG_SMOOTH_TRICK_PLAY=0x0000004000000000LL"
+
+# -- By Application
+APCFG_DEFS+=          "-DAPCFG_APP_ARPHIC_MFONT=0x0000008000000000LL"
+APCFG_DEFS+=       "-DAPCFG_APP_SCHEDULE_RECORD=0x0000010000000000LL"
+APCFG_DEFS+=            "-DAPCFG_APP_SETUP_MENU=0x0000020000000000LL"
+APCFG_DEFS+=         "-DAPCFG_APP_SW_OSD_SCALER=0x0000040000000000LL"
+APCFG_DEFS+=               "-DAPCFG_APP_HI_FONT=0x0000080000000000LL"
+APCFG_DEFS+=               "-DAPCFG_APP_KARAOKE=0x0000100000000000LL"
+APCFG_DEFS+=                  "-DAPCFG_APP_UPNP=0x0000200000000000LL"
+APCFG_DEFS+=            "-DAPCFG_APP_BITTORRENT=0x0000400000000000LL"
+APCFG_DEFS+=            "-DAPCFG_APP_HTTPCLIENT=0x0000800000000000LL"
+APCFG_DEFS+=           "-DAPCFG_APP_UPNPDLNA1p5=0x0001000000000000LL"
+APCFG_DEFS+=          "-DAPCFG_USE_SQLITE_SETUP=0x0002000000000000LL"
+APCFG_DEFS+=              "-DAPCFG_USE_WIFI_WPS=0x0004000000000000LL"
+
+# -- By Project
+APCFG_DEFS+=                   "-DAPCFG_PRJ_DVR=0x0008000000000000LL"
+APCFG_DEFS+=                   "-DAPCFG_PRJ_PVR=0x0010000000000000LL"
+APCFG_DEFS+=                 "-DAPCFG_PRJ_AVHDD=0x0020000000000000LL"
+APCFG_DEFS+=                "-DAPCFG_PRJ_PLAYER=0x0040000000000000LL"
+APCFG_DEFS+=               "-DAPCFG_PRJ_PVR_BOX=0x0080000000000000LL"
+
+# -- By Language
+APCFG_DEFS+=               "-DAPCFG_LAG_CHINESE=0x0100000000000000LL"
+APCFG_DEFS+=              "-DAPCFG_LAG_SCHINESE=0x0200000000000000LL"
+APCFG_DEFS+=              "-DAPCFG_LAG_JAPANESE=0x0400000000000000LL"
+APCFG_DEFS+=                "-DAPCFG_LAG_KOREAN=0x0800000000000000LL"
+APCFG_DEFS+=              "-DAPCFG_LAG_EUROPEAN=0x1000000000000000LL"
+APCFG_DEFS+=                "-DAPCFG_LAG_ARABIC=0x2000000000000000LL"
+APCFG_DEFS+=                  "-DAPCFG_LAG_THAI=0x4000000000000000LL"
+APCFG_DEFS+=                "-DAPCFG_LAG_HEBREW=0x8000000000000000LL"
+
+
+# Modulized Application Setting
+ifeq ($(QUICK_CONFIG), CONFIG_01)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_02)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_03)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_04)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_05)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_06)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_07)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_08)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_09)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0A)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0B)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11S)
+  USE_USB_INPUT = NO
+  USE_ENGLISH_EURO_LANG_ONLY = YES
+  USE_DTV_TT_CC = NO
+  USE_PNG_IMAGE = NO
+  USE_GIF_IMAGE = NO
+  USE_JPEG_IMAGE = NO
+  #USE_SQLITE_SETUP = NO
+  #USE_JPG_TRANSEFFECT = NO
+  USE_ONLY_BMP_UI = YES
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  DEFINES += -DSLIM_AV_FW
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12S)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_13)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_14)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_15)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_16)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_17)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  ENABLE_ANDROID = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_18)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19)
+  USE_USB_INPUT = YES
+  USE_DTV_TT_CC = NO
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  DEFINES += -DSLIM_AV_FW
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19M)
+  USE_USB_INPUT = YES
+  USE_DTV_TT_CC = NO
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  DEFINES += -DSLIM_AV_FW
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19W)
+  USE_USB_INPUT = YES
+  USE_DTV_TT_CC = NO
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  DEFINES += -DSLIM_AV_FW
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1A)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1B)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1C)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1D)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_21)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22S)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_23)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_24)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_25)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+  ENABLE_ANDROID = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_27)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_28)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_29)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2A)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2B)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2C)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_31)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_32)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_33)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_34)
+  APCFG_FLAGS = "$(APCFG_AVHDD)"
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F1)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  BUILD_CMDLINE_DVDPLAYER = YES
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F2)
+  APCFG_FLAGS = "$(APCFG_PLAYER)"
+  BUILD_CMDLINE_DVDPLAYER = YES
+endif
+
+   # ----- APCFG INITIAL -----
+  APCFG_AVHDD       =APCFG_LIMIT
+  APCFG_PLAYER      =APCFG_LIMIT
+
+   # ----- BY HARDWARE -----
+ifneq ($(QUICK_CONFIG), CONFIG_22S)
+  APCFG_AVHDD      +=|APCFG_HW_DVD|APCFG_HW_HDD|APCFG_HW_USB|APCFG_HW_CARD|APCFG_HW_NET_ETH0|APCFG_HW_NET_WLAN0|APCFG_HW_NET_WL_WPA
+endif
+
+   # AVHDD with DTV
+  APCFG_AVHDD      +=|APCFG_HW_DTV|APCFG_DTV_TT|APCFG_DTV_CC
+
+  APCFG_PLAYER     +=|APCFG_HW_DVD|APCFG_HW_HDD|APCFG_HW_USB|APCFG_HW_CARD
+ifneq ($(USE_DTV_TT_CC), NO)
+  APCFG_PLAYER     +=|APCFG_DTV_TT|APCFG_DTV_CC
+endif
+ifeq ($(CHIP_MODEL), 0x1283)
+   # AVHDD with ATV
+  APCFG_AVHDD      +=|APCFG_HW_ANALOG_INPUT  #|APCFG_HW_ATV
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_08)
+  APCFG_AVHDD      +=|APCFG_HW_CI
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_09)
+  APCFG_AVHDD      +=|APCFG_HW_CI
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0A)
+  APCFG_AVHDD      +=|APCFG_HW_CI
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0B)
+  APCFG_AVHDD      +=|APCFG_HW_CI
+endif
+ifneq ($(CHIP_MODEL), 0x1055)
+  APCFG_PLAYER     +=|APCFG_HW_NET_ETH0|APCFG_HW_NET_WLAN0|APCFG_HW_NET_WL_WPA
+endif
+
+   # ----- USER INPUT -----
+  APCFG_AVHDD      +=|APCFG_INPUT_TTY_CONTROL|APCFG_INPUT_IR_CONTROL|APCFG_INPUT_PANEL_CONTROL
+ifeq ($(ENABLE_ANDROID), YES)
+  APCFG_PLAYER     +=|APCFG_INPUT_IR_CONTROL|APCFG_INPUT_PANEL_CONTROL
+else
+  APCFG_PLAYER     +=|APCFG_INPUT_TTY_CONTROL|APCFG_INPUT_IR_CONTROL|APCFG_INPUT_PANEL_CONTROL
+endif
+
+
+ifneq ($(USE_USB_INPUT), NO)
+ifeq ($(MAIN_PROJECT), Casablanca)
+  APCFG_AVHDD      +=|APCFG_INPUT_USBKBD_CONTROL|APCFG_INPUT_USBMOUSE_CONTROL
+  APCFG_PLAYER     +=|APCFG_INPUT_USBKBD_CONTROL|APCFG_INPUT_USBMOUSE_CONTROL
+endif
+endif
+
+   # ----- BY DESIGN -----
+  APCFG_AVHDD      +=|APCFG_REC_FORMAT_FILE|APCFG_JPG_TRANS_EFFECT|APCFG_SMOOTH_TRICK_PLAY  #|APCFG_REC_FORMAT_VR
+  APCFG_PLAYER     +=|APCFG_SMOOTH_TRICK_PLAY
+ifneq ($(USE_JPG_TRANSEFFECT), NO)
+  APCFG_PLAYER     +=|APCFG_JPG_TRANS_EFFECT
+endif
+
+	 # ----- BY APPLICATION -----
+ifneq ($(QUICK_CONFIG), CONFIG_22S)
+  APCFG_AVHDD      +=|APCFG_APP_RECORDABLE|APCFG_APP_SCHEDULE_RECORD|APCFG_USE_SQLITE_SETUP|APCFG_APP_UPNP|APCFG_USE_WIFI_WPS|APCFG_APP_HTTPCLIENT
+else
+  APCFG_AVHDD      +=|APCFG_APP_RECORDABLE|APCFG_USE_SQLITE_SETUP
+endif
+ifneq ($(USE_SQLITE_SETUP), NO)
+  APCFG_PLAYER     +=|APCFG_USE_SQLITE_SETUP
+endif
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+  APCFG_AVHDD      +=|APCFG_APP_SETUP_MENU
+  APCFG_PLAYER     +=|APCFG_APP_SETUP_MENU
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+ifneq ($(QUICK_CONFIG), CONFIG_22S)
+  APCFG_AVHDD      +=|APCFG_APP_UPNPDLNA1p5
+endif
+ifneq ($(CHIP_MODEL), 0x1055)
+ifneq ($(QUICK_CONFIG), CONFIG_12S)
+  APCFG_PLAYER     +=|APCFG_APP_UPNPDLNA1p5|APCFG_APP_UPNP|APCFG_USE_WIFI_WPS|APCFG_APP_HTTPCLIENT
+else
+  APCFG_PLAYER     +=|APCFG_APP_UPNP|APCFG_USE_WIFI_WPS|APCFG_APP_HTTPCLIENT
+endif
+endif
+endif
+
+   # -- By HI FONT
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+  APCFG_AVHDD      +=|APCFG_APP_HI_FONT
+  APCFG_PLAYER     +=|APCFG_APP_HI_FONT
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+  APCFG_AVHDD      +=|APCFG_APP_ARPHIC_MFONT
+  APCFG_PLAYER     +=|APCFG_APP_ARPHIC_MFONT
+endif
+
+   # -- By Recording Feature
+  APCFG_AVHDD      +=|APCFG_MODULE_IMS
+ifneq ($(BUILD_CMDLINE_DVDPLAYER), YES)
+  APCFG_PLAYER     +=|APCFG_MODULE_IMS
+endif
+
+   # -- By PROJECT
+  APCFG_AVHDD      +=|APCFG_PRJ_AVHDD
+  APCFG_PLAYER     +=|APCFG_PRJ_PLAYER|APCFG_PRJ_AVHDD
+
+   # -- By Language
+  APCFG_AVHDD      +=|APCFG_LAG_EUROPEAN
+  APCFG_PLAYER     +=|APCFG_LAG_EUROPEAN
+
+ifneq ($(USE_ENGLISH_EURO_LANG_ONLY), YES)
+  APCFG_AVHDD      +=|APCFG_LAG_CHINESE|APCFG_LAG_SCHINESE
+  APCFG_PLAYER     +=|APCFG_LAG_CHINESE|APCFG_LAG_SCHINESE
+ifneq ($(WDP_3IN1), YES)
+  ifeq ($(MAIN_PROJECT), Casablanca)
+    APCFG_AVHDD      +=|APCFG_LAG_JAPANESE|APCFG_LAG_KOREAN|APCFG_LAG_THAI|APCFG_LAG_HEBREW|APCFG_LAG_ARABIC
+    APCFG_PLAYER     +=|APCFG_LAG_JAPANESE|APCFG_LAG_KOREAN|APCFG_LAG_THAI|APCFG_LAG_HEBREW|APCFG_LAG_ARABIC
+    USE_OPENTYPE_FONT = YES
+  endif
+endif
+endif
+
+   # -- Enable PNG
+  APCFG_AVHDD      +=|APCFG_USE_SW_JPEG_IMAGE|APCFG_USE_PNG_IMAGE|APCFG_USE_GIF_IMAGE|APCFG_HW_STRETCH_SW_IMG
+  APCFG_PLAYER     +=|APCFG_HW_STRETCH_SW_IMG
+
+ifneq ($(USE_JPEG_IMAGE), NO)
+	APCFG_PLAYER	+=|APCFG_USE_SW_JPEG_IMAGE
+endif
+ifneq ($(USE_PNG_IMAGE), NO)
+	APCFG_PLAYER	+=|APCFG_USE_PNG_IMAGE
+endif
+ifneq ($(USE_GIF_IMAGE), NO)
+	APCFG_PLAYER	+=|APCFG_USE_GIF_IMAGE
+endif
+   # ----- APCFG END -----
+  APCFG_AVHDD      +=|APCFG_LIMIT
+  APCFG_PLAYER     +=|APCFG_LIMIT
+
+
+##########################################################################################
+# Select BOARD_ID                                                                        #
+# Available ID:                                                                          #
+# RTD1073-DEMO,       Demo Board                                                         #
+# RTD1283-DEMO,       Demo Board                                                         #
+# RTD1055-DEMO        DEMO Board                                                         #
+# RTD1185-DEMO        DEMO Board                                                         #
+##########################################################################################
+ifeq ($(QUICK_CONFIG), CONFIG_01)
+  BOARD_ID = RTD1073-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_02)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_03)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_04)
+  BOARD_ID = RTD1073-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_05)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_06)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_07)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_08)
+  BOARD_ID = RTD1283-QA
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_09)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0A)
+  BOARD_ID = RTD1283-QA
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_0B)
+  BOARD_ID = RTD1283-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11)
+  BOARD_ID = RTD1055-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_11S)
+  BOARD_ID = RTD1005-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_12S)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_13)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_14)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_15)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_16)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_17)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_18)
+  BOARD_ID = RTD1185-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19M)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_19W)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1A)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1B)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1C)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_1D)
+  BOARD_ID = RTD1185-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_21)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_22S)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_23)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_24)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_25)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_27)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_28)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_29)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2A)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2B)
+  BOARD_ID = RTD1186-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_2C)
+  BOARD_ID = RTD1186-WDP
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_31)
+  BOARD_ID = RTD1882-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_32)
+  BOARD_ID = RTD1882-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_33)
+  BOARD_ID = RTD1882-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_34)
+  BOARD_ID = RTD1882-DEMO
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F1)
+  BOARD_ID = RTD1186-QA
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_F2)
+  BOARD_ID = RTD1185-DEMO
+endif
+
+##########################################################################################
+# Select REMOTE_ID                                                                       #
+# Available ID:                                                                          #
+# JAECS_T118,         Realtek Standard Remote Control                                    #
+# RTK_MEDIA_BUDDY,    Realtek Standard Remote Control for AVHDD                          #
+# YK_54LU,            Customer Remote Control                                            #
+# LIBRA_MS_RCU,       Customer Remote Control                                            #
+# RTK_MK5,            Realtek Standard Remote Control                                    #
+# RTK_MK5_TV,         Realtek Standard Remote Control                                    #
+##########################################################################################
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+  #REMOTE_ID = JAECS_T118
+  REMOTE_ID = RTK_MK4
+  PLAY_PAUSE_SHARE_REMOTE_KEY = NO
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+ifneq ($(findstring APCFG_HW_DTV, $(APCFG_FLAGS)),)
+  REMOTE_ID = RTK_MK5_TV
+else
+  REMOTE_ID = RTK_MK5
+endif
+  PLAY_PAUSE_SHARE_REMOTE_KEY = YES
+endif
+
+ifeq ($(PLAY_PAUSE_SHARE_REMOTE_KEY), YES)
+  DEFINES += -DPLAY_PAUSE_SHARE_REMOTE_KEY
+endif
+
+ENABLE_KEY_TONE = YES
+ifeq ($(ENABLE_KEY_TONE), YES)
+  DEFINES += -DENABLE_KEY_TONE
+endif
+
+
+##########################################################################################
+# Use HDMI                                                                               #
+##########################################################################################
+HDMI_MODEL  = HDMINoUse
+USE_HDMI    = NO
+USE_HDCP    = YES
+USE_CEC     = YES
+
+ifeq ($(CHIP_MODEL), 0x1283)
+  HDMI_MODEL  = HDMIMARS
+  USE_HDMI    = YES
+  USE_HDCP    = NO
+endif
+
+ifeq ($(CHIP_MODEL), 0x1073)
+  HDMI_MODEL  = HDMIMARS
+  USE_HDMI    = YES
+  USE_HDCP    = NO
+endif
+
+ifeq ($(CHIP_MODEL), 0x1185)
+HDMI_MODEL  = HDMIJUPITER
+USE_HDMI    = YES
+USE_HDCP    = NO
+ONE_STEP    = YES
+endif
+
+ifeq ($(CHIP_MODEL), 0x1085)
+HDMI_MODEL  = HDMIJUPITER
+USE_HDMI    = YES
+USE_HDCP    = NO
+ONE_STEP    = YES
+endif
+
+ifeq ($(CHIP_MODEL), 0x1055)
+HDMI_MODEL  = HDMIJUPITER
+USE_HDMI    = YES
+USE_HDCP    = NO
+ONE_STEP    = NO
+endif
+
+ifeq ($(CHIP_MODEL), 0x1035)
+HDMI_MODEL  = HDMIJUPITER
+USE_HDMI    = YES
+USE_HDCP    = NO
+ONE_STEP    = YES
+endif
+
+ifeq ($(CHIP_MODEL), 0x1186)
+HDMI_MODEL  = HDMISATURN
+USE_HDMI    = YES
+USE_HDCP    = NO
+ONE_STEP    = YES
+endif
+
+#for 2-layer/wifi interference board, it should be YES
+#DISABLE_DEEP_COLOR=NO
+
+
+##########################################################################################
+# SET ATV Tuner                                                                          #
+##########################################################################################
+TV_TUNER_ID = ADIntegration
+
+##########################################################################################
+# SET DTV                                                                                #
+# Enable only ONE of the following!!!                                                    #
+##########################################################################################
+BUILD_DVB_T  = Y
+BUILD_DVB_S  = N
+BUILD_DVB_C  = N
+BUILD_ATSC_T = N
+ifeq ($(QUICK_CONFIG), CONFIG_03)
+  BUILD_DVB_T  = N
+  BUILD_ATSC_T = Y
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_06)
+  BUILD_DVB_T  = N
+  BUILD_ATSC_T = Y
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_14)
+  BUILD_DVB_T  = N
+  BUILD_ATSC_T = Y
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_15)
+  BUILD_DVB_S = Y
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_18)
+  BUILD_DVB_C  = Y
+endif
+ifeq ($(QUICK_CONFIG), CONFIG_34)
+  BUILD_DVB_S = Y
+endif
+
+##########################################################################################
+# ID = 0 means we will be reading data through TP0                                       #
+# ID = 1 means we will be reading data through TP1                                       #
+# ID = 2 means we will be reading data through USB                                       #
+##########################################################################################
+LIB_DEFS +=        "-DDTV_TUNER_ID = 0"
+
+
+##########################################################################################
+# Select DTV Tuner                                                                       #
+#                                                                                        #
+# DTV_FE_NONE                       : No Tuner                                           #
+#                                                                                        #
+# DTV_FE_RTL2830_FE664X             : MN & not MN & DVB-T                                #
+# DTV_FE_RTL2830_FE6660X            : not MN      & DVB-T                                #
+# DTV_FE_RTL2830_TDTG_D223D         :               DVB-T                                #
+# DTV_FE_RTL2830_SN5000             : MN & not MN & DVB-T                                #
+# DTV_FE_RTL2830_TDTC_GX31D         : DVB-T                                              #
+# DTV_FE_RTL2830_TDAD3_C01A         : DVB-T                                              #
+# DTV_FE_RTL2830_TDAG1_A02A         : not MN      & DVB-T                                #
+#                                                                                        #
+# DTV_FE_TDA10048_FQD1216           : not MN      & DVB-T                                #
+#                                                                                        #
+# DTV_FE_RTL2810_DTT76831           : MN & ATSC & OpenCable                              #
+# DTV_FE_RTL2810_DPT78130           : MN & ATSC & OpenCable                              #
+# DTV_FE_RTL2810_TDQU4_507A         : MN & ATSC                                          #
+#                                                                                        #
+# DTV_FE_S5H1411X_DTT76831          : MN & ATSC & OpenCable                              #
+# DTV_FE_S5H1411X_SN5000            : MN & not MN & ATSC & OpenCable                     #
+# DTV_FE_S5H1411X_TDAU1_D01A        : ATSC & OpenCable                                   #
+# DTV_FE_S5H1411X_TDAU3_B01A        : MN & ATSC & OpenCable                              #
+#                                                                                        #
+# DTV_FE_LGS8G52_DTCS403PH172A      : DTMB & PAL                                         #
+#                                                                                        #
+# ATV_FE_TMI1C23I1W                 : MN & notMN         CHANGHONG                       #
+# ATV_FE_TCSX0601XD25X              : notMN              SAMSUNG                         #
+# ATV_FE_TCSN9082DA25A              : MN                 SAMSUNG                         #
+# ATV_FE_FQD12X6L                   : MN & notMN         PHILIPS                         #
+# ATV_FE_CDT5GN14                   : MN                 CHINADRAGON                     #
+#                                                                                        #
+# DTV_FE_TPIF_ONLY                  : ALL (pseude device)                                #
+##########################################################################################
+ifneq ($(findstring APCFG_HW_DTV, $(APCFG_FLAGS)),)
+
+   SENSITIVITY_DB_EN= Y
+#  TP_INVERSE_ORDER = Y
+
+  ifeq ($(BUILD_DVB_T), Y)
+    FE_MODELS  = DTV_FE_RTL2832_MXL5007T
+    FE_MODELS += DTV_FE_RTL2832_TDA18272_DUAL
+    FE_MODELS += DTV_FE_NIM_MXL5007
+    #TP0_FE     = DTV_FE_RTL2832_MXL5007T
+    #TP1_FE     = DTV_FE_RTL2832_MXL5007T
+    TP0_FE     = DTV_FE_RTL2832_TDA18272_DUAL
+    TP1_FE     = DTV_FE_RTL2832_TDA18272_DUAL
+  endif
+
+  ifeq ($(BUILD_DVB_S), Y)
+    TP0_FE     = DTV_FE_NIM_AVL6211_AV2011
+    TP1_FE     = DTV_FE_NIM_AVL6211_AV2011
+    TP1_RF_INPUT_INTERNAL_LOOPTHROUGH = Y
+  endif
+
+  ifeq ($(BUILD_DVB_C), Y)
+    TP0_FE     = DTV_FE_RTL2840_TDA18272_DUAL
+    TP1_FE     = DTV_FE_RTL2840_TDA18272_DUAL
+  endif
+
+  ifeq ($(BUILD_ATSC_T), Y)
+    TP0_FE     = DTV_FE_S5H1411X_TDAU1_D01A
+    TP1_FE     = DTV_FE_NONE
+  endif
+
+  TUNER_0_I2C_CHANNEL = 1
+  TUNER_1_I2C_CHANNEL = 1
+
+  ifeq ($(BOARD_ID), RTD1283-QA)
+    TUNER_0_I2C_CHANNEL = 0
+    TUNER_1_I2C_CHANNEL = 1
+  endif
+else
+  TP0_FE     = DTV_FE_NONE
+  TP1_FE     = DTV_FE_NONE
+
+  TUNER_0_I2C_CHANNEL = 0
+  TUNER_1_I2C_CHANNEL = 0
+endif
+
+ENABLE_DTV_LABS_HK_FIXES = NO
+ifeq ($(ENABLE_DTV_LABS_HK_FIXES), YES)
+DEFINES += -DFIX_BUG_19636
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_3
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_2_4
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_17
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_21
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_22
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_23
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_34
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_35
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_42
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_46
+DEFINES += -DFIX_DTV_LABS_HK_ISSUE_48
+endif
+
+ENABLE_DTV_EPG_PROGRAM_MULTI_LANGUAGE = YES
+ifeq ($(ENABLE_DTV_EPG_PROGRAM_MULTI_LANGUAGE), YES)
+DEFINES += -DENABLE_DTV_EPG_PROGRAM_MULTI_LANGUAGE
+endif
+
+##########################################################################################
+# Set Neptune/Mars TP Interface                                                          #
+# TP_MODEL : NONE / NEPTUNE_TP / NEPTUNE_TP_EX / MARS_TP                                 #
+# TP_RESOURCE_PARTITION : form  1~63 (default : 32)                                      #
+##########################################################################################
+TP0_CHSEL = 0
+TP1_CHSEL = 1
+TP_RESOURCE_PARTITION       = 32
+TP_SECTION_ASSEMBLER_ENABLE = Y
+
+ifneq ($(findstring APCFG_HW_DTV, $(APCFG_FLAGS)),)
+  ifeq ($(CHIP_MODEL), 0x1283)
+    TP_MODEL = MARS_TP
+  endif
+
+  ifeq ($(BOARD_ID), RTD1283-QA)
+    TP0_CHSEL = 0
+    TP1_CHSEL = 2
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1185)
+    TP_MODEL = JUPITER_TP
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1881)
+    TP_MODEL = JUPITER_TP
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1186)
+    TP_MODEL = SATURN_TP
+  endif
+
+else
+  TP_MODEL  = NONE
+endif
+
+
+##########################################################################################
+# Select External TVD Chip                                                               #
+# Available ID:                                                                          #
+# TVP5150,         TI TVP5150                                                            #
+##########################################################################################
+ifneq ($(findstring APCFG_HW_ANALOG_INPUT, $(APCFG_FLAGS)),)
+  EXTERNAL_TVD = YES
+  EXTERNAL_TVD_ID = TVP5150
+else
+  EXTERNAL_TVD = NO
+  EXTERNAL_TVD_ID =
+endif
+
+##########################################################################################
+# AV ENCODER                                                                             #
+##########################################################################################
+ENCODER_COMPONENT = NO
+ifeq ($(CHIP_MODEL), 0x1073)
+  ENCODER_COMPONENT = YES
+endif
+
+ifeq ($(CHIP_MODEL), 0x1283)
+  ENCODER_COMPONENT = YES
+endif
+
+TO_BE_REMOVE = NO
+ifeq ($(CHIP_MODEL), 0x1055)
+  TO_BE_REMOVE = YES
+endif
+
+##########################################################################################
+# VGA                                                                                    #
+##########################################################################################
+ifneq ($(findstring APCFG_HW_VGA, $(APCFG_FLAGS)),)
+  DEFINES += -DHW_VGA
+endif
+
+##########################################################################################
+# Set kernel
+##########################################################################################
+ifeq ($(KERNEL_VER), 2.6.34)
+  DEFINES += -DKERNEL_2_6_34
+endif
+
+ifeq ($(KERNEL_VER), 2.6.12.6)
+  DEFINES += -DKERNEL_2_6_12
+endif
+
+##########################################################################################
+# Bluray 3D
+##########################################################################################
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+
+ifeq ($(CHIP_MODEL), 0x1186)
+ENABLE_BLURAY_3D = YES
+SINGLE_RP_FOR_MVC_TS = YES
+ENABLE_BD_PLAY_TITLE = NO
+endif
+
+ifeq ($(BOARD_ID), RTD1185-DEMO)
+ENABLE_BLURAY_3D = YES
+SINGLE_RP_FOR_MVC_TS = YES
+ENABLE_BD_PLAY_TITLE = NO
+endif
+
+#Turn off Jupiter 3D if Config is WDP
+ifeq ($(CHIP_MODEL), 0x1035)
+ifeq ($(WDP_3IN1), YES)
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+endif
+endif
+
+#Turn off Jupiter 3D if Config is OTT
+ifeq ($(QUICK_CONFIG), CONFIG_1A)
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+endif
+
+ifeq ($(QUICK_CONFIG), CONFIG_1B)
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+endif
+
+ifeq ($(QUICK_CONFIG), CONFIG_1C)
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+endif
+
+ifeq ($(QUICK_CONFIG), CONFIG_1D)
+ENABLE_BLURAY_3D = NO
+SINGLE_RP_FOR_MVC_TS = NO
+endif
+
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+ENABLE_BLURAY_3D = NO
+endif
+##########################################################################################
+# OTHER DEFINE  (YES or NO only)                                                         #
+##########################################################################################
+
+# Wi-Fi Display log
+ifeq ($(CHIP_MODEL), 0x1035)
+ifeq ($(WDP_3IN1), YES)
+DEFINES += -DENABLE_CHECK_RTP_SEQUENCE_CONTINUITY
+#DEFINES += -DENABLE_NAV_LOG
+# CALCU_WFD_ACCU_DATA_BYTES, USE_PCR_PACKET_TO_CHECK_LATENCY CAN'T coexist
+#DEFINES += -DCALCU_WFD_ACCU_DATA_BYTES
+#DEFINES += -DUSE_PCR_PACKET_TO_CHECK_LATENCY
+#DEFINES += -DHIDE_CHECK_LATENCY_DETAIL
+#DEFINES += -DWFD_LOG_TO_FILE
+#DEFINES += -DNAV_LOG_TO_FILE
+#DEFINES += -DDUMP_DEMUX_AUDIO_DATA
+#DEFINES += -DDUMP_DEMUX_VIDEO_DATA
+endif
+endif
+
+# This turns on/off compilation commands during compilation.
+SHOW_COMPILER_COMMAND = N
+PREBUILT_LIB = YES
+
+HAS_COMPONENT_HW = YES
+ifeq ($(CHIP_MODEL), 0x1055)
+  HAS_COMPONENT_HW = NO
+endif
+
+# Enable only ONE of the following!!!
+HAS_NETWORK_HW = NO
+ifneq ($(findstring APCFG_HW_NET_WLAN0, $(APCFG_FLAGS)),)
+  HAS_NETWORK_HW = YES
+else
+  ifneq ($(findstring APCFG_HW_NET_ETH0, $(APCFG_FLAGS)),)
+    HAS_NETWORK_HW = YES
+  endif
+endif
+ifeq ($(HAS_NETWORK_HW), YES)
+  FIRMWARE_NETWORK_UPDATE_VIA_HTTP = YES
+  FIRMWARE_NETWORK_UPDATE_VIA_FTP = NO
+endif
+
+ifeq ($(WDP_3IN1), YES)
+  USE_P2P_SOFTAP_MODE = YES
+else
+  USE_P2P_SOFTAP_MODE = NO
+endif
+
+ifeq ($(USE_P2P_SOFTAP_MODE), YES)
+  DEFINES += -DUSE_P2P_SOFTAP_MODE
+endif
+# usb dmalloc or efence to debug mem leak
+# if no, the fallow item will be ingored
+USE_DEBUG_MEM_LEAK_TOOLS = NO
+
+# if no, USE_DEBUG_MEM_EFENCE will be YES
+USE_DEBUG_MEM_DMALLOC = NO
+
+USE_VIDEO_ENCODER_SIMULATOR = NO
+USE_VIDEO_DECODER_SIMULATOR = NO
+USE_SPU_DECODER_SIMULATOR = NO
+INPUT_USE_IO_PLUGIN = YES
+
+ENABLE_WAVE_INPUT_PLUGIN = YES
+ENABLE_FLAC_EXTENSION = YES
+ENABLE_MKA_EXTENSION = YES
+
+ENABLE_RM_INPUT_PLUGIN = YES
+ENABLE_RM_VIDEO = NO
+
+ENABLE_BD_INPUT_PLUGIN = YES
+
+ENABLE_ASF_INPUT_PLUGIN = YES
+ENABLE_MP4_INPUT_PLUGIN = YES
+ENABLE_OGG_INPUT_PLUGIN = YES
+ENABLE_NEPTUNE_TP_PLUGIN = NO
+
+ifeq ($(HAS_NETWORK_HW), YES)
+ENABLE_SOCKET_INPUT_PLUGIN = NO
+ENABLE_NRD3_INPUT_PLUGIN = NO
+endif
+
+#USE_VIDEO_MIXER = NO means use one video decoder only
+USE_VIDEO_MIXER = NO
+
+USE_AUDIO = YES
+USE_SPU = YES
+TEST_TS= YES
+USE_TS_SUBTITLE = YES
+USE_1394 = YES
+USE_IOCACHE = NO
+USE_VOB_CACHE_DATA = NO
+USE_SMOOTH_REVERSE = YES
+
+#USE_RSS_STYLE_GUIDE = YES
+
+USE_HD_SURFACE = YES
+USE_HD_SURFACE_0 = NO
+
+USE_DFB_SUPPORT = NO
+DFB_DISABLE_PLI = NO
+DFB_MULTI_APP = NO
+QT_OPENGL = NO
+ENABLE_DFB_LAYER_SUB1 = NO
+ENABLE_DFB_LAYER_OSD2 = NO
+ENABLE_DFB_OSD = NO
+ENABLE_DFB_VKBD = NO
+ENABLE_DFB_VKBD2 = NO
+ENABLE_DFB_FLIP_THREAD=NO
+
+USE_ZLIB = NO
+
+ENABLE_YWE = NO
+USE_KEN_BURNS  = YES
+BROWSER_USING_SW_DECODE = NO
+
+ENABLE_DVB_OTA_DOWNLOAD = NO
+
+ENABLE_USB_WIRELESS_HEADSET = NO
+
+USE_CRC_CHECK=NO
+
+USE_BASE_LCN=NO
+
+ENABLE_ATS_CERTIFICATION = NO
+
+#if RESET_DTV_FILE_PLAYBACK_RESYNC_THRESHOLD=NO, we will not reference to DTV_FILE_PLAYBACK_RESYNC_THRESHOLD and set to default value 962560
+RESET_DTV_FILE_PLAYBACK_RESYNC_THRESHOLD = YES
+
+DISABLE_BROWSER_PREVIEW_FOR_HD_OUTPUT = NO
+
+ENABLE_HDMV_PLAYBACK = NO
+
+SKIP_HIDDEN_FILE = NO
+ifeq ($(SKIP_HIDDEN_FILE), YES)
+  DEFINES += -DSKIP_HIDDEN_FILE
+endif
+
+# Use audio firmware to decocde APE or not
+ENABLE_AUDIO_APE = YES
+ifeq ($(ENABLE_AUDIO_APE), YES)
+  DEFINES += -DENABLE_AUDIO_APE
+endif
+
+# security options
+SECURITY_BOOT = NO
+
+# suspend to ram options
+ENABLE_SUSPEND_DVDPLAYER_TO_RAM = YES
+
+USE_READ_ONLY_LOADER = YES
+
+# Use ddr DMA instead of memcpy during recording
+USE_DDR_DMA_COPY = YES
+
+# The DDR size of board.
+USE_64M_MEMORY = YES
+
+# Use HDD in Browser
+USE_HDD_DEVICE_IN_BROWSER = YES
+
+# PUT VIDEO PREPROCESSING IN SETUP MENU
+VIDEO_PREPROCESSING_MENU = NO
+
+# GCode menu in timer
+GCODE_MENU = NO
+
+USE_ML = NO
+
+ENABLE_SPU_IN_MPEG_PLUGIN = NO
+
+ENABLE_DVD_HACK_UOP = NO
+
+DISABLE_FELICS = YES
+ENABLE_APE = YES
+USE_AVS = YES
+VIDEO_SUPPORT_AVSTS = YES
+USE_SMOOTH_ROLLING = NO
+
+USE_FREETYPE_FONT = YES
+ENABLE_EXT_HDD_DB = YES
+
+SUPPORT_WMDRM_FLAG = YES
+SUPPORT_PLAYREADY_FLAG = NO
+ENABLE_ANDROID = NO
+USE_ANDROID_3D_ACCELERATOR = NO
+USE_SCREEN_SAVER=YES
+
+ENABLE_VSYNC_BLIT = YES
+TVE_DEC_SWITCH = NO
+
+ENABLE_MO_SCREEN_CAPTURE = NO
+
+ENABLE_MEDIASERVER = YES
+
+OSD_COLOR_FORMAT = COLOR_FORMAT_32
+ENABLE_1080P_UI = NO
+
+ENABLE_DIAL_SERVER = NO
+# Set this flag to YES will change FlashLite's color format to the old one.
+# After setting this flag you need to re-build FlashLite's library.
+ENABLE_FLASH_COLOR_FORMAT_32_888A = NO
+
+# Set this flag to YES will adjust FlashLite's font to be suitable with Philip's font.
+# After setting this flag you need to re-build FlashLite's library.
+ENABLE_FLASH_FONT_ADJUSTMENT = NO
+
+EXCLUDE_OPENSSL = NO
+
+# FOR DTCP-IP
+ENABLE_DTCP_IP = YES
+
+# For DFB Multitouch
+ENABLE_DFB_MULTITOUCH = NO
+
+ENABLE_DTV_ASYNC_RECORD = NO
+
+ENABLE_FILELIST_PLAYBACK = NO
+ifeq ($(ENABLE_FILELIST_PLAYBACK), YES)
+	DEFINES += -DENABLE_FILELIST_PLAYBACK
+endif
+ifeq ($(HAS_NETWORK_HW), YES)
+  USE_P2P_SOFTAP_MODE = YES
+  USE_DHCP_CLIENT = YES
+  USE_STREAM_PPS_IOPLUGIN = NO
+  ENABLE_NRD = NO
+  ENABLE_NETTV = NO
+  USE_CINEMA_NOW = NO
+  USE_OPERA = NO
+  USE_DFB_OPERA = NO
+
+  USE_CEHTML_OPERA = YES
+  ifeq ($(CHIP_MODEL), 0x1283)
+    USE_CEHTML_OPERA = NO
+  endif
+  ifeq ($(CHIP_MODEL), 0x1073)
+    USE_CEHTML_OPERA = NO
+  endif
+
+  DLNADMRCTT = NO
+
+  ENABLE_CONFERENCE = NO
+  ENABLE_IPCSTREAMING = NO
+
+  ENABLE_SNDA = NO
+  ENABLE_YOUTUBELB = YES
+  ENABLE_FLINGO = YES
+  ENABLE_YOTA_MUSIC = YES
+  ENABLE_MEDIASERVER = YES
+endif
+
+ifeq ($(ENABLE_SNDA), YES)
+#input for snda vorbis audio
+	ENABLE_SNDAOGG_INPUT_PLUGIN = YES
+endif
+
+ENABLE_CALC_FREE_MEMORY = NO
+
+ifeq ($(CHIP_MODEL), 0x1073)
+  OSD_COLOR_FORMAT = COLOR_FORMAT_16
+  ENABLE_VSYNC_BLIT = NO
+  DISABLE_FELICS = NO
+  USE_AVS = NO
+  VIDEO_SUPPORT_AVSTS = NO
+endif
+
+ifeq ($(CHIP_MODEL), 0x1283)
+  OSD_COLOR_FORMAT = COLOR_FORMAT_16
+  ENABLE_VSYNC_BLIT = NO
+  DISABLE_FELICS = NO
+  USE_AVS = NO
+  VIDEO_SUPPORT_AVSTS = NO
+endif
+
+ifneq ($(CHIP_MODEL), 0x1055)
+ifneq ($(WDP_3IN1), YES)
+ifneq ($(QUICK_CONFIG), CONFIG_19S)
+  USE_SINA_IMS = YES
+  ENABLE_THUNDER = NO
+  USE_WEB_CGI = YES
+  ENABLE_YOUKU = YES
+endif
+endif
+endif
+
+ifeq ($(REAL_CHIP_MODEL), 0x1882)
+  ENABLE_WAVE_INPUT_PLUGIN = NO
+  ENABLE_FLAC_EXTENSION = NO
+  ENABLE_MKA_EXTENSION = NO
+  ENABLE_APE = NO
+  ENABLE_RM_INPUT_PLUGIN = NO
+  ENABLE_RM_VIDEO = NO
+  ENABLE_CONFERENCE = NO
+  USE_CAMERA = NO
+endif
+
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+  USE_DIRECT_CONNECT = NO
+  USE_STREAM_RTSP_IOPLUGIN = YES
+  USE_LIVE_LIBRARY = YES
+  USE_STREAM_RTP_IOPLUGIN = YES
+  USE_STREAM_MMS_IOPLUGIN = YES
+
+  ENABLE_FLASH_INPUT_PLUGIN = NO
+  USE_SWF = NO
+  ENABLE_NRD2X = NO
+
+  USE_IPOD_CGI = NO
+  ENABLE_LASTDOTFM = NO
+  ENABLE_GTALK = NO
+  ENABLE_MEDIAFLY = NO
+  ENABLE_VTUNER = NO
+  ENABLE_PANDORA = NO
+  ENABLE_SKYPE = NO
+  ENABLE_VUDU = NO
+  ENABLE_VUDU_MOVIE = NO
+  ENABLE_VUDU_APP = NO
+  ENABLE_VUDU_3D = NO
+  ENABLE_WIDI_2.0 = NO
+  ENABLE_WIDI_3.5 = NO
+  ENABLE_MIDI_MIXER = NO
+  ENABLE_ACETRAX = NO
+  ENABLE_FLICKR = NO
+  ENABLE_PODCAST = NO
+  ENABLE_AUDIOPODCAST = NO
+  USE_WEBKIT = NO
+  ENABLE_VOOLETV = NO
+  ENABLE_MYFAVORITES = NO
+  ENABLE_IMAGE_CACHE = NO
+  ENABLE_IMAGE_CACHE_SINK = NO
+
+  ifneq ($(findstring APCFG_PRJ_PLAYER, $(APCFG_FLAGS)),)
+    ENABLE_BESTV = YES
+  else
+    ENABLE_BESTV = NO
+  endif
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+  ENABLE_IMS3D = NO
+  ENABLE_RSSOGLES_STAND_ALONE = NO
+  ENABLE_RSSOGLES_RELOAD = NO
+  ENABLE_MEDIAPLAYSERVER = NO
+  ENABLE_COVERFLOW_HOME = NO
+  ENABLE_FUNHOUSE_HOME = NO
+  ENABLE_IMS3D_PRELOAD = NO
+  ENABLE_IMS3D_DEBUG = NO
+  ENABLE_3D_AP_TRANSITION = NO
+  ENABLE_3D_ONLOADING = NO
+  ENABLE_AIR_FUN = YES
+  ENABLE_SMART_DISPLAY_STAND_ALONE = NO
+  ENABLE_SHOW_DISPLAY = YES
+  USE_SCREEN_SAVER = YES
+  USE_DIRECT_CONNECT = YES
+  USE_STREAM_RTSP_IOPLUGIN = YES
+  USE_LIVE_LIBRARY = YES
+  USE_STREAM_RTP_IOPLUGIN = YES
+  USE_STREAM_MMS_IOPLUGIN = YES
+  ENABLE_PICASA = YES
+  ENABLE_MO_SCREEN_CAPTURE = YES
+
+  ENABLE_FLASH_INPUT_PLUGIN = YES
+  USE_SWF = YES
+  FLASH_GUI = NO
+  FLASH_JUKEBOX = YES
+  ENABLE_NRD2X = NO
+  ENABLE_NRD31A = YES
+  ENABLE_NRD32 = NO
+
+  USE_IPOD_DEVICE = YES
+  USE_IPOD_CGI = YES
+  USE_REMOTE_CONTROL_CGI = YES
+
+  #for new network upgrade + recovery mode
+  ENABLE_RECOVERY_MODE = YES
+
+  ENABLE_LASTDOTFM = YES
+  ENABLE_GTALK = YES
+  ENABLE_BESTV = YES
+  ENABLE_PANDORA = YES
+  ENABLE_SKYPE = NO
+  ENABLE_VUDU = YES
+  ENABLE_VUDU_MOVIE = YES
+  ENABLE_VUDU_APP = YES
+  ENABLE_VUDU_3D = NO
+  ENABLE_WIDI_2.0 = NO
+  ENABLE_WIDI_3.5 = YES
+  ENABLE_MIDI_MIXER = NO
+  ENABLE_WFDISPLAY = YES
+  ENABLE_SIMPLAY = NO
+  ENABLE_ACETRAX = YES
+  ENABLE_FLICKR = YES
+  ENABLE_PODCAST = YES
+  ENABLE_AUDIOPODCAST = YES
+  ENABLE_MEDIAFLY = NO
+  ENABLE_VTUNER = NO
+  USE_WEBKIT = YES
+  ENABLE_VOOLETV = YES
+  ENABLE_WASU = YES
+  ENABLE_PPTV = NO
+  ENABLE_HDMV_PLAYBACK = YES
+  USE_SMOOTH_ROLLING = YES
+  ENABLE_FLASHAPPSTORE = YES
+  ENABLE_IMAGE_CACHE = NO
+  ENABLE_IMAGE_CACHE_SINK = NO
+  EXIF_AUTO_ROTATE = YES
+  ENABLE_MYFAVORITES = YES
+  ENABLE_FILE_BROWSER = YES
+
+  USE_ONLYONE_RSSSKIN = YES
+
+  # directfb multiple layers
+  ENABLE_DFB_LAYER_SUB1 = NO
+  ENABLE_DFB_LAYER_OSD2 = NO
+  DFB_MULTI_APP = NO
+  ENABLE_DFB_OSD = YES
+
+  ENABLE_DMS = YES
+  ENABLE_3DGAMES = NO
+
+  ifeq ($(CHIP_MODEL), 0x1073)
+    ENABLE_NRD2X = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_DFB_OSD = NO
+    ENABLE_VUDU = NO
+    ENABLE_VUDU_MOVIE = NO
+    ENABLE_VUDU_APP = NO
+    ENABLE_WFDISPLAY = NO
+    ENABLE_WIDI_2.0 = NO
+    ENABLE_WIDI_3.5 = NO
+    ENABLE_WASU = NO
+    ENABLE_MO_SCREEN_CAPTURE = NO
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1283)
+    ENABLE_DFB_OSD = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    ENABLE_VUDU = NO
+    ENABLE_VUDU_MOVIE = NO
+    ENABLE_VUDU_APP = NO
+    ENABLE_WFDISPLAY = NO
+    ENABLE_WIDI_2.0 = NO
+    ENABLE_WIDI_3.5 = NO
+    ENABLE_WASU = NO
+    ENABLE_MO_SCREEN_CAPTURE = NO
+  endif
+
+ifeq ($(ENABLE_OTT), YES)
+  USE_SINA_IMS = YES
+  ENABLE_EXT_HDD_DB = NO
+  ENABLE_YOTA_MUSIC = YES
+  ENABLE_BESTV = YES
+  ENABLE_VOOLETV = YES
+  ENABLE_WASU = YES
+  ENABLE_THUNDER = NO
+  ENABLE_IMS3D = NO
+  ENABLE_RSSOGLES_STAND_ALONE = NO
+  ENABLE_RSSOGLES_RELOAD = NO
+  ENABLE_MEDIAPLAYSERVER = NO
+  ENABLE_COVERFLOW_HOME = NO
+  ENABLE_FUNHOUSE_HOME = NO
+  ENABLE_IMS3D_PRELOAD = NO
+  ENABLE_IMS3D_DEBUG = NO
+  ENABLE_3D_AP_TRANSITION = NO
+  ENABLE_3D_ONLOADING = NO
+  ENABLE_SMART_DISPLAY_STAND_ALONE = NO
+  ENABLE_NRD2X = NO
+  ENABLE_FLINGO = YES
+  ENABLE_LASTDOTFM = YES
+  ENABLE_GTALK = YES
+  ENABLE_PANDORA = YES
+  ENABLE_SKYPE = NO
+  ENABLE_VUDU = YES
+  ENABLE_VUDU_MOVIE = YES
+  ENABLE_VUDU_APP = YES
+  ENABLE_VUDU_3D = NO
+  ENABLE_MIDI_MIXER = NO
+  ENABLE_VTUNER = NO
+  ENABLE_FLASHAPPSTORE = NO
+  ENABLE_MYFAVORITES = NO
+
+  ENABLE_NRD31A = YES
+  ENABLE_NRD32 = NO
+  USE_HDCP = YES
+  ENABLE_AIR_FUN = YES
+  ENABLE_FLICKR = YES
+  ENABLE_PICASA = YES
+  ENABLE_PODCAST = YES
+  ENABLE_AUDIOPODCAST = YES
+  ENABLE_YOUTUBELB = YES
+  ENABLE_MEDIAFLY = NO
+
+  ENABLE_SHOW_DISPLAY = YES
+  USE_SCREEN_SAVER = YES
+  USE_DIRECT_CONNECT = YES
+  USE_STREAM_RTSP_IOPLUGIN = YES
+  USE_LIVE_LIBRARY = YES
+  USE_STREAM_RTP_IOPLUGIN = YES
+  USE_STREAM_MMS_IOPLUGIN = YES
+  ENABLE_FLASH_INPUT_PLUGIN = YES
+  USE_SWF = YES
+  FLASH_GUI = NO
+  FLASH_JUKEBOX = YES
+  USE_IPOD_DEVICE = YES
+  USE_IPOD_CGI = YES
+  USE_REMOTE_CONTROL_CGI = YES
+  ENABLE_ACETRAX = YES
+  USE_WEBKIT = YES
+  USE_SMOOTH_ROLLING = YES
+  EXIF_AUTO_ROTATE = YES
+  ENABLE_FILE_BROWSER = YES
+
+ifeq ($(ENABLE_CN_OTT), YES)
+  ENABLE_WIDI_2.0 = NO
+  ENABLE_WIDI_3.5 = NO
+  ENABLE_DATATRANSPORTSERVER = NO
+  ENABLE_FLICKR = NO
+  ENABLE_PICASA = NO
+  ENABLE_PODCAST = NO
+  ENABLE_AUDIOPODCAST = NO
+  ENABLE_YOUTUBELB = NO
+  ENABLE_MEDIAFLY = NO
+  ENABLE_NRD31A = NO
+  ENABLE_NRD32 = NO
+  USE_HDCP = NO
+  USE_CEHTML_OPERA = NO
+endif
+
+ifeq ($(ENABLE_US_OTT), YES)
+  ENABLE_VUDU = YES
+  ENABLE_PANDORA = YES
+endif
+
+endif
+
+ifeq ($(ENABLE_RECOVERY_MODE), YES)
+  DEFINES += -DENABLE_RECOVERY_MODE
+endif
+
+  ifeq ($(CHIP_MODEL), 0x1005)
+    ENABLE_DFB_OSD = NO
+    ENABLE_MO_SCREEN_CAPTURE = NO
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1055)
+    ENABLE_AIR_FUN = NO
+    ENABLE_MO_SCREEN_CAPTURE = NO
+    USE_DIRECT_CONNECT = NO
+    USE_STREAM_RTSP_IOPLUGIN = NO
+    USE_STREAM_RTP_IOPLUGIN = NO
+    USE_STREAM_MMS_IOPLUGIN = NO
+
+    USE_SWF = NO
+
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_FLASH_INPUT_PLUGIN = NO
+    USE_IPOD_DEVICE = NO
+    USE_IPOD_CGI = NO
+    ENABLE_LASTDOTFM = NO
+    ENABLE_GTALK = NO
+    ENABLE_BESTV = NO
+    ENABLE_PANDORA = NO
+    ENABLE_SKYPE = NO
+    ENABLE_VUDU = NO
+    ENABLE_VUDU_MOVIE = NO
+    ENABLE_VUDU_APP = NO
+    ENABLE_VUDU_3D = NO
+    ENABLE_MIDI_MIXER = NO
+    ENABLE_ACETRAX = NO
+    ENABLE_FLICKR = NO
+    ENABLE_PODCAST = NO
+    ENABLE_AUDIOPODCAST = NO
+    ENABLE_NRD2X = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    ENABLE_MEDIAFLY = NO
+    ENABLE_VTUNER = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+    ENABLE_FLASHAPPSTORE = NO
+    USE_DFB_OPERA = NO
+    USE_CEHTML_OPERA = NO
+    ENABLE_MYFAVORITES = NO
+    ENABLE_IMAGE_CACHE = NO
+    ENABLE_IMAGE_CACHE_SINK = NO
+    ENABLE_DFB_OSD = NO
+    ENABLE_DMS = NO
+    ENABLE_WFDISPLAY = NO
+    ENABLE_WIDI_2.0 = NO
+    ENABLE_WIDI_3.5 = NO
+    ENABLE_WASU = NO
+    #TVE_DEC_SWITCH = YES
+    EXCLUDE_OPENSSL = YES
+
+    ifeq ($(QUICK_CONFIG), CONFIG_11S)
+      OSD_COLOR_FORMAT = COLOR_FORMAT_16
+      USE_FREETYPE_FONT = NO
+      ENABLE_EXT_HDD_DB = NO
+      SUPPORT_WMDRM_FLAG = NO
+      SUPPORT_PLAYREADY_FLAG = NO
+    endif
+  endif
+
+  ifeq ($(WDP_3IN1), YES)
+    ENABLE_SMART_DISPLAY_STAND_ALONE = YES
+    ENABLE_AIR_FUN = YES
+    ENABLE_SHOW_DISPLAY = NO
+    USE_DIRECT_CONNECT = YES
+    USE_STREAM_RTSP_IOPLUGIN = NO
+    USE_STREAM_RTP_IOPLUGIN = NO
+    USE_STREAM_MMS_IOPLUGIN = NO
+    ifeq ($(WIDI3.5_AUTH), YES)
+      ENABLE_FILE_BROWSER = NO
+    else
+      ENABLE_FILE_BROWSER = YES
+      ifeq ($(ENABLE_FILE_BROWSER), YES)
+        DEFINES += -DFEATURE_ENABLE_FILE_BROWSER_POPUP
+      endif
+    endif
+    USE_SCREEN_SAVER=NO
+
+    USE_SWF = NO
+
+    ENABLE_YOUTUBELB = NO
+    ENABLE_EXT_HDD_DB = NO
+    ENABLE_WAVE_INPUT_PLUGIN = YES
+    ENABLE_RM_INPUT_PLUGIN = YES
+    ENABLE_BD_INPUT_PLUGIN = NO
+    ENABLE_ASF_INPUT_PLUGIN = YES
+    ENABLE_MP4_INPUT_PLUGIN = YES
+    ENABLE_OGG_INPUT_PLUGIN = YES
+    USE_CEC = NO
+    #USE_SCRIPT_FUNC_ONLY = YES
+    ENABLE_KEY_TONE = NO
+    ENABLE_FLAC_EXTENSION = NO
+    ENABLE_MKA_EXTENSION = NO
+    ENABLE_RSSOGLES_RELOAD = NO
+    EXIF_AUTO_ROTATE = NO
+
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_FLASH_INPUT_PLUGIN = NO
+    USE_IPOD_DEVICE = NO
+    USE_IPOD_CGI = YES
+    USE_REMOTE_CONTROL_CGI = YES
+    ENABLE_LASTDOTFM = NO
+    ENABLE_GTALK = NO
+    ENABLE_BESTV = NO
+    ENABLE_PANDORA = NO
+    ENABLE_SKYPE = NO
+    ENABLE_VUDU = NO
+    ENABLE_VUDU_MOVIE = NO
+    ENABLE_VUDU_APP = NO
+    ENABLE_VUDU_3D = NO
+    ENABLE_MIDI_MIXER = NO
+    ENABLE_ACETRAX = NO
+    ENABLE_FLICKR = NO
+    ENABLE_PODCAST = NO
+    ENABLE_AUDIOPODCAST = NO
+    ENABLE_NRD2X = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    ENABLE_MEDIAFLY = NO
+    ENABLE_VTUNER = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+    ENABLE_FLASHAPPSTORE = NO
+    USE_DFB_OPERA = NO
+    USE_CEHTML_OPERA = NO
+    ENABLE_MYFAVORITES = NO
+    ENABLE_IMAGE_CACHE = NO
+    ENABLE_IMAGE_CACHE_SINK = NO
+    ENABLE_DFB_OSD = NO
+    ENABLE_WASU = NO
+    ifneq ($(CHIP_MODEL), 0x1186)
+      ENABLE_PPTV = YES
+    endif
+    ifeq ($(QUICK_CONFIG), CONFIG_19M)
+      ENABLE_PPTV = NO
+      ENABLE_WIDI_2.0 = NO
+      ENABLE_WIDI_3.5 = NO
+    endif
+    ifeq ($(QUICK_CONFIG), CONFIG_19W)
+	  ifeq ($(ENABLE_WIDI_3.5), YES)
+        DISABLE_WFDISPLAY_UI = YES
+      else
+        ENABLE_WFDISPLAY = NO
+      endif
+    endif
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1085)
+    ENABLE_DFB_OSD = NO
+    FLASH_GUI = NO
+
+    ifeq ($(QUICK_CONFIG), CONFIG_12S)
+      ENABLE_DMS = NO
+      USE_DIRECT_CONNECT = NO
+    endif
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1185)
+    ENABLE_DFB_OSD = NO
+    ENABLE_DFB_VKBD = NO
+    ENABLE_DFB_VKBD2 = NO
+    FLASH_GUI = NO
+  endif
+
+  ifeq ($(CHIP_MODEL), 0x1186)
+    ENABLE_DFB_VKBD = YES
+    ENABLE_DFB_VKBD2 = YES
+    USE_WEBKIT = YES
+    ENABLE_VOOLETV = YES
+    ENABLE_VUDU_3D = YES
+
+    ENABLE_VTUNER = NO
+    ENABLE_BESTV = YES
+    ENABLE_IMAGE_CACHE = YES
+    ENABLE_IMAGE_CACHE_SINK = YES
+    ENABLE_1080P_UI = NO
+    ifeq ($(ENABLE_OTT), YES)
+      ENABLE_SKYPE = YES
+    endif
+  endif
+
+  ifeq ($(REAL_CHIP_MODEL), 0x1882)
+    USE_DIRECT_CONNECT = NO
+    ENABLE_EXT_HDD_DB = NO
+    ENABLE_MYFAVORITES = NO
+    FLASH_JUKEBOX = NO
+    FLASH_GUI = NO
+
+    ENABLE_NRD2X = NO
+    ifeq ($(QUICK_CONFIG), CONFIG_31)
+      ENABLE_NRD2X = YES
+    endif
+    ifeq ($(QUICK_CONFIG), CONFIG_33)
+      USE_WEBKIT = NO
+      ENABLE_HDMV_PLAYBACK = NO
+      ENABLE_FLASHAPPSTORE = NO
+    endif
+  endif
+
+  ifeq ($(WDP_3IN1), YES)
+	ENABLE_DFB_VKBD = NO
+    ENABLE_DFB_VKBD2 = NO
+    USE_WEBKIT = NO
+    ENABLE_HDMV_PLAYBACK = NO
+	ENABLE_VOOLETV = NO
+	ENABLE_VUDU_3D = NO
+
+	ENABLE_VTUNER = NO
+    ENABLE_BESTV = NO
+	ENABLE_IMAGE_CACHE = NO
+    ENABLE_IMAGE_CACHE_SINK = NO
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_15)
+    FLASH_GUI = NO
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_16)
+    ENABLE_THUNDER = NO
+    OSD_COLOR_FORMAT = COLOR_FORMAT_32
+    ENABLE_NRD2X = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+    USE_SWF = YES
+    ENABLE_FLASH_INPUT_PLUGIN = NO
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_17)
+    ENABLE_ANDROID = YES
+    ENABLE_MEDIAPLAYSERVER = YES
+    ENABLE_FLASH_INPUT_PLUGIN = NO
+    USE_SWF = NO
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_GTALK = NO
+    ENABLE_BESTV = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_22)
+    ENABLE_SKYPE = YES
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_22S)
+    EXCLUDE_OPENSSL = YES
+    ENABLE_AIR_FUN = NO
+    ENABLE_MO_SCREEN_CAPTURE = NO
+    USE_DIRECT_CONNECT = NO
+    USE_STREAM_RTSP_IOPLUGIN = NO
+    USE_STREAM_RTP_IOPLUGIN = NO
+    USE_STREAM_MMS_IOPLUGIN = NO
+
+    USE_SWF = NO
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_FLASH_INPUT_PLUGIN = NO
+    USE_IPOD_DEVICE = NO
+    USE_IPOD_CGI = NO
+    ENABLE_LASTDOTFM = NO
+    ENABLE_GTALK = NO
+    ENABLE_BESTV = NO
+    ENABLE_PANDORA = NO
+    ENABLE_SKYPE = NO
+    ENABLE_VUDU = NO
+    ENABLE_VUDU_MOVIE = NO
+    ENABLE_VUDU_APP = NO
+    ENABLE_VUDU_3D = NO
+    ENABLE_MIDI_MIXER = NO
+    ENABLE_ACETRAX = NO
+    ENABLE_FLICKR = NO
+    ENABLE_PODCAST = NO
+    ENABLE_AUDIOPODCAST = NO
+    ENABLE_NRD2X = NO
+    ENABLE_NRD31A = NO
+    ENABLE_NRD32 = NO
+    ENABLE_MEDIAFLY = NO
+    ENABLE_VTUNER = NO
+    USE_WEBKIT = NO
+    ENABLE_VOOLETV = NO
+    ENABLE_HDMV_PLAYBACK = NO
+    ENABLE_FLASHAPPSTORE = NO
+    USE_DFB_OPERA = NO
+    USE_CEHTML_OPERA = NO
+    ENABLE_MYFAVORITES = NO
+    ENABLE_IMAGE_CACHE = NO
+    ENABLE_IMAGE_CACHE_SINK = NO
+    ENABLE_DFB_OSD = NO
+    ENABLE_DFB_VKBD = NO
+
+    ENABLE_WFDISPLAY = NO
+    ENABLE_WIDI_2.0 = NO
+    ENABLE_WIDI_3.5 = NO
+    ENABLE_WASU = NO
+
+    ENABLE_DMS = NO
+
+    USE_FREETYPE_FONT = NO
+    SUPPORT_WMDRM_FLAG = NO
+    SUPPORT_PLAYREADY_FLAG = NO
+
+    USE_SINA_IMS = NO
+    ENABLE_THUNDER = NO
+    USE_WEB_CGI = NO
+#   TVE_DEC_SWITCH = YES
+    ENABLE_YOUKU = NO
+
+    ENABLE_EXT_HDD_DB = NO
+    ENABLE_FILE_BROWSER = NO
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_23)
+    ENABLE_IMS3D = YES
+    ENABLE_RSSOGLES_RELOAD = YES
+    ENABLE_RSSOGLES_NEW_DC = YES
+    ENABLE_COVERFLOW_HOME = YES
+    ENABLE_FUNHOUSE_HOME = NO
+    ENABLE_IMS3D_PRELOAD = YES
+    ENABLE_IMS3D_DEBUG = YES
+    ENABLE_3D_AP_TRANSITION = NO
+    ENABLE_3D_ONLOADING = NO
+    ENABLE_3DGAMES = YES
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_24)
+    ENABLE_IMS3D = YES
+    ENABLE_RSSOGLES_RELOAD = YES
+    ENABLE_RSSOGLES_NEW_DC = YES
+    ENABLE_COVERFLOW_HOME = YES
+    ENABLE_FUNHOUSE_HOME = NO
+    ENABLE_IMS3D_PRELOAD = YES
+    ENABLE_IMS3D_DEBUG = YES
+    ENABLE_3D_AP_TRANSITION = NO
+    ENABLE_3D_ONLOADING = NO
+    ENABLE_3DGAMES = YES
+    ENABLE_SKYPE = YES
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_27)
+    ENABLE_IMS3D = YES
+    ENABLE_RSSOGLES_RELOAD = YES
+    ENABLE_RSSOGLES_NEW_DC = YES
+    ENABLE_COVERFLOW_HOME = NO
+    ENABLE_FUNHOUSE_HOME = YES
+    ENABLE_IMS3D_PRELOAD = YES
+    ENABLE_IMS3D_DEBUG = YES
+    ENABLE_3D_AP_TRANSITION = YES
+    ENABLE_3D_ONLOADING = YES
+    ENABLE_3DGAMES = YES
+  endif
+
+  ifeq ($(QUICK_CONFIG), CONFIG_25)
+    ENABLE_ANDROID = YES
+    USE_ANDROID_3D_ACCELERATOR = YES
+    ENABLE_MEDIAPLAYSERVER = YES
+    ENABLE_FLASH_INPUT_PLUGIN = YES
+    USE_SWF = YES
+    FLASH_GUI = NO
+    FLASH_JUKEBOX = NO
+    ENABLE_GTALK = YES
+    ENABLE_BESTV = YES
+    USE_WEBKIT = YES
+    ENABLE_VOOLETV = YES
+    USE_ONLYONE_RSSSKIN = NO
+  endif
+  ifeq ($(ENABLE_ANDROID), YES)
+  	ENABLE_IMAGE_CACHE = NO
+	ENABLE_IMAGE_CACHE_SINK = NO
+  endif
+ifeq ($(BOARD_ID), RTD1185-DEMO)
+  ENABLE_PPTV = YES
+endif
+endif ## MAIN_PROJECT = Casablanca
+
+ENABLE_FP10 = NO
+ifeq ($(ENABLE_ANDROID), YES)
+    ifeq ($(ENABLE_FP10), YES)
+        DEFINES += -DENABLE_FP10
+    endif
+endif
+
+DISABLE_H263_DECODER = NO
+DISABLE_MJPEG_DECODER = NO
+
+ROLLING_CRITERION_BY_SCALE = NO
+
+MINIMIZE_AUDIO_MUTED_DURATION = NO
+
+USE_CAMERA = NO
+USE_OPENCV_LIBRARY = NO
+ENABLE_FACE_DETECTION = NO
+ENABLE_FACE_RECOGNITION = NO
+ENABLE_PERMANENT_TIMESHIFT = YES
+PERMANENT_TIMESHIFT_DEFAULT_ON = YES
+
+ifneq ($(ENABLE_FILE_BROWSER), YES)
+ENABLE_EXT_HDD_DB = NO
+endif
+
+ENABLE_HULUPLUS = NO
+ifeq ($(ENABLE_HULUPLUS), YES)
+  DEFINES += -DENABLE_HULUPLUS
+endif
+
+##########################################################################################
+# SKYPE CONFIGURATIONN                                                                   #
+##########################################################################################
+ifeq ($(ENABLE_SKYPE), YES)
+
+#SKYPE_AUDIO_HOST = voicertphost-loopback
+SKYPE_AUDIO_HOST = voicepcmhost-rtaudio
+SKYPE_AUDIO_ENGINE = pcm
+
+#SKYPE_VIDEO_HOST = videortphost-pl
+SKYPE_VIDEO_HOST = videortphost-uvc
+SKYPE_VIDEO_ENGINE = rtp
+
+SKYPE_RUN_TIME = linux-mipsel-skypekit-voice$(SKYPE_AUDIO_ENGINE)-video$(SKYPE_VIDEO_ENGINE)
+
+endif
+
+##########################################################################################
+# DISABLE SOME FEATURES FOR COMMAND LINE DVDPLAYER                                       #
+##########################################################################################
+
+ifeq ($(BUILD_CMDLINE_DVDPLAYER), YES)
+      ENABLE_HDMV_PLAYBACK = NO
+      ENABLE_THUNDER = NO
+      ENABLE_VOOLETV = NO
+      ENABLE_BESTV = NO
+      USE_WEBKIT = NO
+      USE_SWF = NO
+      USE_DIRECT_CONNECT = NO
+      USE_CINEMA_NOW = NO
+      USE_OPERA = NO
+      USE_DFB_OPERA = NO
+      ENABLE_NRD2X = NO
+      USE_CEHTML_OPERA = NO
+      ENABLE_WFDISPLAY = NO
+      ENABLE_WIDI_2.0 = NO
+      ENABLE_WIDI_3.5 = NO
+      ENABLE_WASU = NO
+      ENABLE_DFB_VKBD = NO
+      ENABLE_NRD31A = NO
+      ENABLE_VUDU = NO
+      ENABLE_VUDU_APP = NO
+      ENABLE_VUDU_MOVIE = NO
+      ENABLE_VUDU_3D = NO
+      ENABLE_PPTV = NO
+      ENABLE_SOCKET_INPUT_PLUGIN = YES
+      ENABLE_MEDIAPLAYSERVER = YES
+      ENABLE_MEDIAPLAYCLIENT = YES
+      ENABLE_DATATRANSPORTSERVER = YES
+      ENABLE_MO_SCREEN_CAPTURE = NO
+      ENABLE_AIR_FUN = NO
+endif
+
+##########################################################################################
+# APPLY OTHER DEFINE                                                                     #
+##########################################################################################
+
+ifeq ($(ENABLE_FLASH_COLOR_FORMAT_32_888A), YES)
+  DEFINES += -DFLASH_COLOR_FORMAT_32_888A
+endif
+
+ifeq ($(ENABLE_FLASH_FONT_ADJUSTMENT), YES)
+  DEFINES += -DFLASH_FONT_ADJUSTMENT
+endif
+
+ifeq ($(ENABLE_1080P_UI), YES)
+  DEFINES += -DUSE_1080P_UI
+endif
+
+ifeq ($(ENABLE_IMAGE_CACHE_SINK), YES)
+  DEFINES += -DUSE_IMAGE_CACHE_SINK
+  ENABLE_IMAGE_CACHE = YES
+endif
+ifeq ($(ENABLE_IMAGE_CACHE), YES)
+  DEFINES += -DUSE_IMAGE_CACHE
+endif
+
+ifeq ($(ENABLE_VUDU), YES)
+	ifeq ($(ENABLE_VUDU_MOVIE), NO)
+		ifeq ($(ENABLE_VUDU_APP), NO)
+			ENABLE_VUDU_MOVIE = YES
+		endif
+	endif
+endif
+
+ifeq ($(ENABLE_VUDU_MOVIE), YES)
+  DEFINES += -DREALTEK_VUDU_MOVIE
+  ENABLE_VUDU = YES
+endif
+
+ifeq ($(ENABLE_VUDU_APP), YES)
+  DEFINES += -DREALTEK_VUDU_APP
+  ENABLE_VUDU = YES
+endif
+
+ifeq ($(CHIP_MODEL), 0x1186)
+	ENABLE_VUDU_3D = YES
+endif
+
+ifeq ($(WDP_3IN1), YES)
+	ENABLE_VUDU_3D = NO
+endif
+
+ifeq ($(ENABLE_VUDU_3D), YES)
+  DEFINES += -DREALTEK_VUDU_3D
+  ENABLE_VUDU = YES
+endif
+
+ifeq ($(ENABLE_VUDU), YES)
+  DEFINES += -DREALTEK_VUDU
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+endif
+
+# Enable MediaPlayServer & MediaPlayClient
+# # If user select CEHTML OPERA, than USE_OPERA and USE_DFB_OPERA must be enabled!
+# # remote should contain number and color key, so I use TV remote here
+#
+ifeq ($(USE_CEHTML_OPERA), YES)
+  DEFINES += -DREALTEK_CEHTML_OPERA
+  USE_OPERA = YES
+  USE_DFB_OPERA = YES
+  OPERA_SDK_REV = S0301
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  #REMOTE_ID = RTK_MK5_TV
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+endif
+
+ifeq ($(ENABLE_WIDI_2.0), YES)
+  DEFINES += -DREALTEK_WIDI
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+  ENABLE_DATATRANSPORTSERVER = YES
+  ENABLE_WIDI_HDCP2_SUPPORT = YES
+  ENABLE_HDCP2_KEY_PROTECT_WITH_KIMG = YES
+  WIDI_HDCP2_HDCP1X_CONVERTER = YES
+  ifeq ($(WIDI_HDCP2_HDCP1X_CONVERTER), YES)
+    USE_HDCP = YES
+  endif
+  ### WFD default enable HDCP2.0
+  ENABLE_HDCP2_1 = NO
+endif
+
+ifeq ($(ENABLE_WIDI_3.5), YES)
+  DEFINES += -DREALTEK_WIDI
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+  ENABLE_DATATRANSPORTSERVER = YES
+  ENABLE_WIDI_HDCP2_SUPPORT = YES
+  ENABLE_HDCP2_KEY_PROTECT_WITH_KIMG = YES
+  WIDI_HDCP2_HDCP1X_CONVERTER = YES
+  ifeq ($(WIDI_HDCP2_HDCP1X_CONVERTER), YES)
+    USE_HDCP = YES
+  endif
+  ### WFD default enable HDCP2.0
+  ENABLE_HDCP2_1 = NO
+endif
+
+ifeq ($(ENABLE_MO_SCREEN_CAPTURE), YES)
+  ENABLE_MO_SCREEN_CAPTURE_264=YES
+  ENABLE_SOCKET_IO_PLUGIN = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+  ENABLE_DATATRANSPORTSERVER = YES
+endif
+
+ifeq ($(ENABLE_MIDI_MIXER), YES)
+  DEFINES += -DENABLE_MIDI_MIXER
+endif
+
+ifeq ($(ENABLE_WFDISPLAY), YES)
+  DEFINES += -DREALTEK_WFDISPLAY
+  ##DEFINES += -DREALTEK_WFDISPLAY_STANDALONE
+  ##DEFINES += -DREALTEK_WFDISPLAY_SIGMA
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  ENABLE_DFB_MULTITOUCH = YES
+  ENABLE_SERVER_IOPLUGIN = YES
+  USE_USB_INPUT = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+  ENABLE_DATATRANSPORTSERVER = YES
+  DEFINES += -DENABLE_PBC_MODE
+  DEFINES += -DHDCP2_KEY_PROTECT_WITH_KIMG
+  ### WFD default enable HDCP2.0
+  ENABLE_HDCP2_1 = NO
+  HDCP2_HDCP1X_CONVERTER = NO
+  ifeq ($(HDCP2_HDCP1X_CONVERTER), YES)
+    DEFINES += -DHDCP_REPEATER=1
+    USE_HDCP = YES
+  else
+    DEFINES += -DHDCP_REPEATER=0
+  endif
+  ifeq ($(DISABLE_WFDISPLAY_UI), YES)
+    DEFINES += -DDISABLE_WFDISPLAY_UI
+  endif
+endif
+
+ifeq ($(ENABLE_SIMPLAY), YES)
+  DEFINES += -DREALTEK_SIMPLAY
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  USE_USB_INPUT = YES
+  ENABLE_SOCKET_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_MEDIAPLAYCLIENT = YES
+endif
+
+ifeq ($(ENABLE_IMS3D), YES)
+  DEFINES+= -DRSSOGLES
+
+  ENABLE_IMS3D_DEFERLOAD=YES
+
+# define to use openGL 1.x spec or openGL 2.0 spec
+  BUILD_OGLES1X = NO
+  ifeq ($(BUILD_OGLES1X), YES)
+    OGLES_PATH = OGLES
+    DEFINES+= -DBUILD_OGLES
+  else
+    OGLES_PATH = OGLES2
+    DEFINES+= -DBUILD_OGLES2
+  endif
+
+  ifeq ($(ENABLE_IMS3D_PRELOAD), YES)
+    DEFINES+= -DRSSOGLES_PRELOAD
+  endif
+
+ ifeq ($(ENABLE_IMS3D_DEFERLOAD), YES)
+	DEFINES+= -DENABLE_IMS3D_DEFERLOAD
+ endif
+
+  ifeq ($(ENABLE_RSSOGLES_STAND_ALONE), YES)
+  	DEFINES+= -DRSSOGLES_STAND_ALONE
+  	ifeq ($(USE_DEBUG_MEM_DMALLOC), YES)
+		DEFINES+= -DDMALLOC
+  	endif
+  	ENABLE_RSSOGLES_NEW_DC=YES
+
+	#stand alone can use h/w decoder now
+	DEFINES += -DOGLES_USE_HW_IMG_DECODER
+  else
+  	DEFINES+= -DOGLES_USE_HW_IMG_DECODER
+  	ifneq ($(ENABLE_1080P_UI), YES)
+      ifeq ($(ENABLE_3D_AP_TRANSITION), YES)
+        DEFINES+= -DENABLE_AP_TRANSITION_EFFECT
+      endif
+  	endif
+    ifeq ($(ENABLE_3D_ONLOADING), YES)
+      DEFINES+= -DENABLE_3D_ONLOADING
+    endif
+  endif
+  ifeq ($(ENABLE_RSSOGLES_RELOAD), YES)
+	DEFINES+= -DRSSOGLES_RELOAD
+  endif
+else
+  ENABLE_3DGAMES = NO
+endif
+
+ifeq ($(ENABLE_3DGAMES), YES)
+	DEFINES+= -DENABLE_3DGAMES
+endif
+
+ifeq ($(ENABLE_RSSOGLES_NEW_DC), YES)
+    DEFINES += -DENABLE_GL_NEW_DC
+    DEFINES += -DENABLE_GL_NEW_DC2
+endif
+
+ifeq ($(ENABLE_RSSOGLES_NEW_DC), YES)
+	DEFINES += -DENABLE_GL_NEW_DC
+	DEFINES += -DENABLE_GL_NEW_DC2
+endif
+ifeq ($(ENABLE_COVERFLOW_HOME), YES)
+	DEFINES += -DENABLE_COVERFLOW_HOME
+endif
+ifeq ($(ENABLE_FUNHOUSE_HOME), YES)
+	DEFINES += -DENABLE_FUNHOUSE_HOME
+endif
+ifeq ($(ENABLE_AIR_FUN), YES)
+	DEFINES += -DENABLE_AIR_FUN
+endif
+ifeq ($(ENABLE_SMART_DISPLAY_STAND_ALONE), YES)
+	DEFINES += -DENABLE_SMART_DISPLAY_STAND_ALONE
+endif
+ifeq ($(ENABLE_SHOW_DISPLAY), YES)
+	DEFINES += -DENABLE_SHOW_DISPLAY
+endif
+ifeq ($(USE_SCREEN_SAVER), YES)
+  DEFINES += -DUSE_SCREEN_SAVER
+endif
+
+ifeq ($(SHOW_COMPILER_COMMAND), Y)
+  SHOW_COMMAND 		=
+  MAKE_COMMAND_FLAG =
+else
+  SHOW_COMMAND		= @
+  MAKE_COMMAND_FLAG = -s
+endif
+
+ifeq ($(BUILD_DVB_T), Y)
+  DEFINES += -DDVB_T
+endif
+
+ifeq ($(BUILD_DVB_S), Y)
+  DEFINES += -DDVB_S
+endif
+
+ifeq ($(BUILD_ATSC_T), Y)
+  DEFINES += -DATSC_T -DDTV_SOURCE
+endif
+
+ifeq ($(ENABLE_DTV_LABS_HK_FIXES), YES)
+  DEFINES += -DFIX_BUG_19595
+  DEFINES += -DFIX_BUG_19635
+endif
+
+ifeq ($(HAS_COMPONENT_HW), YES)
+  DEFINES += -DHAS_COMPONENT_HW
+endif
+
+ifeq ($(FIRMWARE_NETWORK_UPDATE_VIA_HTTP), YES)
+  DEFINES += -DNETWORK_UPDATE_HTTP
+endif
+
+ifeq ($(FIRMWARE_NETWORK_UPDATE_VIA_FTP), YES)
+  DEFINES += -DNETWORK_UPDATE_FTP
+endif
+
+ERROR_CONCEALMENT_LEVEL = 0
+RECOVERY_JUMP_LEVEL = 128
+
+#DTV_FILE_PLAYBACK_RESYNC_THRESHOLD : the max bytes we try to find out the sync word
+DTV_FILE_PLAYBACK_RESYNC_THRESHOLD = 962560
+
+# DIVX_PROFILE = DIVX_HD / DIVX_ULTRA / HOME_THEATER / DIVX_PLUS / NONE
+DIVX_PROFILE = NONE
+
+ifeq ($(USE_CRC_CHECK), YES)
+  DEFINES += -DCHECKCRC=1
+else
+  DEFINES += -DCHECKCRC=0
+endif
+
+# for bug 23313
+DISCARD_PMT_UPDATE_EVENT_ON_FILEMODE = NO
+ifeq ($(DISCARD_PMT_UPDATE_EVENT_ON_FILEMODE), YES)
+DEFINES += -DDISCARD_PMT_UPDATE_EVENT_ON_FILEMODE
+endif
+
+
+ifeq ($(USE_BASE_LCN), YES)
+  DEFINES += -DUSE_BASE_LCN
+  DEFINES += -DBASE_LCN=800
+endif
+
+ifeq ($(ENABLE_ATS_CERTIFICATION), YES)
+  DEFINES += -DENABLE_ATS_CERTIFICATION
+endif
+
+ifeq ($(ENABLE_THUNDER), YES)
+  DEFINES += -DSTREAM_THUNDER_IOPLUGIN
+  DEFINES += -DTHUNDER
+endif
+
+ifeq ($(ENABLE_VOOLETV), YES)
+  DEFINES += -DVOOLETV
+endif
+
+ifeq ($(ENABLE_WASU), YES)
+  DEFINES += -DENABLE_WASU
+endif
+
+ifeq ($(ENABLE_PPTV), YES)
+  DEFINES     += -DPPTV
+  USE_SO_LIB   = YES
+endif
+
+ifeq ($(ENABLE_APE), YES)
+  DEFINES += -DENABLE_APE
+  DEFINES += -DENABLE_APE_WATCHDOG
+endif
+
+ifeq ($(USE_DIRECT_CONNECT), YES)
+  DEFINES += -DUSE_DIRECT_CONNECT
+endif
+
+ifeq ($(USE_STREAM_PPS_IOPLUGIN), YES)
+  DEFINES += -DSTREAM_PPS_IOPLUGIN
+endif
+
+ifeq ($(ENABLE_SERVER_IOPLUGIN), YES)
+  DEFINES += -DENABLE_SERVER_IOPLUGIN
+endif
+
+ifeq ($(USE_STREAM_RTSP_IOPLUGIN), YES)
+  DEFINES += -DSTREAM_RTSP_IOPLUGIN
+    ifeq ($(USE_LIVE_LIBRARY), YES)
+      DEFINES += -DSTREAM_LIVE_IOPLUGIN
+    endif
+endif
+
+ifeq ($(USE_STREAM_RTP_IOPLUGIN), YES)
+  DEFINES += -DSTREAM_RTP_IOPLUGIN
+endif
+
+ifeq ($(USE_STREAM_MMS_IOPLUGIN), YES)
+  DEFINES += -DSTREAM_MMS_IOPLUGIN
+endif
+
+ifeq ($(ENABLE_BESTV), YES)
+DEFINES     += -DBESTV
+USE_SO_LIB   = YES
+DEFINES += -DUSE_DTA_LIB
+USE_DTA_LIB     = YES
+ifeq ($(USE_WEBKIT), YES)
+DEFINES += -DUSE_WEBKIT_BESTV
+USE_WEBKIT_BESTV        = YES
+endif
+endif
+
+ifeq ($(ENABLE_LASTDOTFM), YES)
+  DEFINES     += -DLASTFM
+endif
+
+ifeq ($(ENABLE_MEDIAFLY), YES)
+  DEFINES     += -DMEDIAFLY
+endif
+
+ifeq ($(ENABLE_VTUNER), YES)
+  DEFINES     += -DVTUNER
+endif
+
+ifeq ($(ENABLE_SNDA), YES)
+  DEFINES     += -DENABLE_SNDA
+endif
+
+ifeq ($(USE_SINA_IMS), YES)
+  DEFINES += -DSINA_IMS
+endif
+
+ifeq ($(TVE_DEC_SWITCH), YES)
+  DEFINES += -DTVE_DEC_SWITCH
+endif
+
+ifeq ($(USE_READ_ONLY_LOADER), YES)
+  DEFINES += -DUSE_READ_ONLY_LOADER
+endif
+
+DEFINES += -D$(HDMI_MODEL)
+ifeq ($(USE_HDMI), YES)
+  DEFINES += -DUSE_HDMI
+  ifeq ($(USE_CEC), YES)
+    DEFINES += -DUSE_CEC
+  endif
+  ifeq ($(USE_HDCP), YES)
+    DEFINES += -DUSE_HDCP
+  endif
+else
+  USE_CEC = NO
+  USE_HDCP = NO
+endif
+
+ifeq ($(ONE_STEP), YES)
+  DEFINES += -DONE_STEP
+endif
+
+ifeq ($(USE_HD_SURFACE), YES)
+  DEFINES += -DUSE_HD_SURFACE
+endif
+
+ifeq ($(USE_HD_SURFACE_0), YES)
+  DEFINES += -DUSE_HD_SURFACE_0
+endif
+
+ifeq ($(DLNADMRCTT), YES)
+  DEFINES += -DDLNADMRCTT
+endif
+
+ifeq ($(ENABLE_GTALK), YES)
+  DEFINES += -DUSE_GTALK
+endif
+
+ifeq ($(USE_ML), YES)
+  DEFINES += -DUSE_ML
+endif
+
+ifeq ($(ENABLE_SPU_IN_MPEG_PLUGIN), YES)
+  DEFINES += -DENABLE_SPU_IN_MPEG_PLUGIN
+endif
+
+ifeq ($(USE_FREETYPE_FONT), YES)
+  DEFINES += -DUSE_FREETYPE_FONT
+endif
+
+ifeq ($(ENABLE_EXT_HDD_DB), YES)
+  DEFINES += -DENABLE_EXT_HDD_DB
+endif
+
+ifeq ($(ENABLE_DVD_HACK_UOP), YES)
+  DEFINES += -DENABLE_DVD_HACK_UOP
+endif
+
+ifeq ($(TEST_TS), YES)
+  DEBUGFLAG= -DRDDEBUG  -g -DTEST_TS
+else
+  DEBUGFLAG= -DRDDEBUG  -ggdb
+endif
+
+TEST_SILK = NO
+ifeq ($(TEST_SILK), YES)
+  DEFINES += -DTEST_SILK
+endif
+
+ifeq ($(USE_IOCACHE), YES)
+  USE_VOB_CACHE_DATA= NO
+endif
+
+ifeq ($(USE_TS_SUBTITLE), YES)
+  DEFINES += -DTS_SUBTITLE
+endif
+
+ifeq ($(USE_SWF), YES)
+  DEFINES += -DUSE_SWF
+endif
+
+ifeq ($(USE_AVS), YES)
+DEFINES += -DUSE_AVS
+endif
+
+ifeq ($(INPUT_USE_IO_PLUGIN), YES)
+  DEFINES += -DINPUT_USE_IO_PLUGIN
+endif
+
+ifeq ($(ENABLE_WAVE_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_WAVE_INPUT_PLUGIN
+endif
+
+ifeq ($(ENABLE_FLAC_EXTENSION), YES)
+  DEFINES += -DENABLE_FLAC_EXTENSION
+endif
+
+ifeq ($(ENABLE_MKA_EXTENSION), YES)
+  DEFINES += -DENABLE_MKA_EXTENSION
+endif
+
+
+ifeq ($(ENABLE_RM_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_RM_INPUT_PLUGIN
+endif
+
+ifeq ($(ENABLE_BD_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_BD_INPUT_PLUGIN
+endif
+
+ifeq ($(ENABLE_NEPTUNE_TP_PLUGIN), YES)
+  DEFINES += -DENABLE_NEPTUNE_TP_PLUGIN
+endif
+
+ifeq ($(USE_P2P_SOFTAP_MODE), YES)
+  DEFINES += -DUSE_P2P_SOFTAP_MODE
+endif
+
+ifeq ($(USE_DHCP_CLIENT), YES)
+  DEFINES += -DDHCP
+endif
+
+ifeq ($(USE_KEN_BURNS), YES)
+  DEFINES += -DUSE_KEN_BURNS
+endif
+
+ifeq ($(BROWSER_USING_SW_DECODE), YES)
+  DEFINES += -DBROWSER_USING_SW_DECODE
+endif
+
+ifeq ($(VIDEO_SUPPORT_AVSTS), YES)
+  DEFINES += -DVIDEO_SUPPORT_AVSTS
+endif
+
+ifeq ($(USE_SMOOTH_REVERSE), YES)
+  DEFINES += -DUSE_REVERSE_SMOOTH
+endif
+
+ifeq ($(USE_RSS_STYLE_GUIDE), YES)
+  DEFINES += -DRSS_STYLE_GUIDE
+endif
+
+ifeq ($(GCODE_MENU), YES)
+  DEFINES += -DVCRPLUS -DGCODE_MENU
+endif
+
+USE_ZLIB = YES
+
+ifeq ($(ENABLE_DVB_OTA_DOWNLOAD), YES)
+  DEFINES += -DENABLE_DVB_OTA_DOWNLOAD
+endif
+
+ifeq ($(DISABLE_H263_DECODER), YES)
+  DEFINES += -DDISABLE_H263_DECODER
+endif
+
+ifeq ($(DISABLE_MJPEG_DECODER), YES)
+  DEFINES += -DDISABLE_MJPEG_DECODER
+endif
+
+ifeq ($(USE_SMOOTH_REVERSE), YES)
+  DEFINES += -DUSE_REVERSE_SMOOTH
+endif
+
+ifeq ($(ENABLE_USB_WIRELESS_HEADSET), YES)
+  DEFINES += -DENABLE_USB_WIRELESS_HEADSET
+endif
+
+ifeq ($(DISABLE_DEEP_COLOR), YES)
+  DEFINES += -DDISABLE_DEEP_COLOR
+endif
+
+ifneq ($(findstring APCFG_USE_WIFI_WPS, $(APCFG_FLAGS)),)
+  WPA_SUPPLICANT = wpa_supplicant-0.6.9
+else
+  WPA_SUPPLICANT = wpa_supplicant-0.5.8
+endif
+
+ifeq ($(MAIN_PROJECT), Ewha_MK1)
+  DEFINES += -DEWHA
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+  DEFINES += -DCASABLANCA
+  DEFINES += -DSTART_ROLLING_DELAY_TIME=2000
+endif
+
+ifeq ($(ENABLE_FLASH_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_FLASH_INPUT_PLUGIN
+endif
+
+ifeq ($(ENABLE_NRD2X), YES)
+  DEFINES += -DENABLE_NRD2X
+endif
+
+ifeq ($(ENABLE_PANDORA), YES)
+  DEFINES+= -DPANDORA
+endif
+
+ifeq ($(ENABLE_SKYPE), YES)
+  DEFINES+= -DREALTEK_SKYPE
+  DEFINES+= -DSKYPE_RENDER_VIDEO
+  DEFINES+= -DVIDEO_CONFERENCE_AUDIO_ONLY
+  ifeq ($(SKYPE_AUDIO_ENGINE), rtp)
+    DEFINES+= -DSKYPE_AUDIO_RTP
+  elif ($(SKYPE_AUDIO_ENGINE), pcm)
+    DEFINES+= -DSKYPE_AUDIO_PCM
+  endif
+  ifeq ($(SKYPE_VIDEO_ENGINE), rtp)
+    DEFINES+= -DSKYPE_VIDEO_RTP
+  endif
+  ENABLE_CONFERENCE = YES
+else
+  DEFINES+= -DDISABLE_SKYPE_PREVIEW
+endif
+
+ifeq ($(ENABLE_YOUTUBELB), YES)
+  DEFINES+= -DENABLE_YOUTUBELB
+endif
+
+ifeq ($(ENABLE_FLINGO), YES)
+  DEFINES+= -DENABLE_FLINGO
+endif
+
+ifeq ($(ENABLE_YOTA_MUSIC), YES)
+  DEFINES+= -DENABLE_YOTA_MUSIC
+endif
+
+ifeq ($(ENABLE_ACETRAX), YES)
+  DEFINES += -DACETRAX
+  DEFINES += -DNRD_TEST
+  USE_FREETYPE_FONT = YES
+  DEFINES += -DUSE_FREETYPE_FONT
+  SUPPORT_WMDRM_FLAG = YES
+  USE_ACETRAX_PRODUCTION_SERVER = YES
+endif
+ifeq ($(ENABLE_NRD31A), YES)
+  DEFINES += -DENABLE_NRD31A
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  SUPPORT_PLAYREADY_FLAG = YES
+  ENABLE_NRD3_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+endif
+ifeq ($(ENABLE_NRD32), YES)
+  DEFINES += -DENABLE_NRD32
+  USE_DFB_SUPPORT = YES
+  DFB_MULTI_APP = YES
+  SUPPORT_PLAYREADY_FLAG = YES
+  ENABLE_NRD3_INPUT_PLUGIN = YES
+  ENABLE_MEDIAPLAYSERVER = YES
+  ENABLE_DIAL_SERVER = YES
+endif
+
+ifeq ($(ENABLE_FLICKR), YES)
+  DEFINES += -DFLICKR
+endif
+
+ifeq ($(ENABLE_PICASA), YES)
+  DEFINES += -DPICASA
+endif
+
+ifeq ($(ENABLE_PODCAST), YES)
+  DEFINES += -DPODCAST
+endif
+
+ifeq ($(ENABLE_AUDIOPODCAST), YES)
+  DEFINES += -DAUDIOPODCAST
+endif
+
+ifeq ($(ENABLE_MEDIAPLAYSERVER), YES)
+  DEFINES+= -DENABLEMEDIAPLAYSERVER
+endif
+
+ifeq ($(USE_CINEMA_NOW), YES)
+  USE_DFB_SUPPORT = YES
+  USE_SO_LIB      = YES
+endif
+
+# If user select CEHTML OPERA, than USE_OPERA and USE_DFB_OPERA must be enabled!
+# remote should contain number and color key, so I use TV remote here
+ifeq ($(USE_CEHTML_OPERA), YES)
+  USE_OPERA = YES
+  USE_DFB_OPERA = YES
+  #REMOTE_ID = RTK_MK5_TV
+endif
+
+ifeq ($(USE_OPERA), YES)
+ifeq ($(USE_DFB_OPERA), YES)
+  USE_DFB_SUPPORT = YES
+  USE_SO_LIB      = YES
+  USE_YOUTUBEXL_AP = YES
+  USE_FLASH_PLUGIN = YES
+endif
+endif
+
+ifeq ($(USE_WEBKIT), YES)
+  USE_DFB_SUPPORT = YES
+  USE_SO_LIB      = YES
+  USE_FLASH_PLUGIN = YES
+  USE_WEBKIT_DAEMON_PROCESS = NO
+
+  USE_WEBKIT_VOD = YES
+  USE_WEBKIT_YXL = NO
+  USE_WEBKIT_UOL = YES
+  USE_WEBKIT_TOSHIBAIGTV = YES
+  USE_WEBKIT_LEANBACK_HTML5 = NO
+
+  USE_WEBKIT_BT = NO
+  USE_WEBKIT_FACEBOOK = YES
+  USE_WEBKIT_ACCUWEATHER = YES
+  USE_WEBKIT_DAILYMOTION = NO
+  USE_WEBKIT_BBCIPLAYER = YES
+  USE_WEBKIT_WEBSYNC = YES
+
+
+
+ifeq ($(ENABLE_CN_OTT), YES)
+  USE_WEBKIT_VOD = NO
+  USE_WEBKIT_BT = NO
+  USE_WEBKIT_FACEBOOK = NO
+  USE_WEBKIT_ACCUWEATHER = NO
+  USE_WEBKIT_DAILYMOTION = NO
+  USE_WEBKIT_BBCIPLAYER = NO
+  USE_WEBKIT_WEBSYNC = NO
+  USE_WEBKIT_YUPPTV = NO
+endif
+
+ifeq ($(ENABLE_UK_OTT), YES)
+  USE_WEBKIT_VOD = NO
+  USE_WEBKIT_BT = NO
+  USE_WEBKIT_FACEBOOK = YES
+  USE_WEBKIT_ACCUWEATHER = YES
+  USE_WEBKIT_DAILYMOTION = YES
+  USE_WEBKIT_BBCIPLAYER = YES
+  USE_WEBKIT_WEBSYNC = NO
+  USE_WEBKIT_YUPPTV = YES
+endif
+
+ifeq ($(ENABLE_US_OTT), YES)
+  USE_WEBKIT_VOD = NO
+  USE_WEBKIT_BT = NO
+  USE_WEBKIT_FACEBOOK = YES
+  USE_WEBKIT_ACCUWEATHER = YES
+  USE_WEBKIT_DAILYMOTION = YES
+  USE_WEBKIT_BBCIPLAYER = NO
+  USE_WEBKIT_WEBSYNC = NO
+  USE_WEBKIT_YUPPTV = YES
+endif
+
+ifeq ($(ENABLE_OTT), YES)
+  USE_WEBKIT_VOD = YES
+  USE_WEBKIT_BT = NO
+  USE_WEBKIT_FACEBOOK = YES
+  USE_WEBKIT_ACCUWEATHER = YES
+  USE_WEBKIT_DAILYMOTION = YES
+  USE_WEBKIT_BBCIPLAYER = YES
+  USE_WEBKIT_WEBSYNC = YES
+  USE_WEBKIT_YUPPTV = YES
+  USE_WEBKIT_YXL = NO
+  USE_WEBKIT_UOL = YES
+  USE_WEBKIT_TOSHIBAIGTV = YES
+endif
+ifneq ($(TOOLCHAIN_VER), 344)
+ifneq ($(ENABLE_CN_OTT), YES)
+  USE_WEBKIT_DAILYMOTION = YES
+endif
+endif
+  USE_WEBKIT_YUPPTV = YES
+  USE_WEBKIT_STANDALONE = YES
+  #yiyuan add for webkit browser ,set  osd size  for different  TV model [PAL NTSC ....]
+  DEFINES += -DTVSYSTEM_WEBKIT
+  DEFINES += -DWEBKITNTSC=0.94
+  DEFINES += -DWEBKITPAL=0.935
+  DEFINES += -DWEBKIT720_50HZ=0.93
+  DEFINES += -DWEBKIT720_60HZ=0.94
+  DEFINES += -DWEBKIT1080I_50HZ=0.93
+  DEFINES += -DWEBKIT1080I_60HZ=0.94
+  DEFINES += -DWEBKIT1080I_24HZ=0.93
+  DEFINES += -DWEBKITSVGA=0.94
+endif
+
+ifeq ($(QUICK_CONFIG), CONFIG_33)
+  USE_WEBKIT_VOD = NO
+endif
+
+USE_WEBKIT_VIDEO_EXTENSION=NO
+USE_WEBKIT_PLAYREADY = NO
+ifeq ($(USE_WEBKIT_VIDEO_EXTENSION),YES)
+  USE_WEBKIT = YES
+  DFB_MULTI_APP = YES
+  USE_WEBKIT_STANDALONE = YES
+  ENABLE_DATATRANSPORTSERVER = YES
+  ifeq ($(USE_WEBKIT_PLAYREADY),YES)
+  SUPPORT_PLAYREADY_FLAG = YES
+  SUPPORT_WMDRM_FLAG = NO
+  DEFINES += -DUSE_WEBKIT_PLAYREADY
+  endif
+  DEFINES += -DUSE_WEBKIT_VIDEO_EXTENSION
+endif
+
+ifeq ($(USE_WEBKIT_FACEBOOK), YES)
+  DEFINES     += -DUSE_WEBKIT_FACEBOOK
+endif
+
+ifeq ($(USE_WEBKIT_ACCUWEATHER), YES)
+  DEFINES     += -DUSE_WEBKIT_ACCUWEATHER
+endif
+
+ifeq ($(USE_WEBKIT_BBCIPLAYER), YES)
+  DEFINES     += -DUSE_WEBKIT_BBCIPLAYER
+endif
+
+ifeq ($(USE_WEBKIT_WEBSYNC), YES)
+  DEFINES     += -DUSE_WEBKIT_WEBSYNC
+endif
+
+ifeq ($(USE_WEBKIT_VOD), YES)
+  DEFINES += -DUSE_WEBKIT_VOD
+endif
+
+ifeq ($(USE_WEBKIT_BT), YES)
+   DEFINES     += -DUSE_WEBKIT_BT
+endif
+
+
+ifeq ($(USE_WEBKIT_YXL), YES)
+  DEFINES += -DUSE_WEBKIT_YXL
+endif
+
+ifeq ($(USE_WEBKIT_UOL), YES)
+  DEFINES += -DUSE_WEBKIT_UOL
+endif
+
+ifeq ($(USE_WEBKIT_TOSHIBAIGTV), YES)
+  DEFINES += -DUSE_WEBKIT_TOSHIBAIGTV
+endif
+
+ifeq ($(USE_WEBKIT_LEANBACK_HTML5), YES)
+  DEFINES += -DUSE_WEBKIT_LEANBACK_HTML5
+endif
+
+ifeq ($(USE_WEBKIT_DAILYMOTION), YES)
+  DEFINES += -DUSE_WEBKIT_DAILYMOTION
+endif
+
+ifeq ($(USE_WEBKIT_YUPPTV), YES)
+  DEFINES += -DUSE_WEBKIT_YUPPTV
+endif
+
+ifeq ($(USE_WEBKIT_STANDALONE), YES)
+  DEFINES += -DUSE_WEBKIT_STANDALONE
+endif
+
+ifeq ($(USE_DFB_OPERA), YES)
+  DEFINES += -DUSE_DFB_OPERA
+endif
+
+# Add CEHTML OPERA define
+ifeq ($(USE_CEHTML_OPERA), YES)
+  DEFINES += -DUSE_CEHTML_OPERA
+endif
+
+ifeq ($(ENABLE_CALC_FREE_MEMORY), YES)
+  DEFINES += -DENABLE_CALC_FREE_MEMORY
+endif
+
+
+# HDMV playback depends on if DFB is enabled
+ifeq ($(ENABLE_HDMV_PLAYBACK), YES)
+  USE_DFB_SUPPORT = YES
+  DEFINES += -DENABLE_HDMV_PLAYBACK
+endif
+
+
+ifeq ($(QT_OPENGL), YES)
+  DEFINES += -DRT_QT_OPENGL
+endif
+
+ifeq ($(USE_WEBKIT_DAEMON_PROCESS), YES)
+  DEFINES += -DUSE_WEBKIT_DAEMON_PROCESS
+endif
+
+ifeq ($(USE_DFB_SUPPORT), YES)
+  DEFINES += -DUSE_DFB_SUPPORT
+#+JT - 20120111 - always enable multi DFB
+  DFB_MULTI_APP = YES
+  ifeq ($(ENABLE_DFB_OSD), YES)
+    DEFINES += -DENABLE_DFB_OSD
+  #  DFB_MULTI_APP = YES
+
+    ifeq ($(ENABLE_HDMV_PLAYBACK), YES)
+      ENABLE_DFB_LAYER_SUB1 = YES
+    endif
+  endif
+
+  ifeq ($(DFB_MULTI_APP), YES)
+	ENABLE_VSYNC_BLIT = YES
+	DEFINES += -DDFB_MULTI_APP
+  endif
+
+  ifeq ($(DFB_DISABLE_PLI), YES)
+    DEFINES += -DDFB_DISABLE_PLI=1
+  endif
+
+  ifeq ($(ENABLE_DFB_LAYER_SUB1), YES)
+	DEFINES += -DENABLE_DFB_LAYER_SUB1
+  endif
+
+  ifeq ($(ENABLE_DFB_LAYER_OSD2), YES)
+	DEFINES += -DENABLE_DFB_LAYER_OSD2
+  endif
+endif
+
+ifeq ($(TOOLCHAIN_VER), 435)
+  USE_FLASH_PLUGIN = YES
+endif
+ifeq ($(USE_FLASH_PLUGIN), YES)
+  DEFINES += -DUSE_FLASH_PLUGIN
+  ifeq ($(TOOLCHAIN_VER), 344)
+  	FLASH_BUILD_MODE = FlashBuildMode_Plugin
+  endif
+  ifeq ($(TOOLCHAIN_VER), 435)
+    FLASH_BUILD_MODE = FlashBuildMode_Plugin_435
+  endif
+  ifeq ($(TOOLCHAIN_VER), 435_fpu)
+    FLASH_BUILD_MODE = FlashBuildMode_Plugin_435_fpu
+  endif
+else
+  FLASH_BUILD_MODE = FlashBuildMode_Release
+endif
+
+ifeq ($(USE_SMOOTH_ROLLING), YES)
+  DEFINES += -DUSE_SMOOTH_ROLLING
+endif
+
+# To minimize audio mute duration when change audio track
+ifeq ($(MINIMIZE_AUDIO_MUTED_DURATION), YES)
+  DEFINES += -DMINIMIZE_AUDIO_MUTED_DURATION
+endif
+
+ifeq ($(ENABLE_FLASHAPPSTORE), YES)
+  ifeq ($(USE_SWF), YES)
+    DEFINES += -DENABLE_FLASHAPPSTORE
+  endif
+endif
+
+ifeq ($(ENABLE_CONFERENCE), YES)
+    DEFINES += -DENABLE_CONFERENCE
+    ENABLE_IPCSTREAMING = YES
+endif
+ifeq ($(ENABLE_IPCSTREAMING), YES)
+    DEFINES += -DENABLE_IPCSTREAMING
+endif
+
+ifeq ($(USE_ONLY_BMP_UI), YES)
+    DEFINES += -DUSE_ONLY_BMP_UI
+endif
+
+ifeq ($(USE_ONLYONE_RSSSKIN), YES)
+    DEFINES += -DUSE_ONLYONE_RSSSKIN
+endif
+
+ifeq ($(SUPPORT_WMDRM_FLAG), YES)
+    DEFINES += -DSUPPORT_WMDRM_FLAG
+endif
+
+ifeq ($(SUPPORT_PLAYREADY_FLAG), YES)
+    DEFINES += -DSUPPORT_PLAYREADY_FLAG
+endif
+
+ifeq ($(ENABLE_ANDROID), YES)
+    DEFINES += -DENABLE_ANDROID
+endif
+
+ifeq ($(USE_ANDROID_3D_ACCELERATOR), YES)
+    DEFINES += -DUSE_ANDROID_3D_ACCELERATOR
+endif
+
+ifeq ($(USE_OPENTYPE_FONT), YES)
+    DEFINES += -DUSE_OPENTYPE_FONT
+endif
+
+ifeq ($(ENABLE_MYFAVORITES), YES)
+  DEFINES += -DUSE_MYFAVORITES
+endif
+
+ifeq ($(ENABLE_FILE_BROWSER), YES)
+  DEFINES += -DUSE_BROWSER
+endif
+
+ifeq ($(USE_CAMERA), YES)
+  DEFINES += -DUSE_CAMERA
+endif
+
+ifeq ($(ENABLE_FACE_DETECTION), YES)
+  DEFINES += -DENABLE_FACE_DETECTION
+  USE_OPENCV_LIBRARY = YES
+endif
+
+ifeq ($(ENABLE_FACE_RECOGNITION), YES)
+  DEFINES += -DENABLE_FACE_RECOGNITION
+  USE_CAMERA = YES
+  USE_OPENCV_LIBRARY = YES
+  ENABLE_FACE_DETECTION = YES
+endif
+
+
+ifeq ($(ENABLE_BLURAY_3D), YES)
+  DEFINES += -DENABLE_BLURAY_3D
+endif
+
+ifeq ($(SINGLE_RP_FOR_MVC_TS), YES)
+  DEFINES += -DSINGLE_RP_FOR_MVC_TS
+endif
+
+ifeq ($(ENABLE_BD_PLAY_TITLE), YES)
+  DEFINES += -DENABLE_BD_PLAY_TITLE
+endif
+
+ifeq ($(MAIN_PROJECT), Casablanca)
+ifeq ($(ENABLE_PERMANENT_TIMESHIFT), YES)
+  DEFINES += -DENABLE_PERMANENT_TIMESHIFT
+endif
+ifeq ($(PERMANENT_TIMESHIFT_DEFAULT_ON), YES)
+  DEFINES += -DPERMANENT_TIMESHIFT_DEFAULT_ON
+endif
+endif
+
+ifeq ($(ENABLE_SOCKET_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_SOCKET_INPUT_PLUGIN
+  ENABLE_SOCKET_IO_PLUGIN = YES
+endif
+
+ifeq ($(ENABLE_NRD3_INPUT_PLUGIN), YES)
+  DEFINES += -DENABLE_NRD3_INPUT_PLUGIN
+  ENABLE_SOCKET_IO_PLUGIN = YES
+endif
+
+ifeq ($(ENABLE_SOCKET_IO_PLUGIN), YES)
+  DEFINES += -DENABLE_SOCKET_IO_PLUGIN
+endif
+
+ifeq ($(ENABLE_MO_SCREEN_CAPTURE), YES)
+  DEFINES += -DENABLE_MO_SCREEN_CAPTURE
+
+  ifeq ($(ENABLE_MO_SCREEN_CAPTURE_264), YES)
+  	DEFINES += -DENABLE_MO_SCREEN_CAPTURE_264
+  endif
+endif
+
+ifeq ($(ENABLE_DIAL_SERVER), YES)
+  DEFINES += -DENABLE_DIAL_SERVER
+endif
+
+SAMBA_VER=.341
+
+ENABLE_RPC_SERVER = NO
+
+# For OTT
+ifeq ($(ENABLE_OTT) , YES)
+  	DEFINES += -DENABLE_OTT
+	ENABLE_RPC_SERVER = NO
+	ENABLE_DMS = YES
+endif
+
+ifeq ($(ENABLE_CN_OTT) , YES)
+  	DEFINES += -DENABLE_CN_OTT
+	ENABLE_RPC_SERVER = NO
+	ENABLE_DMS = YES
+endif
+
+ifeq ($(ENABLE_UK_OTT) , YES)
+  	DEFINES += -DENABLE_UK_OTT
+	ENABLE_RPC_SERVER = NO
+	ENABLE_DMS = YES
+endif
+
+ifeq ($(ENABLE_US_OTT) , YES)
+  	DEFINES += -DENABLE_US_OTT
+	ENABLE_RPC_SERVER = NO
+	ENABLE_DMS = YES
+endif
+
+ifeq ($(ENABLE_DMS), YES)
+ifeq ($(ENABLE_SMART_DISPLAY_STAND_ALONE), NO)
+  ENABLE_RPC_SERVER = YES
+endif
+  DEFINES += -DENABLE_DMS
+endif
+
+ifeq ($(ENABLE_RPC_SERVER), YES)
+  DEFINES += -DENABLE_RPC_SERVER
+endif
+
+
+# MODEL :
+SMOOTH_ROLLING_MODEL = REPEAT_FROM_HEAD
+ifeq ($(SMOOTH_ROLLING_MODEL), REPEAT_FROM_HEAD)
+  DEFINES += -DSROLLING_REPEAT_FROM_HEAD
+endif
+
+# IPOD CGI
+ifeq ($(USE_IPOD_CGI), YES)
+    DEFINES += -DENABLE_IPOD_CGI
+    ifeq ($(USE_REMOTE_CONTROL_CGI), YES)
+        DEFINES += -DENABLE_REMOTE_CONTROL_CGI
+    endif
+endif
+
+
+#for DirectFB keyBoard
+ifeq ($(ENABLE_DFB_VKBD), YES)
+DEFINES += -DEN_DFB_VKBD
+USE_DFB_SUPPORT = YES
+DFB_MULTI_APP = YES
+endif
+
+ifeq ($(ENABLE_DFB_VKBD2), YES)
+DEFINES += -DEN_DFB_VKBD_2
+USE_DFB_SUPPORT = YES
+DFB_MULTI_APP = YES
+ENABLE_DFB_VKBD = YES
+endif
+
+ifeq ($(ENABLE_DTV_ASYNC_RECORD), YES)
+    DEFINES += -DENABLE_DTV_ASYNC_RECORD
+endif
+
+#DEFINES += -DENABLE_CHECK_CONTINUITY_COUNTER
+
+DEFINES += -DRTD1262_SCALING
+DEFINES += $(CHIP_MODEL_DEFS)
+DEFINES += $(APCFG_DEFS) -DAPCFG_FLAGS=$(APCFG_FLAGS) $(LIB_DEFS)
+#DEFINES += -DENABLE_WIN32_HIDDEN
+
+DEFINES += -DTARGET_BOARD
+DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+
+DEFINES += -D$(OSD_COLOR_FORMAT)
+
+DEFINES += -D$(QUICK_CONFIG)
+
+ifeq ($(ENABLE_DTCP_IP), YES)
+  DEFINES += -DENABLE_DTCP_IP
+endif
+
+ifeq ($(ENABLE_DFB_MULTITOUCH), YES)
+  DEFINES += -DENABLE_DFB_MULTITOUCH
+endif
+
+WARNING= -Wall

@@ -1,0 +1,13 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmeteringstub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =                   \
+    meteringutilstub.c      \
+    drmmeterapistub.c       \
+    drmmetercertstorestub.c \
+    drmmeterimpstub.c
+

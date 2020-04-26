@@ -1,0 +1,7 @@
+service chfb /system/bin/chfb
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+

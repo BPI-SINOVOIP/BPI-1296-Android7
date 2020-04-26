@@ -1,0 +1,5 @@
+#service audio_firmware /system/bin/audio_firmware
+#    class delay_start
+#    oneshot
+#    seclabel u:r:realtek:s0
+

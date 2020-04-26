@@ -1,0 +1,21 @@
+!include ..\..\..\..\drmbuild.cmn
+
+TARGETNAME=oemcbc
+TARGETTYPE=LIBRARY
+
+INCLUDES =       \
+    $(INCLUDES); \
+    ..;          \
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_OEMCBC_LIB       \
+!else
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_OEMCBC_LIB       \
+!endif
+
+
+SOURCES =                  \
+    oemcbc.c               \
+

@@ -1,0 +1,72 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcore
+TARGETTYPE=LIBRARY
+
+BUILD_CONSUMES=root_multimedia_PK_WMDRMMD_source_constants root_multimedia_PK_WMDRMMD_source_PKDrmChkDbg
+
+SOURCES =                         \
+    ..\drmaes.c                   \
+    ..\drmbase64.c                \
+    ..\drmbytemanip.c             \
+    ..\drmcbc.c                   \
+    ..\drmchain.c                 \
+    ..\drmcipher.c                \
+    ..\drmcleanstore.c            \
+    ..\drmcrt.c                   \
+    ..\drmdatastore.c             \
+    ..\drmdebug.c                 \
+    ..\drmdevicestore.c           \
+    ..\drmdevstore.c              \
+    ..\drmembeddedstore.c         \
+    ..\drmembedding.c             \
+    ..\drmexpreval.c              \
+    ..\drmexprfunc.c              \
+    ..\drmexprvariable.c          \
+    ..\drmhash.c                  \
+    ..\drmhdrbuilder.c            \
+    ..\drmhdrparser.c             \
+    ..\drmhds.c                   \
+    ..\drmhmac.c                  \
+    ..\drmkeygen.c                \
+    ..\drmlicacqreq.c             \
+    ..\drmlicacqresp.c            \
+    ..\drmliceval.c               \
+    ..\drmlicparser.c             \
+    ..\drmlicstore.c              \
+    ..\drmmd5.c                   \
+    ..\drmorderedlist.c           \
+    ..\drmpkcrypto.c              \
+    ..\drmprofile.c               \
+    ..\drmptrlist.c               \
+    ..\drmrevocation.c            \
+    ..\drmsecstore.c              \
+    ..\drmsha1.c                  \
+    ..\drmstkalloc.c              \
+    ..\drmutilities.c             \
+    ..\drmutilitieslite.c         \
+    ..\drmutilitiescertcache.c    \
+    ..\drmviewrights.c            \
+    ..\drmxmlbuilder.c            \
+    ..\drmxmlbuilderlite.c        \
+    ..\drmxmlparser.c             \
+    ..\drmxmlparserlite.c         \
+    ..\drmxmlutilities.c          \
+    ..\drmoutputlevels.c          \
+    ..\drmint64.c                 \
+    ..\drmplayreadyobj.c          \
+    ..\drmrsa.c                   \
+    ..\drmrevocationstore.c       \
+    ..\drmmetercertstore.c        \
+    ..\drmcontract.c	          \
+    ..\drmxmlbuildera.c           \
+    ..\drmutf.c                   \
+    ..\drmxmlsig.c                \
+    ..\drmsoapxmlutility.c        \
+    ..\drmlicacqv3.c              \
+    ..\drmstrsafe.c               \
+    ..\drmbcrlparser.c
+
+OBJLIBFILES =  \
+	$(_DRM_SOURCE_PATH)\constants\$(_DRM_OBJ_DIR)\drmconstants.lib \
+	$(_DRM_SOURCE_PATH)\core\PKDrmChkDbgForPC\$(_DRM_OBJ_DIR)\PKDrmChkDbgForPC.lib

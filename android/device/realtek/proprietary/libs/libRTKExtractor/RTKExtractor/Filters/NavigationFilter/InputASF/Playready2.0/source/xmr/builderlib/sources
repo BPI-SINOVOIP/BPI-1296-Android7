@@ -1,0 +1,7 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmxmrbuilder
+TARGETTYPE=LIBRARY
+
+SOURCES =                   \
+    ..\drmxmrbuilder.c

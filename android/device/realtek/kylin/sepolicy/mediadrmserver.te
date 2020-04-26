@@ -1,0 +1,1 @@
+allow mediadrmserver system_data_file:dir {open read};

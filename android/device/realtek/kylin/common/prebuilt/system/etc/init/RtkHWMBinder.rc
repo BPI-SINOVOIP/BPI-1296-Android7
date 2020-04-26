@@ -1,0 +1,4 @@
+service RtkHWMBinder /system/bin/RtkHWMBinder
+    class main
+    seclabel u:r:realtek:s0
+

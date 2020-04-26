@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmeststub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =            \
+    drmestimplstub.c
+

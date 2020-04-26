@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcertparsercachestub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    certparsercacheimplstub.c \
+    certparsercacheutilstub.c \
+

@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>AP list</title>
+<link href="css/boxhome.css" rel="stylesheet" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+
+<script type="text/javascript" src="javascript/util.js"></script>
+
+<script type="text/javascript">
+var DEBUG_FLAG = false;
+var gApArray;
+var gApHyperLinkArray;
+var gSSIDArray = new Array();
+var gSecurityArray = new Array();
+
+function handleApList()
+{
+	var apList = new String();
+	var i;
+	var hyperLink;
+	var tmpArray;
+
+	if(command_xmlhttp.readyState==4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve AP list from the response text
+			apList = handleResponseText(command_xmlhttp.responseText);
+
+			// ApInfo:
+			// SSID:Security:Security string:SignalStrength
+			// Response string:
+			// ApListSize\nReScanAP string\nApInfo-1\nApInfo-2\nApInfo-3.....\nApInfo-x
+
+			// Split AP information into array
+			// gApArray[0] => AP list size
+			// gApArray[1] => Re-Scan AP string
+			// gApArray[2]~gApArray[x] => ApInfo (SSID:Security:Security string:Signal strength)
+
+			// Securty:
+			// WL_SECURITY_OPEN	= 0,
+			// WL_SECURITY_WEP	= 1,
+			// WL_SECURITY_WPA	= 2,
+			// WL_SECURITY_WEP_SHAREKEY = 3,
+			// WL_SECURITY_UNKNOWN	= 4,
+
+			gApArray = apList.split("\n");
+			gApHyperLinkArray = apList.split("\n");
+			for (i = 0; i < gApArray[0]; i++)
+			{
+				tmpArray = gApHyperLinkArray[2+i].split(":");
+				if (DEBUG_FLAG) {
+					printStrCode("gbBoxSSID(" + i + ")", tmpArray[0]);
+				}
+				gSSIDArray[i] = tmpArray[0];
+				gSecurityArray[i] = tmpArray[1];
+			}
+
+			if (0 < gApArray[0])
+			{
+				showApList(gSSIDArray, gSecurityArray);
+			}
+		}
+	}
+}
+
+function connectAp(idx)
+{
+	if (DEBUG_FLAG) {
+		printStrCode("selSSID", gSSIDArray[idx]);
+	}
+
+	// Go to connect page to connect to wireless AP
+	window.location.assign("wirelessConnect.html?mode=AP&ssid=" + gSSIDArray[idx] + "&security=" + gSecurityArray[idx]);
+}
+
+function getApList()
+{
+	sendCommand("wlanGetApList", handleApList);
+}
+
+function timeoutHandler()
+{
+	//setElementVisible("PromptString", "false");
+}
+
+function showApList(SSIDArray, securityStringArray)
+{
+	var divBody = document.getElementById("apList");
+	var i = 0;
+	var innerHtml = new String();
+	var hyperLink = new String();
+	var dspName;
+
+	for (i = 0; i < SSIDArray.length; i++)
+	{
+		hyperLink = "javascript:connectAp(" + i + ")";
+		dspName = getSSIDDspStr(SSIDArray[i]);
+		innerHtml += "<table><tr><td><a href=" + hyperLink + ">" + dspName + "</a></td>";
+		if (DEBUG_FLAG) {
+			console.log("cgi-ssid(" + i + ")name=" + dspName);
+		}
+		if (0 == gSecurityArray[i])
+		{
+			innerHtml += "<td class='ap-security-none'></td>";
+		}
+		else
+		{
+			innerHtml += "<td class='ap-security'></td>";
+		}
+
+		innerHtml += "</tr></table>";
+	}
+
+	divBody.innerHTML = innerHtml;
+	setElementVisible("promptArea", "false");
+}
+
+function handleWlanStatus()
+{
+	var retStr = new String();
+	var infoStr = new String();
+
+	if(command_xmlhttp.readyState == 4)
+	{
+		if(command_xmlhttp.status == 200)
+		{
+			// Retrieve wlan status from the response text
+			retStr = handleResponseText(command_xmlhttp.responseText);
+			if ("$[OFF]" == retStr)
+			{
+				infoStr = "Off";
+			}
+			else
+			{
+				infoStr = "On";
+			}
+			document.getElementById("wifiStatus").innerHTML = infoStr;
+
+			getApList();
+		}
+	}
+}
+
+function getWlanStatus(device)
+{
+	cmdStr = new String();
+
+	cmdStr = "CgiSetupCheckDeviceStatus" + ":" + device;
+
+	if ("WLAN0" == device)
+	{
+		sendCommand(cmdStr, handleWlanStatus);
+	}
+}
+
+function prepareDisplayInfo()
+{
+	getWlanStatus("WLAN0");
+}
+</script>
+
+<body onload="prepareDisplayInfo();">
+	<div id="title-bar" onClick="window.history.back();">
+		<a href="#" id="btn-back"></a>
+	</div>
+	<div class="remote-bg">
+		<div class="setup-main">
+			<div class="ap-list">
+				<div id="wifi_off">
+					<a href="select-ap.html">
+						<table class="focus"><tr>
+							<td>WiFi Connection</td>
+							<td class="text-mode" id="wifiStatus"></td>
+						</tr></table>
+					</a>
+					<table class="focus" id="promptArea"><tr><td>Please wait.....</td></table>
+				</div>
+				<div id="apList"></div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

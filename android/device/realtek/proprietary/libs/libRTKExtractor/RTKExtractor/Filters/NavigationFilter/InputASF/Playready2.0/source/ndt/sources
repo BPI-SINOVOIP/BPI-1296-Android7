@@ -1,0 +1,15 @@
+!include ..\drmbuild.cmn
+
+TARGETNAME=ndt
+TARGETTYPE=LIBRARY
+
+INCLUDES = $(INCLUDES) \
+    $(_DRM_SOURCE_PATH)\ndtinc;
+
+SOURCES =           \
+    drmndtmanager.c \
+    drmpfd.c        \
+    drmpfdmanager.c \
+    drmptrlist.c
+
+

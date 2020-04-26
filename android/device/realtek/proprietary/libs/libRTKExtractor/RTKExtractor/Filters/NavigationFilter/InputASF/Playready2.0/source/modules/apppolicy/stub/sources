@@ -1,0 +1,11 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmapppolicystub
+TARGETTYPE=LIBRARY
+
+!include ..\common.src
+
+SOURCES =               \
+    apppolicyimplstub.c \
+    apppolicyutilstub.c \
+

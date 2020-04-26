@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Remote Control</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<script type="text/javascript" src="javascript/util.js"></script>
+	<script type="text/javascript" src="javascript/remote-control.js"></script>
+	<style>
+		* {margin:0; padding:0;}
+		html, body{
+			height:100%;
+		}
+	</style>
+	<script>
+		function initRemoteCtrl()
+		{
+			initTouchKeyListener();
+			if (isParamMatched(HOME_ENTRY_MODE, VAL_ENTRY_REMOTE, HOME_COOKIE_ENTRY_MODE) === true)
+			{
+				// android airfun
+			}
+			resizeLayout();
+		}
+
+		function resizeLayout()
+		{
+			var dspSize = {width:0, height:0};
+			var downRatio = resizeImage('RemoteControlKeyImg', dspSize, CACHE_SAVE, RESIZE_MODE_SCALEUP);
+			if (downRatio == 0 && isAndroidAirFun())
+			{
+				reloadOnce();
+			}
+			else if (downRatio > 0 && dspSize.width != 0)
+			{
+				var ele = document.getElementById('NextFuncImg');
+				var old_width = ele.width, old_height = ele.height;
+				ele.width = dspSize.width;
+				if (old_width < dspSize.width) {
+					// do not scale-up in height, set it back
+					ele.height = old_height;
+				}
+			}
+		}
+	</script>
+</head>
+
+<body bgcolor="#5D6E39" style="overflow: hidden;overflow-y: hidden" scrolling="no" onload="initRemoteCtrl();">
+	<table height="100%" width="100%" align="center" cellspacing="0">
+	<tr>
+	<td valign="top" align="center">
+	<!-- Below is the remote control main section, which contains the mapping to up/down/lef/right/select/guide/return -->
+	<img id="RemoteControlKeyImg" src ="images/bg-remote-key-portrait.jpg" width="520" height="680" usemap="#planetmap"/>
+
+	<map name="planetmap">
+		<area shape="circle" coords="428,98,60" onclick="sendRemoteCommand('HOME')"/>
+		<area shape="circle" coords="98,98,60" onclick="sendRemoteCommand('MENU')"/>
+		<area id="navikey_up" shape="rect" coords="200,110,328,186"/>
+		<area id="navikey_down" shape="rect" coords="200,322,328,400"/>
+		<area id="navikey_left" shape="rect" coords="116,184,183, 326"/>
+		<area id="navikey_right" shape="rect" coords="346,184,413,326"/>
+		<area id="navikey_ok" shape="circle" coords="264,256,65"/>
+		<area id="navikey_back" shape="circle" coords="96,416,60"/>
+		<!-- temporary remove
+		<area shape="rect" coords="26,540,494,620" onclick="self.location.href='remote_ctrl_ti.html';"/>
+		-->
+    </map>
+
+	<div style="position:fixed;bottom:0px" id="nextFuncDiv" onClick="window.location.href='remote_ctrl_playback.html';">
+		<img id="NextFuncImg" src="images/remote-nextPage.png"/>
+	</div>
+	</td>
+	</tr>
+	</table>
+</body>
+</html>
+
+
+
+
+
+
+

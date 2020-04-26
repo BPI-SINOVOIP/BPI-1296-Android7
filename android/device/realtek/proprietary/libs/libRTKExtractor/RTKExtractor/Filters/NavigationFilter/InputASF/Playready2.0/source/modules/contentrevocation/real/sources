@@ -1,0 +1,10 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcontentrevocationreal
+TARGETTYPE=LIBRARY
+
+SOURCES =                           \
+    contentrevocationlevlreal.c     \
+    contentrevocationlicreal.c      \
+    contentrevocationutilreal.c
+

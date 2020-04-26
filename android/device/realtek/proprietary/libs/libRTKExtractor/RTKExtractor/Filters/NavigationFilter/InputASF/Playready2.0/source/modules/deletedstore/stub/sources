@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmdeletedstorestub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    deletedstoreimplstub.c    \
+    deletedstoreutilstub.c    \
+

@@ -1,0 +1,22 @@
+
+=====SOURCE======
+All files in this folder is downloaded from website 
+http://www.fastcgi.com/drupal/node/5. 
+
+The current version is 2.4.1.
+
+=====UPGRADE=====
+
+1. Download the new development kit from the official website.
+2. Un-zip the zip file to the directory named [FCGI_LIB_DIR].
+3. cd [FCGI_LIB_DIR]
+4. Find the CC, CXX and host used. And execute
+	CC=$(MY_CC) CXX=$(MY_CXX) ./configure --host=$(MY_HOST)
+5. Replace all the source files in the 
+   dev/realtek/www/rtCGI/libfcgi_2.4.1 with files in
+   [FCGI_LIB_DIR]/libfcgi.
+6. Copy [FCGI_LIB_DIR]/fcgi_config.h to dev/realtek/www/rtCGI
+7. Update [FCGI_LIB_DIR]/Android.mk to include all the source files
+   located in dev/realtek/www/rtCGI/libfcgi_2.4.1.
+
+

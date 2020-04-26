@@ -1,0 +1,19 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmutilitiescrypto
+TARGETTYPE=LIBRARY
+
+!if "$(_WINCEROOT)" != ""
+CDEFINES=$(CDEFINES)    \
+    -DDRM_DRMUTILITIES_LIB
+
+!else
+C_DEFINES=$(C_DEFINES)    \
+    -DDRM_DRMUTILITIES_LIB
+
+!endif
+
+
+SOURCES =                \
+    drmutilitiescrypto.c
+

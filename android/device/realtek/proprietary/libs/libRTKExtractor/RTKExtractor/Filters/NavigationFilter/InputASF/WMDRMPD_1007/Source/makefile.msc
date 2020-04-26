@@ -1,0 +1,493 @@
+#**@@@+++@@@@******************************************************************
+#*
+#* Microsoft Windows Media
+#* Copyright (C) Microsoft Corporation. All rights reserved.
+#*
+#**@@@---@@@@******************************************************************
+
+#####################################################################
+#
+# This is the makefile for the refcode project and Windows/DOS systems
+# where the Microsoft syntax for cl.exe, lib.exe, and link.exe is used
+#
+#####################################################################
+
+ORIGINAL_MAKEFILE = makefile.msc
+
+#####################################################################
+#        BUILD OPTIONS
+#####################################################################
+
+CONTINUE_ON_ERROR = 0
+QUIET_OUTPUT	  = 0
+STACK_CHECKS      = 0 
+
+#####################################################################
+#        FEATURE OPTIONS
+#####################################################################
+
+#
+# Set this flag to '1' to include the supoort for the Direct License 
+# Acquisition. If this flag is '0', devices will only acquire licenses
+# via content transfer via a host PC or the License Sync (see below).
+#
+# The Following DRM Manager API and the supporting functions will be 
+# included (if this flag is set to '1'):
+# - DRM_MGR_GenerateLicenseChallenge, and
+# - DRM_MGR_GetDeviceProperty
+#
+DRM_SUPPORT_DLA                     = 1
+
+#
+# Set this flag to '1' to include the Secure Clock feature. If this 
+# flag is '0', all date-time based content/licenses would not be able to 
+# be maintained with the accurate date-time physically.
+#
+# The Following DRM Manager API and the supporting functions will be 
+# included (if this flag is set to '1'):
+# - DRM_MGR_ClkProcessResponse,
+# - DRM_MGR_ClkGenerateChallenge, and
+# - DRM_MGR_GetSecureClock
+#
+DRM_SUPPORT_SECURE_CLOCK            = 0
+
+#
+# Set this flag to '1' to include the support for License store Sync'ing
+# with PC host. It this flag is '0', devices will only be able to acquire 
+# licenses via content transfer from a host, or through Direct License
+# Acquisition with a WMRM license server.
+#
+# The following DRM Manager API and the supporting functions will be 
+# included (if this flag is set to '1'):
+# - DRM_MGR_GenerateSyncChallenge
+#
+DRM_SUPPORT_LICENSE_SYNC            = 1
+
+#
+# Set this flag to '1' to include the Metering feature. If this flag is '0',
+# licenses with a Metering ID (MID) will not be usable.
+#
+# The following DRM Manager API and the supporting functions will be 
+# included (if this flag is set to '1'):
+# - DRM_MGR_GenerateMeterChallenge,
+# - DRM_MGR_ProcessMeterResponse
+#
+DRM_SUPPORT_METERING                = 1
+
+#
+# Set this flag to '1' to include the Anti-rollback clock feature. If this
+# flag is set to '0', device clock rollback will not be detected. Hence all 
+# date-time based content/licenses would not be able to be maintained 
+# accurately.
+#
+# There is no DRM Manager API(s) directly affected by this flag. 
+#
+DRM_SUPPORT_ANTIROLLBACK_CLOCK      = 1
+
+#
+# Set this flag to '1' to include the content encryption feature. If this
+# flag is set to '0', devices cannot perform encryption on any content.
+#
+# The following DRM Manager API and the supporting functions will be 
+# included (if this flag is set to '1'):
+# - DRM_MGR_CreateEncryptContext,
+# - DRM_MGR_Encrypt
+#
+DRM_SUPPORT_ENCRYPTION              = 1
+
+#
+# Set this flag to '1' to enable optimizations that cache the certificates
+# validated when verifying a certificate chain.  This allows the asymmetric
+# validation of a particular certificate to be performed only once.  Each
+# subsequent validation is a symmetric validation, and is therefore much quicker.
+# If this flag is set to '0', devices will use more expensive asymmetric operations.
+#
+DRM_SUPPORT_CERTIFICATE_CACHING     = 1
+
+#
+# Set this flag to '1' to enable optimizations that offload asymmetric crypto
+# operations to symmetric operations.  For example some signatures after being
+# verified once asymmetrically can be converted to a symmetric signature such that
+# subseqant verifications are faster.  The same goes for some asymmetric decrypt
+# operations.  If this flag is set to '0', devices will use more expensive 
+# asymmetric operations.
+#
+DRM_SUPPORT_SYMMETRIC_OPTIMIZATIONS = 1
+
+#
+# Set this flag to '1' to disable validity checking of the secure clock
+# response.  When the checks are disabled, the following items in the secure
+# clock response are disabled:
+#     (1) Matching Transaction ID (TID)
+#     (2) Valid signature and certificate chain
+#     (3) Five-minute timeout for the round trip to the secure clock service
+#
+# NOTE: THIS IS FOR TESTING PURPOSES ONLY!  Make sure this flag is 0 (ZERO)
+# before your final release. 
+#
+DRM_SECURE_CLOCK_RESPONSE_TEST_MODE = 0
+
+#
+# Set this flag to '1' to enable the datastore to be created with a specific size.
+# This reduces the fragmentation of the datastore, and increases performance during
+# datastore access.
+# The following two defines in drmmanager.c control the initial size, and the subsequent
+# increment in datastore size.  Set them to suit your specific implementation.
+#    #define DATASTORE_INITSIZE      512     /* prealloc 512 K for initial datastore size */
+#    #define DATASTORE_GROWSIZE      512     /* grow 512 K for each datastore expansion */
+#
+# If this flag is '0', the datastore blocks are allocated as they are needed.
+#
+DRM_SUPPORT_DATASTORE_PREALLOC=0
+
+#
+# Set this flag to '1' to enable profiling functionality
+# Profiling compiles in the gathering of timing data, written to a comma-delimited
+# file at \profile.log
+# Profiling must be activated by a runtime call to DRM_PRO_StartProfiling, and this
+# can also be done by calling DRM_PRO_EnterScope() with the final parameter set to
+#    DRM_PROFILING_START_IF_NOT_STARTED (TRUE)
+# Profiling can be turned off at runtime with DRM_PRO_StopProfiling() to close and
+# flush the file before program termination
+#
+# Example profiling macros are included in public entrypoints in drmmanager.c and 
+# one level deep into calls made from there.  The crypto entrypoints PK_Encypt, 
+# PK_Decrypt, PK_Sign, and PK_Verify are also profiled
+#
+# If this flag is '0', the profiling macros compile to nothing.
+#
+DRM_SUPPORT_PROFILING=0
+
+
+#
+# Set this flag to '1' to enable application revocation functionality.
+#
+# If this flag is '0', the application revocation list storage and application revocation checks
+# do not compile.
+DRM_SUPPORT_APP_REVOCATION=0
+
+#
+# Set this flag to '1' to enable device revocation functionality.
+#
+# If this flag is '0', the Device revocation list storage and device revocation checks
+# do not compile.
+DRM_SUPPORT_DEVICE_REVOCATION=0
+
+
+#
+# Set this flag to '1' to enable revocation support for WMDRM Network Devices Transmitter functionality.
+# Setting this flag will enable support for WMDRMNET revocation list storage  
+# and revocation checks.
+#
+# If this flag is '0', the WMDRMNET revocation storage checks do not compile.
+DRM_SUPPORT_WMDRMNET=0
+
+#
+# Set this flag to '1' to enable native 64 bit types
+DRM_SUPPORT_NATIVE_64BIT_TYPES=1 
+
+#
+# Set this flag to '1' to enable device store functionality.
+#
+# If this flag is '0', the device store functionality will not be compiled.
+# The device store is used by the WMDRM-NDT porting kit, and so is only needed if
+# linking with it.
+DRM_SUPPORT_DEVICESTORE=0
+
+
+# Set this flag to '1' to enable expired license cleanup functionality
+#
+# If this flag is '1', calling DRM_MGR_CleanupLicenseStore will iterate
+# through all licenses and delete those that have expired and are no
+# longer usable.
+DRM_SUPPORT_CLEANUP=1
+
+#
+
+# The following compile flags are for use in PC/host components only and should
+# be unset or set to 0 for all WMDRM-PD implementations:
+#     DRM_SUPPORT_CONTENT_REVOCATION
+#     DRM_BACKUP_RESTORE_SUPPORT
+#     DRM_SUPPORT_PLAYLIST_BURN
+#     DRM_SUPPORT_SECURE_CHANNEL
+#     DRM_SUPPORT_PMLICENSE
+#     DRM_SUPPORT_COPY_OPL
+#
+
+
+#####################################################################
+#        DIRECTORIES
+#####################################################################
+
+# target directory names
+
+LIBEXT         = lib
+OBJEXT         = obj
+EXEEXT         = exe
+
+!IF "$(PROCESSOR)" == ""
+PROCESSOR      = i386
+!ENDIF
+
+OBJ_DIR_FRE    = obj
+OBJ_DIR_CHK    = objd
+
+OBJDIRFRE      = $(OBJ_DIR_FRE)/$(PROCESSOR)
+OBJDIRCHK      = $(OBJ_DIR_CHK)/$(PROCESSOR)
+
+BIN_DIR_FRE    = bin
+BIN_DIR_CHK    = bind
+
+BINDIRFRE      = $(BIN_DIR_FRE)/$(PROCESSOR)
+BINDIRCHK      = $(BIN_DIR_CHK)/$(PROCESSOR)
+
+#####################################################################
+#        EXECUTABLES AND FLAGS
+#####################################################################
+
+!IF "$(CONTINUE_ON_ERROR)" == "1"
+EXEPFX = -
+!ENDIF
+
+!IF "$(QUIET_OUTPUT)" == "1"
+EXEPFX = $(EXEPFX)@
+!ENDIF
+
+!IF "$(STACK_CHECKS)" == "1"
+CL_STACK_CHECK  = /GS
+STACK_CHECK_LIB = BufferOverflowU.lib
+!ENDIF
+
+###############
+#   BEGIN 386
+###############
+!IF "$(PROCESSOR)" == "i386"
+CC               = $(EXEPFX)cl
+LINK             = $(EXEPFX)link
+CLIB             = $(EXEPFX)lib
+
+CFLAGS_FRE	 = /nologo /Za $(CL_STACK_CHECK) /TC /I$(REFCODE_INC) /I$(CRYPTO_INC) /I$(TOOLS_INC) /I$(STD_INC) /I$(CE_INC)  /D_CRT_SECURE_NO_DEPRECATE
+CFLAGS_CHK	 = $(CFLAGS_FRE) /Zi 
+CPPFLAGS_FRE     = /nologo $(CL_STACK_CHECK) /TP /I$(REFCODE_INC) /I$(CRYPTO_INC) /I$(TOOLS_INC) /I$(STD_INC) /I$(CE_INC) /I$(WIN_INC)  /D_CRT_SECURE_NO_DEPRECATE
+CPPFLAGS_CHK     = $(CPPFLAGS_FRE) /Zi 
+
+OBJOUT  	 = -Fo
+DLLOUT  	 = /OUT:
+EXEOUT  	 = /OUT:
+LIBOUT  	 = /OUT:
+LIBFLAGS	 = /nologo
+LNKFLAG_DLL      = /DLL
+LNKFLAG_DEF      = /DEF:
+LNKFLAGS_FRE     = /NOLOGO /IGNORE:4078
+LNKFLAGS_CHK     = $(LNKFLAGS_FRE) /DEBUG
+SYS_LIBS         = $(STACK_CHECK_LIB)
+
+LIBPATH  = /LIBPATH:$(BIN_DIR)\$(PROCESSOR) 
+C_DEFINES= /D_ANSI /DTARGET=10
+
+!ENDIF
+###############
+#   END 386
+###############
+
+###############
+#   BEGIN ARM
+###############
+!IF "$(PROCESSOR)" == "arm"
+CC          = armcc
+LINK        = armlink
+CLIB        = armar
+
+CFLAGS_FRE  = -Wall -ansi -I$(REFCODE_INC) -I$(CRYPTO_INC) -I$(TOOLS_INC) -I$(STD_INC) -I$(CE_INC) 
+CFLAGS_CHK	 = -ansi  -I$(REFCODE_INC) -I$(CRYPTO_INC) -I$(TOOLS_INC) -I$(STD_INC) -I$(CE_INC) 
+CPPFLAGS_FRE     =  -ansi -I$(REFCODE_INC) -I$(CRYPTO_INC) -I$(TOOLS_INC) -I$(STD_INC) -I$(CE_INC) -I$(WIN_INC)
+CPPFLAGS_CHK     = $(CPPFLAGS_FRE)  -g
+OBJOUT  	 = -o
+EXEOUT  	 = -Output $(BOGUS_VARIABLE_TO_ALLOW_INCLUSION_OF_SPACE_AFTER_FLAG)
+LIBOUT  	 = 
+LIBFLAGS	 = r
+LIBPATH		 = -L $(STD_LIB_DIR) 
+#ifneq ($(STDLIB2), "")
+#LIBPATH	+= -L $(STDLIB2)
+#endif
+#ifneq ($(STDLIB3), "")
+#LIBPATH	+= -L $(STDLIB3)
+#endif
+LNKFLAG_DLL  = 
+LNKFLAGS_FRE = 
+
+C_DEFINES= -DTARGET=10 -DCOMPILER=3
+
+!ENDIF
+###############
+#   END ARM
+###############
+
+!IF "$(BUILDTYPE)" == "FREE"
+CFLAGS       = $(CFLAGS_FRE)
+CPPFLAGS     = $(CPPFLAGS_FRE)
+OBJDIR       = $(OBJDIRFRE)
+BIN_DIR      = $(BIN_DIR_FRE)
+BINDIR       = $(BINDIRFRE)
+LNKFLAGS     = $(LNKFLAGS_FRE)
+!ELSE
+CFLAGS       = $(CFLAGS_CHK)
+CPPFLAGS     = $(CPPFLAGS_CHK)
+OBJDIR       = $(OBJDIRCHK)
+BIN_DIR      = $(BIN_DIR_CHK)
+BINDIR       = $(BINDIRCHK)
+LNKFLAGS     = $(LNKFLAGS_CHK)
+!ENDIF
+
+#####################################################################
+#        FEATURES DEFINES
+#####################################################################
+
+DRMOPTIONALTARGETLIBS = 
+DRMOPTIONALTARGETEXES = 
+
+!IF "$(DRM_SUPPORT_DEVICE_REVOCATION)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_DEVICE_REVOCATION=1
+DRM_SUPPORT_REVOCATION = 1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_WMDRMNET)" == "1"
+DRM_SUPPORT_REVOCATION = 1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_SECURE_CHANNEL)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_SECURE_CHANNEL=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_WMDRMNET)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_WMDRMNET=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_DEVICESTORE)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_DEVICESTORE=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_DLA)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_DLA=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_CONTENT_REVOCATION)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_CONTENT_REVOCATION=1
+DRM_SUPPORT_REVOCATION = 1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_APP_REVOCATION)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_APP_REVOCATION=1
+DRM_SUPPORT_REVOCATION = 1
+!ENDIF
+
+!IF "$(DRM_BACKUP_RESTORE_SUPPORT)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_BACKUP_RESTORE_SUPPORT=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_PLAYLIST_BURN)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_PLAYLIST_BURN=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_PMLICENSE)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_PMLICENSE=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_SECURE_CLOCK)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_SECURE_CLOCK=1
+DRMOPTIONALTARGETLIBS = $(DRMOPTIONALTARGETLIBS) $(SCK_LIB)
+DRMOPTIONALTARGETEXES = $(DRMOPTIONALTARGETEXES) $(SCGC_EXE) $(SCPR_EXE) $(SCCR_EXE)
+!ENDIF
+
+!IF "$(DRM_SUPPORT_LICENSE_SYNC)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_LICENSE_SYNC=1
+DRMOPTIONALTARGETLIBS = $(DRMOPTIONALTARGETLIBS) $(SYN_LIB)
+DRMOPTIONALTARGETEXES = $(DRMOPTIONALTARGETEXES) $(GSC_EXE)
+!ENDIF
+
+!IF "$(DRM_SUPPORT_METERING)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_METERING=1
+DRMOPTIONALTARGETLIBS = $(DRMOPTIONALTARGETLIBS) $(MTR_LIB)
+DRMOPTIONALTARGETEXES = $(DRMOPTIONALTARGETEXES) $(GMC_EXE) $(RMC_EXE) $(PMR_EXE)
+!ENDIF
+
+!IF "$(DRM_SUPPORT_NATIVE_64BIT_TYPES)" == "0"
+C_DEFINES= 	$(C_DEFINES) -DDRM_NO_NATIVE_64_TYPES=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_ANTIROLLBACK_CLOCK)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_ANTIROLLBACK_CLOCK=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_ENCRYPTION)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_ENCRYPTION=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_CERTIFICATE_CACHING)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_CERTIFICATE_CACHING=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_SYMMETRIC_OPTIMIZATIONS)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_SYMMETRIC_OPTIMIZATIONS=1
+!ENDIF
+
+!IF "$(DRM_SECURE_CLOCK_RESPONSE_TEST_MODE)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SECURE_CLOCK_RESPONSE_TEST_MODE=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_DATASTORE_PREALLOC)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_DATASTORE_PREALLOC=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_PROFILING)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_PROFILING=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_REVOCATION)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_REVOCATION=1
+!ENDIF
+
+!IF "$(DRM_SUPPORT_CLEANUP)" == "1"
+C_DEFINES =	$(C_DEFINES) -DDRM_SUPPORT_CLEANUP=1
+!ENDIF
+
+.SUFFIXES: .c .obj .lib .exe
+
+include makefile.cmn
+
+#####################################################################
+#        TARGET SUBDIRECTORIES
+#
+# note: not all systems will create obj directories and many will
+#       exit on nonexistent ones.  So create them all as part of
+#       any global build
+#####################################################################
+
+init: FORCE
+	-@echo off
+	-@(if not exist "$(BIN_DIR_FRE)" mkdir "$(BIN_DIR_FRE)")
+	-@(if not exist "$(BIN_DIR_CHK)" mkdir "$(BIN_DIR_CHK)")
+	-@(if not exist "$(BIN_DIR_FRE)/$(PROCESSOR)" mkdir "$(BIN_DIR_FRE)/$(PROCESSOR)")
+	-@(if not exist "$(BIN_DIR_CHK)/$(PROCESSOR)" mkdir "$(BIN_DIR_CHK)/$(PROCESSOR)")
+	-@for %a in ($(LIB_DIRS)) do @(if not exist "%a/$(OBJ_DIR_FRE)" mkdir "%a/$(OBJ_DIR_FRE)")
+	-@for %a in ($(LIB_DIRS)) do @(if not exist "%a/$(OBJ_DIR_CHK)" mkdir "%a/$(OBJ_DIR_CHK)")
+	-@for %a in ($(EXE_DIRS)) do @(if not exist "%a/$(OBJ_DIR_FRE)" mkdir "%a/$(OBJ_DIR_FRE)")
+	-@for %a in ($(EXE_DIRS)) do @(if not exist "%a/$(OBJ_DIR_CHK)" mkdir "%a/$(OBJ_DIR_CHK)")
+	-@for %a in ($(LIB_DIRS)) do @(if not exist "%a/$(OBJ_DIR_FRE)/$(PROCESSOR)" mkdir "%a/$(OBJ_DIR_FRE)/$(PROCESSOR)")
+	-@for %a in ($(LIB_DIRS)) do @(if not exist "%a/$(OBJ_DIR_CHK)/$(PROCESSOR)" mkdir "%a/$(OBJ_DIR_CHK)/$(PROCESSOR)")
+	-@for %a in ($(EXE_DIRS)) do @(if not exist "%a/$(OBJ_DIR_FRE)/$(PROCESSOR)" mkdir "%a/$(OBJ_DIR_FRE)/$(PROCESSOR)")
+	-@for %a in ($(EXE_DIRS)) do @(if not exist "%a/$(OBJ_DIR_CHK)/$(PROCESSOR)" mkdir "%a/$(OBJ_DIR_CHK)/$(PROCESSOR)")
+
+#####################################################################
+#        CLEAN SUBDIRECTORIES
+#####################################################################
+
+clean: $(FORCE)
+	-@(del "$(BIN_DIR_FRE)\$(PROCESSOR)\*.$(LIBEXT)") 2> errs.txt
+	-@(del "$(BIN_DIR_CHK)\$(PROCESSOR)\*.$(LIBEXT)") 2>>errs.txt
+	-@(del "$(BIN_DIR_FRE)\$(PROCESSOR)\*.$(EXEEXT)") 2>>errs.txt
+	-@(del "$(BIN_DIR_CHK)\$(PROCESSOR)\*.$(EXEEXT)") 2>>errs.txt
+	-@for %a in ($(LIB_DIRS)) do @(del "%a\$(OBJ_DIR_FRE)\$(PROCESSOR)\*.$(OBJEXT)") 2>>errs.txt
+	-@for %a in ($(LIB_DIRS)) do @(del "%a\$(OBJ_DIR_CHK)\$(PROCESSOR)\*.$(OBJEXT)") 2>>errs.txt
+	-@for %a in ($(EXE_DIRS)) do @(del "%a\$(OBJ_DIR_FRE)\$(PROCESSOR)\*.$(OBJEXT)") 2>>errs.txt
+	-@for %a in ($(EXE_DIRS)) do @(del "%a\$(OBJ_DIR_CHK)\$(PROCESSOR)\*.$(OBJEXT)") 2>>errs.txt

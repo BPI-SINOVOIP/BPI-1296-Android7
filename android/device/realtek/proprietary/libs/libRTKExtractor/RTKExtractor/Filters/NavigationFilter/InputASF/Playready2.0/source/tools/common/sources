@@ -1,0 +1,16 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmtoolscommon
+TARGETTYPE=LIBRARY
+
+INCLUDES =                                 \
+    $(INCLUDES)                            \
+    $(_DRM_SOURCE_PATH)\asfmmstr\inc;
+
+SOURCES =                   \
+    drmtoolsutils.c         \
+    drmtoolsasfparser.c     \
+    drmtoolsmediafile.c     \
+    drmtoolspkg.c           \
+    drmtoolsinit.c          \
+

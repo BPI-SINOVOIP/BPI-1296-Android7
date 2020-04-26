@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmmodelrevocationstub
+TARGETTYPE=LIBRARY
+
+SOURCES =                     \
+    modelrevocationimplstub.c \
+    modelrevocationutilstub.c \
+

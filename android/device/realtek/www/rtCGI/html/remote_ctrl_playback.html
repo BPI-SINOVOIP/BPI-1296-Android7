@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<script type="text/javascript" src="javascript/util.js"></script>
+	<script type="text/javascript" src="javascript/remote-control.js"></script>
+	<style>
+		* {margin:0; padding:0;}
+		html, body{
+			height:100%;
+		}
+	</style>
+	<script>
+		function initPlaybackCtrl()
+		{
+			initTouchKeyListener();
+			resizeLayout();
+		}
+		function resizeLayout()
+		{
+			var dspSize = {width:0, height:0};
+			var ratio = resizeImage('RemoteCtrlKeyPlaybackImg', dspSize, CACHE_ANY, RESIZE_MODE_SCALEUP);
+			if (ratio > 0 && dspSize.width != 0)
+			{
+				var ele = document.getElementById('prevFuncImg');
+				var old_width = ele.width, old_height = ele.height;
+				ele.width = dspSize.width;
+				if (old_width < dspSize.width ) {
+					// do not scale-up in height
+					ele.height = old_height;
+				}
+			}
+		}
+	</script>
+</head>
+
+<body bgcolor="#5D6E39" style="overflow: hidden;overflow-y: hidden" scrolling="no" onload="initPlaybackCtrl()">
+	<table height="100%" width="100%" align="center" cellspacing="0">
+	<tr>
+	<td valign="top" align="center">
+	<!-- Below is the remote control main section, which contains the mapping to up/down/lef/right/select/guide/return -->
+	<img id="RemoteCtrlKeyPlaybackImg" src ="images/bg-remote-key-pb-portrait.jpg" width="520" height="680" usemap="#planetmap"/>
+
+	<map name="planetmap">
+		<area shape="rect" coords="34,96,180,172" onclick="sendRemoteCommand('PIP')"/>
+		<area shape="rect" coords="188,96,332,172" onclick="sendRemoteCommand('ZOOM')"/>
+		<area shape="rect" coords="340,96,486,254" onclick="sendRemoteCommand('SOURCE')"/>
+		<area shape="rect" coords="34,178,180,254" onclick="sendRemoteCommand('REPEAT')"/>
+		<area shape="rect" coords="188,178,332,254" onclick="sendRemoteCommand('INFO')"/>
+		
+		<area shape="rect" coords="34,290,180,366" onclick="sendRemoteCommand('FR')"/>
+		<area shape="rect" coords="188,290,332,366" onclick="sendRemoteCommand('PLAY')"/>
+		<area shape="rect" coords="340,290,486,366" onclick="sendRemoteCommand('FF')"/>
+		<area shape="rect" coords="34,372,180,448" onclick="sendRemoteCommand('PREV')"/>
+		<area shape="rect" coords="188,372,332,448" onclick="sendRemoteCommand('STOP')"/>
+		<area shape="rect" coords="340,372,486,448" onclick="sendRemoteCommand('NEXT')"/>
+
+		<area id="key_voldown" shape="rect" coords="34,480,180,558"/>
+		<area id="key_volup" shape="rect" coords="188,480,332,558"/>
+		<area shape="rect" coords="340,480,486,558" onclick="sendRemoteCommand('VOL_MUTE')"/>
+
+	</map>
+	<div style="position:fixed;top:0px" onClick="backHistory()" id="prevFuncDiv">
+		<img id="prevFuncImg" src="images/remote-prevPage.png"/>
+	</div>
+	</td>
+	</tr>
+	</table>
+</body>
+</html>

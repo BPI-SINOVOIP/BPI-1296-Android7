@@ -1,0 +1,78 @@
+ANDROID_SRC_PATH=../../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libRTKAoutUtil.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+LOCAL_SRC_FILES := AudioUtil.cpp
+
+LOCAL_CFLAGS := -DLOG_TAG=\"libRtkAoutUtil\"
+LOCAL_CFLAGS += -Wno-multichar --rtti
+LOCAL_CFLAGS += -Wno-error=format-security -Wno-error=non-virtual-dtor -Wno-error=address -Wno-error=sequence-point -Wno-error=return-type
+
+LOCAL_CFLAGS += $(DEFINES) -DSYS_UNIX=1
+LOCAL_CFLAGS += -fPIC
+LOCAL_C_INCLUDES += \
+    $(LOCAL_PATH)/../../Include \
+    $(TOP)/device/realtek/libs/Include \
+    $(TOP)/system/core/include/cutils \
+    $(TOP)/system/core/include/utils \
+    $(LOCAL_PATH)/../../rtk_libs/common \
+    $(LOCAL_PATH)/../../rtk_libs/common/IPC/generate/include/system \
+    $(LOCAL_PATH)/../../rtk_libs/common/IPC/include \
+    $(LOCAL_PATH)/../../rtk_libs/common/IPC/include/xdr \
+    $(LOCAL_PATH)/../../rtk_libs/common/IPC/src/xdr \
+    $(LOCAL_PATH)/../../rtk_libs/OSAL/include \
+    $(LOCAL_PATH)/../../rtk_libs/OSAL/include/OSAL \
+    $(LOCAL_PATH)/../../Include/Application/AppClasse \
+    $(LOCAL_PATH)/../../Include/StreamClass \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/common \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/common/IPC/generate/include/system \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/common/IPC/include \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/common/IPC/include/xdr \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/common/IPC/src/xdr \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/OSAL/include \
+    $(TOP)/hardware/realtek/realtek_omx/rtk_libs/OSAL/include/OSAL \
+	$(TOP)/hardware/realtek/HDMIControl/Include \
+	$(TOP)/hardware/realtek/HDMIControl/Include/Application/AppClass
+LOCAL_C_INCLUDES += \
+    $(TOP)/system/core/include \
+    $(GENERIC_LINUX_PATH)/include
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

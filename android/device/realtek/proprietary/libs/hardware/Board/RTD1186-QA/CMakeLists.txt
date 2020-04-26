@@ -1,0 +1,37 @@
+INCLUDE(../../../../include/config.txt)
+
+SET(LIBNAME Board)
+SET(LIBRARY_OUTPUT_PATH ../../../../lib/)
+
+SET(MYDEFS )
+SET(rm " /bin/rm -f")
+SET(cp " /bin/cp -f")
+SET(CC " ${MYCXX}")
+SET(AR " ${MYAR} cq")
+SET(RANLIB " ${MYRANLIB}")
+#SET(LIBNAME ../../../../lib/libBoard.a)
+
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../../Include/)
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../common/IPC/include)
+SET(INCLUDES  ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../common/IPC/generate/include/system)
+
+
+IF(USE_HDMI STREQUAL YES)
+SET(MYDEFS ${MYDEFS} " -DUSE_HDMI")
+ENDIF(USE_HDMI STREQUAL YES)
+
+SET(CFLAGS " ${DEFINES} -DSYS_UNIX=1 ${MYDEFS}")
+SET(SRCS ./board.cpp)
+SET(OBJS ./board.o)
+SET(SRCS_COMMON ../BoardCommon.cpp)
+
+INCLUDE_DIRECTORIES(${INCLUDES})
+ADD_DEFINITIONS(${CFLAGS} ${DEBUGFLAG} ${WARNING})
+ADD_LIBRARY(${LIBNAME} ${SRCS} ${SRCS_COMMON})
+
+string(REGEX REPLACE  ";" " " APCFG_DVR  ${APCFG_DVR})
+string(REGEX REPLACE  ";" " " CHIP_MODEL_DEFS ${CHIP_MODEL_DEFS})
+string(REGEX REPLACE  ";" " " APCFG_DEFS ${APCFG_DEFS})
+#string(REGEX REPLACE  ";" " " BUILD_OPTIONS ${BUILD_OPTIONS})
+string(REGEX REPLACE  ";" " " DEFINES ${DEFINES})
+string(REGEX REPLACE  ";" " " APCFG_FLAGS ${APCFG_FLAGS})

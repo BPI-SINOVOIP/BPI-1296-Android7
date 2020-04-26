@@ -1,0 +1,38 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.BluetoothRTK3ddService"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+
+    <application android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@style/AppTheme">
+
+        <receiver android:name=".BluetoothRTK3ddBroadcastReceiver">
+            <intent-filter>
+                <!--<action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />  -->
+                <action android:name="android.action.rtk.START_SERV_DD" />
+                <action android:name="android.action.rtk.STOP_SERV_DD" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".BluetoothRTK3ddService"
+            android:enabled="true">
+        </service>
+        <activity
+            android:name="com.android.BluetoothRTK3ddService.BluetoothRTK3ddActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent" >
+        </activity>
+    </application>
+
+</manifest>

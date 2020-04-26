@@ -1,0 +1,23 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmtoolscommon
+TARGETTYPE=LIBRARY
+
+INCLUDES =                                 \
+    $(INCLUDES)                            \
+    $(_DRM_SOURCE_PATH)\asfmmstr\inc;     
+    
+SOURCES =              \
+    drmtoolsconstants.c     \
+	drmtoolsutils.c	    \
+	drmtoolsasfparser.c \
+	drmtoolsmediafile.c
+
+# MSDB files, only include if MSDB is present
+!if exist(cfdtoolsutilities.c)
+SOURCES =              \
+    $(SOURCES)         \
+    cfdtoolsutilities.c \
+    asf_parser_pk.c
+!endif
+

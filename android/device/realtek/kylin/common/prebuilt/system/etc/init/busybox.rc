@@ -1,0 +1,8 @@
+service busybox_link /sbin/busybox --install -s /system/vendor/bin
+    class core
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:rootfs:s0
+

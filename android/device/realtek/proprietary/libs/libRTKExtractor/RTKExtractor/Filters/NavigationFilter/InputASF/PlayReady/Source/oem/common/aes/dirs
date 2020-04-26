@@ -1,0 +1,13 @@
+!IF 0
+
+Microsoft PlayReady
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+Module Name:
+
+    dirs.
+
+!ENDIF
+
+DIRS = \
+    daytona

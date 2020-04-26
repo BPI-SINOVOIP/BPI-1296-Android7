@@ -1,0 +1,7 @@
+﻿<resources>
+    <string name="app_name">BluetoothRTK3ddService</string>
+    <string name="start_3ddserv">Begin to start 3dd sync service! Please put on your glass!</string>
+    <string name="stop_3ddserv">3dd sync stervice has stoped !</string>
+    <string name="connect_3dg">3DG has connected address is : !</string>
+    <string name="bluetooth3d_match_success"> 3D蓝牙眼镜对码成功 </string>
+</resources>

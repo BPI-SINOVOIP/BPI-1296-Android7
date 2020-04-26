@@ -1,0 +1,22 @@
+!include ..\..\drmbuild.cmn
+
+TARGETNAME=drmcerts
+TARGETTYPE=LIBRARY
+
+
+!if "$(_WINCEROOT)" != ""
+
+CDEFINES= $(CDEFINES)               \
+    -DDRM_BUILDING_DRMCERTS_LIB     \
+
+!else
+
+C_DEFINES= $(C_DEFINES)             \
+    -DDRM_BUILDING_DRMCERTS_LIB     \
+
+!endif
+
+SOURCES =                   \
+    ..\drmbcertbuilder.c    \
+    ..\drmbcertparser.c     \
+

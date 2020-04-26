@@ -1,0 +1,42 @@
+INCLUDE(../../../include/config.txt)
+SET(LIBNAME Resource)
+SET(LIBRARY_OUTPUT_PATH ../../../lib/)
+
+SET(rm " /bin/rm -f")
+SET(CC " ${MYCXX}")
+SET(LINK " -=LINK=-")
+SET(AR " ${MYAR} cq")
+SET(RANLIB " ${MYRANLIB}")
+#SET(LIBNAME ../../../lib/libResource.a)
+SET(ftcfg ../../Platform_Lib/Graphics/FontRenderer/freetype-config)
+
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/${INC_DIR})
+
+SET(CXXFLAGS ${CXXFLAGS} "`${ftcfg} --cflags`  -Wall")
+SET(LDFLAGS  "`${ftcfg} --libs`")
+
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/.)
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../Include)
+SET(INCLUDES ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../common/IPC/include)
+SET(INCLUDES  ${INCLUDES}  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../common/IPC/generate/include/system)
+
+SET(DEFINES ${DEFINES} " ${DEFS} -DSYS_UNIX=1")
+
+IF(NOT TARGET_BOARD STREQUAL NO)
+SET(DEFINES ${DEFINES} " -DTARGET_BOARD")
+ENDIF(NOT TARGET_BOARD STREQUAL NO)
+
+SET(CFLAGS ${CFLAGS} ${DEFINES})
+SET(SRCS resource.cpp ioResource.cpp)
+SET(OBJS resource.o ioResource.o)
+#message(${DEFINES})
+#message(${CFLAGS})
+INCLUDE_DIRECTORIES(${INCLUDES})
+ADD_DEFINITIONS(${CFLAGS} ${CXXFLAGS} ${DEBUGFLAG} ${WARNING})
+ADD_LIBRARY(${LIBNAME} ${SRCS})
+string(REGEX REPLACE  ";" " " APCFG_DVR  ${APCFG_DVR})
+string(REGEX REPLACE  ";" " " CHIP_MODEL_DEFS ${CHIP_MODEL_DEFS})
+string(REGEX REPLACE  ";" " " APCFG_DEFS ${APCFG_DEFS})
+#string(REGEX REPLACE  ";" " " BUILD_OPTIONS ${BUILD_OPTIONS})
+string(REGEX REPLACE  ";" " " DEFINES ${DEFINES})
+string(REGEX REPLACE  ";" " " APCFG_FLAGS ${APCFG_FLAGS})

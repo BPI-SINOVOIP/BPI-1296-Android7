@@ -1,0 +1,391 @@
+ANDROID_SRC_PATH=../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H -DUSE_RTK_VOUT_UTIL -DHAVE_PTHREADS
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+STRIP=$(MYSTRIP)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/librvsd.a
+SO_LIBNAME= $(GENERIC_LINUX_PATH)/lib/librvsd.so
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+RVSD_VORPC = true
+RVSD_ENABLE_ENCODE = true
+RVSD_ENABLE_SHARE_ICQ = true
+#RVSD_VO_WRITEBACK = true
+RVSD_USE_VOUTIL = true
+USE_RT_ION = true
+#USE_RT_EXTRACTOR = true
+RVSD_USE_1295_VE = true
+RVSD_USE_VO_SCALE_CMD = false
+RVSD_USE_VO_SCALE_AUTO = false
+
+COMMON_SRC_FILES := \
+        rvsd_maincore.cpp rvsd_ringbuffer.cpp rvsd_OSAL.cpp rvsd_InBandCMD.cpp \
+        rvsd_ptsMsgHandle.cpp \
+        rvsd_entry.cpp \
+        socket_client.cpp\
+        dvbsp_decoder/DVBSP_Decoder_HL.cpp dvbsp_decoder/DVBSP_Decoder.cpp \
+        sp_common/sp_common.cpp sp_common/sp_rpc.cpp dvdsp_decoder/SP.cpp \
+        bdsp_decoder/BDSP_Decoder.cpp bdsp_decoder/BDSP_Decoder_HL.cpp rvsd_dbg.cpp \
+        rvsd_BsValidate.cpp \
+        rvsd_VDecRM.cpp \
+        rvsd_CommonFunc.cpp \
+        rvsd_VDecMpeg2.cpp \
+        rvsd_VDecHdrParameterParser.cpp \
+        rvsd_VdecBitstreamFeed.cpp \
+        rvsd_dbg_md5.c \
+        rvsd_BitReader.cpp
+
+$(warning PLATFORM_VERSION=$(PLATFORM_VERSION))
+ifeq ($(PLATFORM_VERSION), 6.0)
+LOCAL_CFLAGS += -DANDROID_6
+#else ifeq ($(PLATFORM_VERSION), 5.1.1)
+#LOCAL_CFLAGS += -DANDROID_5.1.1
+#else ifeq ($(PLATFORM_VERSION), 4.4)
+#LOCAL_CFLAGS += -DANDROID_4.4
+#else
+#LOCAL_CFLAGS += -DANDROID_6
+endif
+
+LOCAL_CFLAGS += -DRVSD_ENABLE_SET_CRA_AS_BLA
+
+ifeq ($(RVSD_USE_1295_VE), false)
+LOCAL_CFLAGS += -DRVSD_MPEG2_CC
+endif
+LOCAL_CFLAGS += -DVPU_GET_CC
+LOCAL_CFLAGS += -DRVSD_SUPPORT_TECHNICOLOR
+
+ifeq ($(RVSD_USE_VO_SCALE_CMD), true)
+LOCAL_CFLAGS += -DRVSD_USE_VO_SCALE_CMD
+endif
+
+ifeq ($(RVSD_USE_VO_SCALE_AUTO), true)
+LOCAL_CFLAGS += -DRVSD_USE_VO_SCALE_AUTO
+endif
+
+#ifeq ($(TARGET_BOARD_PLATFORM), phoenix)
+LOCAL_CFLAGS += -DPLATFORM_RTK_PHOENIX
+#LOCAL_CFLAGS += -DUSE_FAKE_CLK
+LOCAL_CFLAGS += -DSPU_DECODE_ENABLE
+LOCAL_CFLAGS += -DDVBSPDEC_ENABLED
+LOCAL_CFLAGS += -DBDSPDEC_ENABLED
+#endif
+
+ifeq ($(USE_RT_ION),true)
+LOCAL_CFLAGS += -DUSE_RT_ION
+endif
+ifeq ($(USE_RT_EXTRACTOR),true)
+LOCAL_CFLAGS += -DUSE_RTK_EXTRACTOR
+endif
+
+#ifeq ($(RVSD_USE_VOUTIL),true)
+#include device/realtek/proprietary/libs/rtk_libs/system/include/MakeConfig
+#LOCAL_CFLAGS += $(DEFINES)
+#LOCAL_CFLAGS += -DRVSD_USE_VOUTIL
+#endif
+
+
+LOCAL_SRC_FILES := $(COMMON_SRC_FILES)
+
+LOCAL_SRC_FILES += rvsd_VDecRtk.cpp
+
+LOCAL_SRC_FILES += rvsd_VDecRtk_ProcICQ.cpp
+
+ifeq ($(RVSD_USE_1295_VE), false)
+LOCAL_SRC_FILES += rvsd_JDecRtk.cpp
+LOCAL_SRC_FILES += jpu/rvsd_CodecJdec.cpp
+endif
+
+ifeq ($(RVSD_VORPC),true)
+#LOCAL_CFLAGS += -DRVSD_RPC_RVSD_HANDLE
+LOCAL_CFLAGS += -DRVSD_RPC_VO_ACODEC
+LOCAL_SRC_FILES +=  rvsd_VORPC.cpp
+endif
+ifeq ($(RVSD_ENABLE_ENCODE),true)
+LOCAL_CFLAGS += -DENABLE_ENCODE
+ifeq ($(RVSD_VO_WRITEBACK),true)
+LOCAL_CFLAGS += -DRVSD_VO_WRITEBACK
+#LOCAL_CFLAGS += -DSET_TV_SYSTEM_720P30
+endif
+endif
+
+ifeq ($(RVSD_ENABLE_SHARE_ICQ),true)
+LOCAL_CFLAGS += -DRVSD_NEW_VIDEO_FLOW_EN
+LOCAL_SRC_FILES +=  rvsd_VDecRtk_NewFlow.cpp
+endif
+
+ifeq ($(RVSD_USE_1295_VE), true)
+LOCAL_CFLAGS += -DRVSD_USE_1295_VE
+endif
+
+#LOCAL_SRC_FILES += eventListener.cpp
+
+LOCAL_C_INCLUDES:= \
+    $(TOP)/frameworks/av/media/libstagefright \
+    $(TOP)/frameworks/av/media/libstagefright/include \
+    $(TOP)/frameworks/native/include/media/openmax
+
+LOCAL_C_INCLUDES += \
+    $(TOP)/hardware/realtek/VideoEngine/VE1 \
+    $(TOP)/hardware/realtek/VideoEngine/VE1/vdi \
+    $(TOP)/hardware/realtek/VideoEngine/VE1/vpuapi
+
+LOCAL_C_INCLUDES += \
+    $(LOCAL_PATH)/bdsp_decoder \
+    $(LOCAL_PATH)/dvbsp_decoder \
+    $(LOCAL_PATH)/dvdsp_decoder \
+    $(LOCAL_PATH)/sp_common
+
+ifeq ($(RVSD_VORPC),true)
+LOCAL_C_INCLUDES += .
+LOCAL_C_INCLUDES += $(TOP)/system/core
+LOCAL_C_INCLUDES += $(TOP)/hardware/realtek/realtek_omx/osal_rtk
+LOCAL_C_INCLUDES += $(TOP)/hardware/realtek/realtek_omx/core
+LOCAL_C_INCLUDES += $(TOP)/hardware/realtek/realtek_omx/component
+LOCAL_C_INCLUDES += $(TOP)/hardware/realtek/realtek_omx/include/khronos
+LOCAL_C_INCLUDES += $(TOP)/hardware/realtek/realtek_omx/include/imagination
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/src/xdr
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include/xdr
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include/system
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include/OSAL
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/Include
+endif
+
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/libRTMediaPlayer
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/Include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/transcode
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_ion
+LOCAL_C_INCLUDES += $(TOP)/external/stlport/stlport
+
+LOCAL_C_INCLUDES += \
+	$(TOP)/libnativehelper/include/nativehelper \
+	$(TOP)/system/core/libion/include \
+	$(TOP)/system/core/libion/kernel-headers \
+	$(GENERIC_LINUX_PATH)/include \
+	$(LOCAL_PATH)/foundation/include
+
+LOCAL_CFLAGS += -Wno-multichar
+
+LOCAL_CFLAGS += -DUSE_RT_MEDIA_PLAYER
+
+LOCAL_SYS_INCLUDES = \
+	$(TOP)/system/core/include \
+	$(TOP)/hardware/libhardware/include \
+	$(TOP)/hardware/libhardware_legacy/include \
+	$(TOP)/hardware/ril/include \
+	$(TOP)/libnativehelper/include \
+	$(TOP)/frameworks/native/include \
+	$(TOP)/frameworks/native/opengl/include \
+	$(TOP)/frameworks/av/include \
+	$(TOP)/frameworks/base/include \
+	$(TOP)/external/skia/include \
+	$(TOP)/bionic/libc/kernel/common
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES)) $(addprefix -I, $(LOCAL_SYS_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS) -fPIC
+
+LIBS := -lRT_IPC -lRtkMediaPlayer -lrvsd -lfoundation -lgeneric_misc
+LIBS += -lRTKOMX_OSAL_RTK -lvpu -ljpu
+LIBS += -lion -lRTK_lib -lrtk_ion
+LIBS += -lRTKVoutUtil -lRTKSetupClass -lRTKHDMIControl
+LIBS += -lutils -lcutils -lstagefright
+LIBS += -lhwse_$(TARGET_BOARD_PLATFORM)
+
+LIBS += -lRtkTranscodePlayer
+LIBS += -L$(ANDROID_SRC_PATH)/../../rtk_lib/lib -lgeneric_audio_encoder
+LIBS += -lgeneric_video_encoder
+LIBS += -L$(ANDROID_SRC_PATH)/../../output/target/usr/lib -lfdk-aac
+LIBS += -laudioutils -lspeexresampler
+LIBS += -lavformat
+LIBS += -lavcodec
+LIBS += -lswresample
+LIBS += -lavutil
+LIBS += -lbinder
+LIBS += -lDLNADMRClass -lupnp3 -lneon
+LIBS += -lgeneric_camera
+LIBS += -lHardwareCamera
+LIBS += -lFrameworksCamera
+LIBS += -lyuv_static
+LIBS += -ljpeg
+LIBS += -lexif
+LIBS += -lRtkIpc
+LIBS += -ltinyalsa
+LIBS += -lgeneric_jpeg_decoder
+LIBS += -lz
+
+LDFLAGS = -L$(GENERIC_LINUX_PATH)/lib -Wl,--start-group $(LIBS) -Wl,--end-group
+LDFLAGS += -lpthread -ldl
+
+################################################################################
+########## for mpclient
+MPCLIENT_LOCAL_C_INCLUDES:= \
+    $(TOP)/frameworks/av/media/libstagefright \
+    $(TOP)/frameworks/av/media/libstagefright/include \
+    $(TOP)/frameworks/native/include/media/openmax \
+    $(TOP)/external/stlport/stlport    \
+    $(TOP)/frameworks/native/include/gui \
+    $(TOP)/frameworks/av/media/libmediaplayerservice \
+    $(TOP)/device/realtek/proprietary/libs/libRTMediaPlayer/ \
+    $(TOP)/device/realtek/proprietary/libs/Include \
+    $(TOP)/device/realtek/proprietary/libs/RT_IPC \
+    $(TOP)/device/realtek/proprietary/libs    
+       
+MPCLIENT_LOCAL_C_INCLUDES += \
+    $(TOP)/hardware/realtek/realtek_omx/component/video/cnm_video_api/include \
+    $(TOP)/hardware/realtek/realtek_omx/component/video/cnm_video_api/vpuapi
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/transcode
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/libRTDtvMediaPlayer
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/frameworks/services/jni/tv
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/RtkRpcClientServer
+MPCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/RtkRpcClientServer/rpc
+
+MPCLIENT_LOCAL_C_INCLUDES += \
+	$(TOP)/frameworks/native/include/ \
+	$(TOP)/frameworks/av/include/ \
+	$(TOP)/system/core/include/ \
+	$(TOP)/hardware/libhardware/include/
+
+MPCLIENT_LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH) \
+	$(TOP)/bionic/libc/kernel/common \
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include/system \
+	$(TOP)/hardware/realtek/realtek_omx/osal_rtk
+
+MPCLIENT_LOCAL_C_INCLUDES += \
+	$(TOP)/../../rtk_lib/include \
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include \
+	$(TOP)/hardware/realtek \
+	$(TOP)/hardware/realtek/hdmitx \
+	$(TOP)/device/realtek/proprietary/libs/HDMIControl \
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common
+
+MPCLIENT_INCLUDES = $(addprefix -I, $(MPCLIENT_LOCAL_C_INCLUDES))
+MPCLIENT_CFLAGS = $(MPCLIENT_INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+########## for mpDTVclient
+
+MPDTVCLIENT_LOCAL_C_INCLUDES:= \
+    $(TOP)/frameworks/av/media/libstagefright \
+    $(TOP)/frameworks/av/media/libstagefright/include \
+    $(TOP)/frameworks/native/include/media/openmax \
+    $(TOP)/external/stlport/stlport    \
+    $(TOP)/frameworks/native/include/gui \
+    $(TOP)/frameworks/av/media/libmediaplayerservice \
+    $(TOP)/device/realtek/proprietary/libs/libRTMediaPlayer/ \
+    $(TOP)/device/realtek/proprietary/libs/Include \
+    $(TOP)/device/realtek/proprietary/libs/RT_IPC \
+    $(TOP)/device/realtek/proprietary/libs \
+    $(TOP)/device/realtek/proprietary/libs/libRTDtvMediaPlayer
+
+MPDTVCLIENT_LOCAL_C_INCLUDES += \
+    $(TOP)/hardware/realtek/realtek_omx/component/video/cnm_video_api/include \
+    $(TOP)/hardware/realtek/realtek_omx/component/video/cnm_video_api/vpuapi
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/transcode
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/libRTDtvMediaPlayer
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/frameworks/services/jni/tv
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/RtkRpcClientServer
+MPDTVCLIENT_LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/RtkRpcClientServer/rpc
+
+MPDTVCLIENT_LOCAL_C_INCLUDES += \
+	$(TOP)/frameworks/native/include/ \
+	$(TOP)/frameworks/av/include/ \
+	$(TOP)/system/core/include/ \
+	$(TOP)/hardware/libhardware/include/
+
+MPDTVCLIENT_LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH) \
+	$(TOP)/bionic/libc/kernel/common \
+	$(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include/system \
+	$(TOP)/hardware/realtek/realtek_omx/osal_rtk
+MPDTVCLIENT_INCLUDES = $(addprefix -I, $(MPDTVCLIENT_LOCAL_C_INCLUDES))
+MPDTVCLIENT_CFLAGS = $(MPDTVCLIENT_INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+DTVLIBS := -lRT_IPC -lRtkMediaPlayer -lrvsd -lfoundation -lgeneric_misc
+DTVLIBS += -lRTKOMX_OSAL_RTK -lvpu
+DTVLIBS += -lion -lRTK_lib
+DTVLIBS += -lRTKVoutUtil -lRTKSetupClass -lRTKHDMIControl
+DTVLIBS += -lutils -lcutils -lstagefright
+DTVLIBS += -lhwse_$(TARGET_BOARD_PLATFORM)
+DTVLIBS += -lRTDtvMediaPlayer
+DTVLIBS += -lRtkRpcClientServer
+DTVLIBS += -lstlport
+
+LDDTVFLAGS = -L$(GENERIC_LINUX_PATH)/lib -Wl,--start-group $(DTVLIBS) -Wl,--end-group
+LDDTVFLAGS += -lpthread -ldl
+
+########## for mpDTVclient
+
+all: $(LIBNAME) $(SO_LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES)
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+$(SO_LIBNAME) : $(OBJ_FILES)
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(CXX) -shared -Wl,--whole-archive $(OBJ_FILES) -Wl,--no-whole-archive -o $@
+
+mpclient: client_main.o	
+	$(SHOW_COMMAND)$(CXX) $< $(LDFLAGS) -o $(GENERIC_LINUX_PATH)/mpclient.debug
+	$(SHOW_COMMAND)$(STRIP) $(GENERIC_LINUX_PATH)/mpclient.debug -o $(GENERIC_LINUX_PATH)/mpclient	
+
+client_main.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(MPCLIENT_CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+mpdtvclient: client_main_dtv.o	TvManagerService.o
+	$(SHOW_COMMAND)$(CXX) client_main_dtv.o	TvManagerService.o $(LDDTVFLAGS) -o $(GENERIC_LINUX_PATH)/mpdtvclient.debug
+	$(SHOW_COMMAND)$(STRIP) $(GENERIC_LINUX_PATH)/mpdtvclient.debug -o $(GENERIC_LINUX_PATH)/mpdtvclient
+
+client_main_dtv.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(MPDTVCLIENT_CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+TvManagerService.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(MPDTVCLIENT_CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+rvsd: rvsd_main.o
+	$(SHOW_COMMAND)$(CXX) $< $(LDFLAGS) -o $(GENERIC_LINUX_PATH)/rvsd.debug
+	$(SHOW_COMMAND)$(STRIP) $(GENERIC_LINUX_PATH)/rvsd.debug -o $(GENERIC_LINUX_PATH)/rvsd
+
+rvsd_main.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) $(SO_LIBNAME) core *~ client_main.o mpclient* client_main_dtv.o mpdtvclient*
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

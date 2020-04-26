@@ -1,0 +1,9 @@
+!include ..\..\..\drmbuild.cmn
+
+TARGETNAME=drmcopyoplstub
+TARGETTYPE=LIBRARY
+
+SOURCES =             \
+    copyoplimplstub.c \
+    copyoplutilstub.c \
+
