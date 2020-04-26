@@ -1,0 +1,495 @@
+From 91570681a58bb77fab85a8a0844f425893adddfa Mon Sep 17 00:00:00 2001
+From: ywchen <ywchen@realtek.com>
+Date: Tue, 16 Jan 2018 13:59:08 +0800
+Subject: [PATCH] MU-MIMO for Veriwave
+
+---
+ 8192cd.h                                          |  9 +++
+ 8192cd_cfg.h                                      |  9 +++
+ 8192cd_proc.c                                     | 12 ++++
+ 8192cd_rx.c                                       | 38 ++++++++++++
+ 8192cd_sme.c                                      |  6 ++
+ 8192cd_tx.c                                       |  6 ++
+ 8192cd_util.c                                     |  6 ++
+ Beamforming.c                                     | 50 ++++++++++++++--
+ EdcaTurboCheck.c                                  | 20 +++++++
+ WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEDef.h |  7 +++
+ WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c | 71 +++++++++++++++++++++++
+ 11 files changed, 230 insertions(+), 4 deletions(-)
+
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -2289,6 +2289,7 @@ struct stat_info {
+ 	unsigned char			g_id;
+ 	unsigned int			bf_score;
+ 	unsigned char			error_csi; //eric-6s
++	unsigned char			inTXBFEntry;
+ #if (MU_BEAMFORMING_SUPPORT == 1)
+ 	struct stat_info	*muPartner;	
+ 	unsigned int		mu_tx_rate;
+@@ -2297,6 +2298,11 @@ struct stat_info {
+ 	unsigned char		isSendNDPA;
+ 	unsigned char		isRssiApplyMU;
+ 	unsigned char		muFlagForAMSDU;
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++	unsigned char		isVeriwaveSTA;
++	unsigned char		isVeriwaveInValidSTA;
++	unsigned char		mu_csi_data[3];
++#endif	
+ #endif
+ #endif
+ 
+@@ -3202,6 +3208,9 @@ struct rf_finetune_var {
+ 	unsigned int 		mutime;
+ 	unsigned char		mu_dump;
+ 	unsigned char		muPairResult[MAX_NUM_BEAMFORMEE_MU];
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++	unsigned char		isExistVeriwaveSTA;
++#endif
+ #endif	
+ 	unsigned char 		snd;
+ 	unsigned char 		sndlen;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1266,6 +1266,15 @@
+ #endif
+ 
+ //-------------------------------------------------------------
++//Check Veriwave MU bug
++//-------------------------------------------------------------
++#ifdef CONFIG_WLAN_HAL_8822BE
++#ifndef CONFIG_VERIWAVE_MU_CHECK
++#define CONFIG_VERIWAVE_MU_CHECK
++#endif
++#endif
++
++//-------------------------------------------------------------
+ // Error access counter
+ //-------------------------------------------------------------
+ //#define ERR_ACCESS_CNTR
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -5116,6 +5116,8 @@ static int dump_one_stainfo(int num, str
+ 	CHECK_LEN_B;
+ 	PRINT_SINGL_ARG("    isRssiApplyMU: ", pstat->isRssiApplyMU, "%d");
+ 	CHECK_LEN_B;
++	PRINT_SINGL_ARG("    inTXBFEntry: ", pstat->inTXBFEntry, "%d");
++	CHECK_LEN_B;
+ #endif	
+ 
+ #ifdef RTK_AC_SUPPORT  //vht rate , todo, dump vht rates in Mbps
+@@ -5468,6 +5470,12 @@ static int dump_one_stainfo(int num, str
+     }
+ #endif
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++	PRINT_SINGL_ARG("    isVeriwaveInValidSTA: ", pstat->isVeriwaveInValidSTA,"%d");
++	PRINT_SINGL_ARG("    isVeriwaveSTA: ", pstat->isVeriwaveSTA,"%d");
++	PRINT_ARRAY_ARG("    mu_csi_data:", pstat->mu_csi_data, "%02x ", 3);
++#endif
++
+ #ifdef DOT11K
+     if(priv->pmib->dot11StationConfigEntry.dot11RadioMeasurementActivated) {
+         PRINT_ARRAY_ARG("    rm_cap: ", pstat->rm.rm_cap, "%02x", 5);
+@@ -6132,6 +6140,10 @@ static int rtl8192cd_proc_stats(char *bu
+ 
+ 	PRINT_SINGL_ARG("    mu_BB_ok:      ", priv->pshare->rf_ft_var.mu_BB_ok, "%d");
+ 	PRINT_SINGL_ARG("    mu_BB_fail:    ", priv->pshare->rf_ft_var.mu_BB_fail, "%d");
++#ifdef CONFIG_VERIWAVE_MU_CHECK  
++PRINT_SINGL_ARG("    isExistVeriwaveSTA:  ", priv->pshare->rf_ft_var.isExistVeriwaveSTA, "%d");
++
++#endif
+ 
+ 
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -6213,11 +6213,16 @@ void check_csi_report_info(struct rtl819
+ 	unsigned int				pktType, CSIMatrixLen = 0;   
+ 	unsigned char				csi_nss, sta_nss = 0;
+ 	unsigned char				support_nss = 2;
++	unsigned int				i;
++#ifdef CONFIG_VERIWAVE_MU_CHECK
++	unsigned char isVerwaveSTA;
++#endif
+ 
+ 	struct stat_info *pstat = NULL;
+ 
+ 	PRT_BEAMFORMING_INFO	pBeamInfo = &(priv->pshare->BeamformingInfo);
+-
++	PRT_SOUNDING_INFOV2	pSoundingInfo = &(pBeamInfo->SoundingInfoV2);
++	PRT_BEAMFORMING_ENTRY	pBfeeEntry, pEntry;
+ 
+ #if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
+ 	if (get_tofr_ds((unsigned char *)get_pframe(pfrinfo)) == 3) {
+@@ -6258,15 +6263,45 @@ void check_csi_report_info(struct rtl819
+ 	else
+ 		csi_nss = sta_nss;
+ 
+-	if((Nc+1) != csi_nss){
+-		unsigned char Idx = 0;													
+-		PRT_BEAMFORMING_ENTRY	pBfeeEntry; 
++	pBfeeEntry = Beamforming_GetBFeeEntryByAddr(priv, pstat->hwaddr, &Idx);
+ 
+-		pBfeeEntry = Beamforming_GetBFeeEntryByAddr(priv, pstat->hwaddr, &Idx);
++	if(!pBfeeEntry)
++		return;
+ 
+-		if(!pBfeeEntry)
+-			return;
++#ifdef CONFIG_VERIWAVE_MU_CHECK		
++	if(!pstat->isVeriwaveInValidSTA) {
++		unsigned char invalid_csi[2][3] = {{0x08,0x80,0x00},
++										{0x89,0x92,0x28}};
++		memcpy(pstat->mu_csi_data, pframe+30, 3);
++		isVerwaveSTA = 1;
++		for(i=0;i<5;i++) {
++			if(memcmp(pstat->mu_csi_data,pframe+33+3*i,3)) {
++				isVerwaveSTA = 0;
++				break;
++			}
++		}		
++
++		if(isVerwaveSTA) {			
++			pstat->isVeriwaveSTA = 1;
++			if(pBfeeEntry->is_mu_sta == TXBF_TYPE_MU) {
++				priv->pshare->rf_ft_var.isExistVeriwaveSTA = 1;
++				priv->pshare->rf_ft_var.qlmt = 200;
++				pSoundingInfo->MinSoundingPeriod = 1000;
++				
++				for(i=0;i<2;i++) {
++					if(!memcmp(pstat->mu_csi_data,invalid_csi[i], 3)) {
++						pstat->isVeriwaveInValidSTA = i+1;
++						ODM_SetBBReg(ODMPTR, 0x1c94, 0xFFFFFFFF, 0xafffafff); //always MU
++					}
++				}
++			}
+ 
++		}
++
++	}
++#endif
++
++	if((Nc+1) != csi_nss){
+ #if (MU_BEAMFORMING_SUPPORT == 1)
+ 		if(pBfeeEntry->is_mu_sta == TXBF_TYPE_MU)
+ 			return;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -5980,6 +5980,12 @@ void rtl8192cd_expire_timer(unsigned lon
+ 	}
+ #endif
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++	if(priv->assoc_num == 0) {
++		priv->pshare->rf_ft_var.isExistVeriwaveSTA = 0;
++	}
++#endif
++
+ 	// check asoc_list
+ 	assoc_expire(priv);
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -10116,6 +10116,12 @@ int __rtl8192cd_start_xmit(struct sk_buf
+ 	}
+ #endif
+ 	
++#if defined(CONFIG_VERIWAVE_MU_CHECK) && (MU_BEAMFORMING_SUPPORT == 1)	
++	if(priv->assoc_num > 2 && priv->pshare->rf_ft_var.isExistVeriwaveSTA && pstat && !pstat->inTXBFEntry&& skb->len > 1000) {
++		goto free_and_stop;
++	}
++#endif
++	
+ #if defined(SW_TX_QUEUE) || defined(RTK_ATM) 
+ 	if (swq_out == 0
+         #ifdef GBWC
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+@@ -8386,6 +8386,12 @@ void _txrpt_handler(struct rtl8192cd_pri
+ 	}
+ #endif // DONT_COUNT_PROBE_PACKET
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK
++	if(pstat->isVeriwaveInValidSTA && report->txok > 200) {
++		pstat->isVeriwaveInValidSTA = 0;		
++	}
++#endif
++
+ #if defined(TXRETRY_CNT)
+ 	pstat->cur_tx_ok += report->txok;
+ 	pstat->cur_tx_fail += report->txfail;
+--- a/drivers/net/wireless/realtek/rtl8192cd/Beamforming.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/Beamforming.c
+@@ -682,6 +682,7 @@ Beamforming_AddBFeeEntry(
+ 
+ 		pEntry->CompSteeringNumofBFer = CompSteeringNumofBFer;
+ 		pEntry->pSTA = pSTA;
++		pEntry->pSTA->inTXBFEntry = 1;
+ 
+ 		beamform_UpdateMinSoundingPeriod(priv, pEntry->SoundPeriod, FALSE);
+ #if 1
+@@ -839,6 +840,7 @@ Beamforming_RemoveEntry(
+     if (pBFeeEntry != NULL && ((CurDelBFerBFeeEntrySel == BFeeEntry)||(CurDelBFerBFeeEntrySel == BFerBFeeEntry))) 
+     {
+         pBFeeEntry->bUsed = FALSE;
++		pBFeeEntry->pSTA->inTXBFEntry = 0;
+         pBFeeEntry->BeamformEntryCap = BEAMFORMING_CAP_NONE;
+ 
+         if(CurDelBFerBFeeEntrySel == BFeeEntry)
+@@ -2751,7 +2753,7 @@ ConstructVHTNDPAPacket_MU(
+ 	u1Byte					Sequence = 0;
+ 	pu1Byte					pNDPAFrame = Buffer;
+ 	u2Byte					tmp16 = 0;
+-	char					idx =0 ;
++	char					idx =0, cnt ;
+ 	
+ 	RT_NDPA_STA_INFO		STAInfo;
+ 	int aSifsTime = ((priv->pmib->dot11BssType.net_work_type & WIRELESS_11N) && (priv->pshare->ht_sta_num)) ? 0x10 : 10;
+@@ -2792,12 +2794,24 @@ ConstructVHTNDPAPacket_MU(
+ 
+ 
+ 	/* Construct STA info. for multiple STAs */
++#ifdef CONFIG_VERIWAVE_MU_CHECK		
++	cnt = 0;
++	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {		
++		pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
++		if (pEntry->bUsed && pEntry->is_mu_sta && pEntry->pSTA && pEntry->pSTA->isSendNDPA)
++			cnt++;
++	}
++#endif
+ 	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {		
+ 			
+ 		pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
+ 
+ 		if (pEntry->bUsed && pEntry->is_mu_sta && pEntry->pSTA && pEntry->pSTA->isSendNDPA) {
+ 			//panic_printk("[%d] is_mu_sta=%d AID=%d P_AID=0x%x\n", idx, pEntry->is_mu_sta, pEntry->AID, pEntry->P_AID);
++#ifdef CONFIG_VERIWAVE_MU_CHECK					
++			if(cnt >=3 && pEntry->pSTA->isVeriwaveInValidSTA)
++				continue;
++#endif			
+ 			STAInfo.AID = pEntry->AID;
+ 			STAInfo.FeedbackType = 1; /* 1'b1: MU */
+ 			STAInfo.NcIndex = 0;
+@@ -3243,7 +3257,11 @@ beamform_MUGrouping(
+ 		return;
+ 	}
+ 
+-	if(numCandidate >=4) { // sort by rssi
++	if(numCandidate >=4
++#ifdef CONFIG_VERIWAVE_MU_CHECK
++		&& !priv->pshare->rf_ft_var.isExistVeriwaveSTA
++#endif
++		) { // sort by rssi
+ 		for(i = 0; i< numCandidate - 1; i++) {
+ 			for(j = i; j < numCandidate; j++) {
+ 				if(CandidateEntry[i]->pSTA->rssi < CandidateEntry[j]->pSTA->rssi) {
+@@ -3521,7 +3539,7 @@ beamform_SoundingTimerCallback(
+ 	PRT_BEAMFORMING_ENTRY		pEntry = NULL;
+ #if (MU_BEAMFORMING_SUPPORT == 1) 	
+ 	PRT_BEAMFORMING_ENTRY		pEntry_poll[TOTAL_BEAMFORMEE_ENTRY_NUM];
+-	u1Byte				cnt;
++	u1Byte				cnt, cnt_valid;
+ 	struct stat_info *pstat;
+ #endif	
+ 	u1Byte			SUSoundingIdx = BEAMFORMEE_ENTRY_NUM;
+@@ -3672,6 +3690,19 @@ beamform_SoundingTimerCallback(
+ 							cnt++;
+ 						}
+ }
++
++#ifdef CONFIG_VERIWAVE_MU_CHECK
++					if(cnt >=3) {
++						cnt_valid = 0;
++						for(idx = 0; idx < cnt; idx++) {
++							if(!pEntry_poll[idx]->pSTA->isVeriwaveInValidSTA) {
++								pEntry_poll[cnt_valid] = pEntry_poll[idx];
++								cnt_valid++;
++							}
++						}
++						cnt = cnt_valid;
++					}
++#endif
+ 					if((cnt == 1) && (AC_SIGMA_MODE == AC_SIGMA_NONE)) { //start mu sounding when 2 sta connected  for 11ac logo r2
+ 						pEntry = pEntry_poll[0];
+ 						NDPTxRate = Beamforming_GetVHTNDPTxRate(priv, pEntry->CompSteeringNumofBFer);
+@@ -3686,7 +3717,18 @@ beamform_SoundingTimerCallback(
+ 							else
+ 								SendReportPollPacket(priv, pEntry->MacAddr, pEntry->BW, _6M_RATE_,FALSE);	
+ 						    }
+-                                         }
++					} else if (cnt == 0) {						
++						Beamforming_SetBeamFormStatus(priv, 0);			
++#ifdef CONFIG_VERIWAVE_MU_CHECK							
++						pSoundingInfo->MinSoundingPeriod = priv->pshare->rf_ft_var.mutime;						
++						for(idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++)
++						{		
++							pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
++							if(pEntry->pSTA)
++							pEntry->pSTA->isVeriwaveInValidSTA = 0;
++						}
++#endif						
++					}
+ 	                                 RESTORE_INT(x);
+ 				}
+ 				pSoundingInfo->MUSoundNumPerPeriod++;
+--- a/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
+@@ -498,6 +498,11 @@ IotEdcaSwitch(
+ 								#if (MU_BEAMFORMING_SUPPORT == 1)
+ 								if(priv->pmib->dot11RFEntry.txbf_mu && is_support_bf(pstat, TXBF_TYPE_MU)) {
+ 									txop = 0x138; // 10ms
++									#ifdef CONFIG_VERIWAVE_MU_CHECK		
++									if(priv->pshare->rf_ft_var.isExistVeriwaveSTA == 1)
++										aifs_time = 0x1f;
++									else
++									#endif
+ 									aifs_time = 0x74;
+ 								} else
+ 								#endif								
+@@ -534,6 +539,11 @@ IotEdcaSwitch(
+ 							if(pstat && is_support_bf(pstat, TXBF_TYPE_MU) && pstat->muPartner) {
+ 								txop = 0x138;
+ 								cw_max = 6;
++								#ifdef CONFIG_VERIWAVE_MU_CHECK		
++								if(priv->pshare->rf_ft_var.isExistVeriwaveSTA == 1)
++									aifs_time = 0x1f;
++								else
++								#endif
+ 								aifs_time = 0x74;
+ 							} else
+ #endif
+@@ -613,6 +623,11 @@ IotEdcaSwitch(
+ 								#if (MU_BEAMFORMING_SUPPORT == 1)
+ 								if(priv->pmib->dot11RFEntry.txbf_mu && is_support_bf(pstat, TXBF_TYPE_MU)) {
+ 									txop = 0x138; // 10ms
++									#ifdef CONFIG_VERIWAVE_MU_CHECK		
++									if(priv->pshare->rf_ft_var.isExistVeriwaveSTA == 1)
++										aifs_time = 0x1f;
++									else
++									#endif
+ 									aifs_time = 0x74;
+ 								} else
+ 								#endif								
+@@ -634,6 +649,11 @@ IotEdcaSwitch(
+ 							if(pstat && is_support_bf(pstat, TXBF_TYPE_MU) && pstat->muPartner) {
+ 								txop = 0x138;
+ 								cw_max = 6;
++								#ifdef CONFIG_VERIWAVE_MU_CHECK		
++								if(priv->pshare->rf_ft_var.isExistVeriwaveSTA == 1)
++									aifs_time = 0x1f;
++								else
++								#endif
+ 								aifs_time = 0x74;
+ 							} else
+ 							#endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEDef.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEDef.h
+@@ -65,6 +65,13 @@ SetBeamformStatus8822B(
+ 	IN u1Byte				Idx
+ );
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++void Beamforming_set_csi_data(
++	struct rtl8192cd_priv *priv, 
++	int idx, 
++	int reg_idx);
++#endif
++
+ #if (MU_BEAMFORMING_SUPPORT == 1)
+ VOID
+ HalTxbf8822B_ConfigGtab(
+--- a/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c
+@@ -989,6 +989,11 @@ SetBeamformStatus8822B(
+ 			ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_TRACE, ("2SS Don't Apply Vmatrix"));
+ 			BeamCtrlVal &= ~(BIT9|BIT10|BIT11);
+ 		}
++#ifdef CONFIG_VERIWAVE_MU_CHECK		
++		else if(pBeamformEntry->pSTA && pBeamformEntry->pSTA->isVeriwaveSTA && !pBeamformEntry->is_mu_sta) {
++			BeamCtrlVal &= ~(BIT9|BIT10|BIT11); 
++		}	
++#endif
+ 		else if ((pBeamformEntry->BeamformEntryState == BEAMFORMING_ENTRY_STATE_PROGRESSED) && (priv->pshare->rf_ft_var.applyVmatrix)) {
+ 			if (pBeamformEntry->BW == ODM_BW20M)
+ 				BeamCtrlVal |= BIT9;
+@@ -1022,6 +1027,16 @@ SetBeamformStatus8822B(
+ 			is_sounding_success[4] = (value32 & BIT10)?1:0;
+ 			is_sounding_success[5] = (value32 & BIT26)?1:0;
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK		
++			for(Idx = 0; Idx < BEAMFORMEE_ENTRY_NUM; Idx++)
++			{		
++				pBeamformEntry = &(pBeamformingInfo->BeamformeeEntry[Idx]);
++				if(pBeamformEntry->pSTA && pBeamformEntry->pSTA->isVeriwaveInValidSTA) {					
++					Beamforming_set_csi_data(priv, pBeamformEntry->pSTA->isVeriwaveInValidSTA - 1, pBeamformEntry->mu_reg_index);						
++					is_sounding_success[pBeamformEntry->mu_reg_index] = 1;
++				}
++			}
++#endif
+ 			snd_result = is_sounding_success[0];
+ 			for(i=1;i<6;i++) {
+ 				snd_result |= (is_sounding_success[i] << i);
+@@ -1177,6 +1192,62 @@ SetBeamformStatus8822B(
+ #endif	
+ }
+ 
++#ifdef CONFIG_VERIWAVE_MU_CHECK	
++void Beamforming_set_csi_data(struct rtl8192cd_priv *priv, int idx, int reg_idx)
++{
++
++	unsigned char csidata[2][3] = {{0xb4, 0x45, 0x5b},
++										{0x12, 0x28, 0x81}};
++	unsigned long	flags;
++
++	unsigned int i;
++	unsigned int memaddr;
++    unsigned int dw0,dw1; 
++	memaddr=0;	
++
++	ODM_SetBBReg(ODMPTR, 0x19b8, 0x40,1);
++	ODM_SetBBReg(ODMPTR, 0x19e0, 0x3FC0,0xFF);
++
++	ODM_SetBBReg(ODMPTR, 0x9e8, 0x2000000, 1); //abnormal txbf
++	ODM_SetBBReg(ODMPTR, 0x9e8, 0x1000000, 0); //read phi psi
++	ODM_SetBBReg(ODMPTR, 0x9e8, 0x70000000, reg_idx+2); //user 0	                            
++	ODM_SetBBReg(ODMPTR, 0x1910, 0x8000, 0); //BFer
++
++	memaddr = 4;
++	dw0 = 0;	
++	dw1 = 0;
++	for(i=32;i<32+3*128;i++) {
++		if(i%8 == 0) {
++			dw0 = 0;
++			dw1 = 0;
++		}
++		if(((i)%8) < 4)
++			dw0 = (dw0 >> 8) + (csidata[idx][(i-32)%3]<<24);
++		else
++			dw1 = (dw1 >> 8) + (csidata[idx][(i-32)%3]<<24);
++
++		if((i%8) == 7) {			
++			ODM_SetBBReg(ODMPTR, 0x9e8, 0x1000000, 0); //read phi psi
++			ODM_SetBBReg(ODMPTR, 0x1910, 0x3FF0000, memaddr);
++			ODM_SetBBReg(ODMPTR, 0x1900, 0xFFFFFFFF, dw1);
++			ODM_SetBBReg(ODMPTR, 0x09ec, 0xFFFFFFFF, dw0);
++			ODM_SetBBReg(ODMPTR, 0x9e8, 0x1000000, 1); //write phi psi
++			
++
++				
++			memaddr ++;
++			if (memaddr>=80) {
++				memaddr =0;
++			}
++		
++		}
++		
++	}
++	ODM_SetBBReg(ODMPTR, 0x9e8, 0x2000000, 0); //normal txbf
++
++}
++#endif
++
+ VOID Beamforming_NDPARate_8822B(
+ 	struct rtl8192cd_priv *priv,
+ 	BOOLEAN		Mode,

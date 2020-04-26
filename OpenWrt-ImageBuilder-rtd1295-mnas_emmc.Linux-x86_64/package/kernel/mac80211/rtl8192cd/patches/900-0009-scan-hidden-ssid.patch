@@ -1,0 +1,31 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -17354,8 +17354,18 @@ void start_clnt_ss(struct rtl8192cd_priv
+         memset((void *)priv->site_survey->bss, 0, sizeof(struct bss_desc)*MAX_BSS_NUM);
+ 
+ #ifdef WIFI_SIMPLE_CONFIG
++#ifndef MULTI_MAC_CLONE
++#if defined(WIFI_WPAS_CLI)
++        if ((OPMODE & WIFI_STATION_STATE) || (SSFROM_WPAS == priv->ss_req_ongoing))
++#elif defined(WIFI_WPAS) || defined(RTK_NL80211)
++        if (OPMODE & WIFI_STATION_STATE)
++#else
+         if (priv->ss_req_ongoing == 2)
++#endif
++#endif //ifndef MULTI_MAC_CLONE
++        {
+             memset((void *)priv->site_survey->wscie, 0, sizeof(struct wps_ie_info)*MAX_BSS_NUM);
++        }
+ #endif
+ 
+ #if defined(WIFI_WPAS) || defined(RTK_NL80211)
+@@ -19395,7 +19405,8 @@ next_id_wapi:
+ 			//search_wsc_tag(unsigned char *data, unsigned short id, int len, &target_len);
+ 			priv->site_survey->bss[index].t_stamp[1] |= BIT(8);  //  set t_stamp[1] bit 8 when AP supports WPS
+ 		} else {
+-			awPtr[0]='\0';
++			priv->site_survey->wscie[index].wps_ie_len = 0;
++			memset((void *)&priv->site_survey->wscie[index].data, 0, MAX_WSC_IE_LEN);
+ 			priv->site_survey->bss[index].t_stamp[1] &= ~BIT(8);  // clear t_stamp[1] bit 8 when AP not supports WPS(do not have wps IE)
+ 		}
+ 	}

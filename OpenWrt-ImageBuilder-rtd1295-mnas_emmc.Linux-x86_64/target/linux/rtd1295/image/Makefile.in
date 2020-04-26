@@ -1,0 +1,75 @@
+#
+# Makefile.in $Revision: 56599 $
+#
+# This file describes the Image File
+#
+
+
+# The descriptions of Image File
+IMGFILE_COMPANY=Realtek Semiconductor Corp.
+IMGFILE_DESCRIPTION=This image file contains binaries for RTD1195 phoenix platform.
+IMGFILE_SIGNATURE=Phoenix image files
+IMGFILE_VER=0.0.1
+
+# The name of image file
+IMGFILE_NAME=install.img
+
+# If no value has been assigned to this variable, all the packages in components/packages will be integrated into image file.
+# If this variable has values, it will specify what packages in components/packages should be integrated into image file.
+PACKAGES=omv
+
+# Package type. The image file may be a tar file or a tar/lzma file. Default is TAR. 
+PKG_TYPE=TAR
+
+# This is the RSA key file storing private key, public key, and public exp. Here we only need public key. Public exp is assumed to be 65537.
+# Use absolute path please.
+RSA_KEY_FILE=
+
+COMPRESS_BLOCK_SIZE = 65536 
+
+# Default commands for installing factory.
+IFCMD0 = cd ../../;cp -rpf tmp/install_factory/* tmp/factory/;
+IFCMD1 = rm -rf /tmp/factory/recovery;
+
+AUDIOADDR:=$(if $(CONFIG_AUDIO_ADDR_LEGACY),0x01b00000,0x0F900000)
+
+# default value
+# 1 = yes, 0 = no
+install_bootloader=0
+install_factory?=0
+update_etc=1
+stop_reboot=0
+only_install_factory=0  # TODO: need confirm?
+only_install_bootcode=0  # TODO: need confirm?
+jffs2_nocleanmarker=0
+install_dtb=1
+
+# value
+install_avfile_count?=$(if $(CONFIG_XEN),1,0)
+reboot_delay=5
+customer_delay=0
+rba_percentage=5
+# 0: means use defalt;FAIL:1/INFO:2/LOG:4/DEBUG:8/WARNING:16/UI:32/TARLOG:256/MEMINFO:512
+logger_level=0
+layout_type?=$(subst .,,$(suffix $(subst _,.,$(SUBTARGET))))
+layout_size:=$(if $(CONFIG_TARGET_LAYOUT_SIZE_8GB),8gb,4gb)
+layout_size:=$(if $(CONFIG_TARGET_LAYOUT_SIZE_16GB),16gb,$(layout_size))
+layout_size:=$(if $(CONFIG_TARGET_LAYOUT_SIZE_32GB),32gb,$(layout_size))
+layout_use_emmc_swap:=$(if $(CONFIG_TARGET_NAS_IMG_EMMC_SWAP),true,false)
+secure_boot:=$(if $(CONFIG_TARGET_NAS_IMG_SECURE_BOOT),y,n)
+dual_boot:=$(if $(CONFIG_TARGET_NAS_IMG_DUAL_BOOT),y,n)
+KERNELDT_MINSIZE:=$(if $(CONFIG_KERNELDT_MINSIZE),$(shell expr $(CONFIG_KERNELDT_MINSIZE) \* 1024),)
+RESCUEDT_MINSIZE:=$(if $(CONFIG_RESCUEDT_MINSIZE),$(shell expr $(CONFIG_RESCUEDT_MINSIZE) \* 1024),)
+LINUX_MINSIZE:=$(if $(CONFIG_LINUX_MINSIZE),$(shell expr $(CONFIG_LINUX_MINSIZE) \* 1024),)
+RESCUEROOTFS_MINSIZE:=$(if $(CONFIG_RESCUEROOTFS_MINSIZE),$(shell expr $(CONFIG_RESCUEROOTFS_MINSIZE) \* 1024),)
+AUDIO_MINSIZE:=$(if $(CONFIG_AUDIO_MINSIZE),$(shell expr $(CONFIG_AUDIO_MINSIZE) \* 1024),)
+efuse_key?=0
+chip_rev:=$(if $(CONFIG_TARGET_NAS_IMG_SECURE_CHIP_B),2,)
+hash_imgfile=1
+verify=1
+offline_gen?=n
+gen_install_binary?=n
+ANDROID_IMGS?=$(if $(CONFIG_XEN),y,n)
+HYPERVISOR=$(if $(CONFIG_XEN),y,n)
+NAND_PAGE_SIZE?=8192
+NAND_BLOCK_SIZE?=2097152

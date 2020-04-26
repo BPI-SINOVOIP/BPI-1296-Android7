@@ -1,0 +1,448 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -3729,6 +3729,11 @@ struct priv_shared_info {
+ #endif    /*cfg p2p cfg p2p*/
+ 	unsigned int			type;
+ 	unsigned long			ioaddr;
++#ifdef RTK_129X_PLATFORM
++	unsigned long			ctrl_start;
++	unsigned long			mask_addr;
++	unsigned long			tran_addr;
++#endif
+ 	unsigned int			version_id;
+ #if defined(CONFIG_WLAN_HAL_8814AE) && defined(CONFIG_OPENWRT_SDK)
+ 	unsigned char			is5g;
+@@ -4199,6 +4204,10 @@ struct priv_shared_info {
+ 	spinlock_t				lock_buf;
+ #endif
+ 	spinlock_t				lock_recv;
++#ifdef RTK_129X_PLATFORM
++	spinlock_t				lock_io_129x;
++	int                     lock_io_129x_owner;
++#endif
+ 	int                     lock_owner;
+ 	int                     lock_recv_owner;
+ 	int                     lock_xmit_owner;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -11806,6 +11806,10 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 		spin_lock_init(&priv->pshare->lock_buf);
+ #endif
+ 		spin_lock_init(&priv->pshare->lock_recv);
++#ifdef RTK_129X_PLATFORM
++		spin_lock_init(&priv->pshare->lock_io_129x);
++		priv->pshare->lock_io_129x_owner=-1;
++#endif
+ 		priv->pshare->lock_owner=-1;
+ 		priv->pshare->lock_recv_owner=-1;
+ 		priv->pshare->lock_xmit_owner=-1;
+@@ -11920,6 +11924,33 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 			priv->pshare->ioaddr = pio_start; // device I/O address
+ 		}
+ #else
++#ifdef RTK_129X_PLATFORM
++		if(pdev->bus->number == 0x00) {
++			pciaddr = PCIE_SLOT1_MEM_START;
++			pmem_len = PCIE_SLOT1_MEM_LEN;
++			printk("RTD129X: PCIE SLOT1\n");
++		} else if(pdev->bus->number == 0x01) {
++			pciaddr = PCIE_SLOT2_MEM_START;
++			pmem_len = PCIE_SLOT2_MEM_LEN;
++			printk("RTD129X: PCIE SLOT2\n");
++		} else {
++			printk(KERN_ERR "RTD129X: Wrong Slot Num\n");
++			goto err_out_res;
++		}
++
++		if(pdev->bus->number == 0x00)
++			priv->pshare->ctrl_start = (unsigned long)ioremap( PCIE_SLOT1_CTRL_START, 0x200);
++		else if(pdev->bus->number == 0x01)
++			priv->pshare->ctrl_start = (unsigned long)ioremap( PCIE_SLOT2_CTRL_START, 0x200);
++
++		if(priv->pshare->ctrl_start == 0) {
++			printk(KERN_ERR "RTD129X: Can't map CTRL mem\n");
++			goto err_out_res;
++		}
++
++		priv->pshare->mask_addr = priv->pshare->ctrl_start + PCIE_MASK_OFFSET;
++		priv->pshare->tran_addr = priv->pshare->ctrl_start + PCIE_TRANSLATE_OFFSET;
++#else //RTK_129X_PLATFORM
+ #ifdef IO_MAPPING
+ 		pciaddr = pci_resource_start(pdev, 0);
+ //		pciaddr = pci_resource_start(pdev, 2);
+@@ -11947,6 +11978,7 @@ void *rtl8192cd_init_one(struct sdio_fun
+ #endif
+ 			goto err_out_res;
+ 		}
++#endif //RTK_129X_PLATFORM
+ 
+ 		regs = ioremap_nocache(pciaddr, pmem_len);
+ 		if (!regs) {
+@@ -11956,7 +11988,11 @@ void *rtl8192cd_init_one(struct sdio_fun
+ #else
+ 			printk(KERN_ERR "Cannot map PCI MMIO (%lx@%lx) on pci dev %s\n", (unsigned long)pmem_len, (long)pciaddr, pdev->slot_name);
+ #endif
++#ifdef RTK_129X_PLATFORM
++			goto err_out_iomap_ctrl;
++#else
+ 			goto err_out_res;
++#endif
+ 		}
+ 
+ 		dev->base_addr = (unsigned long)regs;
+@@ -13461,6 +13497,11 @@ err_out_iomap:
+ #endif
+ 	}
+ 
++#ifdef RTK_129X_PLATFORM
++err_out_iomap_ctrl:
++	iounmap((void *)priv->pshare->ctrl_start);
++#endif
++
+ err_out_res:
+ 
+ 	if (((wdev->type >> TYPE_SHIFT) & TYPE_MASK) == TYPE_PCI_BIOS) {
+@@ -13805,6 +13846,9 @@ void rtl8192cd_deinit_one(struct rtl8192
+ #ifdef USE_IO_OPS
+ 	release_region(dev->base_addr, pci_resource_len(priv->pshare->pdev, 0));
+ #else
++#ifdef RTK_129X_PLATFORM
++	iounmap((void *)priv->pshare->ctrl_start);
++#endif
+ 	iounmap((void *)dev->base_addr);
+ 	pci_release_regions(priv->pshare->pdev);
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -53,6 +53,12 @@
+ #endif
+ #endif
+ 
++#ifdef RTK_129X_PLATFORM
++#ifdef CONFIG_RTK_SW_LOCK_API
++#include <soc/realtek/rtd129x_lockapi.h>
++#endif
++#endif
++
+ #ifdef GREEN_HILL
+ #define	SAVE_INT_AND_CLI(x)		{ x = save_and_cli(); }
+ #define RESTORE_INT(x)			restore_flags(x)
+@@ -82,6 +88,10 @@
+ #define SMP_UNLOCK_BUF(__x__)	
+ #define SMP_LOCK_RECV(__x__)
+ #define SMP_UNLOCK_RECV(__x__)
++#ifdef RTK_129X_PLATFORM
++#define SMP_LOCK_IO_129X(__x__)
++#define SMP_UNLOCK_IO_129X(__x__)
++#endif
+ #define SMP_LOCK_RX_DATA(__x__)
+ #define SMP_UNLOCK_RX_DATA(__x__)
+ #define SMP_LOCK_RX_MGT(__x__)
+@@ -349,6 +359,10 @@
+ 		} else \
+ 			__y__ = 0; \
+ 	} while(0)
++#ifdef RTK_129X_PLATFORM
++#define SMP_LOCK_IO_129X(__x__)					do {spin_lock_irqsave(&priv->pshare->lock_io_129x, (__x__));priv->pshare->lock_io_129x_owner=1;}while(0)
++#define SMP_UNLOCK_IO_129X(__x__)				do {priv->pshare->lock_io_129x_owner=-1;spin_unlock_irqrestore(&priv->pshare->lock_io_129x, (__x__));}while(0)
++#endif
+ #else //CONFIG_PREEMPT
+ #define SMP_LOCK_RECV(__x__)	\
+ 	do { \
+@@ -367,6 +381,17 @@
+ 		} else \
+ 			__y__ = 0; \
+ 	} while(0)
++#ifdef RTK_129X_PLATFORM
++#define SMP_LOCK_IO_129X(__x__)	\
++	do { \
++		if(priv->pshare->lock_io_129x_owner!=smp_processor_id()) \
++			spin_lock_irqsave(&priv->pshare->lock_io_129x, (__x__)); \
++		else \
++			panic_printk("[%s %d] recursion detection\n",__FUNCTION__,__LINE__); \
++		priv->pshare->lock_io_129x_owner=smp_processor_id();\
++	}while(0)
++#define SMP_UNLOCK_IO_129X(__x__)				do {priv->pshare->lock_io_129x_owner=-1;spin_unlock_irqrestore(&priv->pshare->lock_io_129x, (__x__));}while(0)
++#endif //RTK_129X_PLATFORM
+ #endif //CONFIG_PREEMPT
+ 
+ //#define SMP_LOCK_RECV(__x__)			spin_lock_irqsave(&priv->pshare->lock_recv, (__x__))
+@@ -439,6 +464,10 @@
+ #define SMP_UNLOCK_BUF(__x__)	
+ #define SMP_LOCK_RECV(__x__)
+ #define SMP_UNLOCK_RECV(__x__)
++#ifdef RTK_129X_PLATFORM
++#define SMP_LOCK_IO_129X(__x__)
++#define SMP_UNLOCK_IO_129X(__x__)
++#endif
+ #define SMP_LOCK_RX_DATA(__x__)
+ #define SMP_UNLOCK_RX_DATA(__x__)
+ #define SMP_LOCK_RX_MGT(__x__)
+@@ -650,6 +679,201 @@ static inline int rtk_memcmp(unsigned ch
+ #endif
+ #endif
+ 
++#ifdef RTK_129X_PLATFORM
++#define PCIE_SLOT1_MEM_START	0x9804F000
++#define PCIE_SLOT1_MEM_LEN	0x1000
++#define PCIE_SLOT1_CTRL_START	0x9804EC00
++
++#define PCIE_SLOT2_MEM_START	0x9803C000
++#define PCIE_SLOT2_MEM_LEN	0x1000
++#define PCIE_SLOT2_CTRL_START	0x9803BC00
++
++#define PCIE_MASK_OFFSET	0x100 //offset from ctrl start
++#define PCIE_TRANSLATE_OFFSET	0x104 //offset from ctrl start
++#define IO_2K_MASK		0xFFFFF800
++#define IO_4K_MASK		0xFFFFF000
++#define MAX_RETRY		5
++
++static unsigned int pci_io_read_129x(struct rtl8192cd_priv *priv, unsigned int addr, unsigned char size)
++{
++	unsigned long ioaddr = priv->pshare->ioaddr;
++	unsigned long mask_addr = priv->pshare->mask_addr;
++	unsigned long tran_addr = priv->pshare->tran_addr;
++	unsigned char busnumber = priv->pshare->pdev->bus->number;
++	unsigned int rval = 0;
++	unsigned int mask;
++	unsigned int translate_val = 0;
++	unsigned int tmp_addr = addr & 0xFFF;
++#ifdef SMP_SYNC
++	unsigned long flags = 0;
++#endif
++	unsigned long pci_error_reg = priv->pshare->ctrl_start + 0x7C;
++	unsigned long pci_timeout_reg = priv->pshare->ctrl_start + 0x74;
++	
++	int retry_cnt = 0;
++	u32 pci_error_status, pci_timeout_status;
++	unsigned long emmc_flags;
++
++#ifdef SMP_SYNC
++	SMP_LOCK_IO_129X(flags);
++#endif
++
++	//PCIE1.1 0x9804FCEC, PCIE2.0 0x9803CCEC & 0x9803CC68 can't be used because of 1295 hardware issue.
++	if((tmp_addr==0xCEC) || ((busnumber==0x01) && (tmp_addr==0xC68))) {
++		mask = IO_2K_MASK;
++		writel( 0xFFFFF800, IO_TYPE_CAST(mask_addr));
++		translate_val = readl(IO_TYPE_CAST(tran_addr));
++		writel( translate_val|(addr&mask), IO_TYPE_CAST(tran_addr));
++	} else if(addr >= 0x1000) {
++		mask = IO_4K_MASK;
++		translate_val = readl(IO_TYPE_CAST(tran_addr));
++		writel( translate_val|(addr&mask), IO_TYPE_CAST(tran_addr));
++	} else
++		mask = 0x0;
++
++pci_read_129x_retry:
++
++#ifdef CONFIG_RTK_SW_LOCK_API
++	//All RBUS1 driver need to have a workaround for emmc hardware error.
++	//Need to protect 0xXXXX_X8XX~ 0xXXXX_X9XX.
++	if((tmp_addr>0x7FF) && (tmp_addr<0xA00))
++		rtk_lockapi_lock(emmc_flags, __FUNCTION__);
++#endif
++
++	switch(size)
++	{
++	case 1:
++		rval = readb(IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	case 2:
++		rval = readw(IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	case 4:
++		rval = readl(IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	default:
++		panic_printk("RTD129X: %s: wrong size %d\n", __func__, size);
++		break;
++	}
++
++#ifdef CONFIG_RTK_SW_LOCK_API
++	if((tmp_addr>0x7FF) && (tmp_addr<0xA00))
++		rtk_lockapi_unlock(emmc_flags, __FUNCTION__);
++#endif
++
++	pci_error_status = readl(IO_TYPE_CAST(pci_error_reg));
++	pci_timeout_status = readl(IO_TYPE_CAST(pci_timeout_reg));
++        
++	//pcie timeout patch
++	if (pci_timeout_status & 0x01) {
++		writel(pci_error_status, IO_TYPE_CAST(pci_error_reg));
++		writel(pci_timeout_status, IO_TYPE_CAST(pci_timeout_reg));
++		panic_printk("RTD129X: %s: TIMEOUT: (#%d) (0x74=0x%x 0x7C=0x%x) reg=%x val=%x\n", __FUNCTION__, retry_cnt, pci_timeout_status, pci_error_status, addr, rval);
++	
++		if(retry_cnt < MAX_RETRY) {
++			retry_cnt++;
++			goto pci_read_129x_retry;
++		}
++	}
++
++	//DLLP error patch
++	if(pci_error_status & 0x1F) {
++		writel(pci_error_status, IO_TYPE_CAST(pci_error_reg));
++		panic_printk("RTD129X: %s: DLLP: (#%d)=0x%x reg=%x val=%x\n", __FUNCTION__, retry_cnt, pci_error_status, addr, rval);
++
++		if(retry_cnt < MAX_RETRY) {
++			retry_cnt++;
++			goto pci_read_129x_retry;
++		}
++	}
++
++	//PCIE1.1 0x9804FCEC, PCIE2.0 0x9803CCEC & 0x9803CC68 can't be used because of 1295 hardware issue.
++	if((tmp_addr==0xCEC) || ((busnumber==0x01) && (tmp_addr==0xC68))) {
++		writel( translate_val, IO_TYPE_CAST(tran_addr));
++		writel( 0xFFFFF000, IO_TYPE_CAST(mask_addr));
++	} else if(addr >= 0x1000) {
++		writel( translate_val, IO_TYPE_CAST(tran_addr));
++	}
++
++#ifdef SMP_SYNC
++	SMP_UNLOCK_IO_129X(flags);
++#endif
++	return rval;
++}
++
++static void pci_io_write_129x(struct rtl8192cd_priv *priv, unsigned int addr, unsigned char size, unsigned int wval)
++{
++	unsigned long ioaddr = priv->pshare->ioaddr;
++	unsigned long mask_addr = priv->pshare->mask_addr;
++	unsigned long tran_addr = priv->pshare->tran_addr;
++	unsigned char busnumber = priv->pshare->pdev->bus->number;
++	unsigned int mask;
++	unsigned int translate_val = 0;
++	unsigned int tmp_addr = addr & 0xFFF;
++#ifdef SMP_SYNC
++	unsigned long flags = 0;
++#endif
++	unsigned long emmc_flags;
++
++#ifdef SMP_SYNC
++	SMP_LOCK_IO_129X(flags);
++#endif
++	//PCIE1.1 0x9804FCEC, PCIE2.0 0x9803CCEC & 0x9803CC68 can't be used because of 1295 hardware issue.
++	if((tmp_addr==0xCEC) || ((busnumber==0x01) && (tmp_addr==0xC68))) {
++		mask = IO_2K_MASK;
++		writel( 0xFFFFF800, IO_TYPE_CAST(mask_addr));
++		translate_val = readl(IO_TYPE_CAST(tran_addr));
++		writel( translate_val|(addr&mask), IO_TYPE_CAST(tran_addr));
++	} else if(addr >= 0x1000) {
++		mask = IO_4K_MASK;
++		translate_val = readl(IO_TYPE_CAST(tran_addr));
++		writel( translate_val|(addr&mask), IO_TYPE_CAST(tran_addr));
++	} else
++		mask = 0x0;
++
++#ifdef CONFIG_RTK_SW_LOCK_API
++	//All RBUS1 driver need to have a workaround for emmc hardware error.
++	//Need to protect 0xXXXX_X8XX~ 0xXXXX_X9XX.
++	if((tmp_addr>0x7FF) && (tmp_addr<0xA00))
++		rtk_lockapi_lock(emmc_flags, __FUNCTION__);
++#endif
++
++	switch(size)
++	{
++	case 1:
++		writeb( (unsigned char)wval, IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	case 2:
++		writew( (unsigned short)wval, IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	case 4:
++		writel( (unsigned int)wval, IO_TYPE_CAST(ioaddr + (addr&~mask)) );
++		break;
++	default:
++		panic_printk("RTD129X: %s: wrong size %d\n", __func__, size);
++		break;
++	}
++
++#ifdef CONFIG_RTK_SW_LOCK_API
++	if((tmp_addr>0x7FF) && (tmp_addr<0xA00))
++		rtk_lockapi_unlock(emmc_flags, __FUNCTION__);
++#endif
++
++	//PCIE1.1 0x9804FCEC, PCIE2.0 0x9803CCEC & 0x9803CC68 can't be used because of 1295 hardware issue.
++	if((tmp_addr==0xCEC) || ((busnumber==0x01) && (tmp_addr==0xC68))) {
++		writel( translate_val, IO_TYPE_CAST(tran_addr));
++		writel( 0xFFFFF000, IO_TYPE_CAST(mask_addr));
++	} else if(addr >= 0x1000) {
++		writel( translate_val, IO_TYPE_CAST(tran_addr));
++	}
++
++#ifdef SMP_SYNC
++	SMP_UNLOCK_IO_129X(flags);
++#endif
++}
++
++#endif //RTK_129X_PLATFORM
++
+ static __inline__ unsigned char RTL_R8_F(struct rtl8192cd_priv *priv, unsigned int reg)
+ {
+ 	unsigned long ioaddr = priv->pshare->ioaddr;
+@@ -679,6 +903,8 @@ static __inline__ unsigned char RTL_R8_F
+ 		int diff = reg&0x3;
+ 		data=REG32((ioaddr + (reg&(0xFFFFFFFC)) ) );
+ 		val8=(unsigned char)(( data>>swap[diff])&0xff);
++#elif defined(RTK_129X_PLATFORM)
++		val8 = pci_io_read_129x(priv, reg, 1);
+ #else
+ 		val8 = readb(IO_TYPE_CAST(ioaddr + reg));
+ #endif
+@@ -719,6 +945,8 @@ static __inline__ unsigned short RTL_R16
+ 		int diff = reg&0x3;
+ 		data=REG32((ioaddr + (reg&(0xFFFFFFFC)) ) );
+ 		val16=(unsigned short)(( data>>swap[diff])&0xffff);
++#elif defined(RTK_129X_PLATFORM)
++		val16 = pci_io_read_129x(priv, reg, 2);
+ #else
+ 		val16 = readw(IO_TYPE_CAST(ioaddr + reg));
+ #endif
+@@ -758,7 +986,11 @@ static __inline__ unsigned int RTL_R32_F
+ 	else
+ #endif
+ 	{
++#if defined(RTK_129X_PLATFORM)
++		val32 = pci_io_read_129x(priv, reg, 4);
++#else
+ 		val32 = readl(IO_TYPE_CAST(ioaddr + reg));
++#endif
+ 	}
+ 
+ #ifdef CHECK_SWAP
+@@ -790,7 +1022,11 @@ static __inline__ void RTL_W8_F(struct r
+ 	else
+ #endif
+ 	{
++#ifdef RTK_129X_PLATFORM
++		pci_io_write_129x(priv, reg, 1, val8);
++#else
+ 		writeb(val8, IO_TYPE_CAST(ioaddr + reg));
++#endif
+ 	}
+ }
+ 
+@@ -828,7 +1064,11 @@ static __inline__ void RTL_W16_F(struct
+ 	else
+ #endif
+ 	{
++#ifdef RTK_129X_PLATFORM
++		pci_io_write_129x(priv, reg, 2, val16_n);
++#else
+ 		writew(val16_n, IO_TYPE_CAST(ioaddr + reg));
++#endif
+ 	}
+ }
+ 
+@@ -866,7 +1106,11 @@ static __inline__ void RTL_W32_F(struct
+ 	else
+ #endif
+ 	{
++#ifdef RTK_129X_PLATFORM
++		pci_io_write_129x(priv, reg, 4, val32_n);
++#else
+ 		writel(val32_n, IO_TYPE_CAST(ioaddr + reg));
++#endif
+ 	}
+ }
+ 

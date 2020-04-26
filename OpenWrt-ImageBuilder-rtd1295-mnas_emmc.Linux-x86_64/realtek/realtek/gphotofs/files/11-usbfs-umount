@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#logger -t DEBUG "hotplug usb: action='$ACTION' devicename='$DEVICENAME' devname='$DEVNAME' devpath='$DEVPATH' product='$PRODUCT' type='$TYPE' interface='$INTERFACE'"
+
+if [ "$ACTION" = "remove" ]; then
+
+	MountPointFile=`echo $PRODUCT$INTERFACE$TYPE | tr -d '/'`
+
+	#logger -t DEBUG "MPFile is '$MountPointFile'"
+
+	if [ -f /tmp/$MountPointFile ]; then
+		MountPoint=`cat /tmp/$MountPointFile`
+
+		#stop samba first
+		uci delete samba.${MountPointFile}
+		uci commit samba
+		/etc/init.d/samba restart
+
+		#umount and remove empty dir
+		umount $MountPoint
+		rmdir $MountPoint
+		rm /tmp/$MountPointFile
+
+	fi
+fi

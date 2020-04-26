@@ -1,0 +1,11 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/include/ioctl_cfg80211.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/include/ioctl_cfg80211.h
+@@ -20,7 +20,7 @@
+ #ifndef __IOCTL_CFG80211_H__
+ #define __IOCTL_CFG80211_H__ 
+ 
+-#if defined(CONFIG_IOCTL_CFG80211) && !defined(CONFIG_CFG80211) && !defined(CONFIG_CFG80211_MODULE)
++#if defined(CONFIG_IOCTL_CFG80211) && !defined(CPTCFG_CFG80211) && !defined(CPTCFG_CFG80211_MODULE)
+ 	#error "Can't define CONFIG_IOCTL_CFG80211 because neither CONFIG_CFG80211 nor CONFIG_CFG80211_MODULE is defined in kernel"
+ #endif
+ #if defined(CONFIG_IOCTL_CFG80211) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35)

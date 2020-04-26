@@ -1,0 +1,610 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -677,7 +677,11 @@ EXTERN unsigned int get_tx_rate(struct r
+ EXTERN unsigned int get_lowest_tx_rate(struct rtl8192cd_priv *priv, struct stat_info *pstat,	unsigned int tx_rate);
+ EXTERN int isSpecialFloodMac(struct rtl8192cd_priv *priv, struct sk_buff *skb);
+ EXTERN int isICMPv6Mng(struct sk_buff *skb);
++#ifdef RTK_129X_PLATFORM
++EXTERN int isMDNS(unsigned char *data);
++#else
+ EXTERN inline int isMDNS(unsigned char *data);
++#endif
+ #else
+ EXTERN 
+ #if (!defined(__OSK__)) || (defined(__OSK__) && !defined(CONFIG_RTL6028))
+@@ -2258,6 +2262,8 @@ EXTERN int rtl_wpas_custom(struct net_de
+ 
+ #ifndef __OSK__
+ 
++EXTERN int mesh_setMACAddr(struct file *file, const char *buffer, unsigned long count, void *data);
++
+ #ifdef CONFIG_RTL_PROC_NEW
+ EXTERN int dump_mesh_one_mpflow_sta(struct seq_file *s, struct stat_info *pstat);
+ EXTERN int mesh_proc_flow_stats_read(struct seq_file *s, void *data);
+@@ -2276,13 +2282,17 @@ EXTERN int mesh_metric_r(struct seq_file
+ #endif
+ #ifdef _MESH_DEBUG_
+ EXTERN int mesh_proc_clear_table(struct seq_file *s, void *data);
+-EXTERN int mesh_proc_issueAuthReq(struct seq_file *s, void *data);
+ EXTERN int mesh_proc_openConnect(struct seq_file *s, void *data);
+ EXTERN int mesh_proc_issueOpen(struct seq_file *s, void *data);
+ EXTERN int mesh_proc_issueConfirm(struct seq_file *s, void *data);
+ EXTERN int mesh_proc_issueClose(struct seq_file *s, void *data);
+ EXTERN int mesh_proc_closeConnect(struct seq_file *s, void *data);
+ EXTERN int mesh_setMACAddr(struct file *file, const char *buffer, unsigned long count, void *data);
++#ifdef MESH_BOOTSEQ_AUTH
++EXTERN int mesh_proc_issueAuthReq(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueAuthRsp(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueDeAuth(struct seq_file *s, void *data);
++#endif //MESH_BOOTSEQ_AUTH
+ #endif
+ #else
+ 
+@@ -2303,7 +2313,6 @@ EXTERN int mesh_metric_r(char *buf, char
+ #endif
+ #ifdef _MESH_DEBUG_
+ EXTERN int mesh_proc_clear_table(char *buf, char **start, off_t offset, int length, int *eof, void *data);
+-EXTERN int mesh_proc_issueAuthReq(char *buf, char **start, off_t offset, int length, int *eof, void *data);
+ EXTERN int mesh_proc_openConnect(char *buf, char **start, off_t offset, int length, int *eof, void *data);
+ EXTERN int mesh_proc_issueOpen(char *buf, char **start, off_t offset, int length, int *eof, void *data);
+ EXTERN int mesh_proc_issueConfirm(char *buf, char **start, off_t offset, int length, int *eof, void *data);
+@@ -2317,6 +2326,19 @@ EXTERN int mesh_proc_flow_stats_write(st
+ #ifdef MESH_USE_METRICOP
+ EXTERN int mesh_metric_w (struct file *file, const char *buffer, unsigned long count, void *data);
+ #endif
++#ifdef _MESH_DEBUG_
++EXTERN int mesh_proc_clear_table(struct seq_file *s, void *data);
++EXTERN int mesh_proc_openConnect(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueOpen(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueConfirm(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueClose(struct seq_file *s, void *data);
++EXTERN int mesh_proc_closeConnect(struct seq_file *s, void *data);
++#ifdef MESH_BOOTSEQ_AUTH
++EXTERN int mesh_proc_issueAuthReq(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueAuthRsp(struct seq_file *s, void *data);
++EXTERN int mesh_proc_issueDeAuth(struct seq_file *s, void *data);
++#endif //MESH_BOOTSEQ_AUTH
++#endif //_MESH_DEBUG_
+ 
+ #endif /* __OSK__ */
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
+@@ -2260,8 +2260,10 @@ static void mesh_PeerLinkEstablish(DRV_P
+     MESH_DEBUG_MSG("Mesh: New MP is establish... MAC=%02X:%02X:%02X:%02X:%02X:%02X State=%d\n"
+                    , pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2], pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5], pstat->mesh_neighbor_TBL.State);
+ 
++#ifdef EVENT_LOG
+     LOG_MESH_MSG("associate to MP:%02X:%02X:%02X:%02X:%02X:%02X successfully.\n"
+                  , pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2], pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5]);
++#endif
+ }
+ 
+ #ifdef MESH_BOOTSEQ_AUTH
+@@ -2896,7 +2898,7 @@ unsigned int OnAssocReq_MP(DRV_PRIV *pri
+     update_support_rate(pstat, supportRate, supportRateNum);
+ 
+     // capability field
+-    val16 = cpu_to_le16(*(unsigned short*)((unsigned int)pframe + WLAN_HDR_A3_LEN));
++    val16 = cpu_to_le16(*(unsigned short*)((unsigned long)pframe + WLAN_HDR_A3_LEN));
+     if (!(val16 & BIT(5))) // NOT use short preamble
+         pstat->useShortPreamble = 0;
+     else
+@@ -3696,7 +3698,7 @@ unsigned int OnAssocRsp_MP(DRV_PRIV *pri
+     pframe = get_pframe(pfrinfo);
+ 
+     // checking status
+-    val = cpu_to_le16(*(unsigned short*)((unsigned int)pframe + WLAN_HDR_A3_LEN + 2));
++    val = cpu_to_le16(*(unsigned short*)((unsigned long)pframe + WLAN_HDR_A3_LEN + 2));
+ 
+     if (val)
+     {
+@@ -3704,7 +3706,7 @@ unsigned int OnAssocRsp_MP(DRV_PRIV *pri
+         goto assoc_mp_rejected;
+     }
+ 
+-    priv->aid = cpu_to_le16(*(unsigned short*)((unsigned int)pframe + WLAN_HDR_A3_LEN + 4)) & 0x3fff;
++    priv->aid = cpu_to_le16(*(unsigned short*)((unsigned long)pframe + WLAN_HDR_A3_LEN + 4)) & 0x3fff;
+ 
+     pstat = get_stainfo(priv, pfrinfo->sa);
+     if (pstat == NULL)
+@@ -4389,12 +4391,12 @@ unsigned int OnProbeRsp_MP(DRV_PRIV *pri
+ #ifndef MESH_BOOTSEQ_STRESS_TEST	// Stop update expire when stress test.
+             pstat->mesh_neighbor_TBL.expire = jiffies + MESH_EXPIRE_TO;	// fix: 0000087
+ #endif
++            mesh_sme_debug("New MP: %02X:%02X:%02X:%02X:%02X:%02X detected then trigger Peer-Link\n",
++                           pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2], pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5]);
+         }
+ 
+         start_swchnl_proc = mesh_channel_switch_check(priv, pfrinfo);
+ 
+-        mesh_sme_debug("New MP: %02X:%02X:%02X:%02X:%02X:%02X detected then trigger Peer-Link\n",
+-                       pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2], pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5]);
+ 
+ #ifdef SIMPLE_CH_UNI_PROTOCOL
+         if( precedence && priv->auto_channel)
+@@ -4546,7 +4548,7 @@ unsigned int OnDisassoc_MP(DRV_PRIV *pri
+         memcpy(&tmpEntry, &(pstat->mesh_neighbor_TBL), sizeof(struct MESH_Neighbor_Entry));
+ #endif
+ 
+-    reason = cpu_to_le16(*(unsigned short *)((unsigned int)pframe + WLAN_HDR_A3_LEN ));
++    reason = cpu_to_le16(*(unsigned short *)((unsigned long)pframe + WLAN_HDR_A3_LEN ));
+     DEBUG_INFO("receiving disassoc from station %02X%02X%02X%02X%02X%02X reason %d\n",
+                pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2],
+                pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5], reason);
+@@ -4596,8 +4598,10 @@ unsigned int OnDisassoc_MP(DRV_PRIV *pri
+ 
+     RESTORE_INT(flags);
+ 
++#ifdef EVENT_LOG
+     LOG_MESH_MSG("A wireless client is disassociated - %02X:%02X:%02X:%02X:%02X:%02X\n",
+                  *sa, *(sa+1), *(sa+2), *(sa+3), *(sa+4), *(sa+5));
++#endif
+ 
+     if (IEEE8021X_FUN)
+     {
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk_hapd.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk_hapd.c
+@@ -1316,6 +1316,37 @@ int psk_indicate_evt(struct rtl8192cd_pr
+ 			return 0;
+ }
+ 
++#ifdef CONFIG_RTK_MESH
++void dot11s_mp_set_key(DRV_PRIV *priv, unsigned char *mac)
++{
++	DOT11_SET_KEY Set_Key;
++	struct Dot11EncryptKey	*pEncryptKey = &(priv->pmib->dot11sKeysTable.dot11EncryptKey);
++	unsigned char key[40];
++
++	if (pEncryptKey->dot11TTKeyLen == 0) {
++		if (strlen((char *)priv->pmib->dot1180211sInfo.dot11PassPhrase) == 64) {// hex
++			get_array_val(key, (char *)priv->pmib->dot1180211sInfo.dot11PassPhrase, 64);
++		} else {
++			PasswordHash(priv->pmib->dot1180211sInfo.dot11PassPhrase,
++						 priv->pmib->dot1180211sInfo.mesh_id,
++						 strlen(priv->pmib->dot1180211sInfo.mesh_id),
++						 key);
++		}
++		pEncryptKey->dot11TTKeyLen = 16;
++		memcpy(pEncryptKey->dot11TTKey.skey, key, pEncryptKey->dot11TTKeyLen);
++	}
++
++	memset(key, 0, sizeof(key));
++	memcpy(key, pEncryptKey->dot11TTKey.skey, pEncryptKey->dot11TTKeyLen);
++	memcpy(Set_Key.MACAddr, mac, MACADDRLEN);
++	Set_Key.KeyType = DOT11_KeyType_Pairwise;
++	Set_Key.EncType = DOT11_ENC_CCMP;
++	Set_Key.KeyIndex = priv->pmib->dot11sKeysTable.keyid;
++	DOT11_Process_Set_Key(priv->dev, NULL, &Set_Key, key);
++}
++
++#endif //CONFIG_RTK_MESH
++
+ #endif
+ 
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
+@@ -45,19 +45,24 @@ typedef struct rtl8190_priv DRV_PRIV;
+  *	@brief	define
+  *
+  */
+-//#define _MESH_DEBUG_ 
+-#undef _MESH_DEBUG_
++#define _MESH_DEBUG_ 
++//#undef _MESH_DEBUG_
+ 
+ //#define MESH_LOG
+ #undef MESH_LOG
+ 
+ //#define mesh_proxy_debug panic_printk
+-#if defined(MESH_DEBUG)
+-#define mesh_tx_debug panic_printk
+-#define mesh_txsc_debug panic_printk
+-#define mesh_sme_debug panic_printk
+-#define mesh_proxy_debug panic_printk
+-#define mesh_route_debug panic_printk
++#if defined(_MESH_DEBUG_)
++#define mesh_tx_debug(msg, args...) 
++#define mesh_txsc_debug(msg, args...) 
++#define mesh_sme_debug(msg, args...)  
++#define mesh_proxy_debug(msg, args...) 
++#define mesh_route_debug(msg, args...)
++//#define mesh_tx_debug panic_printk
++//#define mesh_txsc_debug panic_printk
++//#define mesh_sme_debug panic_printk
++//#define mesh_proxy_debug panic_printk
++//#define mesh_route_debug panic_printk
+ #elif defined(MESH_LOG)
+ #define mesh_tx_debug scrlog_printk
+ #define mesh_txsc_debug scrlog_printk
+@@ -241,8 +246,8 @@ struct MESH_Neighbor_Entry {
+     // The following entries represents the "MP Meighbor Table Entry" in page 61, D0.02
+     // UINT8	NeighborMACADDR[MACADDRLEN]; 	// in fact, this info can be obtained by this.pstate->hwaddr
+     // UINT8	PrimaryMACADDR[MACADDRLEN];		// (popen) No need,Because interface have  priv 	
+-    unsigned long	LocalLinkID;		// peer link local link id (Identify connect by myself)
+-    unsigned long	PeerLinkID;			// peer link Peer link id (Identify connect by peer MP)  (PS:Some process allow NULL,  Check NULL before, If no, compare  match or not.)
++    UINT32	LocalLinkID;		// peer link local link id (Identify connect by myself)
++    UINT32	PeerLinkID;			// peer link Peer link id (Identify connect by peer MP)  (PS:Some process allow NULL,  Check NULL before, If no, compare  match or not.)
+     UINT8			Co;					// operating channel
+     UINT32			Pl;					// CPI
+     UINT16			r;					// byte rate (PS:Undefine use byte number !!)
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_util.h
+@@ -63,7 +63,7 @@
+ #define SMP_LOCK_MESH_ACL(__x__)
+ #define SMP_UNLOCK_MESH_ACL(__x__)
+ 
+-#if 0
++#ifdef CONFIG_PREEMPT
+ 
+ #define SMP_LOCK_MESH_PATH(__x__)      spin_lock_irqsave(&priv->mesh_path_lock, (__x__))
+ #define SMP_UNLOCK_MESH_PATH(__x__)    spin_unlock_irqrestore(&priv->mesh_path_lock, (__x__))
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_proc.c
+@@ -37,6 +37,11 @@ UINT8 mesh_proc_MAC[MACADDRLEN];
+ #endif  // _MESH_DEBUG_
+ 
+ 
++#ifdef	_MESH_DEBUG_
++UINT8 mesh_proc_MAC[MACADDRLEN];
++#endif	// _MESH_DEBUG_
++
++
+ /*
+  *	@brief	Printout assigned mesh MP neighbor table
+  *		PS: Modify from dump__one_stainfo
+@@ -1094,8 +1099,8 @@ int mesh_metric_w (struct file *file, co
+ 	unsigned char local_buf[5];
+ 	unsigned int i;
+ 
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 
+ 	if ( copy_from_user((void *)local_buf, (const void *)buffer, count ))
+ 	{ return count; }
+@@ -1115,8 +1120,8 @@ int mesh_metric_r(struct seq_file *s, vo
+ int mesh_metric_r(char *buffer, char **buffer_location, off_t offset, int buffer_length, int *eof, void *data)
+ #endif
+ {
+-    struct net_device *dev = (struct net_device *)data;
+-    DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++    struct net_device *dev = PROC_GET_DEV();
++    struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 
+     int ret = 0;
+     if (offset > 0) {
+@@ -1150,8 +1155,8 @@ int mesh_proc_clear_table(struct seq_fil
+ int mesh_proc_clear_table(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 	int pos = 0;
+ 
+@@ -1263,10 +1268,14 @@ int mesh_setMACAddr(struct file *file, c
+ }
+ 
+ #ifdef MESH_BOOTSEQ_AUTH
+-static int mesh_proc_issueAuthReq(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#ifdef CONFIG_RTL_PROC_NEW
++int mesh_proc_issueAuthReq(struct seq_file *s, void *data)
++#else
++int mesh_proc_issueAuthReq(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 
+ 	int pos = 0;
+@@ -1286,7 +1295,11 @@ static int mesh_proc_issueAuthReq(char *
+ 	return pos;
+ }
+ 
+-static int mesh_proc_issueAuthRsp(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#ifdef CONFIG_RTL_PROC_NEW
++int mesh_proc_issueAuthRsp(struct seq_file *s, void *data)
++#else
++int mesh_proc_issueAuthRsp(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#endif
+ {
+ 	struct net_device *dev = (struct net_device *)data;
+ 	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
+@@ -1309,11 +1322,14 @@ static int mesh_proc_issueAuthRsp(char *
+ 	return pos;
+ }
+ 
+-
+-static int mesh_proc_issueDeAuth(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#ifdef CONFIG_RTL_PROC_NEW
++int mesh_proc_issueDeAuth(struct seq_file *s, void *data)
++#else
++int mesh_proc_issueDeAuth(char *buf, char **start, off_t offset, int length, int *eof, void *data)
++#endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 	
+ 	int pos = 0;
+@@ -1341,8 +1357,8 @@ int mesh_proc_openConnect(struct seq_fil
+ int mesh_proc_openConnect(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 
+ 	int pos = 0;
+@@ -1372,8 +1388,8 @@ int mesh_proc_issueOpen(struct seq_file
+ int mesh_proc_issueOpen(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 
+ 	int pos = 0;
+@@ -1399,8 +1415,8 @@ int mesh_proc_issueConfirm(struct seq_fi
+ int mesh_proc_issueConfirm(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 
+ 	int pos = 0;
+@@ -1426,8 +1442,8 @@ int mesh_proc_issueClose(struct seq_file
+ int mesh_proc_issueClose(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 	struct stat_info	*pstat;
+ 
+ 	int pos = 0;
+@@ -1453,8 +1469,8 @@ int mesh_proc_closeConnect(struct seq_fi
+ int mesh_proc_closeConnect(char *buf, char **start, off_t offset, int length, int *eof, void *data)
+ #endif
+ {
+-	struct net_device *dev = (struct net_device *)data;
+-	DRV_PRIV *priv = (DRV_PRIV *)dev->priv;
++	struct net_device *dev = PROC_GET_DEV();
++	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
+ 
+ 	int pos = 0;
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -7391,6 +7391,9 @@ static int rtl8192cd_proc_thermal(char *
+ 	RTK_DECLARE_READ_PROC_FOPS(mesh_proxy_table_info);
+ 	RTK_DECLARE_READ_PROC_FOPS(mesh_portal_table_info);
+ 	RTK_DECLARE_READ_PROC_FOPS(mesh_root_info);	
++#if CONFIG_RTK_VLAN_SUPPORT
++	RTK_DECLARE_READ_PROC_FOPS(mesh_vlan_info);	
++#endif
+ 
+ #ifdef MESH_USE_METRICOP
+ 	// change metric method
+@@ -7665,6 +7668,9 @@ void MDL_DEVINIT rtl8192cd_proc_init(str
+     RTK_CREATE_PROC_READ_ENTRY(p, "mesh_proxy_table", mesh_proxy_table_info);
+     RTK_CREATE_PROC_READ_ENTRY(p, "mesh_portal_table", mesh_portal_table_info);
+     RTK_CREATE_PROC_READ_ENTRY(p, "mesh_root_info", mesh_root_info);
++#if CONFIG_RTK_VLAN_SUPPORT
++    RTK_CREATE_PROC_READ_ENTRY(p, "mesh_vlan_info", mesh_vlan_info);
++#endif
+ 
+ #ifdef MESH_USE_METRICOP
+     { // change metric method
+@@ -7874,7 +7880,9 @@ void /*__devexit*/MDL_EXIT rtl8192cd_pro
+         remove_proc_entry( "mesh_pathsel_routetable", rtl8192cd_proc_root );
+         remove_proc_entry( "mesh_proxy_table", rtl8192cd_proc_root );
+         remove_proc_entry( "mesh_root_info", rtl8192cd_proc_root );
++#if CONFIG_RTK_VLAN_SUPPORT
+         remove_proc_entry( "mesh_vlan_info", rtl8192cd_proc_root );
++#endif
+         remove_proc_entry( "mesh_portal_table", rtl8192cd_proc_root );
+ 
+ #ifdef MESH_USE_METRICOP // remove proc file
+@@ -7884,8 +7892,8 @@ void /*__devexit*/MDL_EXIT rtl8192cd_pro
+ #ifdef _MESH_DEBUG_
+         remove_proc_entry( "mesh_clearalltable", rtl8192cd_proc_root );
+         remove_proc_entry( "mesh_setmacaddr", rtl8192cd_proc_root );
+-        remove_proc_entry( "mesh_issueauthreq", rtl8192cd_proc_root );
+ #ifdef MESH_BOOTSEQ_AUTH
++        remove_proc_entry( "mesh_issueauthreq", rtl8192cd_proc_root );
+         remove_proc_entry( "mesh_issueauthrsp", rtl8192cd_proc_root );
+         remove_proc_entry( "mesh_issuedeauth", rtl8192cd_proc_root );
+ #endif
+@@ -7986,6 +7994,9 @@ static struct _proc_table_ proc_table[]
+     {"mesh_proxy_table", 			mesh_proxy_table_info},
+     {"mesh_portal_table", 			mesh_portal_table_info},
+     {"mesh_root_info", 				mesh_root_info},
++#if CONFIG_RTK_VLAN_SUPPORT
++    {"mesh_vlan_info",                                 mesh_vlan_info},
++#endif
+ #endif
+ #endif
+ #ifdef RTK_BR_EXT
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -7462,11 +7462,25 @@ int rtl8192cd_open(struct net_device *de
+ 	priv = GET_DEV_PRIV(dev);
+ 
+     STADEBUG("===>\n");
++
++#ifdef CONFIG_RTK_MESH
++	if((dev->base_addr == 1) && !IS_DRV_OPEN(priv))
++	{
++		printk("please wait for root dev open\n");
++		return -1;
++	}
++#endif
++
+ #ifdef RTK_NL80211
+-	if(!is_iface_ready_nl80211(dev, priv))
+-		return 0;
++#if defined(WDS) || defined(CONFIG_RTK_MESH)
++	if (dev->base_addr != 0 && dev->base_addr != 1)
++#endif
++	{
++		if(!is_iface_ready_nl80211(dev, priv))
++			return 0;
+ 	
+-	prepare_iface_nl80211(dev, priv);
++		prepare_iface_nl80211(dev, priv);
++	}
+ #endif
+ 
+ #ifdef NOT_RTK_BSP 	
+@@ -9472,6 +9486,13 @@ int  rtl8192cd_set_hwaddr(struct net_dev
+ 	p = (unsigned char *)addr;
+ #endif
+ 
++#if defined(CONFIG_RTK_MESH) && defined(RTK_129X_PLATFORM)
++	if((strcmp(dev->name, "wlan-msh")==0)) {
++		printk("Don't need to set wlan-msh mac addr\n");
++		return 0;
++	}
++#endif
++
+ #ifdef RTK_NL80211 
+ 	rtl_setMac(dev, p);
+ #endif
+@@ -13981,7 +14002,7 @@ void rtl8192cd_deinit_one(struct rtl8192
+ 
+ #ifdef CONFIG_RTK_MESH
+     num = (priv->pshare->type >> MESH_SHIFT) & MESH_MASK;
+-    if (num > 0) { // mesh_num is always 0 or 1
++    if (num > 0 && wlan_index == 0 ) { // mesh_num is always 0 or 1
+         unregister_netdev(priv->mesh_dev);
+         // mesh priv pointer to root's priv
+         #ifdef NETDEV_NO_PRIV
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
+@@ -59,7 +59,7 @@ int notify_path_found(unsigned char *des
+ 
+     i = 0;
+     do {            
+-        pskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned int)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++        pskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+         buf[i++] = pskb;            
+     }while(pskb != NULL);
+ 
+@@ -199,7 +199,7 @@ void do_aodv_routing(DRV_PRIV *priv, str
+     if (retryEntry) {
+         if(FALSE == enque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail), (unsigned long)retryEntry->pktqueue.pSkb, NUM_TXPKT_QUEUE,(void*)skb))
+         {             
+-            poldskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned int)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++            poldskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+             if(poldskb)
+                 dev_kfree_skb_any(poldskb);
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
+@@ -313,11 +313,11 @@ void aodv_expire(void *task_priv)
+                 mesh_route_debug("PREQ to find %02x:%02x:%02x:%02x:%02x:%02x exceed retry limit at %lu\n",
+                                 retryEntry->MACAddr[0],retryEntry->MACAddr[1],retryEntry->MACAddr[2],retryEntry->MACAddr[3],retryEntry->MACAddr[4],retryEntry->MACAddr[5],jiffies);
+ 
+-                pskb=(struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned int)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++                pskb=(struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+                 while(pskb)
+                 {
+                     dev_kfree_skb_any(pskb);
+-                    pskb=(struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned int)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++                    pskb=(struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+                 }
+                 HASH_DELETE(priv->mesh_rreq_retry_queue,retryEntry->MACAddr);
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -29,6 +29,10 @@
+ 
+ #include "./8192cd_cfg.h"
+ 
++#if defined(CONFIG_RTK_MESH) && defined(RTK_129X_PLATFORM)
++#include <linux/sched.h>
++#endif
++
+ #ifdef __LINUX_2_6__
+ #include <linux/initrd.h>
+ #include <linux/syscalls.h>
+@@ -13996,6 +14000,9 @@ case MP_SET_RX_GAIN:
+ 			break;
+ 		}
+ 
++#ifdef RTK_129X_PLATFORM
++		priv->pid_pathsel = current->pid;
++#else
+ 		len = wrq->u.data.length;
+ 		memset(strPID, 0, sizeof(strPID));
+ 		ioctl_copy_from_user(strPID, (void *)wrq->u.data.pointer, len);
+@@ -14005,6 +14012,7 @@ case MP_SET_RX_GAIN:
+ 		{
+ 			priv->pid_pathsel = priv->pid_pathsel * 10 + (strPID[i] - 48);
+ 		}
++#endif
+ 
+ 		ret = 0;
+ 		break;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -1652,7 +1652,7 @@ static int gothrough_brsrc(struct rtl819
+ #endif
+ 
+ #ifdef CONFIG_RTK_MESH
+-	if (pskb->dev == priv->mesh_dev && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable) {
++	if (pskb->dev == priv->mesh_dev && priv->mesh_priv_first !=NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable) {
+ 		int index = 0;
+ #ifdef CONFIG_RTL_MESH_CROSSBAND
+ 		index = priv->dev->name[4] - '0';
+@@ -3890,7 +3890,7 @@ int rx_shortcut(struct rtl8192cd_priv *p
+                             return 0;
+                         }
+                     }
+-                    else if(priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable){ /*to wlan0 or eth0*/
++                    else if(priv->mesh_priv_first !=NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable){ /*to wlan0 or eth0*/
+                         dst_pstat = get_stainfo(priv, meshDest);/*mesh addr5*/
+                     }
+                     else
+@@ -3900,11 +3900,11 @@ int rx_shortcut(struct rtl8192cd_priv *p
+                 else { /*from wlan0*/
+                     dst_pstat = get_stainfo(priv, da);  
+                     if(dst_pstat) {
+-                        if(isMeshPoint(dst_pstat) && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable == 0)
++                        if(isMeshPoint(dst_pstat) && priv->mesh_priv_first !=NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable == 0)
+                             dst_pstat = NULL;
+                     }                      
+                     #ifdef BR_SHORTCUT
+-                    else if(dst_pstat == NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable) {
++                    else if(dst_pstat == NULL && priv->mesh_priv_first !=NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable) {
+                         int index = 0;
+                         #ifdef CONFIG_RTL_MESH_CROSSBAND
+                         index = (priv->dev->name[4] == '0')?1:0;
+@@ -9875,7 +9875,7 @@ mcast_netif_rx:
+ 
+ 			dst_pstat = get_stainfo(priv, da);
+ #ifdef CONFIG_RTK_MESH
+-            if(dst_pstat && isMeshPoint(dst_pstat) && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable == 0) {
++            if(dst_pstat && isMeshPoint(dst_pstat) && priv->mesh_priv_first !=NULL && priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable == 0) {
+                 dst_pstat = NULL;
+             }             
+ #endif

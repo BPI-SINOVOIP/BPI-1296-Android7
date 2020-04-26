@@ -1,0 +1,36 @@
+#Copyright (C) 2007-2013 Realtek Semiconductor Corporation.
+# drivers/Kconfig
+
+config CEC
+	bool "CEC Support"
+	
+config CEC_CHARDEV
+	bool "CEC device interface"
+	depends on CEC
+	help
+	  Say Y here to use cec-* device files, usually found in the /dev/cec/
+	  directory on your system.  They make it possible to have user-space
+	  programs use the CEC bus.
+
+	  This support is also available as a module.  If so, the module 
+	  will be called cec-dev.
+	
+
+config CEC_DEBUG
+	bool "CEC Debug Mode"
+	depends on CEC
+	default n
+	help 
+	  If you want to enable cec debug message, say Y.
+
+menu "CEC Adapters"
+	depends on CEC
+
+config RTD1295_CEC
+	tristate "CEC Controller for Realtek RTD1295 platform"
+	depends on CEC 
+	default y
+	help
+	  Say Y, if you want to enable CEC feature on Realtek RTD1195 platform.
+
+endmenu

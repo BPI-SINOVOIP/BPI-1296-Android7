@@ -1,0 +1,27 @@
+--- a/src/drivers/driver_nl80211.c
++++ b/src/drivers/driver_nl80211.c
+@@ -39,6 +39,8 @@
+ #include "driver_nl80211.h"
+ 
+ 
++static int nl80211_put_freq_params(struct nl_msg *msg, const struct hostapd_freq_params *freq);
++
+ #ifndef CONFIG_LIBNL20
+ /*
+  * libnl 1.1 has a bug, it tries to allocate socket numbers densely
+@@ -3497,6 +3499,15 @@ static int wpa_driver_nl80211_set_ap(voi
+ 	}
+ #endif /* CONFIG_P2P */
+ 
++	if(params->freq) {
++		if(nl80211_put_freq_params(msg, params->freq) < 0) {
++			wpa_printf(MSG_ERROR, "nl80211: can't set ap freq params");
++		} else
++			wpa_printf(MSG_DEBUG, "nl80211: put ap freq params: freq=%d ch=%d",
++				   params->freq->freq, params->freq->channel);
++	} else
++		wpa_printf(MSG_DEBUG, "nl80211: no freq params");
++
+ 	ret = send_and_recv_msgs(drv, msg, NULL, NULL);
+ 	if (ret) {
+ 		wpa_printf(MSG_DEBUG, "nl80211: Beacon set failed: %d (%s)",

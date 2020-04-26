@@ -1,0 +1,71 @@
+#
+# Makefile.in $Revision: 56599 $
+#
+# This file specifies the version numbers of Linux, Video, and Audio.
+#
+
+# If you set customer ID here, you can force to pack install.img for a customer
+CUSTOMER_ID=
+
+$(info =>=>=>=>=> In omv/Makefile.in, layout_type=$(layout_type))
+$(info =>=>=>=>=> In omv/Makefile.in, layout_size=$(layout_size))
+
+# If "nosvn=0", check out all of the components, which mean Audio/Video/Linux Images, from the svn server; if "nosvn=1", use the components residing in the directory.
+install_ap=0
+
+# LINUX_IMAGE_LOCATION and AV_IMAGE_LOCATION indicate the SVN location of Linux and A/V Images.
+# If they are left empty, it means that images are checked in the corresponding components directory.
+# If LINUX_IMAGE_LOCATION has value, LAYOUT and PROJECT_NAME both need to have values, too, or else problems will happen.
+LINUX_IMAGE_LOCATION=
+LAYOUT=
+PROJECT_NAME=
+AV_IMAGE_LOCATION=http://cadinfo/svn/col/DVR/jupiter/software/system/flash_environment/develop/image_file/components
+
+# 'AV_IN_ROOT' is only workable for 'LAYOUT=hd'. If the value is 'y', Audio and Video firmware will be put in root and loaded by RootApp.
+AV_IN_ROOT=n
+
+LINUXREV=HEAD		#Linux SVN rev.
+VIDEOREV=HEAD		#Video SVN rev. 
+AUDIOREV=HEAD		#Audio SVN rev.
+
+# If these variables have values, we will embed them, instead of svn version,  into XML file
+AUDIOVER=
+VIDEOVER=
+LINUXVER=
+PACKAGEVER=
+
+# These store the descriptions
+PACKAGE_DESCRIPTION=This is nand solution with android and NAS
+ANDROID_IMGS=y
+TEE_FW=n
+NAS_IMGS=y
+nas_rescue=0
+HYPERVISOR=n
+
+# This indicates the firmware URL of internet updating
+LIVEUPDATE_URL=
+
+# If this is 'y', image file packer will encrypt uImage, fw, android rootfs and rescue rootfs for security boot.
+SECURE_BOOT=n
+
+HAS_ETC_IMG=y
+
+ifeq ($(layout_type), spi)
+# NOR flash
+FACTORY_SUFFIX:=64K
+endif
+
+# UBIFS parameters
+# This is 8GB MLC NAND FLASH, should be filled in by your NAND property.
+NAND_PAGE_SIZE=8192 # unit is byte.
+NAND_BLOCK_SIZE=2097152 # unit is byte.
+#NAND_LEB_SIZE := $(shell expr $(NAND_BLOCK_SIZE) - $(NAND_PAGE_SIZE) \* 2 ) # unit is byte. LEB size = block size - (8192byte x 2)
+
+ifeq ($(layout_type), nand)
+    # Use small factory data on SLC NAND
+    FACTORY_SUFFIX:=$(shell [ $(NAND_BLOCK_SIZE) -lt 524288 ] && echo "64K" )
+endif
+
+#[zlib]
+FW_KERNEL_COMPRESS_TYPE=
+

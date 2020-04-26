@@ -1,0 +1,45 @@
+Index: fstools-2016-01-10/libblkid-tiny/vfat.c
+===================================================================
+--- fstools-2016-01-10.orig/libblkid-tiny/vfat.c	2017-05-23 16:09:16.763042141 +0800
++++ fstools-2016-01-10/libblkid-tiny/vfat.c	2017-05-23 16:12:54.159047324 +0800
+@@ -302,17 +302,24 @@
+ {
+ 	struct vfat_super_block *vs;
+ 	struct msdos_super_block *ms;
++	char *tmp;
+ 	const unsigned char *vol_label = 0;
+ 	unsigned char *vol_serno = NULL, vol_label_buf[11];
+ 	uint16_t sector_size = 0, reserved;
+ 	uint32_t cluster_count, fat_size;
+ 	const char *version = NULL;
+ 
+-	ms = blkid_probe_get_sb(pr, mag, struct msdos_super_block);
++	tmp = (char *)blkid_probe_get_sb(pr, mag, struct msdos_super_block);
++	ms = malloc (sizeof(struct msdos_super_block));
++	if(tmp && ms)
++		memcpy(ms, tmp, sizeof(struct msdos_super_block));
+ 	if (!ms)
+ 		return errno ? -errno : 1;
+ 
+-	vs = blkid_probe_get_sb(pr, mag, struct vfat_super_block);
++	tmp = (char *)blkid_probe_get_sb(pr, mag, struct vfat_super_block);
++	vs = malloc (sizeof(struct vfat_super_block));
++	if(tmp && vs)
++		memcpy(vs, tmp, sizeof(struct vfat_super_block));
+ 	if (!vs)
+ 		return errno ? -errno : 1;
+ 
+@@ -425,9 +432,13 @@
+ 	if (vol_serno)
+ 		blkid_probe_sprintf_uuid(pr, vol_serno, 4, "%02X%02X-%02X%02X",
+ 			vol_serno[3], vol_serno[2], vol_serno[1], vol_serno[0]);
++
+ 	if (version)
+ 		blkid_probe_set_version(pr, version);
+ 
++	if(ms) free(ms);
++	if(vs) free(vs);
++
+ 	return 0;
+ }
+ 

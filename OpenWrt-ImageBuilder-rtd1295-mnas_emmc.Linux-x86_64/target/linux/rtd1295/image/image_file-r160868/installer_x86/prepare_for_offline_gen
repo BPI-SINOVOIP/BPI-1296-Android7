@@ -1,0 +1,2 @@
+./parse_nand_list.pl flash_nand_list.h > Rconfig
+./mconf

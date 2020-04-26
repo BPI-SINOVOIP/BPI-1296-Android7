@@ -1,0 +1,33 @@
+Index: libX11-1.3.2/include/X11/Xlib.h
+===================================================================
+--- libX11-1.3.2.orig/include/X11/Xlib.h	2009-10-17 05:26:29.000000000 +0800
++++ libX11-1.3.2/include/X11/Xlib.h	2017-12-22 10:26:27.213093558 +0800
+@@ -88,6 +88,7 @@
+
+ #define Bool int
+ #define Status int
++#define StatusPtr long
+ #define True 1
+ #define False 0
+
+Index: libX11-1.3.2/modules/im/ximcp/imRm.c
+===================================================================
+--- libX11-1.3.2.orig/modules/im/ximcp/imRm.c	2009-10-17 05:26:29.000000000 +0800
++++ libX11-1.3.2/modules/im/ximcp/imRm.c	2017-12-22 10:27:03.565094425 +0800
+@@ -596,7 +596,7 @@
+     if(XGetGeometry(im->core.display, (Drawable)ic->core.focus_window,
+		&root_return, &x_return, &y_return, &width_return,
+		&height_return, &border_width_return, &depth_return)
+-		== (Status)NULL) {
++		== (StatusPtr)NULL) {
+	return True;
+     }
+     area.x	= 0;
+@@ -625,7 +625,7 @@
+	return True;
+     }
+     if(XGetWindowAttributes(im->core.display, ic->core.client_window,
+-					&win_attr) == (Status)NULL) {
++					&win_attr) == (StatusPtr)NULL) {
+	return True;
+     }

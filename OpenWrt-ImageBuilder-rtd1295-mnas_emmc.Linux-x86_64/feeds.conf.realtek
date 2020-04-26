@@ -1,0 +1,7 @@
+src-link packages ./realtek/packages
+src-link luci ./realtek/luci
+src-link routing ./realtek/routing
+src-link telephony ./realtek/telephony
+src-link management ./realtek/management
+src-link oldpackages ./realtek/oldpackages
+src-link realtek ./realtek/realtek

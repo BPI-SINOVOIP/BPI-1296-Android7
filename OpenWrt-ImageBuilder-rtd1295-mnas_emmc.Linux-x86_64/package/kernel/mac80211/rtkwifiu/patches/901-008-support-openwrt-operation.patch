@@ -1,0 +1,3087 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/include/autoconf.h
+@@ -69,7 +69,7 @@
+ 	#ifndef CONFIG_NATIVEAP_MLME
+ 		#define CONFIG_HOSTAPD_MLME
+ 	#endif
+-	/* #define CONFIG_FIND_BEST_CHANNEL */
++	#define CONFIG_FIND_BEST_CHANNEL
+ 	/* #define CONFIG_NO_WIRELESS_HANDLERS */
+ 	#define CONFIG_TX_MCAST2UNI /* Support IP multicast to unicast */
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
+@@ -3201,7 +3201,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4215,13 +4215,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5645,6 +5645,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6296,6 +6464,8 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6382,6 +6552,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/ioctl_cfg80211.c
+@@ -3361,7 +3361,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4410,13 +4410,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -6160,6 +6160,175 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6826,6 +6995,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6916,6 +7086,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
+@@ -3491,7 +3491,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	DBG_8192C("%s\n", __func__);
++	//DBG_8192C("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 	
+@@ -4506,14 +4506,14 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if(NULL == psta)
+ 	{
+-		DBG_871X("Station is not found\n");
++		//DBG_871X("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5834,6 +5834,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {	
+ 	int ret = 0;
+@@ -6489,6 +6657,8 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,0))
+ 	//wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM;
+ #endif
++
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6561,6 +6731,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
+@@ -3180,7 +3180,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4193,13 +4193,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5592,6 +5592,175 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6325,6 +6494,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
+@@ -3503,7 +3503,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	DBG_8192C("%s\n", __func__);
++	//DBG_8192C("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 	
+@@ -4517,14 +4517,14 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if(NULL == psta)
+ 	{
+-		DBG_871X("Station is not found\n");
++		//DBG_871X("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5853,6 +5853,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {	
+ 	int ret = 0;
+@@ -6508,6 +6676,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,0))
+ 	//wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM;
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6582,6 +6751,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
+@@ -3341,7 +3341,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4391,13 +4391,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -6134,6 +6134,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6790,6 +6958,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6880,6 +7049,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
+@@ -3345,7 +3345,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4403,13 +4403,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -6145,6 +6145,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6801,6 +6969,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6891,6 +7060,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
+@@ -3227,7 +3227,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4241,13 +4241,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5685,6 +5685,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6336,6 +6504,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6422,6 +6591,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/include/autoconf.h
+@@ -99,7 +99,7 @@
+ 	#ifndef CONFIG_NATIVEAP_MLME
+ 		#define CONFIG_HOSTAPD_MLME
+ 	#endif
+-	/*#define CONFIG_FIND_BEST_CHANNEL*/
++	#define CONFIG_FIND_BEST_CHANNEL
+ 	#define CONFIG_TX_MCAST2UNI	/* Support IP multicast->unicast */
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/os_dep/linux/ioctl_cfg80211.c
+@@ -3482,7 +3482,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	DBG_8192C("%s\n", __func__);
++	//DBG_8192C("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 	
+@@ -4489,14 +4489,14 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if(NULL == psta)
+ 	{
+-		DBG_871X("Station is not found\n");
++		//DBG_871X("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5936,6 +5936,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {	
+ 	int ret = 0;
+@@ -6578,6 +6746,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,0))
+ 	//wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM;
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6656,6 +6825,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/include/autoconf.h
+@@ -63,7 +63,7 @@
+ 	#ifndef CONFIG_NATIVEAP_MLME
+ 		#define CONFIG_HOSTAPD_MLME
+ 	#endif
+-	/* #define CONFIG_FIND_BEST_CHANNEL */
++	#define CONFIG_FIND_BEST_CHANNEL
+ 	#define CONFIG_TX_MCAST2UNI /* Support IP multicast to unicast */
+ 
+ 	/* #define CONFIG_AUTO_AP_MODE */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/os_dep/linux/ioctl_cfg80211.c
+@@ -3351,7 +3351,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4409,13 +4409,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -6153,6 +6153,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6798,6 +6966,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6888,6 +7057,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/include/autoconf.h
+@@ -67,7 +67,7 @@
+ 	#ifndef CONFIG_NATIVEAP_MLME
+ 		#define CONFIG_HOSTAPD_MLME
+ 	#endif
+-	/* #define CONFIG_FIND_BEST_CHANNEL */
++	#define CONFIG_FIND_BEST_CHANNEL
+ #ifdef CONFIG_DHC_PATCH
+ //Bug: 43523, 20140609 avoid rtw_xmit error to mark CONFIG_TX_MCAST2UNI
+ //#define CONFIG_TX_MCAST2UNI	1	// Support IP multicast->unicast
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
+@@ -6129,6 +6129,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6801,6 +6969,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6891,6 +7060,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
+@@ -3346,7 +3346,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4404,13 +4404,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -6155,6 +6155,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6811,6 +6979,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/include/autoconf.h
+@@ -64,7 +64,7 @@
+ 	#ifndef CONFIG_NATIVEAP_MLME
+ 		#define CONFIG_HOSTAPD_MLME
+ 	#endif
+-	/*#define CONFIG_FIND_BEST_CHANNEL*/
++	#define CONFIG_FIND_BEST_CHANNEL
+ 	#define CONFIG_TX_MCAST2UNI	/* Support IP multicast->unicast */
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
+@@ -3214,7 +3214,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	RTW_INFO("%s\n", __func__);
++	//RTW_INFO("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 
+@@ -4228,13 +4228,13 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//RTW_INFO(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if (NULL == psta) {
+-		RTW_INFO("Station is not found\n");
++		//RTW_INFO("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5713,6 +5713,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {
+ 	int ret = 0;
+@@ -6366,6 +6534,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ 	/* wiphy->flags |= WIPHY_FLAG_SUPPORTS_FW_ROAM; */
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(adapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6452,6 +6621,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ struct wiphy *rtw_wiphy_alloc(_adapter *padapter, struct device *dev)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/os_dep/linux/ioctl_cfg80211.c
+@@ -3477,7 +3477,7 @@ static int cfg80211_rtw_get_txpower(stru
+ #endif
+ 	int *dbm)
+ {
+-	DBG_8192C("%s\n", __func__);
++	//DBG_8192C("%s\n", __func__);
+ 
+ 	*dbm = (12);
+ 	
+@@ -4484,14 +4484,14 @@ static int	cfg80211_rtw_dump_station(str
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(ndev);
+ 	struct sta_info *psta = NULL;
+ 	struct sta_priv *pstapriv = &padapter->stapriv;
+-	DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
++	//DBG_871X(FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 	_enter_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	psta = rtw_sta_info_get_by_idx(idx, pstapriv);
+ 	_exit_critical_bh(&pstapriv->asoc_list_lock, &irqL);
+ 	if(NULL == psta)
+ 	{
+-		DBG_871X("Station is not found\n");
++		//DBG_871X("Station is not found\n");
+ 		ret = -ENOENT;
+ 		goto exit;
+ 	}
+@@ -5733,6 +5733,174 @@ static int cfg80211_rtw_sched_scan_stop(
+ }
+ #endif /* CONFIG_PNO_SUPPORT */
+ 
++#ifdef CONFIG_FIND_BEST_CHANNEL
++static int get_best_channel(_adapter *padapter, enum ieee80211_band band)
++{
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	u32 i, best_channel_24G = 1, best_channel_5G = 36, index_24G = 0, index_5G = 0;
++
++	for (i=0; pmlmeext->channel_set[i].ChannelNum !=0; i++) {
++		if ( pmlmeext->channel_set[i].ChannelNum == 1)
++			index_24G = i;
++		if ( pmlmeext->channel_set[i].ChannelNum == 36)
++			index_5G = i;
++	}
++
++	for (i=0; (i < MAX_CHANNEL_NUM) && (pmlmeext->channel_set[i].ChannelNum !=0) ; i++) {
++		if (pmlmeext->channel_set[i].ScanType == SCAN_PASSIVE)
++			continue;
++		// 2.4G
++		if ( pmlmeext->channel_set[i].ChannelNum == 6 || pmlmeext->channel_set[i].ChannelNum == 11) {
++			if ( pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_24G].rx_count ) {
++				index_24G = i;
++				best_channel_24G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		// 5G
++		if ( pmlmeext->channel_set[i].ChannelNum >= 36
++			&& pmlmeext->channel_set[i].ChannelNum < 140 ) {
++			// Find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 36) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++
++		if ( pmlmeext->channel_set[i].ChannelNum >= 149
++			&& pmlmeext->channel_set[i].ChannelNum < 165) {
++			// find primary channel
++			if ( (( pmlmeext->channel_set[i].ChannelNum - 149) % 8 == 0)
++				&& (pmlmeext->channel_set[i].rx_count < pmlmeext->channel_set[index_5G].rx_count) ) {
++				index_5G = i;
++				best_channel_5G = pmlmeext->channel_set[i].ChannelNum;
++			}
++		}
++	}
++
++	if (band == IEEE80211_BAND_2GHZ)
++		return best_channel_24G;
++
++	return best_channel_5G;
++}
++#endif
++
++static int cfg80211_rtw_dump_survey(struct wiphy *wiphy, struct net_device *dev, int idx, struct survey_info *survey)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ss_res *ss = &pmlmeext->sitesurvey_res;
++	struct rtw_ieee80211_channel *ch;
++	struct ieee80211_supported_band *sband=NULL;
++	int freq, band=0;
++	int best_ch = -1;
++
++	if (idx >= ss->ch_num)
++		return -EINVAL;
++
++	ch = &ss->ch[idx];
++
++	if (!ch)
++		return -EINVAL;
++
++	if (ch->hw_value > 14)
++		band = NL80211_BAND_5GHZ;
++	else
++		band = NL80211_BAND_2GHZ;
++
++	sband = wiphy->bands[band];
++
++	if(!sband) {
++		printk("%s under unknown band!!\n",dev->name);
++		return -EINVAL;
++	}
++
++	if(sband->band == IEEE80211_BAND_2GHZ)
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_2GHZ);
++	else
++		freq = ieee80211_channel_to_frequency(ch->hw_value, IEEE80211_BAND_5GHZ);
++
++	survey->channel = ieee80211_get_channel(wiphy, freq);
++	#ifdef CONFIG_FIND_BEST_CHANNEL
++	best_ch = get_best_channel(padapter, sband->band);
++	#endif
++
++	if (best_ch == ch->hw_value)
++		survey->noise = -100;
++	else
++		survey->noise = -50;
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)) || defined(BUILD_OPENWRT)
++	survey->time = 100;
++	survey->time_busy = 50;
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_TIME | SURVEY_INFO_TIME_BUSY;
++#else
++	survey->channel_time = 100;
++	survey->channel_time_busy = 50
++	survey->filled = SURVEY_INFO_NOISE_DBM | SURVEY_INFO_CHANNEL_TIME | SURVEY_INFO_CHANNEL_TIME_BUSY;
++#endif
++
++	return 0;
++}
++
++static int cfg80211_rtw_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	_adapter *padapter = wiphy_to_adapter(wiphy);
++	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
++	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
++	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
++	struct ieee80211_channel *chan;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	if (pmlmeext->cur_channel > 14)
++		band = IEEE80211_BAND_5GHZ;
++	else
++		band = IEEE80211_BAND_2GHZ;
++
++	freq = ieee80211_channel_to_frequency(pmlmeext->cur_channel, band);
++	chan = ieee80211_get_channel(wiphy, freq);
++
++	switch (pmlmeext->cur_bwmode) {
++	case CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	case CHANNEL_WIDTH_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case CHANNEL_WIDTH_80_80:
++		chandef->width = NL80211_CHAN_WIDTH_80P80;
++		break;
++	case CHANNEL_WIDTH_160:
++		chandef->width = NL80211_CHAN_WIDTH_160;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	center_ch = rtw_get_center_ch(pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset);
++	chandef->chan = chan;
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	#ifdef CONFIG_DEBUG_CFG80211
++	printk("%s: ret=%d, cur_channel=%d, cur_bwmode=%d, cur_ch_offset=%d, band=%d, center_ch=%d\n",
++		__func__, ret, pmlmeext->cur_channel, pmlmeext->cur_bwmode, pmlmeext->cur_ch_offset, band, center_ch);
++	#endif
++
++	return ret;
++}
++
+ static int rtw_cfg80211_set_beacon_wpsp2pie(struct net_device *ndev, char *buf, int len)
+ {	
+ 	int ret = 0;
+@@ -6321,6 +6489,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
+ 	rtw_cfgvendor_attach(wiphy);
+ #endif
++	_rtw_memcpy(wiphy->perm_addr, adapter_mac_addr(padapter), ETH_ALEN);
+ }
+ 
+ static struct cfg80211_ops rtw_cfg80211_ops = {
+@@ -6393,6 +6562,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.sched_scan_start = cfg80211_rtw_sched_scan_start,
+ 	.sched_scan_stop = cfg80211_rtw_sched_scan_stop,
+ #endif /* CONFIG_PNO_SUPPORT */
++	.dump_survey = cfg80211_rtw_dump_survey,
++	.get_channel = cfg80211_rtw_get_channel,
+ };
+ 
+ int rtw_wdev_alloc(_adapter *padapter, struct device *dev)

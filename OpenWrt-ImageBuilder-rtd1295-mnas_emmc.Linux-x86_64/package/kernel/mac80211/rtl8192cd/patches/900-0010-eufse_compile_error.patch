@@ -1,0 +1,11 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -5268,7 +5268,7 @@ int realtek_cfg80211_init(struct rtknl *
+ #endif		
+ 	{
+ 		memset(efusemac,0,ETH_ALEN);
+-		extern read_efuse_mac_address(struct rtl8192cd_priv * priv,char * efusemac);
++		extern void read_efuse_mac_address(struct rtl8192cd_priv * priv,char * efusemac);
+ 		read_efuse_mac_address(priv,efusemac);
+ 		if( memcmp(efusemac,zero,ETH_ALEN) && !IS_MCAST(efusemac))
+ 			memcpy(rtk->root_mac,efusemac,ETH_ALEN);

@@ -1,0 +1,38 @@
+Sustained Performance Kernel Interface
+======================================
+
+SysFS Files
+-----------
+
+* /sys/kernel/cpu/spif_enable 
+  
+	[default value = 0]  enable spif function
+
+* /sys/kernel/cpu/spif_boost 
+
+	[default value = 0]  set spif to boost mode
+
+
+Usage
+-----
+
+* on init :
+	set /sys/kernel/cpu/spif_enable to 1
+	
+* on exit :
+	set /sys/kernel/cpu/spif_enable to 0
+	
+* control flow :
+	
+	set /sys/kernel/cpu/spif_boost to 1
+	
+	// high loading work
+	
+	set /sys/kernel/cpu/spif_boost to 0
+
+
+Implemetation
+-------------
+When boost mode is enabled, the scaling_min_freq will be
+set to the value cpuinfo_max_freq under system limiation.
+

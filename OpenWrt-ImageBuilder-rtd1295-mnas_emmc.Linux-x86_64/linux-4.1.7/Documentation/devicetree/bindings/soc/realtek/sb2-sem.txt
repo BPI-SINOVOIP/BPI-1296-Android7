@@ -1,0 +1,18 @@
+Reaktek SB2 Semaphore
+=====================
+
+Required properties:
+
+- compatible : shall contain only the following:
+        "realtek,sb2-sem".
+
+- reg : hall contain he semaphore address
+
+
+Example: 
+	sb2_lock0: sb2-lock@9801A000 {
+		compatible = "realtek,sb2-sem";
+		reg = <0x9801A000 0x4>;
+	};
+
+

@@ -1,0 +1,14 @@
+--- a/net/wireless/core.c
++++ b/net/wireless/core.c
+@@ -1066,7 +1066,11 @@ static int cfg80211_netdev_notifier_call
+ 		if (rdev->scan_req && rdev->scan_req->wdev == wdev) {
+ 			if (WARN_ON(!rdev->scan_req->notified))
+ 				rdev->scan_req->aborted = true;
++#if 1 //rtk: client mode 2nd Association
++			cfg80211_scan_done(rdev->scan_req, false);
++#else
+ 			___cfg80211_scan_done(rdev, false);
++#endif
+ 		}
+ 
+ 		sched_scan_req = rtnl_dereference(rdev->sched_scan_req);

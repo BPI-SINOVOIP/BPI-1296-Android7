@@ -1,0 +1,49 @@
+Index: fstools-2015-09-15/block.c
+===================================================================
+--- fstools-2015-09-15.orig/block.c	2016-03-18 17:29:31.993486631 +0800
++++ fstools-2015-09-15/block.c	2016-03-18 17:32:14.397490503 +0800
+@@ -554,6 +554,7 @@
+ 		printf("\toption\tuuid\t'%s'\n", pr->uuid);
+ 	else
+ 		printf("\toption\tdevice\t'%s'\n", pr->dev);
++	printf("\toption\tfstype\t'%s'\n", (!strcmp(pr->id->name, "ntfs") ? "ntfs-3g" : pr->id->name));
+ 	printf("\toption\tenabled\t'0'\n\n");
+ 
+ 	return 0;
+@@ -732,8 +733,17 @@
+ 		if (check_fs)
+ 			check_filesystem(pr);
+ 
+-		err = mount(pr->dev, target, pr->id->name, m->flags,
+-		            (m->options) ? (m->options) : (""));
++		if (strcmp(pr->id->name, "ntfs") && strcmp(pr->id->name, "exfat") && strcmp(pr->id->name, "hfs") && strcmp(pr->id->name, "hfsplus"))
++		{
++			err = mount(pr->dev, target, pr->id->name, m->flags,
++		    		(m->options) ? (m->options) : (""));
++		}
++		else
++		{
++			const char fstype[]="ufsd";
++			err = mount(pr->dev, target, fstype, m->flags, (m->options) ? (m->options) : (""));
++
++		}
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %s\n",
+ 			         pr->dev, pr->id->name, target, err, strerror(err));
+@@ -752,7 +762,15 @@
+ 		if (check_fs)
+ 			check_filesystem(pr);
+ 
+-		err = mount(pr->dev, target, pr->id->name, 0, "");
++		if (strcmp(pr->id->name, "ntfs") && strcmp(pr->id->name, "exfat") && strcmp(pr->id->name, "hfs") && strcmp(pr->id->name, "hfsplus"))
++		{
++			err = mount(pr->dev, target, pr->id->name, 0, "");
++		}
++		else
++		{
++			const char fstype[]="ufsd";
++			err = mount(pr->dev, target, fstype, m->flags, (m->options) ? (m->options) : (""));
++		}
+ 		if (err)
+ 			ULOG_ERR("mounting %s (%s) as %s failed (%d) - %s\n",
+ 			         pr->dev, pr->id->name, target, err, strerror(err));

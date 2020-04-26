@@ -1,0 +1,44 @@
+From 134fd06185e6759600c3e90aeabca7c1e3181a35 Mon Sep 17 00:00:00 2001
+
+Date: Thu, 12 Nov 2015 20:05:31 +0800
+Subject: [PATCH 2/2] mount_root: Do synchronous mount on UBIFS
+
+---
+ libfstools/overlay.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libfstools/overlay.c b/libfstools/overlay.c
+index 565a300..86e64b6 100644
+--- a/libfstools/overlay.c
++++ b/libfstools/overlay.c
+@@ -258,6 +258,7 @@ jffs2_switch(struct volume *v)
+ static int overlay_mount_fs(struct volume *v)
+ {
+ 	char *fstype;
++	uint32_t flag;
+ 
+ 	if (mkdir("/tmp/overlay", 0755)) {
+ 		ULOG_ERR("failed to mkdir /tmp/overlay: %s\n", strerror(errno));
+@@ -265,16 +266,18 @@ static int overlay_mount_fs(struct volume *v)
+ 	}
+ 
+ 	fstype = "jffs2";
++	flag = MS_NOATIME;
+ 
+ 	switch (volume_identify(v)) {
+ 	case FS_UBIFS:
+ 		fstype = "ubifs";
++		flag |= MS_SYNCHRONOUS;
+ 		break;
+ 	}
+ 
+ 	volume_init(v);
+ 
+-	if (mount(v->blk, "/tmp/overlay", fstype, MS_NOATIME, NULL)) {
++	if (mount(v->blk, "/tmp/overlay", fstype, flag, NULL)) {
+ 		ULOG_ERR("failed to mount -t %s %s /tmp/overlay: %s\n",
+ 		         fstype, v->blk, strerror(errno));
+ 		return -1;
+-- 
+1.9.1
+

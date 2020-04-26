@@ -1,0 +1,4 @@
+config ZULU_32BIT_JVM
+	bool
+	prompt "Use 32-bit JVM"
+	default y

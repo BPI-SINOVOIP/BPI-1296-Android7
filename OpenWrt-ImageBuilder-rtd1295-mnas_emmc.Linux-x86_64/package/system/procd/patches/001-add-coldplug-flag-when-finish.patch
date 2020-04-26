@@ -1,0 +1,32 @@
+--- a/plug/coldplug.c
++++ b/plug/coldplug.c
+@@ -16,6 +16,7 @@
+ #include <sys/types.h>
+ #include <sys/mount.h>
+ 
++#include <fcntl.h>
+ #include <unistd.h>
+ 
+ #include "../procd.h"
+@@ -28,6 +29,9 @@ static struct uloop_process udevtrigger;
+ static void coldplug_complete(struct uloop_timeout *t)
+ {
+ 	DEBUG(4, "Coldplug complete\n");
++	if (access(ANDROID_ROOT, F_OK) == 0) {
++		close(open(COLDPLUG_DONE, O_WRONLY|O_CREAT|O_CLOEXEC, 0000));
++	}
+ 	hotplug_last_event(NULL);
+ 	procd_state_next();
+ }
+--- a/plug/hotplug.h
++++ b/plug/hotplug.h
+@@ -17,6 +17,9 @@
+ 
+ #include <libubox/uloop.h>
+ 
++#define ANDROID_ROOT "/rom/android"
++#define COLDPLUG_DONE "/rom/android/.coldplug_done"
++
+ #ifndef DISABLE_INIT
+ void hotplug(char *rules);
+ int hotplug_run(char *rules);

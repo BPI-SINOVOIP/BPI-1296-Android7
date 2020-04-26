@@ -1,0 +1,13 @@
+diff --git a/arch/arm64/boot/dts/realtek/rtd-129x-openwrt.dts b/arch/arm64/boot/dts/realtek/rtd-129x-openwrt.dts
+index 1b6045f..f536236 100644
+--- a/arch/arm64/boot/dts/realtek/rtd-129x-openwrt.dts
++++ b/arch/arm64/boot/dts/realtek/rtd-129x-openwrt.dts
+@@ -39,7 +39,7 @@
+         /* if both setting is loaded, cma-region-info had higher priority.                                   */
+         /* --------------------------------------------------------------------------------------------------*/
+         cma-region-enable = <1>;
+-        cma-region-info = <0x00000000 0x02000000 0x20000000>;
++        cma-region-info = <0x00000000 0x02000000 0x08000000>;
+         /*cma-region-info = <0x00000000 0x01000000 0x12c00000>, <0x00000000 0x12c00000 0x20000000>;*/
+ 	};
+ 

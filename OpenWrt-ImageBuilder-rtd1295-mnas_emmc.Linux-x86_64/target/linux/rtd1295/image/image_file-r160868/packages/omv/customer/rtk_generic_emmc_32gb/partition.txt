@@ -1,0 +1,13 @@
+###
+###	  part = (name mount_point filesystem file size)
+part = system /system ext4 omv/system.bin 861929472
+#part = data /data ext4 omv/data.bin 24508366848
+part = data /data ext4 omv/data.bin 24164433920
+part = cache /cache ext4 omv/cache.bin 419430400
+#part = vendor /vendor ext4 omv/vendor.bin 134217728
+part = uboot /uboot ext4 omv/uboot_p.bin 4194304
+part = logo /logo ext4 omv/logo_p.bin 16777216
+part = backup /backup ext4 omv/backup.bin 524288000
+part = verify /verify ext4 omv/verify_p.bin 104857600
+part = rootfs / squashfs omv/squashfs1.img 100663296
+part = etc etc ext4 omv/etc.bin 41943040

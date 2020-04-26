@@ -1,0 +1,29 @@
+--- a/signal.c
++++ b/signal.c
+@@ -81,6 +81,18 @@ struct sigaction sa_dummy = {
+ 	.sa_flags = SA_SIGINFO
+ };
+ 
++static void signal_infsleep(int signal, siginfo_t *sigingo, void* data)
++{
++	char max_uint[32];
++	sprintf(max_uint, "%u", ~0U);
++	execle("/bin/sleep", "/bin/sleep", max_uint, (char *)0, (char **)0);
++}
++
++static struct sigaction sa_infsleep = {
++	.sa_sigaction = signal_infsleep,
++	.sa_flags = SA_SIGINFO
++};
++
+ void procd_signal(void)
+ {
+ 	signal(SIGPIPE, SIG_IGN);
+@@ -95,6 +107,7 @@ void procd_signal(void)
+ 	sigaction(SIGHUP, &sa_dummy, NULL);
+ 	sigaction(SIGKILL, &sa_dummy, NULL);
+ 	sigaction(SIGSTOP, &sa_dummy, NULL);
++	sigaction(SIGQUIT, &sa_infsleep, NULL);
+ #ifndef DISABLE_INIT
+ 	reboot(RB_DISABLE_CAD);
+ #endif

@@ -1,0 +1,129 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -1602,6 +1602,7 @@ EXTERN int _atoi(char *s, int base);
+ EXTERN void set_mib_default_tbl(struct rtl8192cd_priv *priv);
+ EXTERN int get_array_val (unsigned char *dst, char *src, int len);
+ EXTERN int del_sta(struct rtl8192cd_priv *priv, unsigned char *data);
++EXTERN void reg_dump(struct rtl8192cd_priv * priv,char * str);
+ EXTERN void drvmac_loopback(struct rtl8192cd_priv *priv);
+ EXTERN int rtl8192cd_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd);
+ #ifdef	SUPPORT_TX_MCAST2UNI
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -1121,6 +1121,7 @@ static struct iwpriv_arg mib_table[] = {
+ 	{"disable_scan_ch14",	INT_T,	_OFFSET(dot11RFEntry.disable_scan_ch14), _SIZE(dot11RFEntry.disable_scan_ch14), 1},
+ 	{"disable_ch1213",	INT_T,	_OFFSET(dot11RFEntry.disable_ch1213), _SIZE(dot11RFEntry.disable_ch1213), 1},
+ 	{"xcap",		INT_T,	_OFFSET(dot11RFEntry.xcap), _SIZE(dot11RFEntry.xcap), 0},
++	{"hang_reg_dump",	INT_T,	_OFFSET(dot11RFEntry.hang_reg_dump), _SIZE(dot11RFEntry.hang_reg_dump), 0},
+ 	{"tssi1",		INT_T,	_OFFSET(dot11RFEntry.tssi1), _SIZE(dot11RFEntry.tssi1), 0},
+ 	{"tssi2",		INT_T,	_OFFSET(dot11RFEntry.tssi2), _SIZE(dot11RFEntry.tssi2), 0},
+ 	{"ther",		INT_T,	_OFFSET(dot11RFEntry.ther), _SIZE(dot11RFEntry.ther), 0},
+@@ -6033,11 +6034,12 @@ void reg_dump_8814(struct rtl8192cd_priv
+ }
+ #endif
+ 
+-static void reg_dump(struct rtl8192cd_priv * priv,char * str)
++void reg_dump(struct rtl8192cd_priv * priv,char * str)
+ {
+ 	int i, j, len, reg_num;
+ 	unsigned char tmpbuf[100];
+ 	strcpy(tmpbuf,str);
++	unsigned char mac_dump=0;
+ 
+ //_TXPWR_REDEFINE
+ //_TXPWR_REDEFINE ?? Dump Too much will cause hang up ??
+@@ -6183,6 +6185,25 @@ static void reg_dump(struct rtl8192cd_pr
+ 
+ #endif
+ 
++	if(strcmp(tmpbuf, "rf") == 0)
++		goto RF_DUMP;
++	
++	if(strcmp(tmpbuf, "mac") == 0){
++		mac_dump=1;
++		goto MAC_DUMP;
++	}
++
++	if(strcmp(tmpbuf, "mac2") == 0){
++#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++		if((GET_CHIP_VER(priv) == VERSION_8814A || GET_CHIP_VER(priv) == VERSION_8822B)){
++			mac_dump=2;
++                	goto MAC_DUMP;
++		}
++		else
++#endif
++		return;
++        }
++
+ 	if (strcmp(tmpbuf, "all") != 0) {
+ 
+ #if defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8881A) 
+@@ -6241,6 +6262,7 @@ static void reg_dump(struct rtl8192cd_pr
+ 		return;
+ 	}
+ 
++MAC_DUMP:
+ 	SPRINTT(str,"\nMAC Registers:\n");
+ #if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
+ 	if (GET_CHIP_VER(priv) == VERSION_8814A || GET_CHIP_VER(priv) == VERSION_8822B)
+@@ -6248,8 +6270,19 @@ static void reg_dump(struct rtl8192cd_pr
+ 	else
+ #endif
+ 	reg_num = 0x1000;
++	i=0;
+ 
+-	for (i=0; i<reg_num; i+=0x10) {
++	if(mac_dump==1){
++		reg_num=0x1000;
++	}
++#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++	else if(mac_dump==2){
++		i=0x1000;
++		reg_num=0x2000;
++	}
++#endif
++
++	for (; i<reg_num; i+=0x10) {
+ 		len = sprintf((char *)tmpbuf, "%03X\t", i);
+ 		for (j=i; j<i+0x10; j+=4)
+ 			len += sprintf((char *)(tmpbuf+len), "%08X ", (unsigned int)RTL_R32(j));
+@@ -6257,6 +6290,10 @@ static void reg_dump(struct rtl8192cd_pr
+ 	}
+ 	SPRINTT(str,"\n");
+ 	watchdog_kick();
++	if(mac_dump)
++		return;
++
++RF_DUMP:
+ 	SPRINTT(str,"\nRF Registers:\n");
+ 	len = 0;
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -3846,7 +3846,15 @@ int check_hangup(struct rtl8192cd_priv *
+ 							if ( check_adaptivity_hangup && (priv->pshare->Q_info[q_num].adaptivity_cnt >= PENDING_PERIOD) )
+ 								adaptivity_hangup++;
+ 						}					
+-						
++										
++						if(priv->pmib->dot11RFEntry.hang_reg_dump)
++							if (priv->pshare->Q_info[q_num].pending_tick &&
++								(tail == priv->pshare->Q_info[q_num].pending_tail) &&
++								(UINT32_DIFF(priv->up_time, priv->pshare->Q_info[q_num].pending_tick) >= PENDING_PERIOD - 5)) {
++									reg_dump(priv, "all");
++							}
++
++
+ 						if ((priv->pshare->Q_info[q_num].pending_tick == 0) ||
+ 							(tail != priv->pshare->Q_info[q_num].pending_tail)) {
+ 							if (tail != priv->pshare->Q_info[q_num].pending_tail)
+--- a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -460,6 +460,7 @@ struct Dot11RFEntry {
+ 	unsigned int	disable_scan_ch14;
+ 	unsigned int	disable_ch1213;
+ 	unsigned int	xcap;
++	unsigned int	hang_reg_dump;
+ 	unsigned int	tssi1;
+ 	unsigned int	tssi2;
+ 	unsigned int	ther;

@@ -1,0 +1,22 @@
+Realtek UIO devices dt-bindings
+===============================
+
+Required properties :
+
+* reg : shall contain to address for a uio device
+
+* compatible : shall contain the followings :
+	"realtek,rbus" for RBUS,
+	"realtek,refclk" for REFCLK,
+	"realtek,md" for MD,
+	"realtek,se" for SE,
+	"realtek,tp" for TP.
+
+Optional properties :
+
+* clocks : shall contain the relative clock(s).
+
+* resets : shall contain the relative reset(s).
+
+* interrupts : shall contain the relative interrupt(s).
+

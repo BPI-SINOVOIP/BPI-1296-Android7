@@ -1,0 +1,15 @@
+Realtek Sustained Performance Interface
+=======================================
+
+Required properties :
+
+- compatible : shall contain the following :
+	"realtek,cpu-spif".
+
+Example :
+
+	spif {
+		compatible = "realtek,spif";
+		status = "okay";
+	};
+

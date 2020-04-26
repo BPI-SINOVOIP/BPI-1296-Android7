@@ -1,0 +1,28 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Kconfig
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Kconfig
+@@ -1,6 +1,6 @@
+-config RTL8821AU
+-	tristate "Realtek 8821A USB WiFi"
++config RTL8811AU
++	tristate "Realtek 8811A USB WiFi"
+ 	depends on USB
+ 	---help---
+-	  Help message of RTL8821AU
++	  Help message of RTL8811AU
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Makefile
+@@ -1913,11 +1913,11 @@ ifeq ($(CONFIG_RTL8723B), y)
+ $(MODULE_NAME)-$(CONFIG_MP_INCLUDED)+= core/rtw_bt_mp.o
+ endif
+ 
+-obj-$(CONFIG_RTL8821AU) := $(MODULE_NAME).o
++obj-$(CONFIG_RTL8811AU) := $(MODULE_NAME).o
+ 
+ else
+ 
+-export CONFIG_RTL8821AU = m
++export CONFIG_RTL8811AU = m
+ 
+ all: modules
+ 

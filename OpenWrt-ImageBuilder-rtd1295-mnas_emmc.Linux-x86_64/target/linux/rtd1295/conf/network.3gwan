@@ -1,0 +1,7 @@
+
+config interface 'wan2'
+	option proto '3g'
+	option apn 'internet'
+	option dialnumber '*99#'
+	option service 'umts'
+	option device '/dev/ttyUSB3g'

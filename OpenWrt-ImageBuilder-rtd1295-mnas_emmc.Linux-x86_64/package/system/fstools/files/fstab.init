@@ -1,0 +1,32 @@
+#!/bin/sh /etc/rc.common
+# (C) 2013 openwrt.org
+
+START=40
+
+fstab_add_mount() {
+	local uuid
+
+	config_get uuid $1 uuid
+
+	exist=`block info | grep $uuid |  sed 's/^\(.*\): \(.*\)/\1/'`
+
+	if [ "$exist" = "" ]; then 
+		uci delete fstab.$1
+		uci commit fstab
+	else
+		uci set fstab.$1.target="/mnt/`basename ${exist}`"
+		uci commit fstab
+	fi
+
+}
+
+start() {                            
+	config_load fstab
+	config_foreach fstab_add_mount mount
+
+	/sbin/block mount
+}
+
+stop() {                            
+	/sbin/block umount
+}

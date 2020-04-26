@@ -1,0 +1,53 @@
+diff --git a/ubus.c b/ubus.c
+index f7d1f11..87934ce 100644
+--- a/ubus.c
++++ b/ubus.c
+@@ -36,6 +36,7 @@ static struct blob_buf buf;
+ 
+ #define UH_UBUS_MAX_POST_SIZE	4096
+ #define UH_UBUS_DEFAULT_SID	"00000000000000000000000000000000"
++#define UH_UBUS_ANDROID_SID	"ffffffffffffffffffffffffffffffff"
+ 
+ enum {
+ 	RPC_JSONRPC,
+@@ -407,6 +408,11 @@ static void uh_ubus_send_list(struct cli
+ 	uh_ubus_send_response(cl);
+ }
+ 
++static inline bool bypass_ubus_auth(struct client *cl)
++{
++	return memcmp(&cl->peer_ha.sa_data, &cl->target_ha.sa_data, sizeof(cl->target_ha.sa_data))?false:true;
++}
++
+ static bool parse_json_rpc(struct rpc_data *d, struct blob_attr *data)
+ {
+ 	const struct blobmsg_policy data_policy[] = {
+@@ -527,6 +533,16 @@ static void uh_ubus_handle_request_objec
+ 	if (!parse_json_rpc(&data, buf.head))
+ 		goto error;
+ 
++	if (bypass_ubus_auth(cl)) {
++		//fprintf(stderr, "Bypass ubus authentication on this session\n");
++		if (!data.sid || !*data.sid) {
++			data.sid = UH_UBUS_ANDROID_SID;
++		}
++	}
++        else if (data.sid && !strcmp(data.sid, UH_UBUS_ANDROID_SID)) {
++		data.sid = UH_UBUS_DEFAULT_SID;
++	}
++
+ 	if (!strcmp(data.method, "call")) {
+ 		if (!data.sid || !data.object || !data.function || !data.data)
+ 			goto error;
+@@ -537,7 +553,7 @@ static void uh_ubus_handle_request_objec
+ 			goto error;
+ 		}
+ 
+-		if (!conf.ubus_noauth && !uh_ubus_allowed(data.sid, data.object, data.function)) {
++		if (!conf.ubus_noauth && !bypass_ubus_auth(cl) && !uh_ubus_allowed(data.sid, data.object, data.function)) {
+ 			err = ERROR_ACCESS;
+ 			goto error;
+ 		}
+-- 
+2.7.4
+

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+[ -d "/dev/xen" ] || exit 0
+
+touch /tmp/.netchange
+
+[ -e "/tmp/dhcp.leases" ] || exit 0
+
+ETH1_MAC=`cat /sys/class/net/eth1/address`
+POSTFIX=`echo $ETH1_MAC | cut -c 3-`
+
+REMOTE_IP=192.168.253.10
+[ -n "$REMOTE_IP" ] || exit 0
+
+PORT=59955
+
+# Handle event for WAN/LAN interface
+WAN="`uci get network.wan.ifname || echo eth0`"
+#LAN="`uci get network.lan.ifname || echo eth1`"
+
+if [ "$HOTPLUG_TYPE" = "net" ]; then
+  if [ "$INTERFACE" = "$WAN" ]; then
+    if [ "$ACTION" = "linkup" ]; then
+        netmsg $REMOTE_IP $PORT "eth_link_up"
+    elif [ "$ACTION" = "linkdown" ]; then
+        netmsg $REMOTE_IP $PORT "eth_link_down"
+    fi
+  fi
+elif [ "$HOTPLUG_TYPE" = "iface" ]; then
+  # Notify br-lan creation
+  if [ "$INTERFACE" = "lan" ]; then
+    if [ "$ACTION" = "ifup" ]; then
+        netmsg $REMOTE_IP $PORT "lan_changed"
+    fi
+  fi
+fi

@@ -1,0 +1,35 @@
+#include "rtd-1295-giraffe-2GB.dts"
+
+/ {
+    pinctrl: pinctrl@9801A000 {
+        compatible = "rtk119x,rtk119x-pinctrl";
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_6>,
+            <&spdif_pins>,
+            <&spi_pins_loc_gpio>,
+            <&sdcard_pins_low>,
+            <&sdcard_pins_high>,
+            <&tp0_loc_rgmii_pins>,
+            <&tp1_loc_rgmii_pins>,
+            <&smart_card_pins>;
+        status = "okay";
+    };
+
+    nic: gmac@98016000 {
+        compatible = "Realtek,r8168";
+        pinctrl-names = "default";
+        pinctrl-0 = <&etn_led_pins>;
+        status = "okay";
+    };
+
+    hwnat: gmac@0x98060000 {
+        compatible = "Realtek,rtd1295-hwnat";
+        status = "disabled";
+    };
+    
+};
+
+&tp {
+	status = "okay";
+};

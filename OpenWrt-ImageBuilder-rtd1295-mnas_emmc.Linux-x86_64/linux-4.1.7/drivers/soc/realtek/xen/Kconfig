@@ -1,0 +1,57 @@
+
+comment "RealTek XEN support features"
+
+menu "Realtek XEN Features"
+
+config RTK_DOMU_DMA
+	bool "Realtek XEN DomU DMA zone support"
+	depends on RTK_XEN_SUPPORT
+	default y
+	help
+	  DomU contiguous memory region support, Target
+	  region should be memory reserved in dts.
+
+config RTK_XEN_HYPERCALL
+	bool "Realtek XEN hypercall interface"
+	depends on RTK_XEN_SUPPORT
+	default y
+	help
+	  Interface for RTK xen hypercall
+
+config RTK_XEN_GPIO
+	bool "Realtek XEN GPIO framework"
+	depends on RTK_XEN_HYPERCALL
+	default y
+	help
+	  Support for Per Domain GPIO framework. Each Dom
+	  controls the GPIO that is assigned.
+
+config RTK_XEN_DOMU_RSVMEM
+	bool "Realtek XEN reserve memory expose to DomU"
+	depends on RTK_XEN_SUPPORT
+	default n
+	help
+	  Support DomU Address starts from reserve memory,
+	  so kernel could take control over memory system.
+
+config RTK_XEN_DOMU_DMA_ADDR
+	hex "Start PHYS ADDR of DMA memory allocated"
+	depends on RTK_XEN_DOMU_RSVMEM
+	default 0x30000000
+	help
+	  The real DMA ADDR allocated on DOMU, be sure this
+	  value is set correctly since this is used on calculate
+	  kernel offset.
+
+config RTK_XEN_DOMU_KERNEL_OFFSET
+	hex "Kernel location when reserved memory is used"
+	depends on RTK_XEN_DOMU_RSVMEM
+	default 0x47000000
+	help
+	  Kernel location when reserved memory is used, be
+	  sure that this location starts from the last 32 MB
+	  of the IPA address space DomU used. We fix the
+	  the address at the end so Kernel Modules could fall
+	  into +/- 128MB to fit the ko relocation constraint.
+
+endmenu #RTD1295 Device Drivers

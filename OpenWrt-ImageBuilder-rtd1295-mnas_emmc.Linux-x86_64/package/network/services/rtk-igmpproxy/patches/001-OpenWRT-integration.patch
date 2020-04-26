@@ -1,0 +1,240 @@
+From 99bb911a39d7629ec9506503ed0ece1c4ead74aa Mon Sep 17 00:00:00 2001
+From: edwardwu <edwardwu@realtek.com>
+Date: Fri, 19 Jan 2018 10:25:27 +0800
+Subject: [PATCH] openwrt integration
+
+---
+ Makefile     |  2 +-
+ main.c       | 54 +++++++++++++++++++++++++++---------------------------
+ mclab.h      |  9 +++++++--
+ mroute-api.c |  4 ++--
+ 4 files changed, 37 insertions(+), 32 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1477dd5..1a59d4c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,7 +20,7 @@ endif
+ #CFLAGS=-I -Os -DCONFIG_DEFAULTS_KERNEL_2_6 -D__BIG_ENDIAN_BITFIELD -DCONFIG_CPU_BIG_ENDIAN
+ 
+ CFLAGS += $(EXTRA_CFLAGS)
+-EXEC = igmpproxy
++EXEC = rtk-igmpproxy
+ OBJS = mroute-api.o lib.o ifvc.o syslog.o timeout.o main.o
+ 
+ ifeq ($(CONFIG_IGMPPROXY_MULTIWAN),y)
+diff --git a/main.c b/main.c
+index a66c000..c237749 100644
+--- a/main.c
++++ b/main.c
+@@ -1569,8 +1569,8 @@ nextgrec:
+ 				igmp_leave(dst, 0);
+ 			break;		
+ 		default:
+-			//printf("igmp_accept> receive IGMP Unknown type [%x] from %s:", igmp->type, inet_ntoa(ip->saddr));
+-			//printf("%s\n", inet_ntoa(ip->daddr));
++			printf("igmp_accept> receive IGMP Unknown type [%x] from %s:", igmp->type, inet_ntoa(*(struct in_addr*)&ip->saddr));
++			printf("%s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 			break;
+ 	}
+ 	return 0;
+@@ -1654,8 +1654,8 @@ int igmp_report(__u32 dst, int if_idx)
+ 			MIN_IP_HEADER_LEN + IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+ 			err_cnt++;
+-			printf("igmp_report> sendto error, from %s ", inet_ntoa(ip->saddr));
+-			printf("to %s\n", inet_ntoa(ip->daddr));
++			printf("igmp_report> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++			printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		}
+ 	}
+ 	//if no wan if
+@@ -1674,8 +1674,8 @@ int igmp_report(__u32 dst, int if_idx)
+ 			MIN_IP_HEADER_LEN + IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+ 			err_cnt++;
+-			printf("igmp_report> sendto error, from %s ", inet_ntoa(ip->saddr));
+-			printf("to %s\n", inet_ntoa(ip->daddr));
++			printf("igmp_report> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++			printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		}
+ 	}
+ 	//if getIfByName(up_if_name) failed every time
+@@ -1690,8 +1690,8 @@ int igmp_report(__u32 dst, int if_idx)
+ 	if (sendto(dp->sock, igmp,
+ 			MIN_IP_HEADER_LEN + IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+-		printf("igmp_report> sendto error, from %s ", inet_ntoa(ip->saddr));
+-		printf("to %s\n", inet_ntoa(ip->daddr));
++		printf("igmp_report> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++		printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		return 0;
+ 	}
+ #endif
+@@ -1700,8 +1700,8 @@ int igmp_report(__u32 dst, int if_idx)
+     if (sendto(igmp_socket, send_buf,
+ 			MIN_IP_HEADER_LEN + IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+-		printf("igmp_report> sendto error, from %s ", inet_ntoa(ip->saddr));
+-		printf("to %s\n", inet_ntoa(ip->daddr));
++		printf("igmp_report> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++		printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+     }
+ #endif
+     return 1;
+@@ -1785,15 +1785,15 @@ int igmp_query(__u32 dst, __u32 grp,__u8 mrt)
+ #if defined (CONFIG_IGMPV3_SUPPORT)
+     if (sendto(dp->sock, igmpv3, totalsize, 0, (struct sockaddr *)&sdst, sizeof(sdst)) < 0)
+     {
+-	printf("igmpv3_query> sendto error, from %s ", inet_ntoa(dp->InAdr.s_addr));
+-	printf("to %s\n", inet_ntoa(sdst.sin_addr.s_addr));
++	printf("igmpv3_query> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&dp->InAdr.s_addr));
++	printf("to %s\n", inet_ntoa(*(struct in_addr*)&sdst.sin_addr.s_addr));
+     }
+ #else
+     //printf("send igmp query\n");
+     if (sendto(dp->sock, igmp, IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+-		printf("igmp_query> sendto error, from %s ", inet_ntoa(dp->InAdr.s_addr));
+-		printf("to %s\n", inet_ntoa(grp));		
++		printf("igmp_query> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&dp->InAdr.s_addr));
++		printf("to %s\n", inet_ntoa(*(struct in_addr*)&grp));
+     }
+ #endif
+ 
+@@ -1843,7 +1843,7 @@ int igmp_leave(__u32 grp, int if_idx)
+     sdst.sin_family = AF_INET;
+     sdst.sin_addr.s_addr = ALL_ROUTERS;
+     //printf("send igmp leave\n");
+-    //syslog(LOG_INFO, "igmpproxy: send leave to %s: %s\n", igmp_up_if_name, inet_ntoa(grp));
++    //syslog(LOG_INFO, "igmpproxy: send leave to %s: %s\n", igmp_up_if_name, inet_ntoa(*(struct in_addr*)&grp));
+ 	
+     // Kaohj
+ #if defined(CONFIG_IGMPPROXY_MULTIWAN) || defined(CONFIG_ISP_IGMPPROXY_MULTIWAN)
+@@ -1863,8 +1863,8 @@ int igmp_leave(__u32 grp, int if_idx)
+ 		if (sendto(dp->sock, igmp, IGMP_MINLEN, 0,
+ 				(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+ 			err_cnt++;
+-			printf("igmp_leave> sendto error, from %s ", inet_ntoa(ip->saddr));
+-			printf("to %s\n", inet_ntoa(ip->daddr));
++			printf("igmp_leave> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++			printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		}
+     }
+ 	if ((null_cnt>=MAXWAN)||(err_cnt>=(MAXWAN-null_cnt)))
+@@ -1882,8 +1882,8 @@ int igmp_leave(__u32 grp, int if_idx)
+ 		if (sendto(dp->sock, igmp, IGMP_MINLEN, 0,
+ 				(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+ 			err_cnt++;
+-			printf("igmp_leave> sendto error, from %s ", inet_ntoa(ip->saddr));
+-			printf("to %s\n", inet_ntoa(ip->daddr));
++			printf("igmp_leave> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++			printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		}
+     }
+ 	if ((null_cnt>=igmp_up_if_num)||(err_cnt>=igmp_up_if_num))
+@@ -1898,8 +1898,8 @@ int igmp_leave(__u32 grp, int if_idx)
+ 	ip->saddr       = dp->InAdr.s_addr;
+     if (sendto(dp->sock, igmp, IGMP_MINLEN, 0,
+ 			(struct sockaddr *)&sdst, sizeof(sdst)) < 0) {
+-		printf("igmp_leave> sendto error, from %s ", inet_ntoa(ip->saddr));
+-		printf("to %s\n", inet_ntoa(ip->daddr));
++		printf("igmp_leave> sendto error, from %s ", inet_ntoa(*(struct in_addr*)&ip->saddr));
++		printf("to %s\n", inet_ntoa(*(struct in_addr*)&ip->daddr));
+ 		return 0;
+     }
+ #endif
+@@ -1915,7 +1915,7 @@ int igmp_leave(__u32 grp, int if_idx)
+ ////////////////////////////////////////////////////////////////////////////////////
+ 
+ 
+-char* runPath = "/bin/igmpproxy";
++char* runPath = "/usr/sbin/rtk-igmpproxy";
+ char* pidfile = "/var/run/igmp_pid";
+ 
+ #if 0
+@@ -2191,7 +2191,7 @@ void sigifup(int signum)
+ 			
+ 		  	if (strcmp(IfPt->ifr_name, Dp->Name) == 0) {
+ 				Dp->InAdr = ((struct sockaddr_in *)&IfPt->ifr_addr)->sin_addr;
+-				//printf("update upstream ip to %s\n", inet_ntoa(Dup->InAdr));
++				//printf("update upstream ip to %s\n", inet_ntoa(*(struct in_addr*)&Dup->InAdr));
+ 				// Update default multicast interface for this socket.
+ 				setsockopt(Dp->sock, IPPROTO_IP, IP_MULTICAST_IF, 
+ 					(void*)&Dp->InAdr, sizeof(struct in_addr));
+@@ -2214,7 +2214,7 @@ void sigifup(int signum)
+ 		  igmp_up_if_idx[index] = addVIF(Dup);
+ 		  if (!strcmp(IfPt->ifr_name, Dup->Name)) {
+ 			Dup->InAdr = ((struct sockaddr_in *)&IfPt->ifr_addr)->sin_addr;
+-			//printf("update upstream ip to %s\n", inet_ntoa(Dup->InAdr));
++			//printf("update upstream ip to %s\n", inet_ntoa(*(struct in_addr*)&Dup->InAdr));
+ 			// Update default multicast interface for this socket.
+ 			setsockopt(Dup->sock, IPPROTO_IP, IP_MULTICAST_IF, 
+ 				(void*)&Dup->InAdr, sizeof(struct in_addr));
+@@ -2223,7 +2223,7 @@ void sigifup(int signum)
+ 		
+ 	      if (!strcmp(IfPt->ifr_name, Ddp->Name)) {
+ 			Ddp->InAdr = ((struct sockaddr_in *)&IfPt->ifr_addr)->sin_addr;
+-			//printf("update downstream ip to %s\n", inet_ntoa(Ddp->InAdr));
++			//printf("update downstream ip to %s\n", inet_ntoa(*(struct in_addr*)&Ddp->InAdr));
+ 			// Update default multicast interface for this socket.
+ 			setsockopt(Ddp->sock, IPPROTO_IP, IP_MULTICAST_IF, 
+ 				(void*)&Ddp->InAdr, sizeof(struct in_addr));
+@@ -2242,14 +2242,14 @@ void sigifup(int signum)
+ 	for( IfPt = IfVc; IfPt < IfEp; IfPt++ ) {
+ 		if (!strcmp(IfPt->ifr_name, Dup->Name)) {
+ 			Dup->InAdr = ((struct sockaddr_in *)&IfPt->ifr_addr)->sin_addr;
+-			//printf("update upstream ip to %s\n", inet_ntoa(Dup->InAdr));
++			//printf("update upstream ip to %s\n", inet_ntoa(*(struct in_addr*)&Dup->InAdr));
+ 			// Update default multicast interface for this socket.
+ 			setsockopt(Dup->sock, IPPROTO_IP, IP_MULTICAST_IF, 
+ 				(void*)&Dup->InAdr, sizeof(struct in_addr));
+ 		}
+ 		else if (!strcmp(IfPt->ifr_name, Ddp->Name)) {
+ 			Ddp->InAdr = ((struct sockaddr_in *)&IfPt->ifr_addr)->sin_addr;
+-			//printf("update downstream ip to %s\n", inet_ntoa(Ddp->InAdr));
++			//printf("update downstream ip to %s\n", inet_ntoa(*(struct in_addr*)&Ddp->InAdr));
+ 			// Update default multicast interface for this socket.
+ 			setsockopt(Ddp->sock, IPPROTO_IP, IP_MULTICAST_IF, 
+ 				(void*)&Ddp->InAdr, sizeof(struct in_addr));
+diff --git a/mclab.h b/mclab.h
+index c9c0088..d6af892 100644
+--- a/mclab.h
++++ b/mclab.h
+@@ -29,11 +29,16 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+-#include <net/if.h>		/* ifreq struct         */
++#include <net/if.h>		/* ifreq struct         */
++#include <sys/ioctl.h>
++#include <sys/param.h>
++#include <sys/select.h>
++
++#include <netinet/in.h>
++#include <arpa/inet.h>
+ 
+ #define USE_LINUX_IN_H
+ #ifdef USE_LINUX_IN_H
+-# include <linux/in.h>
+ # include <linux/mroute.h>
+ # include <linux/ip.h>
+ # include <linux/igmp.h>
+diff --git a/mroute-api.c b/mroute-api.c
+index 3590db9..46d9c5e 100644
+--- a/mroute-api.c
++++ b/mroute-api.c
+@@ -174,8 +174,8 @@ int addVIF( struct IfDesc *IfDp )
+   VifCtl.vifc_lcl_addr.s_addr = VifDp->IfDp->InAdr.s_addr;
+   VifCtl.vifc_rmt_addr.s_addr = INADDR_ANY;
+ 
+-  log( LOG_NOTICE, 0, "adding VIF, idx=%d Fl flags=0x%x IP=%s %s", 
+-       VifCtl.vifc_vifi, VifCtl.vifc_flags,  inet_ntoa(VifCtl.vifc_lcl_addr), VifDp->IfDp->Name );
++  //log( LOG_NOTICE, 0, "adding VIF, idx=%d Fl flags=0x%x IP=%s %s", 
++  //     VifCtl.vifc_vifi, VifCtl.vifc_flags,  inet_ntoa(VifCtl.vifc_lcl_addr), VifDp->IfDp->Name );
+ 
+   if( setsockopt( MRouterFD, IPPROTO_IP, MRT_ADD_VIF, 
+ 		  (char *)&VifCtl, sizeof( VifCtl ) ) )
+-- 
+2.10.2.windows.1
+

@@ -1,0 +1,16 @@
+#Copyright (C) 2007-2013 Realtek Semiconductor Corporation.
+# drivers/Kconfig
+
+config RTK_HDMITX
+	tristate "HDMITX for Realtek RTD1295 platform"
+	select I2C
+	select SWITCH
+    select RTK_RPC
+	default n
+	help
+	  Say Y, if you want to enable HDMITX feature on Realtek RTD1295 platform.
+
+config HDMITX_DBG
+	tristate "HDMITX debug sysfs"
+	select RTK_HDMITX
+	default n

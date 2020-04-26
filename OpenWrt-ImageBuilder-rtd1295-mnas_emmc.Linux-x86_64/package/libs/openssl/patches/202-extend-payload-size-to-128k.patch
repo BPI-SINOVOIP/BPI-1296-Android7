@@ -1,0 +1,38 @@
+From bbef26bd784c00dc425f763e53907c71cd07604a Mon Sep 17 00:00:00 2001
+From: vera_xu <vera_xu@realsil.com.cn>
+Date: Thu, 5 May 2016 10:20:40 +0800
+Subject: [PATCH] extend payload size to 128k
+
+---
+ apps/speed.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -226,7 +226,7 @@
+ # endif
+ 
+ # undef BUFSIZE
+-# define BUFSIZE ((long)1024*8+1)
++# define BUFSIZE ((long)1024*128+1)
+ static volatile int run = 0;
+ 
+ static int mr = 0;
+@@ -242,7 +242,7 @@ static int do_multi(int multi);
+ # endif
+ 
+ # define ALGOR_NUM       30
+-# define SIZE_NUM        5
++# define SIZE_NUM        9
+ # define RSA_NUM         4
+ # define DSA_NUM         3
+ 
+@@ -260,7 +260,7 @@ static const char *names[ALGOR_NUM] = {
+ };
+ 
+ static double results[ALGOR_NUM][SIZE_NUM];
+-static int lengths[SIZE_NUM] = { 16, 64, 256, 1024, 8 * 1024 };
++static int lengths[SIZE_NUM] = { 16, 64, 256, 1024, 8 * 1024 , 16 * 1024 , 32 * 1024 , 64 * 1024 , 128 * 1024 };
+ 
+ # ifndef OPENSSL_NO_RSA
+ static double rsa_results[RSA_NUM][2];

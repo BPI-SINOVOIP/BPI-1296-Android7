@@ -1,0 +1,173 @@
+diff --git a/include/parted/disk.in.h b/include/parted/disk.in.h
+index 58d49f0..dbff226 100644
+--- a/include/parted/disk.in.h
++++ b/include/parted/disk.in.h
+@@ -75,10 +75,11 @@ enum _PedPartitionFlag {
+         PED_PARTITION_LEGACY_BOOT=15,
+         PED_PARTITION_MSFT_DATA=16,
+         PED_PARTITION_IRST=17,
+-        PED_PARTITION_ESP=18
++        PED_PARTITION_ESP=18,
++        PED_PARTITION_FIX_PART_CODE=19
+ };
+ #define PED_PARTITION_FIRST_FLAG        PED_PARTITION_BOOT
+-#define PED_PARTITION_LAST_FLAG         PED_PARTITION_ESP
++#define PED_PARTITION_LAST_FLAG         PED_PARTITION_FIX_PART_CODE
+ 
+ enum _PedDiskTypeFeature {
+         PED_DISK_TYPE_EXTENDED=1,       /**< supports extended partitions */
+diff --git a/libparted/disk.c b/libparted/disk.c
+index fe82f44..d24de03 100644
+--- a/libparted/disk.c
++++ b/libparted/disk.c
+@@ -2406,6 +2406,8 @@ ped_partition_flag_get_name (PedPartitionFlag flag)
+                 return N_("irst");
+         case PED_PARTITION_ESP:
+                 return N_("esp");
++    case PED_PARTITION_FIX_PART_CODE:
++		return  N_("fix_part_code");
+ 
+ 	default:
+ 		ped_exception_throw (
+diff --git a/libparted/labels/dos.c b/libparted/labels/dos.c
+index fa53020..f3163da 100644
+--- a/libparted/labels/dos.c
++++ b/libparted/labels/dos.c
+@@ -163,6 +163,7 @@ typedef struct {
+ 	int		diag;
+ 	int		irst;
+ 	int		esp;
++	int		msftdata;
+ 	OrigState*	orig;			/* used for CHS stuff */
+ } DosPartitionData;
+ 
+@@ -1353,6 +1354,7 @@ msdos_partition_new (const PedDisk* disk, PedPartitionType part_type,
+ 		dos_data->prep = 0;
+ 		dos_data->irst = 0;
+ 		dos_data->esp = 0;
++		dos_data->msftdata = 0;
+ 	} else {
+ 		part->disk_specific = NULL;
+ 	}
+@@ -1390,6 +1392,7 @@ msdos_partition_duplicate (const PedPartition* part)
+ 	new_dos_data->prep = old_dos_data->prep;
+ 	new_dos_data->irst = old_dos_data->irst;
+ 	new_dos_data->esp = old_dos_data->esp;
++	new_dos_data->msftdata = old_dos_data->msftdata;
+ 
+ 	if (old_dos_data->orig) {
+ 		new_dos_data->orig = ped_malloc (sizeof (OrigState));
+@@ -1480,6 +1483,12 @@ msdos_partition_set_system (PedPartition* part,
+ 		dos_data->system = PARTITION_ESP;
+ 		return 1;
+ 	}
++	if (dos_data->msftdata) {
++		dos_data->system = PARTITION_NTFS;
++		return 1;
++	}
++	/* PED_PARTITION_FIX_PART_CODE will skip all above conditions
++	   and set the partition code according to its filesystem */
+ 
+ 	if (!fs_type)
+ 		dos_data->system = PARTITION_LINUX;
+@@ -1519,6 +1528,7 @@ clear_flags (DosPartitionData *dos_data)
+   dos_data->irst = 0;
+   dos_data->esp = 0;
+   dos_data->raid = 0;
++  dos_data->msftdata = 0;
+ }
+ 
+ static int
+@@ -1608,6 +1618,17 @@ msdos_partition_set_flag (PedPartition* part,
+ 		dos_data->esp = state;
+ 		return ped_partition_set_system (part, part->fs_type);
+ 
++	case PED_PARTITION_MSFT_DATA:
++		if (state)
++			clear_flags (dos_data);
++		dos_data->msftdata = state;
++		return ped_partition_set_system (part, part->fs_type);
++
++	case PED_PARTITION_FIX_PART_CODE:
++		if (state)
++			clear_flags (dos_data);
++		return ped_partition_set_system (part, part->fs_type);
++
+ 	default:
+ 		return 0;
+ 	}
+@@ -1656,6 +1677,12 @@ msdos_partition_get_flag (const PedPartition* part, PedPartitionFlag flag)
+ 	case PED_PARTITION_ESP:
+ 		return dos_data->esp;
+ 
++	case PED_PARTITION_MSFT_DATA:
++		return dos_data->msftdata;
++
++	case PED_PARTITION_FIX_PART_CODE:
++		return 0;
++
+ 	default:
+ 		return 0;
+ 	}
+@@ -1681,6 +1708,8 @@ msdos_partition_is_flag_available (const PedPartition* part,
+ 	case PED_PARTITION_IRST:
+ 	case PED_PARTITION_ESP:
+ 	case PED_PARTITION_DIAG:
++	case PED_PARTITION_MSFT_DATA:
++	case PED_PARTITION_FIX_PART_CODE:
+ 		return 1;
+ 
+ 	default:
+diff --git a/libparted/labels/gpt.c b/libparted/labels/gpt.c
+index d69377a..cf16b46 100644
+--- a/libparted/labels/gpt.c
++++ b/libparted/labels/gpt.c
+@@ -1499,6 +1499,8 @@ gpt_partition_set_system (PedPartition *part,
+       gpt_part_data->type = PARTITION_IRST_GUID;
+       return 1;
+     }
++  /* PED_PARTITION_FIX_PART_CODE will skip all above conditions
++     and set the partition code according to its filesystem */
+ 
+   if (fs_type)
+     {
+@@ -1787,6 +1789,20 @@ gpt_partition_set_flag (PedPartition *part, PedPartitionFlag flag, int state)
+           = gpt_part_data->prep
+           = gpt_part_data->atvrecv = 0;
+       return gpt_partition_set_system (part, part->fs_type);
++    case PED_PARTITION_FIX_PART_CODE:
++      if (state)
++        gpt_part_data->boot
++          = gpt_part_data->raid
++          = gpt_part_data->lvm
++          = gpt_part_data->bios_grub
++          = gpt_part_data->hp_service
++          = gpt_part_data->msftres
++          = gpt_part_data->msftdata
++          = gpt_part_data->msftrecv
++          = gpt_part_data->prep
++          = gpt_part_data->irst
++          = gpt_part_data->atvrecv = 0;
++      return gpt_partition_set_system (part, part->fs_type);
+     case PED_PARTITION_HIDDEN:
+       gpt_part_data->hidden = state;
+       return 1;
+@@ -1838,6 +1854,7 @@ gpt_partition_get_flag (const PedPartition *part, PedPartitionFlag flag)
+       return gpt_part_data->prep;
+     case PED_PARTITION_IRST:
+       return gpt_part_data->irst;
++    case PED_PARTITION_FIX_PART_CODE:
+     case PED_PARTITION_SWAP:
+     case PED_PARTITION_LBA:
+     case PED_PARTITION_ROOT:
+@@ -1867,6 +1884,7 @@ gpt_partition_is_flag_available (const PedPartition *part,
+     case PED_PARTITION_PREP:
+     case PED_PARTITION_IRST:
+     case PED_PARTITION_ESP:
++    case PED_PARTITION_FIX_PART_CODE:
+       return 1;
+     case PED_PARTITION_SWAP:
+     case PED_PARTITION_ROOT:
+-- 
+1.7.10.4
+

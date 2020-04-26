@@ -1,0 +1,24 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -6723,6 +6723,21 @@ static inline int dev_hard_header(struct
+         return dev->hard_header(skb, dev, type, daddr, saddr, len);
+ }
+ #endif
++
++#ifndef CONFIG_VIRT_TO_BUS
++#ifndef virt_to_bus
++static inline unsigned long virt_to_bus(void *address)
++{
++	return (unsigned long)address;
++}
++
++static inline void *bus_to_virt(unsigned long address)
++{
++	return (void *)address;
++}
++#endif
++#endif
++
+ #endif // __KERNEL__
+ 
+ #if (BEAMFORMING_SUPPORT == 1)

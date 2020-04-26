@@ -1,0 +1,253 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8189es/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8189es/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8189fs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8189fs/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bu/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812bu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812bu/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821as/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821as/Makefile
+@@ -3,7 +3,7 @@ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ 
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821au/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821au/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821ce/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821ce/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/Makefile
+@@ -2,7 +2,7 @@ SHELL=/bin/bash
+ TOP = $(PWD)/../../..
+ include $(TOP)/make.include
+ EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS)
+-EXTRA_CFLAGS += -O1
++#EXTRA_CFLAGS += -O1
+ #EXTRA_CFLAGS += -O3
+ #EXTRA_CFLAGS += -Wall
+ #EXTRA_CFLAGS += -Wextra

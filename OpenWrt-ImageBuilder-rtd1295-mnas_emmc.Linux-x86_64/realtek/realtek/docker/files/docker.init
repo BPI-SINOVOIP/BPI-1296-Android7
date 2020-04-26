@@ -1,0 +1,27 @@
+#!/bin/sh /etc/rc.common
+
+START=85
+STOP=15
+
+USE_PROCD=1
+PROG=/usr/local/bin/dockerd
+
+reload_service() {
+	kill -HUP dockerd
+}
+
+service_triggers() {
+	procd_add_reload_trigger "docker"
+}
+
+start_service() {
+	procd_open_instance
+	procd_set_param command $PROG
+	procd_set_param respawn
+	procd_set_param env PATH=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin
+	procd_close_instance 
+}
+
+stop_service() {
+	killall dockerd
+}

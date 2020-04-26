@@ -1,0 +1,70 @@
+#!/bin/sh
+
+handle_mount() {
+
+	MountPointFile=`echo $PRODUCT$INTERFACE$TYPE | tr -d '/'`
+
+	#logger -t DEBUG "mount '$MOUNTPOINT'"
+	[ ! -d /mnt/$MOUNTPOINT ] && mkdir -p /mnt/$MOUNTPOINT
+	gphotofs -o allow_other /mnt/$MOUNTPOINT
+
+	if [ $? -eq 0 ]; then
+		echo "/mnt/$MOUNTPOINT" >  /tmp/$MountPointFile
+		have_uuid=$(uci show samba | grep -c "$MountPointFile")
+		SMBSHARED=`ls -d /mnt/$MOUNTPOINT/*/`
+		[ "$have_uuid" = "0" ] && set_samba
+		[ "$have_uuid" -gt "0" ] && set_samba_path
+		/etc/init.d/samba restart
+	else
+		rmdir /mnt/$MOUNTPOINT
+	fi
+}
+
+set_samba(){
+	uci set samba.${MountPointFile}="sambashare"
+	uci set samba.${MountPointFile}.name=$MOUNTPOINT
+	uci set samba.${MountPointFile}.path="$SMBSHARED"
+	uci set samba.${MountPointFile}.state="a"
+	uci set samba.${MountPointFile}.read_only="yes"
+	uci set samba.${MountPointFile}.guest_ok="yes"
+	uci commit samba
+}
+
+set_samba_path(){
+	uci set samba.${MountPointFile}.path="$SMBSHARED"
+	uci commit samba
+}
+
+
+[ -f /sys/$DEVPATH/bInterfaceClass ] && IMGDEV=`cat /sys/$DEVPATH/bInterfaceClass`
+
+[ -f /sys/$DEVPATH/interface ] && MTPDEV=`cat /sys/$DEVPATH/interface`
+
+
+if [ "$ACTION" = "add" ] && [ -n "$INTERFACE" ]; then
+
+	#check MTP or PTP only
+	if [ "$IMGDEV" = "06" ] || [ "$IMGDEV" = "ff" -a "$MTPDEV" = "MTP" ]; then
+
+		while :
+		do
+			INFO=`/usr/bin/gphoto2  --storage-info`
+
+			#Wait iOS for authorization, since no event triggered
+			AUTH=`echo $INFO | grep store_feedface`
+	
+			[ -z $AUTH ] &&  break
+			sleep 1
+		done
+
+		if [ -n "$INFO" ]; then
+
+			DEV=`dirname $DEVPATH`
+			MOUNTPOINT=`cat /sys/$DEV/product | tr -d ' '`
+
+			handle_mount
+		fi
+	fi
+
+
+fi

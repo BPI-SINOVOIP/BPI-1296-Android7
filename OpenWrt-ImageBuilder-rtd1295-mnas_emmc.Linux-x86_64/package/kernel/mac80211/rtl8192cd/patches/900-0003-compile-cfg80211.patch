@@ -1,0 +1,40 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_br_ext.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_br_ext.c
+@@ -61,9 +61,13 @@ typedef struct udphdr udphdr;
+ #include <linux/ipv6.h>
+ #include <linux/icmpv6.h>
+ #include <net/ndisc.h>
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
++#include <net/ip6_checksum.h>
++#else
+ #include <net/checksum.h>
+ #endif
+ #endif
++#endif
+ 
+ #ifdef RTK_BR_EXT
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -712,7 +712,11 @@ int event_indicate_cfg80211(struct rtl81
+ 			{
+ 				//_eric_nl ?? disconnect event no mac, for station mode only ??
+ 				NDEBUG3("cfg80211_event [CFG80211_DISCONNECTED][%d]\n", event);
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)) || defined(OPENWRT_CC)
++				cfg80211_disconnected(priv->dev, 0, NULL, 0, 1, GFP_KERNEL);
++#else
+ 				cfg80211_disconnected(priv->dev, 0, NULL, 0, GFP_KERNEL);
++#endif
+ 				break;
+ 			}
+ 			break;
+@@ -4211,6 +4215,9 @@ void type_to_name(type, type_name)
+ 
+ static struct wireless_dev *realtek_cfg80211_add_iface(struct wiphy *wiphy,
+ 						      const char *name,
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0))
++						      char name_assign_type,
++#endif
+ 						      enum nl80211_iftype type,
+ 						      u32 *flags,
+ 						      struct vif_params *params)

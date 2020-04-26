@@ -1,0 +1,28 @@
+--- a/net/wireless/core.c
++++ b/net/wireless/core.c
+@@ -51,6 +51,8 @@ module_param(cfg80211_disable_40mhz_24gh
+ MODULE_PARM_DESC(cfg80211_disable_40mhz_24ghz,
+ 		 "Disable 40MHz support in the 2.4GHz band");
+ 
++static atomic_t wiphy_counter = ATOMIC_INIT(0);
++
+ struct cfg80211_registered_device *cfg80211_rdev_by_wiphy_idx(int wiphy_idx)
+ {
+ 	struct cfg80211_registered_device *result = NULL, *rdev;
+@@ -339,8 +341,6 @@ static void cfg80211_sched_scan_stop_wk(
+ struct wiphy *wiphy_new_nm(const struct cfg80211_ops *ops, int sizeof_priv,
+ 			   const char *requested_name)
+ {
+-	static atomic_t wiphy_counter = ATOMIC_INIT(0);
+-
+ 	struct cfg80211_registered_device *rdev;
+ 	int alloc_size;
+ 
+@@ -854,6 +854,7 @@ void cfg80211_dev_free(struct cfg80211_r
+ void wiphy_free(struct wiphy *wiphy)
+ {
+ 	put_device(&wiphy->dev);
++	atomic_dec(&wiphy_counter);
+ }
+ EXPORT_SYMBOL(wiphy_free);
+ 

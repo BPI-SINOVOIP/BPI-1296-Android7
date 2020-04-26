@@ -1,0 +1,14 @@
+#include <dt-bindings/clock/rtk,cc-rtd129x.h>
+/ {
+    dvfs: dvfs {
+	    compatible = "Realtek,rtk129x-dvfs";
+	    status = "okay";
+	    clocks = <&cc CC_PLL_SCPU>; 
+	    clock-names = "spll";
+    };
+};
+
+#include "rtd-129x-dvfs-g2227.dtsi"
+// #include "rtd-129x-dvfs-gpio.dtsi"
+// #include "rtd-129x-dvfs-sy8089a.dtsi"
+// #include "rtd-129x-dvfs-g2237.dtsi"

@@ -1,0 +1,95 @@
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -11704,9 +11704,7 @@ static void IQK_88C(struct rtl8192cd_pri
+ 
+ void PHY_IQCalibrate(struct rtl8192cd_priv *priv)
+ {
+-#ifndef SMP_SYNC
+ 	unsigned long x;
+-#endif
+ 
+ #ifdef RF_MIMO_SWITCH
+ 	if(priv->pshare->rf_status) {
+@@ -11878,7 +11876,9 @@ void PHY_IQCalibrate(struct rtl8192cd_pr
+ #ifdef USE_OUT_SRC
+ 	if (GET_CHIP_VER(priv) == VERSION_8192E) {
+ //		SAVE_INT_AND_CLI(x);
++		SMP_LOCK_IQK(x);
+ 		PHY_IQCalibrate_8192E(ODMPTR, FALSE);
++		SMP_UNLOCK_IQK(x);
+ //		RESTORE_INT(x);
+ 	}
+ #endif
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -402,6 +402,8 @@
+ #define SMP_LOCK_CFG80211(__x__)			spin_lock_irqsave(&priv->cfg80211_lock, (__x__))
+ #define SMP_UNLOCK_CFG80211(__x__)		spin_unlock_irqrestore(&priv->cfg80211_lock, (__x__))
+ #endif
++#define SMP_LOCK_IQK(__x__)			spin_lock_irqsave(&priv->pshare->lock_iqk, (__x__))
++#define SMP_UNLOCK_IQK(__x__)			spin_unlock_irqrestore(&priv->pshare->lock_iqk, (__x__))
+ #endif
+ #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+ #ifdef __ECOS
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/phydm/halphyrf_ap.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/phydm/halphyrf_ap.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/phydm/halphyrf_ap.c
+@@ -291,7 +291,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter
+ #ifdef MP_TEST
+ 			if (!(priv->pshare->rf_ft_var.mp_specific && (OPMODE & (WIFI_MP_CTX_BACKGROUND | WIFI_MP_CTX_PACKET))))
+ #endif	
+-				PHY_IQCalibrate_8192E(pDM_Odm,false);
++				PHY_IQCalibrate(priv);
+ 		}
+ 
+ 		if (delta_LCK > 8) {
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -1838,7 +1838,7 @@ static struct iwpriv_arg mib_table[] = {
+ 	{"aes_check_th",	RFFT_T,	_OFFSET_RFFT(aes_check_th), _SIZE_RFFT(aes_check_th), 2},
+ 
+ 	// Tx power tracking
+-	{"tpt_period",		RFFT_T,	_OFFSET_RFFT(tpt_period), _SIZE_RFFT(tpt_period), 2},
++	{"tpt_period",		RFFT_T,	_OFFSET_RFFT(tpt_period), _SIZE_RFFT(tpt_period), 10},
+ 
+ #ifdef CAM_SWAP
+ 	{"cam_rotation",		RFFT_T, _OFFSET_RFFT(cam_rotation), _SIZE_RFFT(cam_rotation), 60},
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -4220,6 +4220,7 @@ struct priv_shared_info {
+ 	unsigned long			lock_flags;
+ 	unsigned char			lock_xmit_func[50];
+ 	unsigned char			lock_func[50];
++	spinlock_t		lock_iqk;
+ #endif
+ 
+ 	// for RF fine tune
+@@ -5282,7 +5283,6 @@ typedef struct rtl8192cd_priv {
+ 	struct list_head 	BssTransDbBsBlockList;
+ 	spinlock_t			BssTransDbBsBlockNodeLock;
+ #endif
+-
+ #endif
+ #endif
+ #ifdef SUPPORT_MONITOR
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -11890,6 +11890,7 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 		priv->pshare->lock_recv_owner=-1;
+ 		priv->pshare->lock_xmit_owner=-1;
+ #endif
++		spin_lock_init(&priv->pshare->lock_iqk);
+ 
+ #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+ 		priv->pshare->nr_bcn = 1;

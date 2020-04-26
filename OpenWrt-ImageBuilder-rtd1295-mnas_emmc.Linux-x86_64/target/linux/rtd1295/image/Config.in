@@ -1,0 +1,14 @@
+config RTK_OVERRIDE_OVERLAY_FS
+	bool "Change overlay fs size"
+	depends on TARGET_rtd1295
+	default n
+	help
+	  Choose this would enable the capability to set overlay FS size
+
+
+config OVERLAY_FS_SIZE
+        int "Set overlay fs size (in Bytes)"
+        depends on RTK_OVERRIDE_OVERLAY_FS
+        default 104857600
+        help
+          Set this wouldl change overlay FS partition size

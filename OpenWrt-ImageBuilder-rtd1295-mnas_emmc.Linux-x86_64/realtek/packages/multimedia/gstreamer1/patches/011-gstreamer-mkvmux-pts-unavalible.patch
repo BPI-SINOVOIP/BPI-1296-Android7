@@ -1,0 +1,50 @@
+diff git a/libs/gst/base/gstcollectpads.c b/libs/gst/base/gstcollectpads.c
+index 8edfe41..53d5946 100644
+--- a/libs/gst/base/gstcollectpads.c
++++ b/libs/gst/base/gstcollectpads.c
+@@ -508,14 +508,19 @@ gst_collect_pads_clip_running_time (GstCollectPads * pads,
+   *outbuf = buf;
+ 
+   /* invalid left alone and passed */
+-  if (G_LIKELY (GST_CLOCK_TIME_IS_VALID (GST_BUFFER_DTS (buf))
+-          || GST_CLOCK_TIME_IS_VALID (GST_BUFFER_PTS (buf)))) {
++  if (G_LIKELY (GST_CLOCK_TIME_IS_VALID (GST_BUFFER_DTS_OR_PTS (buf)))) {
+     GstClockTime time;
+     GstClockTime buf_dts, abs_dts;
+     gint dts_sign;
+ 
+     time = GST_BUFFER_PTS (buf);
+ 
++    /* If PTS is not set, the best guess we can make is to assume that both
++     * PTS and DTS are the same. If it was possible, parsers should have fixed
++     * it already as explained in https://bugzilla.gnome.org/show_bug.cgi?id=659489 */
++    if (!GST_CLOCK_TIME_IS_VALID (time))
++      time = GST_BUFFER_DTS (buf);
++
+     if (GST_CLOCK_TIME_IS_VALID (time)) {
+       time =
+           gst_segment_to_running_time (&cdata->segment, GST_FORMAT_TIME, time);
+
+
+diff --git a/gst/gstbuffer.h b/gst/gstbuffer.h
+index 20154aa..d5ff273 100644
+--- a/gst/gstbuffer.h
++++ b/gst/gstbuffer.h
+@@ -94,6 +94,16 @@ typedef struct _GstBufferPool GstBufferPool;
+  */
+ #define GST_BUFFER_DTS(buf)                     (GST_BUFFER_CAST(buf)->dts)
+ /**
++ * GST_BUFFER_DTS_OR_PTS:
++ * @buf: a #GstBuffer.:
++ *
++ * Returns the buffer decoding timestamp (dts) if valid, else the buffer
++ * presentation time (pts)
++ *
++ * Since: 1.8
++ */
++#define GST_BUFFER_DTS_OR_PTS(buf)              (GST_BUFFER_DTS_IS_VALID(buf) ? GST_BUFFER_DTS(buf) : GST_BUFFER_PTS (buf))
++/**
+  * GST_BUFFER_DURATION:
+  * @buf: a #GstBuffer.
+  *
+

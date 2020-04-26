@@ -1,0 +1,90 @@
+From 6dd69c0f915e98dd24e89f2221ae954d96e378c8 Mon Sep 17 00:00:00 2001
+From: vera_xu <vera_xu@realsil.com.cn>
+Date: Wed, 4 May 2016 11:46:59 +0800
+Subject: [PATCH] support aes(cbc) in cryptodev engine
+
+---
+ crypto/engine/eng_cryptodev.c | 80 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+
+--- a/crypto/engine/eng_cryptodev.c
++++ b/crypto/engine/eng_cryptodev.c
+@@ -161,6 +161,15 @@ static struct {
+     {
+         CRYPTO_AES_CBC, NID_aes_256_cbc, 16, 32,
+     },
++    {
++        CRYPTO_AES_ECB, NID_aes_128_ecb, 0, 16,
++    },
++    {
++        CRYPTO_AES_ECB, NID_aes_192_ecb, 0, 24,
++    },
++    {
++        CRYPTO_AES_ECB, NID_aes_256_ecb, 0, 32,
++    },
+ # ifdef CRYPTO_AES_CTR
+     {
+         CRYPTO_AES_CTR, NID_aes_128_ctr, 14, 16,
+@@ -668,6 +677,45 @@ const EVP_CIPHER cryptodev_aes_256_cbc =
+     cryptodev_cipher_ctrl
+ };
+ 
++const EVP_CIPHER cryptodev_aes_128_ecb = {
++    NID_aes_128_ecb,
++    16, 16, 0,
++    EVP_CIPH_ECB_MODE,
++    cryptodev_init_key,
++    cryptodev_cipher,
++    cryptodev_cleanup,
++    sizeof(struct dev_crypto_state),
++    EVP_CIPHER_set_asn1_iv,
++    EVP_CIPHER_get_asn1_iv,
++    NULL
++};
++
++const EVP_CIPHER cryptodev_aes_192_ecb = {
++    NID_aes_192_ecb,
++    16, 24, 0,
++    EVP_CIPH_ECB_MODE,
++    cryptodev_init_key,
++    cryptodev_cipher,
++    cryptodev_cleanup,
++    sizeof(struct dev_crypto_state),
++    EVP_CIPHER_set_asn1_iv,
++    EVP_CIPHER_get_asn1_iv,
++    NULL
++};
++
++const EVP_CIPHER cryptodev_aes_256_ecb = {
++    NID_aes_256_ecb,
++    16, 32, 0,
++    EVP_CIPH_ECB_MODE,
++    cryptodev_init_key,
++    cryptodev_cipher,
++    cryptodev_cleanup,
++    sizeof(struct dev_crypto_state),
++    EVP_CIPHER_set_asn1_iv,
++    EVP_CIPHER_get_asn1_iv,
++    NULL
++};
++
+ # ifdef CRYPTO_AES_CTR
+ const EVP_CIPHER cryptodev_aes_ctr = {
+     NID_aes_128_ctr,
+@@ -745,6 +793,16 @@ cryptodev_engine_ciphers(ENGINE *e, cons
+     case NID_aes_256_cbc:
+         *cipher = &cryptodev_aes_256_cbc;
+         break;
++    case NID_aes_128_ecb:
++        *cipher = &cryptodev_aes_128_ecb;
++        break;
++    case NID_aes_192_ecb:
++        *cipher = &cryptodev_aes_192_ecb;
++        break;
++    case NID_aes_256_ecb:
++        *cipher = &cryptodev_aes_256_ecb;
++        break;
++
+ # ifdef CRYPTO_AES_CTR
+     case NID_aes_128_ctr:
+         *cipher = &cryptodev_aes_ctr;

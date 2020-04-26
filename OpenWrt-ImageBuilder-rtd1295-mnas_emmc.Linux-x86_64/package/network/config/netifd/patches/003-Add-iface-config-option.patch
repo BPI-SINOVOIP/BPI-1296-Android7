@@ -1,0 +1,13 @@
+Index: netifd-2016-12-09/scripts/netifd-wireless.sh
+===================================================================
+--- netifd-2016-12-09.orig/scripts/netifd-wireless.sh
++++ netifd-2016-12-09/scripts/netifd-wireless.sh
+@@ -296,6 +296,8 @@ _wdev_common_device_config() {
+ 
+ _wdev_common_iface_config() {
+ 	config_add_string mode ssid encryption 'key:wpakey'
++	config_add_boolean tdls_prohibited tdls_cs_prohibited ieee80211k smart_roaming mesh_portal txbf txbf_mu
++	config_add_int sm_linktime sm_signal_min sm_load_min sm_speed_weight sm_signal_weight sm_load_weight
+ }
+ 
+ init_wireless_driver() {

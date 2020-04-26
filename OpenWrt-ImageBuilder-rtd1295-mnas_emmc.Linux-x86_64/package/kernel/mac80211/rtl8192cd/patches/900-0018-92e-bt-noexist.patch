@@ -1,0 +1,20 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
+@@ -5189,7 +5189,16 @@ InitMAC88XX(
+         
+     }
+ #endif
+-
++#if IS_EXIST_RTL8192EE && !defined(BT_COEXIST)
++	if ( IS_HARDWARE_TYPE_8192E(Adapter) ) {
++		u8 Value8;
++		Value8 = HAL_RTL_R8(0x64);
++		HAL_RTL_W8(0x64, Value8&0xFB);
++		
++		Value8 = HAL_RTL_R8(0x65);
++		HAL_RTL_W8(0x65, Value8|BIT0);
++	}
++#endif
+     
+ 	RT_TRACE(COMP_INIT, DBG_LOUD, ("%s===>\n", __FUNCTION__) );
+ 

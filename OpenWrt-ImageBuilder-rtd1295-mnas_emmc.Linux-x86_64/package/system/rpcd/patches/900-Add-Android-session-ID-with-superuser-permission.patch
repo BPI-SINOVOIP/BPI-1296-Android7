@@ -1,0 +1,84 @@
+--- a/include/rpcd/session.h
++++ b/include/rpcd/session.h
+@@ -33,6 +33,7 @@
+ #define RPC_SID_LEN	32
+ #define RPC_DEFAULT_SESSION_TIMEOUT	300
+ #define RPC_DEFAULT_SESSION_ID	"00000000000000000000000000000000"
++#define RPC_ANDROID_SESSION_ID	"ffffffffffffffffffffffffffffffff"
+ #define RPC_SESSION_DIRECTORY	"/var/run/rpcd/sessions"
+ #define RPC_SESSION_ACL_DIR		"/usr/share/rpcd/acl.d"
+ 
+--- a/session.c
++++ b/session.c
+@@ -779,6 +779,9 @@ rpc_handle_destroy(struct ubus_context *
+ 	if (!strcmp(blobmsg_get_string(tb), RPC_DEFAULT_SESSION_ID))
+ 		return UBUS_STATUS_PERMISSION_DENIED;
+ 
++	if (!strcmp(blobmsg_get_string(tb), RPC_ANDROID_SESSION_ID))
++		return UBUS_STATUS_PERMISSION_DENIED;
++
+ 	ses = rpc_session_get(blobmsg_data(tb));
+ 	if (!ses)
+ 		return UBUS_STATUS_NOT_FOUND;
+@@ -886,6 +889,7 @@ rpc_login_test_login(struct uci_context
+ 
+ static bool
+ rpc_login_test_permission(struct uci_section *s,
++                          const char *id,
+                           const char *perm, const char *group)
+ {
+ 	const char *p;
+@@ -896,6 +900,10 @@ rpc_login_test_permission(struct uci_sec
+ 	 * default session, in this case uncondionally allow access to the
+ 	 * "unauthenticated" access group */
+ 	if (!s) {
++		if (!strcmp(id, RPC_ANDROID_SESSION_ID)) {
++			return !strcmp(group, "superuser");
++		}
++
+ 		return !strcmp(group, "unauthenticated");
+ 	}
+ 
+@@ -937,7 +945,7 @@ rpc_login_test_permission(struct uci_sec
+ 
+ 	/* make sure that write permission implies read permission */
+ 	if (!strcmp(perm, "read"))
+-		return rpc_login_test_permission(s, "write", group);
++		return rpc_login_test_permission(s, id, "write", group);
+ 
+ 	return false;
+ }
+@@ -1030,7 +1038,7 @@ rpc_login_setup_acl_file(struct rpc_sess
+ 			 * Check if the current user context specifies the current
+ 			 * "read" or "write" permission in the given access group.
+ 			 */
+-			if (!rpc_login_test_permission(login, blobmsg_name(acl_perm),
++			if (!rpc_login_test_permission(login, ses->id, blobmsg_name(acl_perm),
+ 			                                      blobmsg_name(acl_group)))
+ 				continue;
+ 
+@@ -1310,6 +1318,15 @@ int rpc_session_api_init(struct ubus_con
+ 		avl_insert(&sessions, &ses->avl);
+ 	}
+ 
++	/* setup the android session */
++	ses = rpc_session_new();
++
++	if (ses) {
++		strcpy(ses->id, RPC_ANDROID_SESSION_ID);
++		rpc_login_setup_acls(ses, NULL);
++		avl_insert(&sessions, &ses->avl);
++	}
++
+ 	return ubus_add_object(ctx, &obj);
+ }
+ 
+@@ -1349,6 +1366,8 @@ void rpc_session_freeze(void)
+ 		/* skip default session */
+ 		if (!strcmp(ses->id, RPC_DEFAULT_SESSION_ID))
+ 			continue;
++		if (!strcmp(ses->id, RPC_ANDROID_SESSION_ID))
++			continue;
+ 
+ 		snprintf(path, sizeof(path) - 1, RPC_SESSION_DIRECTORY "/%s", ses->id);
+ 		rpc_session_to_blob(ses, false);

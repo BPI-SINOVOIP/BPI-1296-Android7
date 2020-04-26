@@ -1,0 +1,22 @@
+Index: fstools-2016-01-10/block.c
+===================================================================
+--- fstools-2016-01-10.orig/block.c	2017-05-15 18:59:14.274805777 +0800
++++ fstools-2016-01-10/block.c	2017-05-15 19:00:32.430807640 +0800
+@@ -1222,7 +1222,7 @@
+ 	if (config_load(NULL))
+ 		return -1;
+ 
+-	cache_load(1);
++	cache_load(0);
+ 	list_for_each_entry(pr, &devices, list)
+ 		mount_device(pr, 0);
+ 
+@@ -1270,7 +1270,7 @@
+ 	int i;
+ 	struct blkid_struct_probe *pr;
+ 
+-	cache_load(1);
++	cache_load(0);
+ 	if (argc == 2) {
+ 		list_for_each_entry(pr, &devices, list)
+ 			print_block_info(pr);

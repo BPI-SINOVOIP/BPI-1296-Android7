@@ -1,0 +1,26 @@
+
+config RTD129x
+	bool "Realtek SOC drivers support"
+	depends on ARCH_RTD129x
+	default y
+	help
+	  Realtek RTD129x SOC drivers support.
+
+	  If unsure, say N.
+
+if RTD129x
+source "drivers/soc/realtek/rtd129x/Kconfig"
+endif # RTD129x
+
+config RTK_XEN_SUPPORT
+	bool "Realtek XEN support"
+	depends on XEN
+	default n
+	help
+	  Realtek XEN utility support.
+
+if RTK_XEN_SUPPORT
+source "drivers/soc/realtek/xen/Kconfig"
+
+endif
+source "drivers/soc/realtek/cwmp/Kconfig"

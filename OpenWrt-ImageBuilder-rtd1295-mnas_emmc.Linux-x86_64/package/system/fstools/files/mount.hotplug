@@ -1,0 +1,4 @@
+device=`basename $DEVPATH`
+except=`echo $device | grep -E "mmcblk|mtdblock"`
+[ -z "$except" ] && \
+/sbin/block hotplug

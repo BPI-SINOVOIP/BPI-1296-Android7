@@ -1,0 +1,14 @@
+--- faac-1.28/common/mp4v2/mpeg4ip.h.orig	2009-01-27 06:42:35.000000000 +0800
++++ faac-1.28/common/mp4v2/mpeg4ip.h	2016-07-18 16:05:30.147832432 +0800
+@@ -121,9 +121,9 @@
+ #include <sys/param.h>
+ 
+ #ifdef __cplusplus
+-extern "C" {
++extern "C++" {
+ #endif
+-char *strcasestr(const char *haystack, const char *needle);
++const char *strcasestr(const char *haystack, const char *needle);
+ #ifdef __cplusplus
+ }
+ #endif

@@ -1,0 +1,394 @@
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -974,10 +974,11 @@ enum RTK_CFG80211_EVENT {
+ 	CFG80211_IBSS_JOINED = 3,
+ 	CFG80211_NEW_STA = 4,
+ 	CFG80211_SCAN_DONE = 5, 
+-	CFG80211_SCAN_ABORDED = 6,
++	CFG80211_SCAN_ABORTED = 6,
+ 	CFG80211_DEL_STA = 7, 
+ 	CFG80211_RADAR_CAC_FINISHED = 8,
+-	CFG80211_RADAR_DETECTED = 9
++	CFG80211_RADAR_DETECTED = 9,
++	CFG80211_RADAR_CAC_ABORTED = 10
+ };
+ #endif
+ 
+@@ -5166,6 +5167,7 @@ typedef struct rtl8192cd_priv {
+ 	//struct class 			*c1;
+ 	//struct device			*tmp_device;
+ 	unsigned char			receive_connect_cmd;
++	unsigned char			cfg80211_interface_add;
+ #endif
+ 
+ 	struct wifi_mib 		*pmib;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -447,7 +447,7 @@ void realtek_cfg80211_inform_bss_ies(uns
+ int translate_ss_result_rssi(int rssi)
+ {
+ 	//reference libiwinfo/iwinfo_nl80211.c - scan_cb
+-	return ((rssi-100+0x100)*100);
++	return ((rssi-100)*100);
+ }
+ #endif
+ 
+@@ -587,7 +587,7 @@ static void rtk_abort_scan(struct rtl819
+ 		priv->scan_req = NULL;
+ 	}
+ 
+-	//event_indicate_cfg80211(priv, NULL, CFG80211_SCAN_ABORDED, NULL);
++	//event_indicate_cfg80211(priv, NULL, CFG80211_SCAN_ABORTED, NULL);
+ 	//cfg80211_sched_scan_stopped(wiphy);
+ }
+ 
+@@ -617,8 +617,8 @@ void event_to_name(int event, char *even
+ 	case CFG80211_SCAN_DONE:
+ 		strcpy(event_name, "CFG80211_SCAN_DONE");
+ 		break;
+-	case CFG80211_SCAN_ABORDED:
+-		strcpy(event_name, "CFG80211_SCAN_ABORDED");
++	case CFG80211_SCAN_ABORTED:
++		strcpy(event_name, "CFG80211_SCAN_ABORTED");
+ 		break;
+ 	case CFG80211_DEL_STA:
+ 		strcpy(event_name, "CFG80211_DEL_STA");
+@@ -799,7 +799,7 @@ int event_indicate_cfg80211(struct rtl81
+ 				netif_wake_queue(priv->dev); //wrt-vap
+ 			}
+ 			break;
+-		case CFG80211_SCAN_ABORDED:
++		case CFG80211_SCAN_ABORTED:
+ 			{
+ 				//NDEBUG2("cfg80211_event [CFG80211_SCAN_DONE][%d]\n", event);		
+ 				priv->ss_req_ongoing = 0;
+@@ -843,13 +843,25 @@ int event_indicate_cfg80211(struct rtl81
+ 			cfg80211_del_sta(priv->dev, mac, GFP_KERNEL);
+ 			break;
+ 		case CFG80211_RADAR_CAC_FINISHED:
+-			NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_FINISHED][%d]\n", event);
+-			cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
++			if (priv->pshare->dfs_chan_def && priv->wdev.cac_started) {
++				NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_FINISHED][%d]\n", event);
++				cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
++			}
+ 			break;
+ 		case CFG80211_RADAR_DETECTED:
+-			NDEBUG("cfg80211_event [CFG80211_RADAR_DETECTED][%d]\n", event);
+-			cfg80211_radar_event(wiphy, priv->pshare->dfs_chan_def, GFP_KERNEL);
++			if (priv->pshare->dfs_chan_def && priv->wdev.cac_started) {
++				NDEBUG("cfg80211_event [CFG80211_RADAR_DETECTED][%d]\n", event);
++				cfg80211_radar_event(wiphy, priv->pshare->dfs_chan_def, GFP_KERNEL);
++				cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_ABORTED, GFP_KERNEL);
++				priv->pmib->dot11DFSEntry.DFS_detected = 0;
++			}
+ 			break;
++		case CFG80211_RADAR_CAC_ABORTED:
++			if (priv->pshare->dfs_chan_def) {
++				NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_ABORTED][%d]\n", event);
++				cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_ABORTED, GFP_KERNEL);
++			}
++			break;
+ 		default:
+ 			NDEBUG("cfg80211_event [Unknown Event !!][%d]\n", event);            
+     }
+@@ -1121,6 +1133,7 @@ int is_support_ac(struct rtl8192cd_priv
+ 	switch(GET_CHIP_VER(priv)) {
+ 		case VERSION_8812E:
+ 		case VERSION_8881A:
++		case VERSION_8822B:
+ 			ret=1;
+ 			break;
+ #if defined(CONFIG_WLAN_HAL_8814AE)
+@@ -1160,9 +1173,11 @@ static void rtk_set_band_mode(struct rtl
+ 
+ 	if(channel_width == NL80211_CHAN_WIDTH_80 || is_support_ac(priv)) {
+ 		priv->pmib->dot11BssType.net_work_type |= WIRELESS_11AC;
+-#ifdef CONFIG_WLAN_HAL_8814AE
+-		if(GET_CHIP_VER(priv) == VERSION_8814A)
++#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++#if defined(SUPPORT_TX_AMSDU)
++		if(GET_CHIP_VER(priv) == VERSION_8814A || GET_CHIP_VER(priv) == VERSION_8822B)
+ 			priv->pmib->dot11nConfigEntry.dot11nAMSDU = 2;
++#endif //SUPPORT_TX_AMSDU
+ #endif
+ 		//configure shortGI for client mode
+ 		priv->pmib->dot11nConfigEntry.dot11nShortGIfor80M = 1;
+@@ -1178,9 +1193,11 @@ static void rtk_set_band_mode(struct rtl
+ 		priv->pvxd_priv->pmib->dot11nConfigEntry.dot11nShortGIfor20M = priv->pmib->dot11nConfigEntry.dot11nShortGIfor20M;
+ 		priv->pvxd_priv->pmib->dot11nConfigEntry.dot11nShortGIfor40M = priv->pmib->dot11nConfigEntry.dot11nShortGIfor40M;
+ 		priv->pvxd_priv->pmib->dot11nConfigEntry.dot11nShortGIfor80M = priv->pmib->dot11nConfigEntry.dot11nShortGIfor80M;
+-#ifdef CONFIG_WLAN_HAL_8814AE
+-		if(GET_CHIP_VER(priv) == VERSION_8814A)
++#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++#if defined(SUPPORT_TX_AMSDU)
++		if(GET_CHIP_VER(priv) == VERSION_8814A || GET_CHIP_VER(priv) == VERSION_8822B)
+ 			priv->pvxd_priv->pmib->dot11nConfigEntry.dot11nAMSDU = priv->pmib->dot11nConfigEntry.dot11nAMSDU;
++#endif //SUPPORT_TX_AMSDU
+ #endif
+ 	}
+ #endif
+@@ -1299,6 +1316,7 @@ void realtek_reset_security(struct rtl81
+ 	priv->pmib->dot118021xAuthEntry.dot118021xAlgrthm = 0;
+ 	priv->pmib->dot1180211AuthEntry.dot11WPACipher = 0;
+ 	priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher = 0;
++	priv->pmib->dot11GroupKeysTable.dot11Privacy = 0;
+ }
+ 
+ void realtek_auth_wep(struct rtl8192cd_priv *priv, int cipher)
+@@ -1791,6 +1809,62 @@ static int realtek_cfg80211_set_channel(
+ 	return 0;
+ }
+ 
++static int realtek_cfg80211_get_channel(struct wiphy *wiphy, struct wireless_dev *wdev, struct cfg80211_chan_def *chandef)
++{
++	struct rtknl *rtk = wiphy_priv(wiphy);
++	struct rtl8192cd_priv *priv = rtk->priv;
++	enum ieee80211_band band;
++	int ret = -ENODATA;
++	int freq;
++	u8 center_ch;
++
++	//NLENTER;
++
++	switch(priv->pmib->dot11RFEntry.phyBandSelect) {
++	case PHY_BAND_2G:
++		band = NL80211_BAND_2GHZ;
++		break;
++	case PHY_BAND_5G:
++		band = NL80211_BAND_5GHZ;
++		break;
++	}
++
++	if (priv->pshare->is_40m_bw != priv->pshare->CurrentChannelBW)
++		NDEBUG3("%s: is_40m_bw=%d, CurrentChannelBW=%d\n", wdev->netdev->name, priv->pshare->is_40m_bw, priv->pshare->CurrentChannelBW);
++
++	switch (priv->pshare->CurrentChannelBW) {
++	case HT_CHANNEL_WIDTH_80:
++		chandef->width = NL80211_CHAN_WIDTH_80;
++		break;
++	case HT_CHANNEL_WIDTH_20_40:
++		chandef->width = NL80211_CHAN_WIDTH_40;
++		break;
++	case HT_CHANNEL_WIDTH_20:
++		chandef->width = NL80211_CHAN_WIDTH_20;
++		break;
++	default:
++		WARN_ON(1);
++		break;
++	}
++
++	freq = ieee80211_channel_to_frequency(priv->pmib->dot11RFEntry.dot11channel, band);
++	chandef->chan = ieee80211_get_channel(wiphy, freq);
++	center_ch = get_center_channel(priv,
++				       priv->pmib->dot11RFEntry.dot11channel,
++				       priv->pmib->dot11nConfigEntry.dot11n2ndChOffset,
++				       1);
++	chandef->center_freq1 = ieee80211_channel_to_frequency(center_ch, band);
++	chandef->center_freq2 = 0;
++
++	NDEBUG3("band=%d chandef->width=%d center_freq=%d center_freq1=%d center_freq2=%d\n", band, chandef->width, freq, chandef->center_freq1, chandef->center_freq2);
++
++	if (cfg80211_chandef_valid(chandef))
++		ret = 0;
++
++	//NLEXIT;
++
++	return ret;
++}
+ 
+ //Not in ath6k
+ static int realtek_cfg80211_change_bss(struct wiphy *wiphy,
+@@ -2295,6 +2369,11 @@ static int realtek_cfg80211_del_station(
+ #endif
+ 
+ 	NLENTER;
++
++	if(!IS_DRV_OPEN(priv)) {
++		NLMSG("[%s]%s is not open\n", __func__, priv->dev->name);
++		goto realtek_cfg80211_del_station_end;
++	}
+ 	
+ 	pstat = get_stainfo(priv, mac);
+ 
+@@ -2884,7 +2963,16 @@ static int realtek_cfg80211_suspend(stru
+ 	struct rtl8192cd_priv *priv = realtek_get_priv(wiphy, NULL);
+ 
+ 	NLENTER;
++
++#ifdef RTK_129X_PLATFORM
++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,12))
++	kobject_uevent(&priv->dev->dev.kobj, KOBJ_OFFLINE);
++#else
++	kobject_hotplug(&priv->dev->class_dev.kobj, KOBJ_OFFLINE);
++#endif
++#else
+ 	NLNOT;
++#endif
+ 	
+ 	return 0;
+ }
+@@ -2895,7 +2983,16 @@ static int realtek_cfg80211_resume(struc
+ 	struct rtl8192cd_priv *priv = realtek_get_priv(wiphy, NULL);
+ 
+ 	NLENTER;
++
++#ifdef RTK_129X_PLATFORM
++#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,12))
++	kobject_uevent(&priv->dev->dev.kobj, KOBJ_ONLINE);
++#else
++	kobject_hotplug(&priv->dev->class_dev.kobj, KOBJ_ONLINE);
++#endif
++#else
+ 	NLNOT;
++#endif
+ 
+ 	return 0;
+ }
+@@ -3005,6 +3102,7 @@ static int realtek_cfg80211_scan(struct
+     //rtk_abort_scan(priv);   
+ 
+ 	priv->ss_ssidlen = 0;
++	memset(priv->ss_ssid, 0, 32);
+ 
+ #if defined(P2P_SUPPORT)
+     if(ssids->ssid != NULL
+@@ -3694,8 +3792,7 @@ static int realtek_cfg80211_disconnect(s
+ 	NLENTER;
+ 	//rtk_abort_scan(priv);
+ 
+-	if(IS_VXD_INTERFACE(priv))
+-		rtl8192cd_close(priv->dev);
++	event_indicate_cfg80211(priv, NULL, CFG80211_DISCONNECTED, NULL);
+ 
+ 	return 0;
+ 
+@@ -4055,6 +4152,7 @@ int realtek_interface_add(struct rtl8192
+ 	
+ 	SET_NETDEV_DEVTYPE(ndev, &wiphy_type);
+ 
++	priv->cfg80211_interface_add = FALSE;
+ 
+ 	register_netdev(ndev);
+ 
+@@ -4109,7 +4207,7 @@ void realtek_change_iftype(struct rtl819
+ 	//OPMODE &= ~(WIFI_STATION_STATE|WIFI_ADHOC_STATE|WIFI_AP_STATE);
+ 
+ 	if(IS_ROOT_INTERFACE(priv) && IS_DRV_OPEN(priv)){
+-		if(type != NL80211_IFTYPE_P2P_CLIENT) 
++		if((type != NL80211_IFTYPE_P2P_CLIENT) && (type != priv->wdev.iftype))
+ 		rtl8192cd_close(priv->dev);
+     }
+ 
+@@ -4246,6 +4344,7 @@ static struct wireless_dev *realtek_cfg8
+ 	{
+ 		//NLMSG("Root interface, just change type\n");
+ 		realtek_change_iftype(priv, type);
++		priv->cfg80211_interface_add = TRUE;
+ 		return &rtk->priv->wdev;
+ 	}	
+ 
+@@ -4328,11 +4427,13 @@ static struct wireless_dev *realtek_cfg8
+ 					realtek_change_iftype(priv_vxd, type);
+ 				}
+ #endif
+-
++				priv_vxd->cfg80211_interface_add = TRUE;
+ 				return &priv_vxd->wdev;
+ 			}
+-			else
++			else {
++				priv_vap->cfg80211_interface_add = TRUE;
+ 				return &priv_vap->wdev;
++			}
+ 
+ 		}
+ 		else
+@@ -4346,7 +4447,7 @@ static struct wireless_dev *realtek_cfg8
+ 				realtek_change_iftype(priv_add, type);
+ 			}
+ #endif
+-
++			priv_add->cfg80211_interface_add = TRUE;
+ 			return &priv_add->wdev;
+ 		}
+ 
+@@ -4405,8 +4506,10 @@ static int realtek_cfg80211_del_iface(st
+ 
+ 	netif_stop_queue(priv->dev);
+ 
+-	//printk("Just close this interface\n");
+-
++	if(priv->cfg80211_interface_add == FALSE) {
++		NDEBUG3("del_iface:name[%s] is already closed\n", name);
++		return 0;
++	}
+ #ifdef MBSSID
+ 	if(IS_ROOT_INTERFACE(priv))
+ 	{
+@@ -4421,6 +4524,7 @@ static int realtek_cfg80211_del_iface(st
+ 	if(IS_VAP_INTERFACE(priv))
+ 		rtk->num_vap --;
+ #endif
++	priv->cfg80211_interface_add = FALSE;
+ 	
+ 	priv->receive_connect_cmd = 0;
+ 
+@@ -4912,6 +5016,7 @@ struct cfg80211_ops realtek_cfg80211_ops
+ 	.change_bss = realtek_cfg80211_change_bss,
+ 	//.set_txq_params = realtek_cfg80211_set_txq_params,
+ 	//.set_channel = realtek_cfg80211_set_channel,
++	.get_channel = realtek_cfg80211_get_channel,
+ 	.suspend = realtek_cfg80211_suspend,
+ 	.resume = realtek_cfg80211_resume,
+ 	.scan = realtek_cfg80211_scan,
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_net80211.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_net80211.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_net80211.c
+@@ -224,7 +224,7 @@ int	rtl_wpas_join(struct rtl8192cd_priv
+ #ifdef RTK_NL80211
+ 	if(priv->pmib->dot11Bss.channel >=36)
+ 	{
+-		if(GET_CHIP_VER(priv)==VERSION_8812E || GET_CHIP_VER(priv)==VERSION_8881A || GET_CHIP_VER(priv)==VERSION_8814A)
++		if(GET_CHIP_VER(priv)==VERSION_8812E || GET_CHIP_VER(priv)==VERSION_8881A || GET_CHIP_VER(priv)==VERSION_8814A || GET_CHIP_VER(priv)==VERSION_8822B)
+ 			priv->pmib->dot11BssType.net_work_type = WIRELESS_11A|WIRELESS_11N|WIRELESS_11AC;
+ 		else
+ 			priv->pmib->dot11BssType.net_work_type = WIRELESS_11A|WIRELESS_11N;
+@@ -249,9 +249,11 @@ int	rtl_wpas_join(struct rtl8192cd_priv
+ 	if(is_support_ac(priv))
+ 		priv->pmib->dot11nConfigEntry.dot11nShortGIfor80M = 1;
+ 
+-#ifdef CONFIG_WLAN_HAL_8814AE
+-	if(GET_CHIP_VER(priv) == VERSION_8814A)
++#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++#if defined(SUPPORT_TX_AMSDU)
++	if(GET_CHIP_VER(priv) == VERSION_8814A || GET_CHIP_VER(priv) == VERSION_8822B)
+ 		priv->pmib->dot11nConfigEntry.dot11nAMSDU=2;
++#endif //SUPPORT_TX_AMSDU
+ #endif
+ #endif
+ 
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -9618,6 +9618,14 @@ int rtl8192cd_close(struct net_device *d
+ 		return 0;
+ 	}
+ #endif
++
++#ifdef DFS
++	if (priv->wdev.cac_started) 
++		event_indicate_cfg80211(priv, NULL, CFG80211_RADAR_CAC_ABORTED, NULL);
++#endif
++
++	if (priv->scan_req || (priv->pshare->bScanInProcess == TRUE))
++		event_indicate_cfg80211(priv, NULL, CFG80211_SCAN_ABORTED, NULL);
+ #endif
+ 
+     STADEBUG("===>\n");

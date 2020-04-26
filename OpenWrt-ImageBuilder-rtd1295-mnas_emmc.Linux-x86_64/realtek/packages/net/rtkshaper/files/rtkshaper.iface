@@ -1,0 +1,3 @@
+#!/bin/sh
+
+[ "$ACTION" = ifup ] && /etc/init.d/rtkshaper enabled && /etc/init.d/rtkshaper start || exit 0

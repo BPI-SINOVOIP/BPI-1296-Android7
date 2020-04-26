@@ -1,0 +1,102 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -192,6 +192,32 @@
+ #define SMP_LOCK_MESH_ACL(__x__)		do { spin_lock(&priv->mesh_acl_list_lock); (void)(__x__); } while (0)
+ #define SMP_UNLOCK_MESH_ACL(__x__)		do { spin_unlock(&priv->mesh_acl_list_lock); (void)(__x__); } while (0)
+ #elif defined(CONFIG_PCI_HCI)
++#ifdef CONFIG_PREEMPT
++#define SMP_LOCK(__x__)		do {spin_lock_irqsave(&priv->pshare->lock, priv->pshare->lock_flags); priv->pshare->lock_owner=1;} while(0)
++#define SMP_UNLOCK(__x__)	do {priv->pshare->lock_owner=-1;spin_unlock_irqrestore(&priv->pshare->lock, priv->pshare->lock_flags);}while(0)
++#define SMP_TRY_LOCK(__x__,__y__) SMP_LOCK(__x__);__y__ = 1;
++#define SMP_LOCK_ASSERT() \
++	do { \
++			if(priv->pshare->lock_owner!=1) { \
++					panic_printk("ERROR: Without obtaining SMP_LOCK(). Please calling SMP_LOCK() before entering into %s()\n\n\n",__FUNCTION__); \
++					return; \
++			} \
++	}while(0)
++#define SMP_LOCK_XMIT(__x__)			do {spin_lock_irqsave(&priv->pshare->lock_xmit, priv->pshare->lock_xmit_flags);priv->pshare->lock_xmit_owner=1;} while(0)
++#define SMP_UNLOCK_XMIT(__x__) 			do {priv->pshare->lock_xmit_owner=-1;spin_unlock_irqrestore(&priv->pshare->lock_xmit, priv->pshare->lock_xmit_flags);}while(0)
++#if 0
++#define SMP_TRY_LOCK_XMIT(__x__,__y__) \
++	do { \
++		if(priv->pshare->lock_xmit_owner != 1) { \
++			SMP_LOCK_XMIT(__x__); \
++			__y__ = 1; \
++		} else \
++			__y__ = 0; \
++	} while(0)
++#else
++#define SMP_TRY_LOCK_XMIT(__x__,__y__) SMP_LOCK_XMIT(__x__);__y__ = 1;
++#endif
++#else //CONFIG_PREEMPT
+ #define SMP_LOCK(__x__)	\
+ 	do { \
+ 		if(priv->pshare->lock_owner!=smp_processor_id()) \
+@@ -244,6 +270,7 @@
+ 		} else \
+ 			__y__ = 0; \
+ 	} while(0)
++#endif //CONFIG_PREEMPT
+ 
+ #define SMP_LOCK_HASH_LIST(__x__)		spin_lock_irqsave(&priv->hash_list_lock, (__x__))
+ #define SMP_UNLOCK_HASH_LIST(__x__)		spin_unlock_irqrestore(&priv->hash_list_lock, (__x__))
+@@ -256,6 +283,22 @@
+ 
+ //#define SMP_LOCK_ASOC_LIST(__x__)		spin_lock_irqsave(&priv->asoc_list_lock, (__x__))
+ //#define SMP_UNLOCK_ASOC_LIST(__x__)		spin_unlock_irqrestore(&priv->asoc_list_lock, (__x__))
++#ifdef CONFIG_PREEMPT
++#define SMP_LOCK_ASOC_LIST(__x__) 		do {spin_lock_irqsave(&priv->asoc_list_lock, __x__);priv->asoc_list_lock_owner=1;} while(0)
++#define SMP_UNLOCK_ASOC_LIST(__x__)		do {priv->asoc_list_lock_owner = -1; spin_unlock_irqrestore(&priv->asoc_list_lock, __x__);} while(0)
++#if 0
++#define SMP_TRY_LOCK_ASOC_LIST(__x__, __y__) \
++	do { \
++		if(priv->asoc_list_lock_owner != 1) { \
++			SMP_LOCK_ASOC_LIST(__x__); \
++			__y__ = 1; \
++		} else \
++			__y__ = 0; \
++	} while(0)
++#else
++#define SMP_TRY_LOCK_ASOC_LIST(__x__,__y__) SMP_LOCK_ASOC_LIST(__x__);__y__ = 1;
++#endif
++#else //CONFIG_PREEMPT
+ #define SMP_LOCK_ASOC_LIST(__x__) \
+ 	do { \
+ 		if(priv->asoc_list_lock_owner != smp_processor_id()) \
+@@ -276,7 +319,7 @@
+ 		} else \
+ 			__y__ = 0; \
+ 	} while(0)
+-	
++#endif //CONFIG_PREEMPT	
+ #define SMP_LOCK_SLEEP_LIST(__x__)		spin_lock_irqsave(&priv->sleep_list_lock, (__x__))
+ #define SMP_UNLOCK_SLEEP_LIST(__x__)	spin_unlock_irqrestore(&priv->sleep_list_lock, (__x__))
+ #define SMP_LOCK_AUTH_LIST(__x__)		spin_lock_irqsave(&priv->auth_list_lock, (__x__))
+@@ -295,6 +338,18 @@
+ #define SMP_LOCK_BUF(__x__)				spin_lock_irqsave(&priv->pshare->lock_buf, (__x__))
+ #define SMP_UNLOCK_BUF(__x__)			spin_unlock_irqrestore(&priv->pshare->lock_buf, (__x__))
+ #endif
++#ifdef CONFIG_PREEMPT
++#define SMP_LOCK_RECV(__x__)				do {spin_lock_irqsave(&priv->pshare->lock_recv, (__x__));priv->pshare->lock_recv_owner=1;}while(0)
++#define SMP_UNLOCK_RECV(__x__)				do {priv->pshare->lock_recv_owner=-1;spin_unlock_irqrestore(&priv->pshare->lock_recv, (__x__));}while(0)
++#define SMP_TRY_LOCK_RECV(__x__,__y__) \
++	do { \
++		if(priv->pshare->lock_recv_owner != 1) { \
++			SMP_LOCK_RECV(__x__); \
++			__y__ = 1; \
++		} else \
++			__y__ = 0; \
++	} while(0)
++#else //CONFIG_PREEMPT
+ #define SMP_LOCK_RECV(__x__)	\
+ 	do { \
+ 		if(priv->pshare->lock_recv_owner!=smp_processor_id()) \
+@@ -312,6 +367,7 @@
+ 		} else \
+ 			__y__ = 0; \
+ 	} while(0)
++#endif //CONFIG_PREEMPT
+ 
+ //#define SMP_LOCK_RECV(__x__)			spin_lock_irqsave(&priv->pshare->lock_recv, (__x__))
+ //#define SMP_UNLOCK_RECV(__x__)			spin_unlock_irqrestore(&priv->pshare->lock_recv, (__x__))

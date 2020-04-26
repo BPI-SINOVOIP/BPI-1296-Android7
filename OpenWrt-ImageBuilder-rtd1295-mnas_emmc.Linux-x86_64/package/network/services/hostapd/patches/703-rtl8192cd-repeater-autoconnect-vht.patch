@@ -1,0 +1,17 @@
+--- a/src/ap/hostapd.c
++++ b/src/ap/hostapd.c
+@@ -77,6 +77,14 @@ static void hostapd_reload_bss(struct ho
+ 
+ 	ssid = &hapd->conf->ssid;
+ 
++	if (!hapd->iconf->secondary_channel)
++		hapd->iconf->vht_oper_chwidth = VHT_CHANWIDTH_USE_HT;
++
++	if(hapd->iconf->vht_oper_chwidth == VHT_CHANWIDTH_USE_HT)
++		hapd->iconf->vht_oper_centr_freq_seg0_idx = hapd->iconf->channel + hapd->iconf->secondary_channel * 2;
++	else if(hapd->iconf->vht_oper_chwidth == VHT_CHANWIDTH_80MHZ)
++		hapd->iconf->vht_oper_centr_freq_seg0_idx = 0;
++
+ 	hostapd_set_freq(hapd, hapd->iconf->hw_mode, hapd->iface->freq,
+ 			 hapd->iconf->channel,
+ 			 hapd->iconf->ieee80211n,

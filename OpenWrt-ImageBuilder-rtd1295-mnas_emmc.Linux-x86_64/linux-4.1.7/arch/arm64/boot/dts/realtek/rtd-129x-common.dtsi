@@ -1,0 +1,416 @@
+#include <dt-bindings/clock/rtk,cc-rtd129x.h>
+#include <dt-bindings/reset/rtk,reset.h>
+#include <dt-bindings/soc/rtk,pwrctrl.h>
+#include <dt-bindings/reset/rtk,reset-rtd129x.h>
+#include <dt-bindings/clock/rtk,clock-rtd129x.h>
+
+/{
+	rbus@98000000 {
+		compatible = "realtek,rbus";
+		reg = <0x98000000 0x200000>;
+		status = "okay";
+	};
+
+	md@9800b000 {
+		compatible = "realtek,md";
+		reg = <0x9800b000 0x1000>;
+		interrupts = <0 38 4>; /* 70 - 32 = 38 */
+		clocks = <&clk_en_1 CLK_EN_MD>;
+		resets = <&rst1 RSTN_MD>;
+		status = "okay";
+	};
+
+	se@9800c000 {
+		compatible = "realtek,se";
+		reg = <0x9800c000 0x1000>;
+		interrupts = <0 20 4>; /* 52 - 32 = 20 */
+		clocks = <&clk_en_1 CLK_EN_SE>;
+		resets = <&rst1 RSTN_SE>;
+		power-domains = <&pd_se>;
+		status = "okay";
+	};
+
+	tp: tp@98014000 {
+		compatible = "realtek,tp";
+		reg = <0x98014000 0x1000>;
+		clocks = <&clk_en_1 CLK_EN_TP>;
+		resets = <&rst1 RSTN_TP>;
+		status = "disabled";
+	};
+
+	refclk@9801b540 {
+		compatible = "realtek,refclk";
+		reg = <0x9801b000 0x1000>;
+		status = "okay";
+	};
+
+	spif {
+		compatible = "realtek,cpu-spif";
+		status = "okay";
+	};
+
+	sb2_lock0: sb2-lock@9801A000 {
+		compatible = "realtek,sb2-sem";
+		reg = <0x9801A000 0x4>;
+	};
+
+	/* fixed clock */
+	osc27M: osc27M {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <27000000>;
+		clock-output-names = "osc27M";
+	};
+
+	/* mmio */
+	crt_mmio: mmio@98000000 {
+		compatible = "realtek,mmio";
+		reg = <0x98000000 0x600>;
+		realtek,sb2-lock = <&sb2_lock0>;
+	};
+
+	iso_mmio: mmio@98007088 {
+		compatible = "realtek,mmio";
+		reg = <0x98007088 0x8>;
+		realtek,sb2-lock = <&sb2_lock0>;
+	};
+
+	/* clock-controller */
+	clk_en_1: clk-en@9800000c {
+		compatible   = "realtek,clock-gate-controller";
+		reg = <0x9800000c 0x4>;
+		#clock-cells = <1>;
+		realtek,mmio = <&crt_mmio 0xc>;
+		clock-output-names =
+			"clk_en_misc",
+			"clk_en_pcie0",
+			"clk_en_sata_0",
+			"clk_en_gspi",
+			"clk_en_usb",
+			"",
+			"clk_en_iso_misc",
+			"clk_en_sata_alive_0",
+			"clk_en_hdmi",
+			"clk_en_etn",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"clk_en_lvds",
+			"clk_en_se",
+			"",
+			"clk_en_cp",
+			"clk_en_md",
+			"clk_en_tp",
+			"",
+			"clk_en_nf",
+			"clk_en_emmc",
+			"clk_en_cr",
+			"clk_en_sdio_ip",
+			"clk_en_mipi",
+			"clk_en_emmc_ip",
+			"",
+			"clk_en_sdio",
+			"clk_en_sd_ip";
+		ignore-unused-clocks =
+			"clk_en_misc",
+			"clk_en_iso_misc",
+			"clk_en_cp",
+			"clk_en_md",
+			"clk_en_tp",
+			"clk_en_hdmi";
+		ignore-pm-clocks =
+			"clk_en_hdmi";
+	};
+
+	clk_en_2: clk-en@98000010 {
+		compatible   = "realtek,clock-gate-controller";
+		reg = <0x98000010 0x4>;
+		#clock-cells = <1>;
+		realtek,mmio = <&crt_mmio 0x10>;
+		clock-output-names =
+			"clk_en_nat",
+			"clk_en_misc_i2c_5",
+			"",
+			"clk_en_jpeg",
+			"",
+			"clk_en_pcie1",
+			"clk_en_misc_sc",
+			"clk_en_cbus_tx",
+			"",
+			"",
+			"clk_en_misc_rtc",
+			"",
+			"",
+			"clk_en_misc_i2c_4",
+			"clk_en_misc_i2c_3",
+			"clk_en_misc_i2c_2",
+			"clk_en_misc_i2c_1",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"clk_en_hdmirx",
+			"clk_en_sata_1",
+			"clk_en_sata_alive_1",
+			"clk_en_ur2",
+			"clk_en_ur1",
+			"clk_en_fan",
+			"clk_en_dcphy_0",
+			"clk_en_dcphy_1";
+		ignore-unused-clocks =
+			"clk_en_dcphy_0",
+			"clk_en_dcphy_1";
+	};
+
+	iclk_en: clk-en@9800708c {
+		compatible   = "realtek,clock-gate-controller";
+		reg = <0x9800708c 0x4>;
+		#clock-cells = <1>;
+		realtek,mmio = <&iso_mmio 0x4>;
+		clock-output-names =
+			"",
+			"",
+			"clk_en_misc_cec0",
+			"clk_en_cbusrx_sys",
+			"clk_en_cbustx_sys",
+			"clk_en_cbus_sys",
+			"clk_en_cbus_osc",
+			"clk_en_misc_ir",
+			"clk_en_misc_ur0",
+			"clk_en_i2c0",
+			"clk_en_i2c1",
+			"clk_en_etn_250m",
+			"clk_en_etn_sys";
+		ignore-unused-clocks =
+			"clk_en_etn_250m",
+			"clk_en_etn_sys";
+	};
+
+	cc: clock-controller@98000000 {
+		compatible   = "realtek,clock-controller";
+		reg = <0x98000000 0x600>;
+		#clock-cells = <1>;
+		realtek,mmio = <&crt_mmio 0x0>;
+	};
+
+	/* reset-controller */
+	rst1: soft-reset@98000000 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000000 0x4>;
+		realtek,mmio = <&crt_mmio 0x0>;
+		#reset-cells = <1>;
+		pm-ignore-bits = <0x00001000>;
+	};
+
+	rst2: soft-reset@98000004 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000004 0x4>;
+		realtek,mmio = <&crt_mmio 0x4>;
+		#reset-cells = <1>;
+	};
+
+	rst3: soft-reset@98000008 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000008 0x4>;
+		realtek,mmio = <&crt_mmio 0x8>;
+		#reset-cells = <1>;
+	};
+
+	rst4: soft-reset@98000050 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000050 0x4>;
+		realtek,mmio = <&crt_mmio 0x50>;
+		#reset-cells = <1>;
+	};
+
+	irst:
+	iso_rst: soft-reset@98007088 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98007088 0x4>;
+		realtek,mmio = <&iso_mmio 0x0>;
+		#reset-cells = <1>;
+	};
+
+	asr1: async-soft-reset@98000000 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000000 0x4>;
+		realtek,mmio = <&crt_mmio 0x0>;
+		#reset-cells = <1>;
+		async-group = <0>;
+	};
+
+	asr2: async-soft-reset@98000004 {
+		compatible = "realtek,reset-controller";
+		reg = <0x98000004 0x4>;
+		realtek,mmio = <&crt_mmio 0x4>;
+		#reset-cells = <1>;
+		async-group = <0>;
+	};
+
+	rcp: rcp {
+		compatible = "realtek,reset-control-provider";
+	};
+
+	uctrl {
+		compatible = "realtek,userspace-control";
+		clocks = <&clk_en_1 CLK_EN_TP>,
+			<&clk_en_1 CLK_EN_MD>,
+			<&clk_en_1 CLK_EN_SE>;
+		clock-names = "tp", "md", "se";
+		resets = <&rst1 RSTN_TP>,
+			<&rst1 RSTN_MD>,
+			<&rst1 RSTN_SE>;
+		reset-names = "tp", "md", "se";
+	};
+
+
+	busfreq {
+		compatible = "realtek,rtd129x-busfreq";
+		enable = <1>;
+		polling-ms = <1000>;
+		clocks = <&cc CC_PLL_BUS_H>;
+		status = "okay";
+
+		clk@0 {
+			clocks = <&cc CC_CLK_SYS>;
+			rate = <128 256>;
+		};
+		clk@1 {
+			clocks = <&cc CC_PLL_BUS_H>;
+			rate = <200 459>;
+		};
+	};
+
+	/* power-control */
+	pcm_pd_sata_nat:
+	pcm_pd_rtc:
+	pcm_pd_vo:
+	pcm_pd_gpu:
+	pcm_pd_ve:
+	power-domain {
+		compatible = "realtek,129x-pcm";
+		status = "okay";
+		pcm,type = <PCM_TYPE_GENPD>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+	};
+	pcm_vo:
+	pcm_ddr:
+	pcm_sys:
+	pcm_usb:
+	managed-power-control {
+		compatible = "realtek,129x-pcm";
+		status = "okay";
+		pcm,type = <PCM_TYPE_MGR>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+	};
+	pcm_ve_timer:
+	pcm_gpu_core:
+	pcm_unmanaged:
+	unmanaged-power-control {
+		compatible = "realtek,129x-pcm";
+		status = "okay";
+		pcm,type = <PCM_TYPE_NONE>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+	};
+
+	/* power-domain binding */
+	sata@9803F000 {
+		power-domains = <&pd_sata>;
+	};
+	gmac@0x98060000 {
+		power-domains = <&pd_nat>;
+	};
+	rtc@0x9801B600 {
+		power-domains = <&pd_rtc>;
+	};
+	hdmirx@98034000 {
+		power-domains = <&pd_hdmirx>;
+	};
+	gpu@0x98050000 {
+		power-domains = <&pd_gpu>;
+	};
+	ve1@98040000 {
+		power-domains = <&pd_ve12>;
+	};
+	ve3@98048000 {
+		power-domains = <&pd_ve3>;
+	};
+	cec0@98037800 {
+		power-domains = <&pd_cectx>;
+	};
+	cec1@98037200 {
+		power-domains = <&pd_cecrx>;
+	};
+};
+#include "rtd-129x-powerctrl.dtsi"
+&rcp {
+	hwnat {
+		resets =
+			<&rst1 SATA_FUNC_EXIST_0>,
+			<&rst1 RSTN_SATA_PHY_POW_0>,
+			<&rst1 RSTN_SATA_PHY_0>,
+			<&rst1 RSTN_SATA_0>,
+			<&rst1 RSTN_NAT>,
+			<&rst2 RSTN_SDS_PHY>,
+			<&iso_rst IRSTN_GPHY>,
+			<&iso_rst IRSTN_GMAC>;
+		reset-names =
+			"sata_func_exist_0",
+			"rstn_sata_phy_pow_0",
+			"rstn_sata_phy_0",
+			"rstn_sata_0",
+			"rstn_nat",
+			"rstn_sds_phy",
+			"iso_rstn_gphy",
+			"iso_rstn_gmac";
+	};
+
+	hdmirx {
+		resets =
+			<&rst1 RSTN_MIPI>,
+			<&rst1 RSTN_TP>,
+			<&rst1 RSTN_CP>,
+			<&rst2 RSTN_CBUS_TX>,
+			<&rst4 RSTN_HDMIRX>,
+			<&rst4 RSTN_HDMIRX_WRAP>,
+			<&iso_rst IRSTN_CBUS>,
+			<&iso_rst IRSTN_CBUSRX>,
+			<&iso_rst IRSTN_CBUSTX>;
+		reset-names =
+			"rstn_mipi",
+			"rstn_tp",
+			"rstn_cp",
+			"rstn_cbus_tx",
+			"rstn_hdmirx_wrap",
+			"rstn_hdmirx",
+			"iso_rstn_cbus",
+			"iso_rstn_cbusrx",
+			"iso_rstn_cbustx";
+	};
+	hdmitx {
+		resets =
+			<&rst1 RSTN_HDMI>;
+		reset-names =
+			"rstn_hdmi";
+	};
+	gpu {
+		resets = <&rst1 RSTN_GPU>;
+		reset-names = "rstn_gpu";
+	};
+};
+

@@ -1,0 +1,246 @@
+From bd643df744124e6abe07229a97c3fd84d6ce22fc Mon Sep 17 00:00:00 2001
+From: Oliver <oliver@zerolag.com>
+Date: Fri, 11 Jan 2013 15:16:28 -0800
+Subject: [PATCH] Multicast: Support setting interface when listening or
+ sending
+
+Iperf now supports specifying an interface name with -O or --interface
+in order to permit listening and sending multicast datagrams on an
+interface other than the default.
+
+Works for IPv4 and IPv6.
+---
+ include/Locale.h     |  2 ++
+ include/Settings.hpp |  5 +++++
+ include/headers.h    |  2 ++
+ src/Listener.cpp     | 18 +++++++++++++++++-
+ src/Locale.c         |  4 ++++
+ src/PerfSocket.cpp   | 25 +++++++++++++++++++++++++
+ src/Settings.cpp     | 13 ++++++++++++-
+ 7 files changed, 67 insertions(+), 2 deletions(-)
+
+diff --git a/include/Locale.h b/include/Locale.h
+index d3c4f25..4b79d34 100644
+--- a/include/Locale.h
++++ b/include/Locale.h
+@@ -164,6 +164,8 @@ extern const char report_interval_small[];
+ 
+ extern const char warn_invalid_server_option[];
+ 
++extern const char warn_interface_invalid_ignored[];
++
+ extern const char warn_invalid_client_option[];
+ 
+ extern const char warn_invalid_compatibility_option[];
+diff --git a/include/Settings.hpp b/include/Settings.hpp
+index 31de506..946f0a8 100644
+--- a/include/Settings.hpp
++++ b/include/Settings.hpp
+@@ -112,6 +112,7 @@ typedef struct thread_Settings {
+     char*  mHost;                   // -c
+     char*  mLocalhost;              // -B
+     char*  mOutputFileName;         // -o
++    char*  mCustInterface;          // -O
+     FILE*  Extractor_file;
+     ReportHeader*  reporthdr;
+     MultiHeader*   multihdr;
+@@ -210,6 +211,7 @@ typedef struct thread_Settings {
+ #define FLAG_SINGLECLIENT   0x00100000
+ #define FLAG_SINGLEUDP      0x00200000
+ #define FLAG_CONGESTION     0x00400000
++#define FLAG_INTERFACE      0x00800000
+ 
+ #define isBuflenSet(settings)      ((settings->flags & FLAG_BUFLENSET) != 0)
+ #define isCompat(settings)         ((settings->flags & FLAG_COMPAT) != 0)
+@@ -226,6 +228,7 @@ typedef struct thread_Settings {
+ #define isModeTime(settings)       ((settings->flags & FLAG_MODETIME) != 0)
+ #define isReport(settings)         ((settings->flags & FLAG_REPORTSETTINGS) != 0)
+ #define isMulticast(settings)      ((settings->flags & FLAG_MULTICAST) != 0)
++#define isCustInterface(settings)  ((settings->flags & FLAG_INTERFACE) != 0)
+ // Active Low for Reports
+ #define isSettingsReport(settings) ((settings->flags & FLAG_NOSETTREPORT) == 0)
+ #define isConnectionReport(settings)  ((settings->flags & FLAG_NOCONNREPORT) == 0)
+@@ -259,6 +262,7 @@ typedef struct thread_Settings {
+ #define setNoMultReport(settings)  settings->flags |= FLAG_NOMULTREPORT
+ #define setSingleClient(settings)  settings->flags |= FLAG_SINGLECLIENT
+ #define setSingleUDP(settings)     settings->flags |= FLAG_SINGLEUDP
++#define setCustInterface(settings) settings->flags |= FLAG_INTERFACE
+ #define setCongestionControl(settings) settings->flags |= FLAG_CONGESTION
+ 
+ #define unsetBuflenSet(settings)   settings->flags &= ~FLAG_BUFLENSET
+@@ -283,6 +287,7 @@ typedef struct thread_Settings {
+ #define unsetNoMultReport(settings)   settings->flags &= ~FLAG_NOMULTREPORT
+ #define unsetSingleClient(settings)   settings->flags &= ~FLAG_SINGLECLIENT
+ #define unsetSingleUDP(settings)      settings->flags &= ~FLAG_SINGLEUDP
++#define unsetCustInterface(settings)  settings->flags &= ~FLAG_INTERFACE
+ #define unsetCongestionControl(settings) settings->flags &= ~FLAG_CONGESTION
+ 
+ 
+diff --git a/include/headers.h b/include/headers.h
+index 4667bfe..1271675 100644
+--- a/include/headers.h
++++ b/include/headers.h
+@@ -131,6 +131,7 @@
+ /* unix headers */
+     #include <sys/types.h>
+     #include <sys/socket.h>
++    #include <sys/ioctl.h>
+     #include <sys/time.h>
+     #include <signal.h>
+     #include <unistd.h>
+@@ -146,6 +147,7 @@ SPECIAL_OSF1_EXTERN_C_STOP
+ 
+ SPECIAL_OSF1_EXTERN_C_START
+     #include <arpa/inet.h>   /* netinet/in.h must be before this on SunOS */
++    #include <net/if.h>
+ SPECIAL_OSF1_EXTERN_C_STOP
+ 
+     #ifdef HAVE_POSIX_THREAD
+diff --git a/src/Listener.cpp b/src/Listener.cpp
+index 94e32de..0e1379a 100644
+--- a/src/Listener.cpp
++++ b/src/Listener.cpp
+@@ -363,6 +363,19 @@ void Listener::McastJoin( ) {
+                 sizeof(mreq.imr_multiaddr));
+ 
+         mreq.imr_interface.s_addr = htonl( INADDR_ANY );
++		
++		if(isCustInterface ( mSettings ) ) {
++			int fd = socket(AF_INET, SOCK_DGRAM, 0);
++			struct ifreq ifr;
++			ifr.ifr_addr.sa_family = AF_INET;
++			strncpy(ifr.ifr_name, mSettings->mCustInterface, IFNAMSIZ-1);
++			if(ioctl(fd, SIOCGIFADDR, &ifr) != -1)
++			{
++				struct sockaddr_in *int_addr = (struct sockaddr_in *)&ifr.ifr_addr;
++				mreq.imr_interface = int_addr->sin_addr;
++			}
++			close(fd);
++		}
+ 
+         int rc = setsockopt( mSettings->mSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                              (char*) &mreq, sizeof(mreq));
+@@ -375,7 +388,10 @@ void Listener::McastJoin( ) {
+         memcpy( &mreq.ipv6mr_multiaddr, SockAddr_get_in6_addr( &mSettings->local ), 
+                 sizeof(mreq.ipv6mr_multiaddr));
+ 
+-        mreq.ipv6mr_interface = 0;
++		if(isCustInterface ( mSettings ) )
++			mreq.ipv6mr_interface = if_nametoindex(mSettings->mCustInterface);
++		else
++			mreq.ipv6mr_interface = 0;
+ 
+         int rc = setsockopt( mSettings->mSock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,
+                              (char*) &mreq, sizeof(mreq));
+diff --git a/src/Locale.c b/src/Locale.c
+index b5d42b1..93313b2 100644
+--- a/src/Locale.c
++++ b/src/Locale.c
+@@ -88,6 +88,7 @@ Client/Server:\n\
+   -C, --compatibility      for use with older versions does not sent extra msgs\n\
+   -M, --mss       #        set TCP maximum segment size (MTU - 40 bytes)\n\
+   -N, --nodelay            set TCP no delay, disabling Nagle's Algorithm\n\
++  -O, --interface <int>    specify an interface to bind to for multicast\n\
+   -V, --IPv6Version        Set the domain to IPv6\n\
+ \n\
+ Server specific:\n\
+@@ -306,6 +307,9 @@ const char report_interval_small[] =
+ const char warn_invalid_server_option[] =
+ "WARNING: option -%c is not valid for server mode\n";
+ 
++const char warn_interface_invalid_ignored[] =
++"WARNING: interface name is too long to be valid, iperf will ignore it\n";
++
+ const char warn_invalid_client_option[] =
+ "WARNING: option -%c is not valid for client mode\n";
+ 
+diff --git a/src/PerfSocket.cpp b/src/PerfSocket.cpp
+index 3ecdbe0..1299b23 100644
+--- a/src/PerfSocket.cpp
++++ b/src/PerfSocket.cpp
+@@ -114,12 +114,37 @@ void SetSocketOptions( thread_Settings *inSettings ) {
+ 		    (const void*) &val, (Socklen_t) sizeof(val));
+ 
+ 	    WARN_errno( rc == SOCKET_ERROR, "multicast ttl" );
++		if(isCustInterface ( inSettings ) ) {
++			int fd = socket(AF_INET, SOCK_DGRAM, 0);
++			struct ifreq ifr;
++			ifr.ifr_addr.sa_family = AF_INET;
++			strncpy(ifr.ifr_name, inSettings->mCustInterface, IFNAMSIZ-1);
++			if(ioctl(fd, SIOCGIFADDR, &ifr) != -1)
++			{
++				struct sockaddr_in *int_addr = (struct sockaddr_in *)&ifr.ifr_addr;
++				setsockopt(inSettings->mSock, IPPROTO_IP, IP_MULTICAST_IF, &int_addr->sin_addr, sizeof(int_addr->sin_addr));
++			}
++			close(fd);
++		}
+ 	}
+ #ifdef HAVE_IPV6_MULTICAST
+ 	else {
+ 	    int rc = setsockopt( inSettings->mSock, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+ 		    (const void*) &val, (Socklen_t) sizeof(val));
+ 	    WARN_errno( rc == SOCKET_ERROR, "multicast ttl" );
++		
++		if(isCustInterface ( inSettings ) ) {
++			int fd = socket(AF_INET6, SOCK_DGRAM, 0);
++			struct ifreq ifr;
++			ifr.ifr_addr.sa_family = AF_INET6;
++			strncpy(ifr.ifr_name, inSettings->mCustInterface, IFNAMSIZ-1);
++			if(ioctl(fd, SIOCGIFADDR, &ifr) == 0)
++			{
++				struct sockaddr_in6 *int_addr = (struct sockaddr_in6 *)&ifr.ifr_addr;
++				setsockopt(inSettings->mSock, IPPROTO_IPV6, IPV6_MULTICAST_IF, &int_addr->sin6_addr, sizeof(int_addr->sin6_addr));
++			}
++			close(fd);
++		}
+ 	}
+ #endif
+ #endif
+diff --git a/src/Settings.cpp b/src/Settings.cpp
+index 6a5f092..28a5e75 100644
+--- a/src/Settings.cpp
++++ b/src/Settings.cpp
+@@ -112,6 +112,7 @@ const struct option long_options[] =
+ {"stdin_input",      no_argument, NULL, 'I'},
+ {"mss",        required_argument, NULL, 'M'},
+ {"nodelay",          no_argument, NULL, 'N'},
++{"interface",  required_argument, NULL, 'O'},
+ {"listenport", required_argument, NULL, 'L'},
+ {"parallel",   required_argument, NULL, 'P'},
+ {"remove",           no_argument, NULL, 'R'},
+@@ -156,6 +157,7 @@ const struct option env_options[] =
+ {"IPERF_STDIN_INPUT",      no_argument, NULL, 'I'},
+ {"IPERF_MSS",        required_argument, NULL, 'M'},
+ {"IPERF_NODELAY",          no_argument, NULL, 'N'},
++{"IPERF_INTERFACE",  required_argument, NULL, 'O'},
+ {"IPERF_LISTENPORT", required_argument, NULL, 'L'},
+ {"IPERF_PARALLEL",   required_argument, NULL, 'P'},
+ {"IPERF_TOS",        required_argument, NULL, 'S'},
+@@ -169,7 +171,7 @@ const struct option env_options[] =
+ 
+ #define SHORT_OPTIONS()
+ 
+-const char short_options[] = "1b:c:df:hi:l:mn:o:p:rst:uvw:x:y:B:CDF:IL:M:NP:RS:T:UVWZ:";
++const char short_options[] = "1b:c:df:hi:l:mn:o:p:rst:uvw:x:y:B:CDF:IL:M:N:O:P:RS:T:UVWZ:";
+ 
+ /* -------------------------------------------------------------------
+  * defaults
+@@ -605,6 +607,15 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
+         case 'N': // specify TCP nodelay option (disable Jacobson's Algorithm)
+             setNoDelay( mExtSettings );
+             break;
++			
++		case 'O': // specify interface to bind to (multicast)
++			if(strlen(outarg) < IFNAMSIZ) {
++				setCustInterface ( mExtSettings );
++				mExtSettings->mCustInterface = new char[strlen(optarg)+1];
++				strcpy(mExtSettings->mCustInterface, optarg);
++			} else
++				fprintf( stderr, warn_interface_invalid_ignored, option);
++			break;
+ 
+         case 'P': // number of client threads
+ #ifdef HAVE_THREAD
+-- 
+1.8.1
+

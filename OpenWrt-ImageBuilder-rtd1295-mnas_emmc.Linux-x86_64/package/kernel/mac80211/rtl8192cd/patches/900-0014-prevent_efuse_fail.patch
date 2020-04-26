@@ -1,0 +1,10 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -21218,6 +21218,7 @@ static void ReadEFuse(struct rtl8192cd_p
+ 		eFuse_Addr++;
+ 	} else {
+ 		//RTPRINT(FEEPROM, EFUSE_READ_ALL, ("EFUSE is empty efuse_Addr-%d efuse_data=%x\n", eFuse_Addr, *rtemp8));
++		memset(pbuf, 0xff, priv->EfuseMapLen);
+ 		return;
+ 	}
+ 

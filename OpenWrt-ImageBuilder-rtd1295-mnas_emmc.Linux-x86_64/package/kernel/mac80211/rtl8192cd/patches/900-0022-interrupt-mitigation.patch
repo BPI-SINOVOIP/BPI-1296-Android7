@@ -1,0 +1,36 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -10010,6 +10010,10 @@ static void MacInit_8812(struct rtl8192c
+ 	LLT_table_init_8812(priv);
+ 
+ 	//printk("\n\n 0x%.x, 0x%.8x \n\n\n", RTL_R32(0x200),  RTL_R32(0x204));
++#ifdef RTK_129X_PLATFORM
++	//Enable interrupt mitigation
++	RTL_W32(REG_INT_MIG_8812, 0x151300E0);
++#endif
+ 
+ 	// Enable interrupt
+ 	RTL_W32(REG_HISR0_8812, 0xffffffff);
+--- a/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
+@@ -4630,6 +4630,20 @@ InitMAC88XX(
+ 	RT_TRACE(COMP_INIT, DBG_LOUD, ("===>%s\n", __FUNCTION__));
+ 
+     //MACFM_software_init(Adapter);
++#ifdef RTK_129X_PLATFORM
++	//Enable INterrupt mitigation
++#if IS_EXIST_RTL8192EE
++	if ( IS_HARDWARE_TYPE_8192EE(Adapter) ) {
++		HAL_RTL_W32(REG_INT_MIG, 0x00378000);
++	}
++#endif
++#ifdef IS_EXIST_RTL8822BE
++	if ( IS_HARDWARE_TYPE_8822BE(Adapter) ) {
++		HAL_RTL_W32(REG_INT_MIG, 0x151300E0);
++	}
++#endif
++#endif //RTK_129X_PLATFORM
++
+ 
+ #if IS_SUPPORT_MACHAL_API
+     if(IS_HARDWARE_MACHAL_SUPPORT(Adapter))

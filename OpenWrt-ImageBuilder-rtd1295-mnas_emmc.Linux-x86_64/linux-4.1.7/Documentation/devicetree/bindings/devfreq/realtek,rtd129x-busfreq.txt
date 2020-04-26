@@ -1,0 +1,48 @@
+Realtek RTD129x Bus DFS DT-bindings
+===================================
+
+Required properties :
+
+- compatible : shall contain the following :
+	"realtek,rtd129x-busfreq".
+
+- clocks : shall contain a phandle of clk, which is used for 
+	reference checking.
+
+Optional propertise :
+
+- enable : shall contain a integer, defalue 0. Set 1 for enable 
+	bus dfs by default.
+
+- polling-ms : shall contain a integer, default 1000. polling time 
+
+
+
+* Sub nodes for clock configuration
+
+Required properties :
+
+- clocks : shall contain a phandle of DFS clock.
+
+- rate : shall contain a array if u32, for freq table in MHz
+
+
+Exmaple :
+
+        busfreq {
+                compatible = "realtek,rtd129x-busfreq";
+                enable = <1>;
+                polling-ms = <1000>;
+                clocks = <&cc CC_PLL_BUS_H>;
+                status = "okay";
+
+                clk@0 {
+                        clocks = <&cc CC_CLK_SYS>;
+                        rate = <128 256>;
+                };
+                clk@1 {
+                        clocks = <&cc CC_PLL_BUS_H>;
+                        rate = <200 459>;
+                };
+        };
+	

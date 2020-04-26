@@ -1,0 +1,20 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -9515,13 +9515,10 @@ int  rtl8192cd_set_hwaddr(struct net_dev
+     memset(dev->broadcast, 0xff, ETH_ALEN);
+ #endif
+ #ifdef MBSSID
+-	if (GET_ROOT(priv)->pmib->miscEntry.vap_enable)
+-	{
+-		if (IS_VAP_INTERFACE(priv)) {
+-			RESTORE_INT(flags);
+-			SMP_UNLOCK(flags);
+-			return 0;
+-		}
++	if (IS_VAP_INTERFACE(priv)) {
++		RESTORE_INT(flags);
++		SMP_UNLOCK(flags);
++		return 0;
+ 	}
+ #endif
+ 

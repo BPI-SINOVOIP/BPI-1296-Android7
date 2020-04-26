@@ -1,0 +1,2142 @@
+/*
+ *      Header file of AP mib
+ *      Authors: David Hsu	<davidhsu@realtek.com.tw>
+ *
+ *      $Id: apmib.h,v 1.55 2009/10/06 05:49:10 bradhuang Exp $
+ *
+ */
+
+#define NOREP
+
+#ifdef MIB_HW_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl, decision_id,reinit_id */
+MIBDEF(unsigned char,	boardVer,	,	BOARD_VER,	BYTE_T, HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	nic0Addr,	[6],	NIC0_ADDR,	BYTE6_T, HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	nic1Addr,	[6],	NIC1_ADDR,	BYTE6_T, HW_SETTING_T, 0, 0,0,0)
+MIBDEF(HW_WLAN_SETTING_T,	wlan, [NUM_WLAN_INTERFACE],	WLAN_ROOT,	TABLE_LIST_T, HW_SETTING_T, 0, hwmib_wlan_table,0,0)
+#endif // #ifdef MIB_HW_IMPORT
+
+#ifdef MIB_HW_WLAN_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char, macAddr, [6],	WLAN_ADDR,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr1, [6],	WLAN_ADDR1,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr2, [6],	WLAN_ADDR2,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr3, [6],	WLAN_ADDR3,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr4, [6],	WLAN_ADDR4,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr5, [6],	WLAN_ADDR5,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr6,[6],	    WLAN_ADDR6,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, macAddr7, [6],	WLAN_ADDR7,	BYTE6_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+#if defined(CONFIG_RTL_8196B)
+MIBDEF(unsigned char, txPowerCCK, [MAX_CCK_CHAN_NUM],	TX_POWER_CCK,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, txPowerOFDM_HT_OFDM_1S, [MAX_OFDM_CHAN_NUM],	TX_POWER_OFDM_1S,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, txPowerOFDM_HT_OFDM_2S, [MAX_OFDM_CHAN_NUM],	TX_POWER_OFDM_2S,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, regDomain, ,	REG_DOMAIN,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, rfType, ,	RF_TYPE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, xCap, ,	11N_XCAP,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, LOFDMPwDiffA, ,	11N_LOFDMPWDA,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, LOFDMPwDiffB, ,	11N_LOFDMPWDB,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, TSSI1, ,	11N_TSSI1,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, TSSI2, ,	11N_TSSI2,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Ther, ,	11N_THER,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, ledType, ,	LED_TYPE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved1, ,	11N_RESERVED1,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved2, ,	11N_RESERVED2,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved3, ,	11N_RESERVED3,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved4, ,	11N_RESERVED4,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved5, ,	11N_RESERVED5,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved6, ,	11N_RESERVED6,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved7, ,	11N_RESERVED7,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved8, ,	11N_RESERVED8,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+#else /*rtl8196c*/
+MIBDEF(unsigned char, pwrlevelCCK_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_CCK_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelCCK_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_CCK_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelHT40_1S_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_HT40_1S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelHT40_1S_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_HT40_1S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiffHT40_2S, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_HT40_2S,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiffHT20, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_HT20,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiffOFDM, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, regDomain, ,	REG_DOMAIN,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, rfType, ,	RF_TYPE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, ledType, ,	LED_TYPE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, xCap, ,	11N_XCAP,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, TSSI1, ,	11N_TSSI1,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, TSSI2, ,	11N_TSSI2,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Ther, ,	11N_THER,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, trswitch, ,      11N_TRSWITCH,   BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, trswpape_C9, ,	11N_TRSWPAPE_C9, BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, trswpape_CC, ,	11N_TRSWPAPE_CC, BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, target_pwr, ,	11N_TARGET_PWR,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pa_type, ,	11N_PA_TYPE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Ther2, ,	11N_THER_2,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, xCap2, ,	11N_XCAP_2,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Kfree_enable, ,	11N_KFREE_ENABLE,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved9, ,	11N_RESERVED9,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, Reserved10, ,	11N_RESERVED10,	BYTE_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevel5GHT40_1S_A, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_5G_HT40_1S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevel5GHT40_1S_B, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_5G_HT40_1S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff5GHT40_2S, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_5G_HT40_2S,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff5GHT20, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_5G_HT20,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff5GOFDM, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_5G_OFDM,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+#ifdef WIFI_SIMPLE_CONFIG
+MIBDEF(unsigned char, wscPin, [PIN_LEN+1],	WSC_PIN,	STRING_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+#if defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8881A)
+
+MIBDEF(unsigned char, pwrdiff_20BW1S_OFDM1T_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_20BW1S_OFDM1T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW2S_20BW2S_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW2S_20BW2S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM2T_CCK2T_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM2T_CCK2T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW3S_20BW3S_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW3S_20BW3S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_4OFDM3T_CCK3T_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM3T_CCK3T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW4S_20BW4S_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW4S_20BW4S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM4T_CCK4T_A, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM4T_CCK4T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+MIBDEF(unsigned char, pwrdiff_5G_20BW1S_OFDM1T_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_20BW1S_OFDM1T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW2S_20BW2S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW2S_20BW2S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW3S_20BW3S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW3S_20BW3S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW4S_20BW4S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW4S_20BW4S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_RSVD_OFDM4T_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_RSVD_OFDM4T_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW1S_160BW1S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW1S_160BW1S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW2S_160BW2S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW2S_160BW2S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW3S_160BW3S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW3S_160BW3S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW4S_160BW4S_A, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW4S_160BW4S_A,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+
+MIBDEF(unsigned char, pwrdiff_20BW1S_OFDM1T_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_20BW1S_OFDM1T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW2S_20BW2S_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW2S_20BW2S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM2T_CCK2T_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM2T_CCK2T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW3S_20BW3S_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW3S_20BW3S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM3T_CCK3T_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM3T_CCK3T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW4S_20BW4S_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW4S_20BW4S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM4T_CCK4T_B, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM4T_CCK4T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+MIBDEF(unsigned char, pwrdiff_5G_20BW1S_OFDM1T_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_20BW1S_OFDM1T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW2S_20BW2S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW2S_20BW2S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW3S_20BW3S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW3S_20BW3S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW4S_20BW4S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW4S_20BW4S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_RSVD_OFDM4T_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_RSVD_OFDM4T_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW1S_160BW1S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW1S_160BW1S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW2S_160BW2S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW2S_160BW2S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW3S_160BW3S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW3S_160BW3S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW4S_160BW4S_B, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW4S_160BW4S_B,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+
+#endif
+
+#if defined(CONFIG_WLAN_HAL_8814AE)
+
+MIBDEF(unsigned char, pwrdiff_20BW1S_OFDM1T_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_20BW1S_OFDM1T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW2S_20BW2S_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW2S_20BW2S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM2T_CCK2T_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM2T_CCK2T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW3S_20BW3S_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW3S_20BW3S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_4OFDM3T_CCK3T_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM3T_CCK3T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW4S_20BW4S_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW4S_20BW4S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM4T_CCK4T_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM4T_CCK4T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+MIBDEF(unsigned char, pwrdiff_5G_20BW1S_OFDM1T_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_20BW1S_OFDM1T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW2S_20BW2S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW2S_20BW2S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW3S_20BW3S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW3S_20BW3S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW4S_20BW4S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW4S_20BW4S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_RSVD_OFDM4T_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_RSVD_OFDM4T_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW1S_160BW1S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW1S_160BW1S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW2S_160BW2S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW2S_160BW2S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW3S_160BW3S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW3S_160BW3S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW4S_160BW4S_C, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW4S_160BW4S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+
+MIBDEF(unsigned char, pwrdiff_20BW1S_OFDM1T_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_20BW1S_OFDM1T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW2S_20BW2S_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW2S_20BW2S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM2T_CCK2T_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM2T_CCK2T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW3S_20BW3S_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW3S_20BW3S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM3T_CCK3T_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM3T_CCK3T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_40BW4S_20BW4S_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_40BW4S_20BW4S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_OFDM4T_CCK4T_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_DIFF_OFDM4T_CCK4T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+MIBDEF(unsigned char, pwrdiff_5G_20BW1S_OFDM1T_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_20BW1S_OFDM1T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW2S_20BW2S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW2S_20BW2S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW3S_20BW3S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW3S_20BW3S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_40BW4S_20BW4S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_40BW4S_20BW4S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_RSVD_OFDM4T_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_RSVD_OFDM4T_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW1S_160BW1S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW1S_160BW1S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW2S_160BW2S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW2S_160BW2S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW3S_160BW3S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW3S_160BW3S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrdiff_5G_80BW4S_160BW4S_D, [MAX_5G_DIFF_NUM],	TX_POWER_DIFF_5G_80BW4S_160BW4S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+
+MIBDEF(unsigned char, pwrlevelCCK_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_CCK_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelCCK_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_CCK_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelHT40_1S_C, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_HT40_1S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevelHT40_1S_D, [MAX_2G_CHANNEL_NUM_MIB],	TX_POWER_HT40_1S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevel5GHT40_1S_C, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_5G_HT40_1S_C,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char, pwrlevel5GHT40_1S_D, [MAX_5G_CHANNEL_NUM_MIB],	TX_POWER_5G_HT40_1S_D,	BYTE_ARRAY_T, HW_WLAN_SETTING_T, 0, 0,0,0)
+
+#endif
+#endif // #ifdef MIB_HW_WLAN_IMPORT
+#ifdef BLUETOOTH_HW_SETTING_SUPPORT
+#ifdef MIB_BLUETOOTH_HW_IMPORT
+MIBDEF(unsigned char,	btAddr,	[6],	BT_ADDR,	BYTE6_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	txPowerIdx, [6],	TX_POWER_IDX,	BYTE6_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	thermalVal, ,	THERMAL_VALUE,	BYTE_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	antennaS0, ,	ANTENNA_S0,	BYTE_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	antennaS1, ,	ANTENNA_S1,	BYTE_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	xtalCapValue, ,	XTAL_CAP_VAL,	BYTE_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	txDacValue, , TX_DAC_VAL,	BYTE_T, BLUETOOTH_HW_SETTING_T, 0, 0,0,0)
+
+#endif
+#endif
+
+#ifdef CUSTOMER_HW_SETTING_SUPPORT
+#ifdef MIB_CUSTOMER_HW_IMPORT
+MIBDEF(unsigned char, serialNum, [15], SERIAL_NUM, STRING_T, CUSTOMER_HW_SETTING_T, 0, 0,0,0)
+#endif
+#endif
+#ifdef MIB_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+// TCP/IP stuffs
+MIBDEF(unsigned char,	ipAddr, [4],	IP_ADDR,	IA_T, APMIB_T, 0, 0,DECISION_LAN_IP_FUNC_ID,0)
+MIBDEF(unsigned char,	subnetMask, [4],	SUBNET_MASK,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	defaultGateway, [4],	DEFAULT_GATEWAY,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dhcp, ,	DHCP,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dhcpClientStart, [4],	DHCP_CLIENT_START,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dhcpClientEnd, [4],	DHCP_CLIENT_END,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned long,	dhcpLeaseTime, ,	DHCP_LEASE_TIME, DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	elanMacAddr, [6],	ELAN_MAC_ADDR,	BYTE6_T, APMIB_T, 0, 0,DECISION_LAN_MAC_FUNC_ID,0)
+//Brad add for static dhcp, set wan dns also need it
+MIBDEF(unsigned char,	dns1,	[4],	DNS1,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dns2,	[4],	DNS2,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dns3,	[4],	DNS3,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	stpEnabled,	,	STP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_STP_FUNC_ID)
+//wlp2p and wsc need device name
+MIBDEF(unsigned char,	deviceName,	[MAX_NAME_LEN],	DEVICE_NAME,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_APP_FUNC_ID)
+MIBDEF(unsigned char,	scrlogEnabled,	,	SCRLOG_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_LOG_FUNC_ID)
+//only pocket ap need the mib
+MIBDEF(unsigned char,	autoDiscoveryEnabled,	,	AUTO_DISCOVERY_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+//wan dnrd, dnssl and lan dhcp
+MIBDEF(unsigned char,	domainName,	[MAX_NAME_LEN],	DOMAIN_NAME,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+
+//HF for config dat check
+MIBDEF(unsigned char,	configTag,	[MAX_NAME_LEN],	CONFIG_TAG,	STRING_T, APMIB_T, 0, 0,0,0)
+#ifdef SUPER_NAME_SUPPORT
+// Supervisor of web server account
+MIBDEF(unsigned char,	superName,	[MAX_NAME_LEN],	SUPER_NAME,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_PASSWD_FUNC_ID)
+MIBDEF(unsigned char,	superPassword, [MAX_NAME_LEN],	SUPER_PASSWORD,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_PASSWD_FUNC_ID)
+#endif
+// web server account
+MIBDEF(unsigned char,	userName, [MAX_NAME_LEN],	USER_NAME,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_PASSWD_FUNC_ID)
+MIBDEF(unsigned char,	userPassword, [MAX_NAME_LEN],	USER_PASSWORD,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_PASSWD_FUNC_ID)
+#ifdef RTK_REINIT_SUPPORT
+MIBDEF(unsigned int,	startUpTimes, ,	STARTUP_TIMES,  DWORD_T, APMIB_T, 0, 0,DECISION_REINIT_ALL_FUNC_ID,0)
+#endif
+#if defined(CONFIG_RTL_8198_AP_ROOT) || defined(CONFIG_RTL_8197D_AP)
+MIBDEF(unsigned char,   ntpEnabled, ,   NTP_ENABLED,    BYTE_T, APMIB_T, 0, 0,DECISION_NTP_ENABLE_FUNC_ID,0)
+MIBDEF(unsigned char,   daylightsaveEnabled, ,  DAYLIGHT_SAVE,  BYTE_T, APMIB_T, 0, 0,0,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerId, ,  NTP_SERVER_ID,  BYTE_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpTimeZone, [8],       NTP_TIMEZONE,   STRING_T, APMIB_T, 0, 0,0,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp1, [4],      NTP_SERVER_IP1, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp2, [4],      NTP_SERVER_IP2, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp3, [4],      NTP_SERVER_IP3, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp4, [4],      NTP_SERVER_IP4, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp5, [4],      NTP_SERVER_IP5, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp6, [4],      NTP_SERVER_IP6, IA_T, APMIB_T, 0, 0,0,REINIT_WANAPP_NTP_FUNC_ID)
+#endif
+
+#ifdef HOME_GATEWAY
+MIBDEF(unsigned char,	wanMacAddr, [6],	WAN_MAC_ADDR,	BYTE6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanDhcp,	,	WAN_DHCP,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanIpAddr, [4],	WAN_IP_ADDR,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanSubnetMask, [4],	WAN_SUBNET_MASK,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanDefaultGateway, [4],	WAN_DEFAULT_GATEWAY,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppUserName, [MAX_NAME_LEN_LONG],	PPP_USER_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppPassword, [MAX_NAME_LEN_LONG],	PPP_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+//dzh begin
+
+
+//MIBDEF(unsigned short,	pppConnectCount,	,PPP_CONNECT_COUNT,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppConnectCount,	,	PPP_CONNECT_COUNT,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pppUserName2, [MAX_NAME_LEN_LONG],	PPP_USER_NAME2,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppPassword2, [MAX_NAME_LEN_LONG],	PPP_PASSWORD2,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pppUserName3, [MAX_NAME_LEN_LONG],	PPP_USER_NAME3,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppPassword3, [MAX_NAME_LEN_LONG],	PPP_PASSWORD3,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pppUserName4, [MAX_NAME_LEN_LONG],	PPP_USER_NAME4,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppPassword4, [MAX_NAME_LEN_LONG],	PPP_PASSWORD4,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	SubNet1Count,	,SUBNET1_COUNT,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F1_start, [4],SUBNET1_F1_START,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F1_end,   [4],SUBNET1_F1_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F2_start, [4],SUBNET1_F2_START,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F2_end,   [4],SUBNET1_F2_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F3_start, [4],SUBNET1_F3_START,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet1_F3_end,   [4],SUBNET1_F3_END,	IA_T, APMIB_T, 0, 0,0,0)	
+
+MIBDEF(unsigned short,	SubNet2Count,	,SUBNET2_COUNT,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F1_start, [4],SUBNET2_F1_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F1_end,   [4],SUBNET2_F1_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F2_start, [4],SUBNET2_F2_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F2_end,   [4],SUBNET2_F2_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F3_start, [4],SUBNET2_F3_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet2_F3_end,   [4],SUBNET2_F3_END,	IA_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	SubNet3Count,	,SUBNET3_COUNT, WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F1_start, [4],SUBNET3_F1_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F1_end,   [4],SUBNET3_F1_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F2_start, [4],SUBNET3_F2_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F2_end,   [4],SUBNET3_F2_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F3_start, [4],SUBNET3_F3_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet3_F3_end,   [4],SUBNET3_F3_END,	IA_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	SubNet4Count,	,SUBNET4_COUNT,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F1_start, [4],SUBNET4_F1_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F1_end,   [4],SUBNET4_F1_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F2_start, [4],SUBNET4_F2_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F2_end,   [4],SUBNET4_F2_END,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F3_start, [4],SUBNET4_F3_START, IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SubNet4_F3_end,   [4],SUBNET4_F3_END,	IA_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppIdleTime2,	,	PPP_IDLE_TIME2,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppConnectType2,	,	PPP_CONNECT_TYPE2,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppIdleTime3,	,	PPP_IDLE_TIME3,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppConnectType3,	,	PPP_CONNECT_TYPE3,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppIdleTime4,	,	PPP_IDLE_TIME4,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppConnectType4,	,	PPP_CONNECT_TYPE4,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppMtuSize2, ,	PPP_MTU_SIZE2,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pppMtuSize3, ,	PPP_MTU_SIZE3,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pppMtuSize4, ,	PPP_MTU_SIZE4,	WORD_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pppServiceName2, [41],	PPP_SERVICE_NAME2,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServiceName3, [41],	PPP_SERVICE_NAME3,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServiceName4, [41],	PPP_SERVICE_NAME4,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pppSubNet1, [30],	PPP_SUBNET1,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppSubNet2, [30],	PPP_SUBNET2,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppSubNet3, [30],	PPP_SUBNET3,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppSubNet4, [30],	PPP_SUBNET4,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppSessionNum2, ,	PPP_SESSION_NUM2,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServerMac2, [6],	PPP_SERVER_MAC2,	BYTE6_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppSessionNum3, ,	PPP_SESSION_NUM3,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServerMac3, [6],	PPP_SERVER_MAC3,	BYTE6_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned short,	pppSessionNum4, ,	PPP_SESSION_NUM4,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServerMac4, [6],	PPP_SERVER_MAC4,	BYTE6_T, APMIB_T, 0, 0,0,0)
+
+//dzh end
+
+MIBDEF(DNS_TYPE_T,	dnsMode,	,	DNS_MODE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pppIdleTime,	,	PPP_IDLE_TIME,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppConnectType,	,	PPP_CONNECT_TYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	dmzEnabled,	,	DMZ_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_DMZ_ID)
+MIBDEF(unsigned char,	dmzHost, [4],	DMZ_HOST,	IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_DMZ_ID)
+MIBDEF(unsigned char,	upnpEnabled, ,	UPNP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppoeWithDhcpEnabled, ,	PPPOE_DHCP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pppMtuSize, ,	PPP_MTU_SIZE,	WORD_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pptpIpAddr, [4],	PPTP_IP_ADDR,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpSubnetMask, [4],	PPTP_SUBNET_MASK,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpServerIpAddr, [4],	PPTP_SERVER_IP_ADDR,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpUserName, [MAX_NAME_LEN_LONG],	PPTP_USER_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	pptpPassword, [MAX_NAME_LEN_LONG],	PPTP_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pptpMtuSize, ,	PPTP_MTU_SIZE,	WORD_T, APMIB_T, 0, 0,0,0)
+
+/* # keith: add l2tp support. 20080515 */
+MIBDEF(unsigned char,	l2tpIpAddr, [4],	L2TP_IP_ADDR,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpSubnetMask, [4],	L2TP_SUBNET_MASK,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpServerIpAddr, [MAX_PPTP_HOST_NAME_LEN],	L2TP_SERVER_IP_ADDR,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpGateway, [4],	L2TP_GATEWAY,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpUserName, [MAX_NAME_LEN_LONG],	L2TP_USER_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpPassword, [MAX_NAME_LEN_LONG],	L2TP_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpMtuSize, ,	L2TP_MTU_SIZE,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpIdleTime, ,	L2TP_IDLE_TIME,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpConnectType, ,	L2TP_CONNECTION_TYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	L2tpwanIPMode, ,	L2TP_WAN_IP_DYNAMIC,	BYTE_T, APMIB_T, 0, 0,0,0)
+#if defined(CONFIG_DYNAMIC_WAN_IP)
+MIBDEF(unsigned char,	l2tpDefGw, [4],	L2TP_DEFAULT_GW,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpDefGw, [4],	PPTP_DEFAULT_GW,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpWanIPMode, ,	PPTP_WAN_IP_DYNAMIC,	BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef CONFIG_GET_SERVER_IP_BY_DOMAIN
+MIBDEF(unsigned char,	pptpGetServByDomain, ,	PPTP_GET_SERV_BY_DOMAIN,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpServerDomain, [MAX_SERVER_DOMAIN_LEN],  PPTP_SERVER_DOMAIN, STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpGetServByDomain, ,	L2TP_GET_SERV_BY_DOMAIN,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpServerDomain, [MAX_SERVER_DOMAIN_LEN],  L2TP_SERVER_DOMAIN, STRING_T, APMIB_T, 0, 0,0,0)
+#endif
+#endif
+
+/* USB3G */
+MIBDEF(unsigned char,   usb3g_user,     [32],    USB3G_USER,        STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_pass,     [32],    USB3G_PASS,        STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_pin,      [5],     USB3G_PIN,         STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_apn,      [20],    USB3G_APN,         STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_dialnum,  [12],    USB3G_DIALNUM,     STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_connType, [5],     USB3G_CONN_TYPE,   STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_idleTime, [5] ,    USB3G_IDLE_TIME,   STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,   usb3g_mtuSize,  [5],     USB3G_MTU_SIZE,    STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	lte4g,	,	LTE4G,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	ntpEnabled, ,	NTP_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NTP_ENABLE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	daylightsaveEnabled, ,	DAYLIGHT_SAVE,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	ntpServerId, ,	NTP_SERVER_ID,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,	ntpTimeZone, [8],	NTP_TIMEZONE,	STRING_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	ntpServerIp1, [4],	NTP_SERVER_IP1,	IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,	ntpServerIp2, [4],	NTP_SERVER_IP2,	IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp3, [4],	NTP_SERVER_IP3, IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp4, [4],	NTP_SERVER_IP4, IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp5, [4],	NTP_SERVER_IP5, IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+MIBDEF(unsigned char,   ntpServerIp6, [4],	NTP_SERVER_IP6, IA_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WANAPP_NTP_FUNC_ID)
+
+#ifdef CONFIG_CPU_UTILIZATION
+MIBDEF(unsigned char,	enable_cpu_utilization, ,	ENABLE_CPU_UTILIZATION,	BYTE_T, APMIB_T, 0, 0,0,REINIT_SYSTEM_CPU_UTILIZATION_FUNC_ID)
+MIBDEF(unsigned char,	cpu_utilization_interval, ,	CPU_UTILIZATION_INTERVAL,BYTE_T, APMIB_T, 0, 0,0,REINIT_SYSTEM_CPU_UTILIZATION_FUNC_ID)
+#endif
+
+MIBDEF(unsigned char,	ddnsEnabled, ,	DDNS_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ddnsType, ,	DDNS_TYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ddnsDomainName, [MAX_DOMAIN_LEN],	DDNS_DOMAIN_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ddnsUser, [MAX_DOMAIN_LEN],	DDNS_USER,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ddnsPassword, [MAX_NAME_LEN],	DDNS_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	fixedIpMtuSize, ,	FIXED_IP_MTU_SIZE,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	dhcpMtuSize, ,	DHCP_MTU_SIZE,	WORD_T, APMIB_T, 0, 0,0,0)
+//OpenVPN 
+#ifdef CONFIG_APP_OPENVPN
+MIBDEF(unsigned char,	openvpnEnabled, ,	OPENVPN_ENABLED,	BYTE_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	openvpnMode, ,	OPENVPN_MODE,	BYTE_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned short,	openvpnPort, ,		OPENVPN_PORT,	WORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	openvpnAuthType, ,	OPENVPN_AUTH_TYPE,	BYTE_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	openvpnAuthNone, ,	OPENVPN_AUTH_NONE,	BYTE_T, APMIB_T, 0, 0, 0, 0)
+#endif
+#endif // HOME_GATEWAY
+
+MIBDEF(unsigned char,	opMode, ,	OP_MODE,	BYTE_T, APMIB_T, 0, 0,DECISION_REINIT_ALL_FUNC_ID,0)
+MIBDEF(unsigned char,	wispWanId, ,	WISP_WAN_ID,	BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_REPEATER_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+#ifdef HOME_GATEWAY
+MIBDEF(unsigned char,	wanAccessEnabled, ,	WEB_WAN_ACCESS_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_WEBACCESS_ID)
+#if defined(CONFIG_RTL_WEB_WAN_ACCESS_PORT)
+MIBDEF(unsigned short,	wanAccessPort, , WEB_WAN_ACCESS_PORT, WORD_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_WEBACCESS_ID)
+#endif
+MIBDEF(unsigned char,	pingAccessEnabled, ,	PING_WAN_ACCESS_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_PINGACCESS_ID)
+MIBDEF(unsigned char,	hostName, [MAX_NAME_LEN],	HOST_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef HOME_GATEWAY
+
+#ifdef CONFIG_APP_WEAVE
+MIBDEF(unsigned char,	weaveRegistered, ,	WEAVE_REGISTERED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	weaveConfig, [MAX_WEAVE_CONFIG_LENGTH],	WEAVE_CONFIG,	STRING_T, APMIB_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,	rtLogEnabled, ,	REMOTELOG_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rtLogServer, [4],	REMOTELOG_SERVER,	IA_T, APMIB_T, 0, 0,0,0)
+
+#ifdef UNIVERSAL_REPEATER
+// for wlan0 interface
+MIBDEF(unsigned char,	repeaterEnabled1, ,	REPEATER_ENABLED1,	BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_REPEATER_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	repeaterSSID1, [MAX_SSID_LEN],	REPEATER_SSID1,	STRING_T, APMIB_T, 0, 0,DECISION_WLAN_REPEATER_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+// for wlan1 interface
+MIBDEF(unsigned char,	repeaterEnabled2, ,	REPEATER_ENABLED2,	BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_REPEATER_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	repeaterSSID2, [MAX_SSID_LEN],	REPEATER_SSID2,	STRING_T, APMIB_T, 0, 0,DECISION_WLAN_REPEATER_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif // #ifdef UNIVERSAL_REPEATER
+
+MIBDEF(unsigned char,	wifiSpecific, ,	WIFI_SPECIFIC,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+#ifdef HOME_GATEWAY
+MIBDEF(unsigned char,	pppServiceName, [41],	PPP_SERVICE_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+
+
+#ifdef DOS_SUPPORT
+MIBDEF(unsigned long,	dosEnabled, ,	DOS_ENABLED,	DWORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	syssynFlood, ,	DOS_SYSSYN_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	sysfinFlood, ,	DOS_SYSFIN_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	sysudpFlood, ,	DOS_SYSUDP_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	sysicmpFlood, ,	DOS_SYSICMP_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	pipsynFlood, ,	DOS_PIPSYN_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	pipfinFlood, ,	DOS_PIPFIN_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	pipudpFlood, ,	DOS_PIPUDP_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	pipicmpFlood, ,	DOS_PIPICMP_FLOOD,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+MIBDEF(unsigned short,	blockTime, ,	DOS_BLOCK_TIME,	WORD_T, APMIB_T, 0, 0,0,REINIT_WAN_DOS_FUNC_ID)
+#endif // #ifdef DOS_SUPPORT
+
+MIBDEF(unsigned char,	vpnPassthruIPsecEnabled, ,	VPN_PASSTHRU_IPSEC_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	vpnPassthruPPTPEnabled, ,	VPN_PASSTHRU_PPTP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	vpnPassthruL2TPEnabled, ,	VPN_PASSTHRU_L2TP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cusPassThru, ,	CUSTOM_PASSTHRU_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpSecurityEnabled, ,	PPTP_SECURITY_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	igmpproxyDisabled, ,	IGMP_PROXY_DISABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpMppcEnabled, ,	PPTP_MPPC_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pptpIdleTime, ,	PPTP_IDLE_TIME,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpConnectType, ,	PPTP_CONNECTION_TYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef HOME_GATEWAY
+//it seems not change
+MIBDEF(unsigned char,	igmpFastLeaveDisabled, ,	IGMP_FAST_LEAVE_DISABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+//it also not change
+MIBDEF(unsigned char,   mibVer, , MIB_VER,    BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef DEFSETTING_AUTO_UPDATE
+MIBDEF(unsigned char,   needAutoUpdate, , NEED_AUTO_UPDATE,    BYTE_T, APMIB_T, 0, 0,0,0)
+#endif
+// added by rock /////////////////////////////////////////
+#ifdef VOIP_SUPPORT 
+//it seems to be firewall rules
+MIBDEF(voipCfgParam_t,	voipCfgParam, ,	VOIP_CFG,	VOIP_T, APMIB_T, 0, 0,0,0) 
+#endif
+//this mib never use
+MIBDEF(unsigned char,	startMp, ,	START_MP,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+#ifdef HOME_GATEWAY
+#ifdef CONFIG_IPV6
+MIBDEF(radvdCfgParam_t,			radvdCfgParam, ,	IPV6_RADVD_PARAM,	RADVDPREFIX_T, APMIB_T, 0, 0,0,0)
+MIBDEF(dnsv6CfgParam_t,	        dnsCfgParam, ,		IPV6_DNSV6_PARAM,	DNSV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(dhcp6sCfgParam_t,	    dhcp6sCfgParam, ,	IPV6_DHCPV6S_PARAM,	DHCPV6S_T, APMIB_T, 0, 0,0,0)
+MIBDEF(dhcp6cCfgParam_t,		dhcp6cCfgParam, ,	IPV6_DHCPV6C_PARAM, DHCPV6C_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addrIPv6CfgParam_t,	    addrIPv6CfgParam, ,	IPV6_ADDR_PARAM,	ADDR6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t,			addr6CfgParam, , 	IPV6_ADDR6_PARAM,	ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6LanCfgParam, ,	IPV6_ADDR_LAN_PARAM,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6WanCfgParam, , IPV6_ADDR_WAN_PARAM,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6GwCfgParam, , 	IPV6_ADDR_GW_PARAM,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6PrefixCfgParam, , IPV6_ADDR_PFEFIX_PARAM,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6DnsCfgParam, , IPV6_ADDR_DNS_PARAM,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 		addr6DnsSecondary, , IPV6_ADDR_DNS_SECONDARY,ADDRV6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(tunnelCfgParam_t,	    tunnelCfgParam, ,	IPV6_TUNNEL_PARAM,	TUNNEL6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			linkType, ,		IPV6_LINK_TYPE,		BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			orignType, , 		IPV6_ORIGIN_TYPE, 	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			wanEnable, ,		IPV6_WAN_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			ipv6DnsAuto, ,		IPV6_DNS_AUTO,		BYTE_T, APMIB_T, 0, 0,0,0)
+//MIBDEF(unsigned char,			mldproxyEnabled, ,	IPV6_MLD_PROXY_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			mldproxyDisabled, ,	MLD_PROXY_DISABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			ipv6DhcpMode, ,		IPV6_DHCP_MODE,		BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			ipv6DhcpPdEnable, , 	IPV6_DHCP_PD_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,			ipv6DhcpRapidCommitEnable, , 	IPV6_DHCP_RAPID_COMMIT_ENABLE, 	BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef TR181_SUPPORT
+MIBDEF(unsigned char,	ipv6DhcpcIface, [64] , IPV6_DHCPC_IFACE,  STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char, 		ipv6DhcpcReqAddr, , IPV6_DHCPC_REQUEST_ADDR,BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned long,		ipv6DhcpcSuggestedT1, , IPV6_DHCPC_SUGGESTEDT1,DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned long,		ipv6DhcpcSuggestedT2, , IPV6_DHCPC_SUGGESTEDT2,DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipv6DhcpcSendOptNum, , IPV6_DHCPC_SENDOPT_TBL_NUM,  BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(DHCPV6C_SENDOPT_T,	ipv6DhcpcSendOptTbl,[IPV6_DHCPC_SENDOPT_NUM], IPV6_DHCPC_SENDOPT_TBL,	DHCPV6C_SENDOPT_ARRAY_T, APMIB_T, 0, mib_ipv6DhcpcSendOpt_tbl,0,0)
+#endif
+#ifdef CONFIG_APP_RADVD_WAN
+MIBDEF(radvdCfgParam_t, radvdCfgParam_wan, ,	IPV6_RADVD_PARAM_WAN,	RADVDPREFIX_T, APMIB_T, 0, 0,0,0)
+#endif
+
+#ifdef CONFIG_IPV6_CE_ROUTER_SUPPORT
+MIBDEF(unsigned char,	ula_enabled,			,	IPV6_ULA_ENABLE,	BYTE_T,		APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ula_mode,				,	IPV6_ULA_MODE,		BYTE_T,		APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t,	addr6UlaPrefixParam,	,	IPV6_ADDR_ULA_PARAM,ADDRV6_T,	APMIB_T, 0, 0,0,0)
+#endif
+
+#ifdef CONFIG_DSLITE_SUPPORT
+MIBDEF(addr6CfgParam_t,		addr6AftrParam, , 	IPV6_ADDR_AFTR_PARAM,	ADDRV6_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		dsliteMode, ,		DSLITE_MODE,			BYTE_T, 	APMIB_T, 0, 0,0,0)
+#endif
+#ifdef CONFIG_SIXRD_SUPPORT
+MIBDEF(addr6CfgParam_t, 	addr66rdParam, ,	IPV6_6RD_PREFIX_PARAM,	ADDRV6_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		ip4MaskLen, ,		IPV4_6RD_MASK_LEN,		BYTE_T,		APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char, 		ip46rdBrAddr, [4],	IPV4_6RD_BR_ADDR,		IA_T,		APMIB_T, 0, 0,0,0)
+#endif
+#ifdef CONFIG_MAP_E_SUPPORT
+MIBDEF(unsigned char,		MapEEnable, ,		MAPE_ENABLE,			BYTE_T,		APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		MapEMode,	,		MAPE_MODE,				BYTE_T, 	APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 	addr6MapEPrefix, ,	IPV6_MAPE_PREFIX,		ADDRV6_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		ip4MapEAddr, [4],	IPV4_MAPE,				IA_T,		APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		ip4MapEPrefixLen, ,	IPV4_MAPE_PREFIX_LEN,	BYTE_T, 	APMIB_T, 0, 0,0,0)
+MIBDEF(addr6CfgParam_t, 	addr6MapEBR, ,		IPV6_MAPE_BR_ADDR,		ADDRV6_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		MapEPortOffset, ,	MAPE_PSID_OFFSET,		BYTE_T, 	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,		MapEPsidLen, ,		MAPE_PSID_LEN,			BYTE_T, 	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,		MapEPsid, , 		MAPE_PSID,				WORD_T,		APMIB_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,		ipv6DnsForward, ,	IPV6_DNS_FORWARD,		BYTE_T, 	APMIB_T, 0, 0,0,0)
+#endif /* #ifdef CONFIG_IPV6*/
+
+#ifdef CONFIG_APP_BT_REPEATER_CONFIG
+MIBDEF(unsigned char, btConfigPartitionErased, ,	BT_PARTITION_ERASED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char, btConfigConfigured, ,	BT_CONFIG_CONFIGURED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif
+
+#ifdef TR181_SUPPORT
+MIBDEF(unsigned char,	DnsClientEnable, , DNS_CLIENT_ENABLE,  BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dnsClientServerNum, , DNS_CLIENT_SERVER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(DNS_CLIENT_SERVER_T,	dnsClientServerTbl,[DNS_CLIENT_SERVER_NUM], DNS_CLIENT_SERVER_TBL,	DNS_CLIENT_SERVER_ARRAY_T, APMIB_T, 0, mib_dnsClientServer_tbl,0,0)
+#endif
+#endif
+//bt should be wan app
+#if (defined CONFIG_RTL_BT_CLIENT,0,0) || (defined CONFIG_RTL_TRANSMISSION,0,0)
+MIBDEF(unsigned char,	uploadDir, [64] , BT_UPLOAD_DIR,  STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	downloadDir, [64] , BT_DOWNLOAD_DIR,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	uLimit, ,	BT_TOTAL_ULIMIT,  DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	dLimit, ,	BT_TOTAL_DLIMIT,	 DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	refreshTime, ,	BT_REFRESH_TIME, BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	bt_enabled, ,	BT_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif
+
+#if defined(CONFIG_RTL_ULINKER)
+MIBDEF(unsigned char,	ulinker_auto,	, ULINKER_AUTO,	BYTE_T, APMIB_T, 0, 0,DECISION_REINIT_ALL_FUNC_ID,0)
+MIBDEF(unsigned char,	ulinker_cur_mode, , ULINKER_CURRENT_MODE,	BYTE_T, APMIB_T, 0, 0,DECISION_REINIT_ALL_FUNC_ID,0)
+MIBDEF(unsigned char,	ulinker_lst_mode, , ULINKER_LATEST_MODE,	BYTE_T, APMIB_T, 0, 0,DECISION_REINIT_ALL_FUNC_ID,0)
+MIBDEF(unsigned char,	ulinker_cur_wl_mode, , ULINKER_CURRENT_WLAN_MODE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ulinker_lst_wl_mode, , ULINKER_LATEST_WLAN_MODE,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	ulinker_repeaterEnabled1, ,	ULINKER_REPEATER_ENABLED1,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ulinker_repeaterEnabled2, , ULINKER_REPEATER_ENABLED2,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+#endif
+
+#if defined(CONFIG_APP_APPLE_MFI_WAC) //mark_kit
+MIBDEF(unsigned char,	hap_accessory_setupcode, [32] , HAP_ACCESSORY_SETUPCODE,  STRING_T, APMIB_T, 0, 0, 0, 0)
+#endif
+/*+++++added by Jack for Tr-069 configuration+++++*/
+#ifdef CONFIG_APP_TR069
+
+MIBDEF(unsigned char,	cwmp_enabled, ,	CWMP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ProvisioningCode, [CWMP_PROVISION_CODE_LEN],	CWMP_PROVISIONINGCODE,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACSURL, [CWMP_ACS_URL_LEN],	CWMP_ACS_URL,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACSUserName, [CWMP_ACS_USERNAME_LEN],	CWMP_ACS_USERNAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACSPassword, [CWMP_ACS_PASSWD_LEN],	CWMP_ACS_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_InformEnable, ,	CWMP_INFORM_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_InformInterval, ,	CWMP_INFORM_INTERVAL,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_InformTime, ,	CWMP_INFORM_TIME,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ConnReqUserName, [CWMP_CONREQ_USERNAME_LEN],	CWMP_CONREQ_USERNAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ConnReqPassword, [CWMP_CONREQ_PASSWD_LEN],	CWMP_CONREQ_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_UpgradesManaged, ,	CWMP_ACS_UPGRADESMANAGED,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned int,	cwmp_RetryMinWaitInterval, ,	CWMP_RETRY_MIN_WAIT_INTERVAL,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_RetryIntervalMutiplier, ,	CWMP_RETRY_INTERVAL_MUTIPLIER,	DWORD_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	cwmp_UDPConnReqAddr, [CWMP_UDP_CONN_REQ_ADDR_LEN],	CWMP_UDP_CONN_REQ_ADDR,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_STUNEnable, ,	CWMP_STUN_EN,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_STUNServerAddr, [CWMP_STUN_SERVER_ADDR_LEN],	CWMP_STUN_SERVER_ADDR,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_STUNServerPort, ,	CWMP_STUN_SERVER_PORT,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_STUNUsername, [CWMP_STUN_USERNAME_LEN],	CWMP_STUN_USERNAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_STUNPassword, [CWMP_STUN_PASSWORD_LEN],	CWMP_STUN_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(int,				cwmp_STUNMaxKeepAlivePeriod, ,	CWMP_STUN_MAX_KEEP_ALIVE_PERIOD,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_STUNMinKeepAlivePeriod, ,	CWMP_STUN_MIN_KEEP_ALIVE_PERIOD,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_NATDetected, ,	CWMP_NAT_DETECTED,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	cwmp_LANConfPassword, [CWMP_LANCONF_PASSWD_LEN],	CWMP_LAN_CONFIGPASSWD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_SerialNumber, [CWMP_SERIALNUMBER_LEN],	CWMP_SERIALNUMBER,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_DHCP_ServerConf, ,	CWMP_DHCP_SERVERCONF,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_LAN_IPIFEnable, ,	CWMP_LAN_IPIFENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_LAN_EthIFEnable, ,	CWMP_LAN_ETHIFENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_LAN_EthIFDisable, ,	CWMP_LAN_ETHIFDISABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_WAN_EthIFDisable, ,	CWMP_WAN_ETHIFDISABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_WLAN_BasicEncry, ,	CWMP_WLAN_BASICENCRY,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_WLAN_WPAEncry, ,	CWMP_WLAN_WPAENCRY,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	cwmp_DL_CommandKey, [CWMP_COMMAND_KEY_LEN+1],	CWMP_DL_COMMANDKEY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_DL_StartTime, ,	CWMP_DL_STARTTIME,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_DL_CompleteTime, ,	CWMP_DL_COMPLETETIME,	WORD_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned int,	cwmp_DL_FaultCode, ,	CWMP_DL_FAULTCODE,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_Inform_EventCode, ,	CWMP_INFORM_EVENTCODE,	WORD_T, APMIB_T, 0, 0,0,0)
+
+
+
+
+
+MIBDEF(unsigned char,	cwmp_RB_CommandKey, [CWMP_COMMAND_KEY_LEN+1],	CWMP_RB_COMMANDKEY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACS_ParameterKey, [CWMP_COMMAND_KEY_LEN+1],	CWMP_ACS_PARAMETERKEY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_CERT_Password, [CWMP_CERT_PASSWD_LEN+1],	CWMP_CERT_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_Flag, ,	CWMP_FLAG,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SI_CommandKey, [CWMP_COMMAND_KEY_LEN+1],	CWMP_SI_COMMANDKEY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ParameterKey, [CWMP_COMMAND_KEY_LEN+1],	CWMP_PARAMETERKEY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_pppconn_instnum, ,	CWMP_PPPCON_INSTNUM,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_ipconn_instnum, ,	CWMP_IPCON_INSTNUM,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_pppconn_created, ,	CWMP_PPPCON_CREATED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ipconn_created, ,	CWMP_IPCON_CREATED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef _PRMT_USERINTERFACE_
+MIBDEF(unsigned char,	UIF_PW_Shared, ,	UIF_PW_SHARED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_PW_Required, ,	UIF_PW_REQUIRED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_PW_User_Sel, ,	UIF_PW_USER_SEL,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_Upgrade, ,	UIF_UPGRADE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	UIF_WarrantyDate, ,	UIF_WARRANTYDATE,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_AutoUpdateServer, [256],	UIF_AUTOUPDATESERVER,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_UserUpdateServer, [256],	UIF_USERUPDATESERVER,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	UIF_Cur_Lang, [16],	UIF_CUR_LANG,	STRING_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef _PRMT_USERINTERFACE_
+
+MIBDEF(unsigned char,	cwmp_ACS_KickURL, [CWMP_KICK_URL],	CWMP_ACS_KICKURL,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACS_DownloadURL, [CWMP_DOWNLOAD_URL],	CWMP_ACS_DOWNLOADURL,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_ConnReqPort, ,	CWMP_CONREQ_PORT,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ConnReqPath, [CONN_REQ_PATH_LEN],	CWMP_CONREQ_PATH,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_Flag2, ,	CWMP_FLAG2,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_NotifyList, [CWMP_NOTIFY_LIST_LEN],	CWMP_NOTIFY_LIST,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_ACSURL_old, [CWMP_ACS_URL_LEN],	CWMP_ACS_URL_OLD,	STRING_T, APMIB_T, 0, 0,0,0)
+
+#ifdef _PRMT_TR143_
+MIBDEF(unsigned char,	tr143_udpecho_enable, ,	TR143_UDPECHO_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tr143_udpecho_itftype, ,	TR143_UDPECHO_ITFTYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tr143_udpecho_srcip, [4],	TR143_UDPECHO_SRCIP,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	tr143_udpecho_port, ,	TR143_UDPECHO_PORT,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tr143_udpecho_plus, ,	TR143_UDPECHO_PLUS,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef _PRMT_TR143_
+MIBDEF(unsigned int,	cwmp_UserInfo_Result, ,	CWMP_USERINFO_RESULT,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_Needreboot, ,	CWMP_NEED_REBOOT ,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_Persistent_Data,[256] ,	CWMP_PERSISTENT_DATA,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned int,	cwmp_SW_Port1_Disable, ,	CWMP_SW_PORT1_DISABLE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(int,				cwmp_SW_Port1_MaxBitRate, ,	CWMP_SW_PORT1_MAXBITRATE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SW_Port1_DuplexMode,[10] ,	CWMP_SW_PORT1_DUPLEXMODE,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+MIBDEF(unsigned int,	cwmp_SW_Port2_Disable, ,	CWMP_SW_PORT2_DISABLE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(int,				cwmp_SW_Port2_MaxBitRate, ,	CWMP_SW_PORT2_MAXBITRATE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SW_Port2_DuplexMode,[10] ,	CWMP_SW_PORT2_DUPLEXMODE,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+MIBDEF(unsigned int,	cwmp_SW_Port3_Disable, ,	CWMP_SW_PORT3_DISABLE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(int,				cwmp_SW_Port3_MaxBitRate, ,	CWMP_SW_PORT3_MAXBITRATE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SW_Port3_DuplexMode,[10] ,	CWMP_SW_PORT3_DUPLEXMODE,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+MIBDEF(unsigned int,	cwmp_SW_Port4_Disable, ,	CWMP_SW_PORT4_DISABLE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(int,				cwmp_SW_Port4_MaxBitRate, ,	CWMP_SW_PORT4_MAXBITRATE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SW_Port4_DuplexMode,[10] ,	CWMP_SW_PORT4_DUPLEXMODE,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+MIBDEF(unsigned int,	cwmp_SW_Port5_Disable, ,	CWMP_SW_PORT5_DISABLE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(int,				cwmp_SW_Port5_MaxBitRate, ,	CWMP_SW_PORT5_MAXBITRATE,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+MIBDEF(unsigned char,	cwmp_SW_Port5_DuplexMode,[10] ,	CWMP_SW_PORT5_DUPLEXMODE,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+MIBDEF(unsigned short,	cwmp_pppoe_wan_vlanid, ,	CWMP_PPPOE_WAN_VLANID,	WORD_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned int,	cwmp_DefActNortiThrottle, ,	CWMP_DEF_ACT_NOTIF_THROTTLE,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,	cwmp_ManageDevNortiLimit, ,	CWMP_MANAGE_DEV_NOTIF_LIMIT,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_Dns_Disable, ,	CWMP_DNS_DISABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_TR069_FUNC_ID)
+
+#endif // #ifdef CONFIG_APP_TR069
+
+#ifdef CONFIG_RTK_VLAN_WAN_TAG_SUPPORT
+MIBDEF(unsigned char,	vlan_wan_enable,	 				NOREP,	VLAN_WAN_ENALE,						BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_tag, 						NOREP,	VLAN_WAN_TAG,						WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_bridge_enable, 			NOREP,	VLAN_WAN_BRIDGE_ENABLE,				BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_bridge_tag, 				NOREP,	VLAN_WAN_BRIDGE_TAG,				WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_bridge_port, 				NOREP,	VLAN_WAN_BRIDGE_PORT,				WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_bridge_multicast_enable, 	NOREP,	VLAN_WAN_BRIDGE_MULTICAST_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_bridge_multicast_tag, 		NOREP,	VLAN_WAN_BRIDGE_MULTICAST_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+
+MIBDEF(unsigned char,	vlan_wan_host_enable,		NOREP,	VLAN_WAN_HOST_ENABLE,		BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_host_tag, 			NOREP,	VLAN_WAN_HOST_TAG,			WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_host_pri, 			NOREP,	VLAN_WAN_HOST_PRI,			WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_wifi_root_enable,	NOREP,	VLAN_WAN_WIFI_ROOT_ENABLE, 	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_root_tag, 	NOREP,	VLAN_WAN_WIFI_ROOT_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_root_pri,		NOREP,	VLAN_WAN_WIFI_ROOT_PRI, 	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_wifi_vap0_enable,	NOREP,	VLAN_WAN_WIFI_VAP0_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap0_tag, 	NOREP,	VLAN_WAN_WIFI_VAP0_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap0_pri,		NOREP,	VLAN_WAN_WIFI_VAP0_PRI, 	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_wifi_vap1_enable,	NOREP,	VLAN_WAN_WIFI_VAP1_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap1_tag, 	NOREP,	VLAN_WAN_WIFI_VAP1_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap1_pri,		NOREP,	VLAN_WAN_WIFI_VAP1_PRI, 	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_wifi_vap2_enable,	NOREP,	VLAN_WAN_WIFI_VAP2_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap2_tag, 	NOREP,	VLAN_WAN_WIFI_VAP2_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap2_pri,		NOREP,	VLAN_WAN_WIFI_VAP2_PRI, 	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	vlan_wan_wifi_vap3_enable,	NOREP,	VLAN_WAN_WIFI_VAP3_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap3_tag, 	NOREP,	VLAN_WAN_WIFI_VAP3_TAG,		WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned short,	vlan_wan_wifi_vap3_pri,		NOREP,	VLAN_WAN_WIFI_VAP3_PRI, 	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+#endif
+// SNMP, Forrest added, 2007.10.25.
+#ifdef CONFIG_SNMP
+MIBDEF(unsigned char,	snmpEnabled, ,	SNMP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpName, [MAX_SNMP_NAME_LEN],	SNMP_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpLocation, [MAX_SNMP_LOCATION_LEN],	SNMP_LOCATION,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpContact, [MAX_SNMP_CONTACT_LEN],	SNMP_CONTACT,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpRWCommunity, [MAX_SNMP_COMMUNITY_LEN],	SNMP_RWCOMMUNITY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpROCommunity, [MAX_SNMP_COMMUNITY_LEN],	SNMP_ROCOMMUNITY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpTrapReceiver1, [4],	SNMP_TRAP_RECEIVER1,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpTrapReceiver2, [4],	SNMP_TRAP_RECEIVER2,	IA_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpTrapReceiver3, [4],	SNMP_TRAP_RECEIVER3,	IA_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef CONFIG_SNMP
+
+MIBDEF(unsigned short,	system_time_year, ,	SYSTIME_YEAR,	WORD_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	system_time_month, ,SYSTIME_MON,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	system_time_day, ,	SYSTIME_DAY,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	system_time_hour, ,	SYSTIME_HOUR,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	system_time_min, ,	SYSTIME_MIN,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	system_time_sec, ,	SYSTIME_SEC,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_SYSTEM_TIME_FUNC_ID)
+MIBDEF(unsigned char,	wlan11nOnOffTKIP, ,	WLAN_11N_ONOFF_TKIP,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	dhcpRsvdIpEnabled, ,	DHCPRSVDIP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(unsigned char,	dhcpRsvdIpNum, ,	DHCPRSVDIP_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+MIBDEF(DHCPRSVDIP_T,	dhcpRsvdIpArray, [MAX_DHCP_RSVD_IP_NUM],	DHCPRSVDIP_TBL,	DHCPRSVDIP_ARRY_T, APMIB_T, 0, mib_dhcpRsvdIp_tbl,0,REINIT_LAN_APP_DHCP_FUNC_ID)
+
+#ifdef WLAN_PROFILE
+MIBDEF(unsigned char,	wlan_profile_enable1, ,	PROFILE_ENABLED1,	BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wlan_profile_num1, ,	PROFILE_NUM1,		BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(WLAN_PROFILE_T,	wlan_profile_arrary1, [MAX_WLAN_PROFILE_NUM],PROFILE_TBL1,PROFILE_ARRAY_T, APMIB_T, 0, mib_wlan_profile_tbl1,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+MIBDEF(unsigned char,	wlan_profile_enable2, ,	PROFILE_ENABLED2,	BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wlan_profile_num2, ,	PROFILE_NUM2,		BYTE_T, APMIB_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(WLAN_PROFILE_T,	wlan_profile_arrary2, [MAX_WLAN_PROFILE_NUM],PROFILE_TBL2,PROFILE_ARRAY_T, APMIB_T, 0, mib_wlan_profile_tbl2,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif
+
+#if defined(VLAN_CONFIG_SUPPORTED)
+MIBDEF(unsigned char,   VlanConfigEnabled, ,    VLANCONFIG_ENABLED,     BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,   VlanConfigNum, ,        VLANCONFIG_TBL_NUM,     BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(VLAN_CONFIG_T,   VlanConfigArray, [MAX_IFACE_VLAN_CONFIG],       VLANCONFIG_TBL, VLANCONFIG_ARRAY_T, APMIB_T, 0, mib_vlanconfig_tbl,0,REINIT_LAN_FUNC_ID)
+#endif
+
+#if defined(CONFIG_8021Q_VLAN_SUPPORTED)
+MIBDEF(unsigned short,	HwNatLanVid, ,	VLAN_HW_NAT_LAN_VID,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	PvidArray, [MAX_VLAN_PORT_NUM*2],	VLAN_PVID_ARRAY,	BYTE_ARRAY_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,	VlanOpMode, ,	  VLAN_OPMODE, 	    BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,   VlanEnabled, ,    VLAN_ENABLED,     BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(unsigned char,   VlanNum, ,        VLAN_TBL_NUM,     BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_FUNC_ID)
+MIBDEF(VLAN_CONFIG_T,	VlanConfigArray, [MAX_VLAN_CONFIG_NUM],	VLAN_TBL, VLAN_ARRAY_T, APMIB_T, 0, mib_vlan_tbl,0,REINIT_LAN_FUNC_ID)
+#endif
+
+
+#ifdef _SUPPORT_CAPTIVEPORTAL_PROFILE_
+MIBDEF(unsigned char,	capPortalEnable, ,	CAPTIVEPORTAL_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	capPortalUrl, [CWMP_CAP_PORTAL_URL_LEN],	CAPTIVEPORTAL_URL,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	capPortalCurNum, ,	CAP_PORTAL_ALLOW_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(CAP_PORTAL_T,	capPortalAllowArray, [MAX_CAP_PORTAL_ALLOW_NUM],	CAP_PORTAL_ALLOW_TBL,	CAP_PORTAL_ALLOW_ARRAY_T, APMIB_T, 0, mib_capPortalAllow_tbl,0,0)
+#endif
+
+#ifdef HOME_GATEWAY
+MIBDEF(unsigned char,	portFwEnabled, ,	PORTFW_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_PORTFORWARD_ID)
+MIBDEF(unsigned char,	portFwNum, ,	PORTFW_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(PORTFW_T,	portFwArray, [MAX_FILTER_NUM],	PORTFW_TBL,	PORTFW_ARRAY_T, APMIB_T, 0, mib_portfw_tbl,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_PORTFORWARD_ID)
+
+MIBDEF(unsigned char,	ipFilterEnabled, ,	IPFILTER_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_IPFILTER_ID)
+MIBDEF(unsigned char,	ipFilterNum, ,	IPFILTER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(IPFILTER_T,	ipFilterArray, [MAX_FILTER_NUM],	IPFILTER_TBL,	IPFILTER_ARRAY_T, APMIB_T, 0, mib_ipfilter_tbl,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_IPFILTER_ID)
+
+MIBDEF(unsigned char,	portFilterEnabled, ,	PORTFILTER_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_PORTFILTER_ID)
+MIBDEF(unsigned char,	portFilterNum, ,	PORTFILTER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(PORTFILTER_T,	portFilterArray, [MAX_FILTER_NUM],	PORTFILTER_TBL,	PORTFILTER_ARRAY_T, APMIB_T, 0, mib_portfilter_tbl,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_PORTFILTER_ID)
+
+MIBDEF(unsigned char,	macFilterEnabled, ,	MACFILTER_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_MACFILTER_ID)
+MIBDEF(unsigned char,	macFilterNum, ,	MACFILTER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(MACFILTER_T,	macFilterArray, [MAX_FILTER_NUM],	MACFILTER_TBL,	MACFILTER_ARRAY_T, APMIB_T, 0, mib_macfilter_tbl,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_MACFILTER_ID)
+
+MIBDEF(unsigned char,	triggerPortEnabled, ,	TRIGGERPORT_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	triggerPortNum, ,	TRIGGERPORT_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(TRIGGERPORT_T,	triggerPortArray, [MAX_FILTER_NUM],	TRIGGERPORT_TBL,	TRIGGERPORT_ARRAY_T, APMIB_T, 0, mib_triggerport_tbl,0,0)
+
+MIBDEF(unsigned char,	urlFilterEnabled, ,	URLFILTER_ENABLED,	BYTE_T, APMIB_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_URLFILTER_ID)
+MIBDEF(unsigned char,	urlFilterMode, , URLFILTER_MODE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	urlFilterNum, ,	URLFILTER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(URLFILTER_T,	urlFilterArray, [MAX_URLFILTER_NUM],	URLFILTER_TBL,	URLFILTER_ARRAY_T, APMIB_T, 0, mib_urlfilter_tbl,DECISION_NULL_FUNC_ID,REINIT_FIREWALL_URLFILTER_ID)
+
+#if defined(_PRMT_X_TELEFONICA_ES_DHCPOPTION_)
+MIBDEF(unsigned char,	dhcpServerOptionNum, , DHCP_SERVER_OPTION_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(MIB_CE_DHCP_OPTION_T,	dhcpServerOptionArray, [MAX_DHCP_SERVER_OPTION_NUM], DHCP_SERVER_OPTION_TBL, DHCP_SERVER_OPTION_ARRAY_T, APMIB_T, 0, mib_dhcpServerOption_tbl,0,0)
+
+MIBDEF(unsigned char,	dhcpClientOptionNum, , DHCP_CLIENT_OPTION_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(MIB_CE_DHCP_OPTION_T,	dhcpClientOptionArray, [MAX_DHCP_CLIENT_OPTION_NUM], DHCP_CLIENT_OPTION_TBL, DHCP_CLIENT_OPTION_ARRAY_T, APMIB_T, 0, mib_dhcpClientOption_tbl,0,0)
+
+MIBDEF(unsigned char,	dhcpsServingPoolNum, , DHCPS_SERVING_POOL_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(DHCPS_SERVING_POOL_T,	dhcpsServingPoolArray, [MAX_DHCPS_SERVING_POOL_NUM], DHCPS_SERVING_POOL_TBL, DHCPS_SERVING_POOL_ARRAY_T, APMIB_T, 0, mib_dhcpsServingPool_tbl,0,0)
+#endif /* #if defined(_PRMT_X_TELEFONICA_ES_DHCPOPTION_) */
+
+#ifdef ROUTE_SUPPORT
+MIBDEF(unsigned char,	staticRouteEnabled, ,	STATICROUTE_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	staticRouteNum, ,	STATICROUTE_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(STATICROUTE_T,	staticRouteArray, [MAX_ROUTE_NUM],	STATICROUTE_TBL,	STATICROUTE_ARRAY_T, APMIB_T, 0, mib_staticroute_tbl,DECISION_NULL_FUNC_ID,REINIT_STAITC_ROUTE_ID)
+MIBDEF(unsigned char,	ripEnabled, ,	RIP_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef RIP6_SUPPORT
+MIBDEF(unsigned char,	rip6Enabled, ,	RIP6_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,	ripLanTx, ,	RIP_LAN_TX,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ripLanRx, ,	RIP_LAN_RX,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ripWanTx, ,	RIP_WAN_TX,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ripWanRx, ,	RIP_WAN_RX,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	natEnabled, ,	NAT_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef ROUTE_SUPPORT
+//it seems never change
+MIBDEF(unsigned char,	sambaEnabled, ,	SAMBA_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#ifdef VPN_SUPPORT
+MIBDEF(unsigned char,	ipsecTunnelEnabled, ,	IPSECTUNNEL_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipsecTunnelNum, ,	IPSECTUNNEL_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(IPSECTUNNEL_T,	ipsecTunnelArray, [MAX_TUNNEL_NUM],	IPSECTUNNEL_TBL,	IPSECTUNNEL_ARRAY_T, APMIB_T, 0, mib_ipsectunnel_tbl,0,0)
+MIBDEF(unsigned char,	ipsecNattEnabled, ,	IPSEC_NATT_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipsecRsaKeyFile, [MAX_RSA_FILE_LEN],	IPSEC_RSA_FILE,	BYTE_ARRAY_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef VPN_SUPPORT
+
+MIBDEF(unsigned short,	pppSessionNum, ,	PPP_SESSION_NUM,	WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServerMac, [6],	PPP_SERVER_MAC,	BYTE6_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	l2tpPayload, [MAX_L2TP_BUFF_LEN],	L2TP_PAYLOAD, BYTE_ARRAY_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpPayloadLength, ,	L2TP_PAYLOAD_LENGTH, WORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpNs, ,	L2TP_NS, WORD_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef HOME_GATEWAY
+
+//it seems never change
+#ifdef CONFIG_APP_SIMPLE_CONFIG
+MIBDEF(unsigned char,	scDeviceType, ,	SC_DEVICE_TYPE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	scDeviceName, [MAX_SC_DEVICE_NAME],	SC_DEVICE_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+#endif
+
+#ifdef RTK_CAPWAP
+MIBDEF(unsigned char,	capwapMode, ,	CAPWAP_MODE,	BYTE_T,	APMIB_T, 0, 0,0,0)
+// for WTP
+MIBDEF(unsigned char,	wtpId,		,	CAPWAP_WTP_ID,	BYTE_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	acIpAddr,[4],	CAPWAP_AC_IP,	IA_T,	APMIB_T, 0, 0,0,0)
+// for AC
+MIBDEF(unsigned char,	wtpConfigNum, , CAPWAP_WTP_CONFIG_TBL_NUM,	BYTE_T,	APMIB_T, 0, 0,0,0)
+MIBDEF(CAPWAP_WTP_CONFIG_T,	wtpConfigArray, [MAX_CAPWAP_WTP_NUM], CAPWAP_WTP_CONFIG_TBL, CAPWAP_WTP_CONFIG_ARRAY_T,	APMIB_T, 0, mib_capwap_wtp_config_tbl,0,0)
+MIBDEF(char,			defaultFwId, [MAX_CAPWAP_FWID_BUF_SIZE], CAPWAP_WTP_DEFAULT_FWID, STRING_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef RTK_CAPWAP
+
+#ifdef CONFIG_RTL_AIRTIME
+MIBDEF(unsigned char,  airTimeEnabled ,    , AIRTIME_ENABLED , BYTE_T,  APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeMode    ,    , AIRTIME_MODE    , BYTE_T,  APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeIf      , [6], AIRTIME_IFTIME  , BYTE6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeNum , , AIRTIME_TBL_NUM, BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(AIRTIME_T, airTimeArray, [MAX_AIRTIME_NUM], AIRTIME_TBL, AIRTIME_ARRAY_T, APMIB_T, 0, mib_airtime_tbl,0,0)
+
+MIBDEF(unsigned char,  airTimeEnabled2 ,    , AIRTIME2_ENABLED , BYTE_T,  APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeMode2    ,    , AIRTIME2_MODE    , BYTE_T,  APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeIf2      , [6], AIRTIME2_IFTIME  , BYTE6_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,  airTimeNum2 , , AIRTIME2_TBL_NUM, BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(AIRTIME_T, airTimeArray2, [MAX_AIRTIME_NUM], AIRTIME2_TBL, AIRTIME_ARRAY_T, APMIB_T, 0, mib_airtime_tbl,0,0)
+#endif /* CONFIG_RTL_AIRTIME */
+
+#ifdef CONFIG_RTL_ETH_802DOT1X_SUPPORT
+MIBDEF(unsigned long,	rs_reauth_to, ,	ELAN_RS_REAUTH_TO,	DWORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsIpAddr, [4],	ELAN_RS_IP,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	rsPort, ,	ELAN_RS_PORT,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsPassword, [MAX_RS_PASS_LEN],	ELAN_RS_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	enable1X, ,	ELAN_ENABLE_1X,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	accountRsEnabled, ,	ELAN_ACCOUNT_RS_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	accountRsIpAddr, [4],	ELAN_ACCOUNT_RS_IP,	IA_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	accountRsPort, ,	ELAN_ACCOUNT_RS_PORT,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	accountRsPassword, [MAX_RS_PASS_LEN],	ELAN_ACCOUNT_RS_PASSWORD,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	accountRsUpdateEnabled, ,	ELAN_ACCOUNT_RS_UPDATE_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	accountRsUpdateDelay, ,	ELAN_ACCOUNT_RS_UPDATE_DELAY,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	macAuthEnabled, ,	ELAN_MAC_AUTH_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsMaxRetry, ,	ELAN_RS_MAXRETRY,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	rsIntervalTime, ,	ELAN_RS_INTERVAL_TIME,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	accountRsMaxRetry, ,	ELAN_ACCOUNT_RS_MAXRETRY,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	accountRsIntervalTime, ,	ELAN_ACCOUNT_RS_INTERVAL_TIME,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	dot1xMode, ,	ELAN_DOT1X_MODE,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	dot1xProxyType, ,	ELAN_DOT1X_PROXY_TYPE,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	dot1xProxyClientModePortMask, ,	ELAN_DOT1X_CLIENT_MODE_PORT_MASK,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned short,	dot1xProxyProxyModePortMask, , ELAN_DOT1X_PROXY_MODE_PORT_MASK,	WORD_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	dot1xEapolUnicastEnabled, , ELAN_EAPOL_UNICAST_ENABLED, BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+#ifdef CONFIG_RTL_ETH_802DOT1X_CLIENT_MODE_SUPPORT
+MIBDEF(unsigned char,	eapType, ,	ELAN_EAP_TYPE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	eapInsideType, ,	ELAN_EAP_INSIDE_TYPE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	eapPhase2Type, ,	ELAN_EAP_PHASE2_TYPE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	phase2EapMethod, ,	ELAN_PHASE2_EAP_METHOD,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	eapUserId, [MAX_EAP_USER_ID_LEN+1],	ELAN_EAP_USER_ID,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsUserName, [MAX_RS_USER_NAME_LEN+1],	ELAN_RS_USER_NAME,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsUserPasswd, [MAX_RS_USER_PASS_LEN+1],	ELAN_RS_USER_PASSWD,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	rsUserCertPasswd, [MAX_RS_USER_CERT_PASS_LEN+1],	ELAN_RS_USER_CERT_PASSWD,	STRING_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+#endif
+MIBDEF(unsigned char,	serverPortNum, , ELAN_DOT1X_SERVER_PORT, BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(unsigned char,	entryNum, ,	ELAN_DOT1X_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+MIBDEF(ETHDOT1X_T,	ethdot1xArray, [MAX_ELAN_DOT1X_PORTNUM+1],	ELAN_DOT1X_TBL,	ETHDOT1X_ARRAY_T, APMIB_T, 0, mib_ethdot1xconfig_tbl,0,REINIT_LAN_APP_ETH_802DOT1X_FUNC_ID)
+#endif
+
+//it seems not used
+#ifdef TLS_CLIENT
+MIBDEF(unsigned char,	certRootNum, ,	CERTROOT_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(CERTROOT_T,	certRootArray, [MAX_CERTROOT_NUM],	CERTROOT_TBL,	CERTROOT_ARRAY_T, APMIB_T, 0, mib_certroot_tbl,0,0)
+MIBDEF(unsigned char,	certUserNum, ,	CERTUSER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(CERTUSER_T,	certUserArray, [MAX_CERTUSER_NUM],	CERTUSER_TBL,	CERTUSER_ARRAY_T, APMIB_T, 0, mib_certuser_tbl,0,0)
+MIBDEF(unsigned char,	rootIdx, ,	ROOT_IDX,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	userIdx, ,	USER_IDX,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif // #ifdef TLS_CLIENT
+
+//it is firewall rule
+#if defined(GW_QOS_ENGINE) || defined(QOS_BY_BANDWIDTH)
+MIBDEF(unsigned char,	qosEnabled, ,	QOS_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	qosAutoUplinkSpeed, ,	QOS_AUTO_UPLINK_SPEED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned long,	qosManualUplinkSpeed, ,	QOS_MANUAL_UPLINK_SPEED,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	qosAutoDownLinkSpeed, ,	QOS_AUTO_DOWNLINK_SPEED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned long,	qosManualDownLinkSpeed, ,	QOS_MANUAL_DOWNLINK_SPEED,	DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	qosRuleNum, ,	QOS_RULE_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif // #if defined(GW_QOS_ENGINE) || defined(QOS_BY_BANDWIDTH)
+
+#if defined(GW_QOS_ENGINE)
+MIBDEF(QOS_T,	qosRuleArray, [MAX_QOS_RULE_NUM],	QOS_RULE_TBL,	QOS_ARRAY_T, APMIB_T, 0, mib_qos_tbl,0,0)
+#endif // #if defined(GW_QOS_ENGINE)
+
+#if defined(QOS_BY_BANDWIDTH)
+MIBDEF(IPQOS_T,	qosRuleArray, [MAX_QOS_RULE_NUM],	QOS_RULE_TBL,	QOS_ARRAY_T, APMIB_T, 0, mib_qos_tbl,0,0)
+#endif // #if defined(GW_QOS_ENGINE)
+
+#ifdef QOS_OF_TR069
+MIBDEF(unsigned char, QosEnable, , QOS_ENABLE, BYTE_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  MaxQueue, , QOS_MAX_QUEUE, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  MaxQueueEntries, , QOS_MAX_QUEUE_ENTRIES, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  DefaultQueue, , QOS_DEF_QUEUE, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(int, DefaultDSCPMark, , QOS_DEF_DSCP_MARK, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(int, DefaultEthernetPriorityMark, , QOS_DEF_ETHERNET_PRIO_MARK, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned int, DefaultForwardingPolicy, , QOS_DEF_FORWORDING_POLICY, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(int, DefaultPolicer, , QOS_DEF_POLICER, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(int, DefaultTrafficClass, , QOS_DEF_TRAFFIC_CLASS, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(unsigned char, AvailableAppList, [MAX_APP_LIST_LEN+1], QOS_AVAIL_APP_LIST, STRING_T, APMIB_T, 0, 0, 0, 0)
+
+MIBDEF(unsigned int,  QosQueueNum, , QOS_QUEUE_TBL_NUM, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(QOSQUEUE_T,  QosQueueArray, [MAX_QOS_QUEUE_NUM], QOS_QUEUE_TBL, QOS_QUEUE_ARRAY_T, APMIB_T, 0, mib_qos_queue_tbl, 0, 0)
+
+MIBDEF(unsigned int,  QosClassNum, , QOS_CLASS_TBL_NUM, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(QOSCLASS_T,  QosClassArray, [MAX_QOS_CLASS_NUM], QOS_CLASS_TBL, QOS_CLASS_ARRAY_T, APMIB_T, 0, mib_qos_class_tbl, 0, 0)
+
+MIBDEF(unsigned int,   tr098_appconf_num, ,TR098_QOS_APP_TBL_NUM,     DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(TR098_APPCONF_T,	tr098_appconf_array, [MAX_TR098_APP_TBL_NUM],	TR098_QOS_APP_TBL,	TR098_APPCONF_ARRAY_T, APMIB_T, 0, mib_tr098_app_tbl, 0, 0)
+
+MIBDEF(unsigned int,   tr098_flowconf_num, ,TR098_QOS_FLOW_TBL_NUM,     DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(TR098_FLOWCONF_T, tr098_flowconf_array, [MAX_TR098_FLOW_TBL_NUM],	TR098_QOS_FLOW_TBL,	TR098_FLOWCONF_ARRAY_T, APMIB_T, 0, mib_tr098_flow_tbl, 0, 0)
+
+//mark_qos
+MIBDEF(unsigned int,  QosPolicerNum, , QOS_POLICER_TBL_NUM, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(QOSPOLICER_T,  QosPolicerArray, [MAX_QOS_POLICER_NUM], QOS_POLICER_TBL, QOS_POLICER_ARRAY_T, APMIB_T, 0, mib_qos_policer_tbl, 0, 0)
+MIBDEF(unsigned int,  QosQueueStatsNum, , QOS_QUEUESTATS_TBL_NUM, DWORD_T, APMIB_T, 0, 0, 0, 0)
+MIBDEF(QOSQUEUESTATS_T,  QosQueueStatsArray, [MAX_QOS_QUEUESTATS_NUM], QOS_QUEUESTATS_TBL, QOS_QUEUESTATS_ARRAY_T, APMIB_T, 0, mib_qos_queuestats_tbl, 0, 0)
+#endif
+
+
+MIBDEF(unsigned char,	snmpROcommunity, [MAX_SNMP_COMMUNITY_LEN],	SNMP_RO_COMMUNITY,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	snmpRWcommunity, [MAX_SNMP_COMMUNITY_LEN],	SNMP_RW_COMMUNITY,	STRING_T, APMIB_T, 0, 0,0,0)
+
+MIBDEF(CONFIG_WLAN_SETTING_T,	wlan, [NUM_WLAN_INTERFACE][NUM_VWLAN_INTERFACE+1],	WLAN_ROOT,	TABLE_LIST_T, APMIB_T, 0, mib_wlan_table,0,0)
+
+//#ifdef CONFIG_RTL_FLASH_DUAL_IMAGE_ENABLE
+MIBDEF(unsigned char,	dualBankEnabled,	, DUALBANK_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0) //default test
+MIBDEF(unsigned char,	wlanBand2G5GSelect,	, WLAN_BAND2G5G_SELECT,	BYTE_T, APMIB_T, 0, 0,0,0)
+#if defined( MULTI_WAN_SUPPORT )
+//MIBDEF(unsigned char,	WANIfaceEnabled, ,	WANIFACE_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	WANIfaceNum, ,	WANIFACE_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(WanIntfacesType,	CurrentWANIfaceIdx, ,WANIFACE_CURRENT_IDX,DWORD_T, APMIB_T, 0, 0,0,0)
+MIBDEF(WanIntfacesType,	wanBindingLanPorts,[WAN_INTERFACE_LAN_PORT_NUM+WAN_INTERFACE_WLAN_PORT_NUM] ,WANIFACE_BINDING_LAN_PORTS,DWORD_ARRAY_T, APMIB_T, 0, 0,DECISION_BRIDGE_BIND_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(WANIFACE_T,	WANIfaceArray, [WANIFACE_NUM],	WANIFACE_TBL,	WANIFACE_ARRAY_T, APMIB_T, 0, mib_waniface_tbl,DECISION_NULL_FUNC_ID,REINIT_WAN_START_FUNC_ID)
+#endif
+//it never used
+MIBDEF(unsigned char,	LanDhcpConfigurable,	,	LAN_DHCP_CONFIGURABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+
+#if defined(WLAN_SUPPORT)
+
+MIBDEF(unsigned char,	cwmp_WlanConf_Enabled, ,	CWMP_WLANCONF_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cwmp_WlanConf_EntryNum, ,	CWMP_WLANCONF_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(CWMP_WLANCONF_T,	cwmp_WlanConfArray, [MAX_CWMP_WLANCONF_NUM],	CWMP_WLANCONF_TBL,	CWMP_WLANCONF_ARRAY_T, APMIB_T, 0, mib_cwmp_wlanconf_tbl,0,0)
+#endif
+
+#ifdef SAMBA_WEB_SUPPORT
+MIBDEF(unsigned char,	StorageUserNum, ,	STORAGE_USER_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(unsigned char,	StorageGroupNum, ,	STORAGE_GROUP_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(unsigned char,	StorageShareInfoNum, ,	STORAGE_SHAREINFO_TBL_NUM,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+
+MIBDEF(unsigned char,	StorageAnonEnable, ,	STORAGE_ANON_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+//MIBDEF(unsigned char,	StorageAnonFtpEnable, ,	STORAGE_ANON_FTP_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	StorageAnonDiskEnable, ,	STORAGE_ANON_DISK_ENABLE,	BYTE_T, APMIB_T, 0, 0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+
+MIBDEF(STORAGE_USER_T,	StorageUserArray,	[MAX_USER_NUM],	STORAGE_USER_TBL,	STORAGE_USER_ARRAY_T,	APMIB_T,0,mib_storage_user_tbl,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(STORAGE_GROUP_T,	StorageGroupArray,	[MAX_GROUP_NUM],	STORAGE_GROUP_TBL,	STORAGE_GROUP_ARRAY_T,	APMIB_T,0,mib_storage_group_tbl,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(STORAGE_SHAREINFO_T, StorageShareInfoArray,	[MAX_SHAREINFO_LEN],	STORAGE_SHAREINFO_TBL,	STORAGE_SHAREINFO_ARRAY_T,	APMIB_T,0,mib_storage_shareinfo_tbl,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+
+MIBDEF(char,			StorageFolderLocal,		[20],					STORAGE_FOLDER_LOCAL,		STRING_T,APMIB_T,0,0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(unsigned char,	StorageEditUserIndex,		,	STORAGE_USER_EDIT_INDEX,	BYTE_T,APMIB_T,0,0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(unsigned char,	StorageEditGroupIndex,		,	STORAGE_GROUP_EDIT_INDEX,	BYTE_T,APMIB_T,0,0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+MIBDEF(char,			StorageEditSambaFolder,	[MAX_GROUP_NAME_LEN],	STORAGE_FOLDER_EDIT_NAME,	STRING_T,APMIB_T,0,0,0,REINIT_LAN_APP_SAMBA_WEB_FUNC_ID)
+#endif
+
+MIBDEF(unsigned char,	MfiAirplayPassword, [MAX_NAME_LEN_LONG],	MFI_AIRPLAY_PASSWD,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	WACdeviceName,	[MAX_NAME_LEN],	MFI_WAC_DEVICE_NAME,	STRING_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned int,    MfiWACBand,  , MFI_WAC_BAND,	DWORD_T,	APMIB_T, 0, 0,0,0)
+
+#endif // #ifdef MIB_IMPORT
+
+
+#ifdef _SUPPORT_CAPTIVEPORTAL_PROFILE_
+#ifdef MIB_CAP_PORTAL_IMPORT
+MIBDEF(unsigned char,	ipAddr, [20],	CAP_PORTAL_IP,	BYTE6_T, CAP_PORTAL_T, 0, 0,0,0)
+#endif // #ifdef MIB_CAP_PORTAL_IMPORT
+#endif/*_SUPPORT_CAPTIVEPORTAL_PROFILE_*/
+
+#ifdef MIB_DHCPRSVDIP_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl */
+#ifdef _PRMT_X_TELEFONICA_ES_DHCPOPTION_
+MIBDEF(unsigned char,	dhcpRsvdIpEntryEnabled, ,	DHCPRSVDIP_ENTRY_ENABLED,	BYTE_T, DHCPRSVDIP_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,	ipAddr, [4],	DHCPRSVDIP_IPADDR,	IA_T, DHCPRSVDIP_T, 0, 0,0,0)
+#ifdef SUPPORT_DHCP_PORT_IP_BIND
+MIBDEF(unsigned char,	portId, ,	DHCPRSVDIP_PORTID, BYTE_T, DHCPRSVDIP_T, 0, 0)
+#endif
+MIBDEF(unsigned char,	macAddr,	[6],	DHCPRSVDIP_MACADDR,	BYTE6_T, DHCPRSVDIP_T, 0, 0,0,0)
+MIBDEF(unsigned char,	hostName, [32],	DHCPRSVDIP_HOSTNAME,	STRING_T, DHCPRSVDIP_T, 0, 0,0,0)
+MIBDEF(unsigned int,    InstanceNum,  , DHCPRSVDIP_INSTANCENUM,	DWORD_T,	DHCPRSVDIP_T, 0, 0,0,0)
+#endif // #ifdef MIB_DHCPRSVDIP_IMPORT
+#ifdef CONFIG_IPV6
+#ifdef TR181_SUPPORT
+#ifdef MIB_IPV6_DHCPC_SENDOPT_IMPORT
+MIBDEF(unsigned char,	index,	,	IPV6_DHCPC_SENDOPT_INDEX,	BYTE_T, DHCPV6C_SENDOPT_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enable,	,	IPV6_DHCPC_SENDOPT_ENABLE,	BYTE_T, DHCPV6C_SENDOPT_T, 0, 0,0,0)
+MIBDEF(unsigned long,	tag,	,	IPV6_DHCPC_SENDOPT_TAG, DWORD_T, DHCPV6C_SENDOPT_T, 0, 0,0,0)
+MIBDEF(unsigned char,	value,	[64],	IPV6_DHCPC_SENDOPT_VALUE,STRING_T	, DHCPV6C_SENDOPT_T, 0, 0,0,0)
+#endif
+#endif
+#endif
+#ifdef TR181_SUPPORT
+#ifdef MIB_DNS_CLIENT_SERVER_IMPORT
+MIBDEF(unsigned char,	index,	,	DNS_CLIENT_SERVER_INDEX,	BYTE_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enable,	,	DNS_CLIENT_SERVER_ENABLE,	BYTE_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	status,	,	DNS_CLIENT_SERVER_STATUS,	BYTE_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	alias, [64],	DNS_CLIENT_SERVER_ALIAS,	STRING_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipAddr,	[40],	DNS_CLIENT_SERVER_IPADDR,	STRING_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	interface, [64],	DNS_CLIENT_SERVER_IF,	STRING_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	type,	,	DNS_CLIENT_SERVER_TYPE,		BYTE_T, DNS_CLIENT_SERVER_T, 0, 0,0,0)
+#endif
+#endif
+#ifdef WLAN_PROFILE
+#ifdef MIB_WLAN_PROFILE_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	ssid, [MAX_SSID_LEN],	PROFILE_SSID,	STRING_T,	WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	encryption, ,			PROFILE_ENC,	BYTE_T, 	WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	auth, ,					PROFILE_AUTH,	BYTE_T, 	WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpa_cipher, , 			PROFILE_WPA_CIPHER,	BYTE_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaPSK, [MAX_PSK_LEN+1],PROFILE_WPA_PSK,STRING_T, 	WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wep_default_key, ,		PROFILE_WEP_DEFAULT_KEY,BYTE_T,WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wepKey1, [WEP128_KEY_LEN*2+1],PROFILE_WEP_KEY1,BYTE_ARRAY_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wepKey2, [WEP128_KEY_LEN*2+1],PROFILE_WEP_KEY2,BYTE_ARRAY_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wepKey3, [WEP128_KEY_LEN*2+1],PROFILE_WEP_KEY3,BYTE_ARRAY_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wepKey4, [WEP128_KEY_LEN*2+1],PROFILE_WEP_KEY4,BYTE_ARRAY_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wepKeyType, ,	PROFILE_WEP_KEY_TYPE,	BYTE_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaPSKFormat, ,	PROFILE_PSK_FORMAT,	BYTE_T, WLAN_PROFILE_T, 0, 0,DECISION_WLAN_PROFILE_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif // #ifdef MIB_WLAN_PROFILE_IMPORT
+#endif
+
+#ifdef MIB_SCHEDULE_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	text, [SCHEDULE_NAME_LEN],	SCHEDULE_TEXT,	STRING_T, SCHEDULE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	eco,	,	SCHEDULE_ECO,	WORD_T, SCHEDULE_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	fTime, ,	SCHEDULE_FTIME,	WORD_T, SCHEDULE_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	tTime,	,	SCHEDULE_TTIME,	WORD_T, SCHEDULE_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	day,	,	SCHEDULE_DAY,	WORD_T, SCHEDULE_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif // #ifdef MIB_SCHEDULE_IMPORT
+
+#ifdef MIB_MACFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	macAddr, [6],	MACFILTER_MACADDR,	BYTE6_T, MACFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	MACFILTER_COMMENT,	STRING_T, MACFILTER_T, 0, 0,0,0)
+#endif // #ifdef MIB_MACFILTER_IMPORT
+
+#ifdef VLAN_CONFIG_SUPPORTED
+#ifdef MIB_VLAN_CONFIG_IMPORT
+/* _ctype,      _cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,   enabled, ,      VLANCONFIG_ENTRY_ENABLED,       BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,   netIface, [IFNAMSIZE],  VLANCONFIG_NETIFACE,    STRING_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,   tagged, ,       VLANCONFIG_TAGGED,      BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+//MIBDEF(unsigned char, untagged, ,     VLANCONFIG_UNTAGGED,    BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,   priority, ,     VLANCONFIG_PRIORITY,    BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,   cfi, ,  VLANCONFIG_CFI, BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+//MIBDEF(unsigned char, groupId, ,      VLANCONFIG_GROUPID,     BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned short,  vlanId, ,       VLANCONFIG_VLANID,      WORD_T, VLAN_CONFIG_T, 0, 0,0,0)
+#if defined(CONFIG_RTK_BRIDGE_VLAN_SUPPORT) ||defined(CONFIG_RTL_HW_VLAN_SUPPORT)
+MIBDEF(unsigned char,	forwarding_rule, ,	VLANCONFIG_FORWARDING_RULE, BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_VLAN_CONFIG_IMPORT
+#endif // #ifdef VLAN_CONFIG_SUPPORTED
+
+#if defined(CONFIG_8021Q_VLAN_SUPPORTED)
+#ifdef MIB_VLAN_CONFIG_IMPORT
+MIBDEF(unsigned char,   VlanType, ,      VLAN_TYPE,       BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned short,	VlanId, ,		VLAN_ID,		WORD_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	VlanPriority, ,  VLAN_PRIORITY,	BYTE_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned int,	MemberPortMask, ,  VLAN_MEMBER_PORT_MASK, DWORD_T, VLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned int,	TaggedPortMask, ,  VLAN_TAGGED_PORT_MASK, DWORD_T, VLAN_CONFIG_T, 0, 0,0,0)
+#endif
+#endif
+
+#ifdef HOME_GATEWAY
+#ifdef MIB_PORTFW_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	ipAddr, [4],	PORTFW_IPADDR,	IA_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned short,	fromPort,	,	PORTFW_FROMPORT,	WORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned short,	toPort, ,	PORTFW_TOPORT,	WORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned char,	protoType, ,	PORTFW_PROTOTYPE,	BYTE_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned short,	svrport, ,	PORTFW_SVRPORT,	WORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned char,	svrName,	 [COMMENT_LEN],	PORTFW_SVRNAME,	STRING_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned int,	InstanceNum, ,	PORTFW_INSTANCENUM,	DWORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned int,	WANIfIndex, ,	PORTFW_WANIFACE_ID,	DWORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment,	 [COMMENT_LEN],	PORTFW_COMMENT,	STRING_T, PORTFW_T, 0, 0,0,0)
+#if defined(CONFIG_RTL_PORTFW_EXTEND)
+MIBDEF(unsigned short,	externelFromPort,	,	PORTFW_EXTERNEL_FROMPORT,	WORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned short,	externeltoPort, ,	PORTFW_EXTERNEL_TOPORT,	WORD_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rmtipAddr, [4],	PORTFW_REMOTE_IPADDR,	IA_T, PORTFW_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enabled, ,	PORTFW_ENABLED,	BYTE_T, PORTFW_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_PORTFW_IMPORT
+
+#ifdef MIB_IPFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	ipAddr, [4],	IPFILTER_IPADDR,	IA_T, IPFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	protoType,	,	IPFILTER_PROTOTYPE,	BYTE_T, IPFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	IPFILTER_COMMENT,	STRING_T, IPFILTER_T, 0, 0,0,0)
+#ifdef CONFIG_IPV6
+MIBDEF(unsigned char, 	ip6Addr, [48], 	IPFILTER_IP6ADDR,	STRING_T, IPFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipVer, 	,	IPFILTER_IP_VERSION,	BYTE_T, IPFILTER_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_IPFILTER_IMPORT
+
+#ifdef MIB_STORAGE_GROUP_IMPORT
+MIBDEF(char, storage_group_name, 	[MAX_GROUP_NAME_LEN],	STORAGE_GROUP_NAME,		STRING_T,	STORAGE_GROUP_T,0,0,0,0)
+MIBDEF(char, storage_group_access,	[10],	STORAGE_GROUP_ACCESS,	STRING_T,	STORAGE_GROUP_T,0,0,0,0)
+
+MIBDEF(unsigned char, 	storage_group_sharefolder_flag,	,		STORAGE_GROUP_SHAREFOLDER_FLAG,	BYTE_T,		STORAGE_GROUP_T,0,0,0,0)
+MIBDEF(char, 			storage_group_sharefolder,		[MAX_FOLDER_NAME_LEN],	STORAGE_GROUP_SHAREFOLDER,		STRING_T,	STORAGE_GROUP_T,0,0,0,0)
+MIBDEF(char, 			storage_group_displayname,		[MAX_DISPLAY_NAME_LEN],	STORAGE_GROUP_DISPLAYNAME,		STRING_T,	STORAGE_GROUP_T,0,0,0,0)
+#endif
+
+#ifdef MIB_STORAGE_USER_IMPORT
+MIBDEF(char, storage_user_name, 	[MAX_USER_NAME_LEN],	STORAGE_USER_NAME,	STRING_T,	STORAGE_USER_T,0,0,0,0)
+MIBDEF(char, storage_user_password, [MAX_USER_PASSWD_LEN],	STORAGE_USER_PASSWD,STRING_T,	STORAGE_USER_T,0,0,0,0)
+MIBDEF(char, storage_user_group,	[MAX_GROUP_NAME_LEN],	STORAGE_USER_GROUP,	STRING_T,	STORAGE_USER_T,0,0,0,0)
+#endif
+
+#ifdef MIB_STORAGE_SHAREINFO_IMPORT
+MIBDEF(unsigned char, storage_sharefolder_name, 	[MAX_SHAREINFO_FOLDERNAME_LEN],	STORAGE_SHAREINFO_FOLDERNAME,	STRING_T,	STORAGE_SHAREINFO_T,0,0,0,0)
+MIBDEF(unsigned char, storage_sharefolder_path, [MAX_SHAREINFO_PATH_LEN],	STORAGE_SHAREINFO_FOLDERPATH,STRING_T,	STORAGE_SHAREINFO_T,0,0,0,0)
+MIBDEF(unsigned char, storage_account,	[MAX_OWNER_LEN],	STORAGE_SHAREINFO_OWNUSER,	STRING_T,	STORAGE_SHAREINFO_T,0,0,0,0)
+MIBDEF(unsigned char, storage_permission, ,	STORAGE_SHAREINFO_PERMISSION, BYTE_T,	STORAGE_SHAREINFO_T,0,0,0,0)
+#endif
+
+#ifdef MIB_PORTFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned short,	fromPort, ,	PORTFILTER_FROMPORT,	WORD_T, PORTFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned short,	toPort, ,	PORTFILTER_TOPORT,	WORD_T, PORTFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	protoType, ,	PORTFILTER_PROTOTYPE,	BYTE_T, PORTFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	PORTFILTER_COMMENT,	STRING_T, PORTFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipVer, , 	PORTFILTER_IPVERSION, 	BYTE_T, PORTFILTER_T, 0, 0,0,0)
+#endif // #ifdef MIB_PORTFILTER_IMPORT
+
+#ifdef MIB_TRIGGERPORT_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned short,	tri_fromPort, ,	TRIGGERPORT_TRI_FROMPORT,	WORD_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned short,	tri_toPort, ,	TRIGGERPORT_TRI_TOPORT,	WORD_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tri_protoType, ,	TRIGGERPORT_TRI_PROTOTYPE,	BYTE_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned short,	inc_fromPort, ,	TRIGGERPORT_INC_FROMPORT,	WORD_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned short,	inc_toPort, ,	TRIGGERPORT_INC_TOPORT,	WORD_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned char,	inc_protoType, ,	TRIGGERPORT_INC_PROTOTYPE,	BYTE_T, TRIGGERPORT_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	TRIGGERPORT_COMMENT,	STRING_T, TRIGGERPORT_T, 0, 0,0,0)
+#endif // #ifdef MIB_TRIGGERPORT_IMPORT
+
+#ifdef MIB_URLFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	urlAddr, [31],	URLFILTER_URLADDR,	STRING_T, URLFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ruleMode, ,	URLFILTER_RULE_MODE,	BYTE_T, URLFILTER_T, 0, 0,0,0)
+#ifdef URL_FILTER_USER_MODE_SUPPORT
+MIBDEF(unsigned char,   usrMode, , URLFILTER_USR_MODE,      BYTE_T,URLFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipAddr, [4],	URLFILTER_IPADDR,	IA_T, URLFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,   macAddr,[6],	URLFILTER_MACADDR,  BYTE6_T,URLFILTER_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_URLFILTER_IMPORT
+
+
+#ifdef ROUTE_SUPPORT
+#ifdef MIB_STATICROUTE_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	dstAddr, [4],	STATICROUTE_DSTADDR,	IA_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	netmask, [4],	STATICROUTE_NETMASK,	IA_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	gateway, [4],	STATICROUTE_GATEWAY,	IA_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	interface, ,	STATICROUTE_INTERFACE,	BYTE_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(int,	metric, ,	STATICROUTE_METRIC,	DWORD_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	Enable, ,	STATICROUTE_ENABLE,	BYTE_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	Type, ,	STATICROUTE_TYPE,	BYTE_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SourceIP, [4],	STATICROUTE_SRCADDR,	IA_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	SourceMask, [4],	STATICROUTE_SRCNETMASK,	IA_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	ifIndex, ,	STATICROUTE_IFACEINDEX,	DWORD_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	InstanceNum, ,	STATICROUTE_INSTANCENUM,	DWORD_T, STATICROUTE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	Flags, ,	STATICROUTE_FLAGS,	BYTE_T, STATICROUTE_T, 0, 0,0,0)
+#endif // #ifdef MIB_STATICROUTE_IMPORT
+#endif // #ifdef ROUTE_SUPPORT
+
+#ifdef VPN_SUPPORT
+#ifdef MIB_IPSECTUNNEL_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	tunnelId, ,	IPSECTUNNEL_TUNNELID,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	authType, ,	IPSECTUNNEL_AUTHTYPE,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+//local info
+MIBDEF(unsigned char,	lcType, ,	IPSECTUNNEL_LCTYPE,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	lc_ipAddr, [4],	IPSECTUNNEL_LC_IPADDR,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	lc_maskLen, ,	IPSECTUNNEL_LC_MASKLEN,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+//remote Info
+MIBDEF(unsigned char,	rtType, ,	IPSECTUNNEL_RTTYPE,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rt_ipAddr, [4],	IPSECTUNNEL_RT_IPADDR,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rt_maskLen, ,	IPSECTUNNEL_RT_MASKLEN,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rt_gwAddr, [4],	IPSECTUNNEL_RT_GWADDR,	IA_T, IPSECTUNNEL_T, 0, 0,0,0)
+// Key mode common
+MIBDEF(unsigned char,	keyMode, ,	IPSECTUNNEL_KEYMODE,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	espAh, ,	IPSECTUNNEL_ESPAH,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	espEncr, ,	IPSECTUNNEL_ESPENCR,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	espAuth, ,	IPSECTUNNEL_ESPAUTH,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	ahAuth, ,	IPSECTUNNEL_AHAUTH,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+//IKE mode
+MIBDEF(unsigned char,	conType, ,	IPSECTUNNEL_CONTYPE,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	psKey, [MAX_NAME_LEN],	IPSECTUNNEL_PSKEY,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rsaKey, [MAX_RSA_KEY_LEN],	IPSECTUNNEL_RSAKEY,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+//Manual Mode
+MIBDEF(unsigned char,	spi, [MAX_SPI_LEN],	IPSECTUNNEL_SPI,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	encrKey, [MAX_ENCRKEY_LEN],	IPSECTUNNEL_ENCRKEY,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	authKey, [MAX_AUTHKEY_LEN],	IPSECTUNNEL_AUTHKEY,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+// tunnel info
+MIBDEF(unsigned char,	enable, ,	IPSECTUNNEL_ENABLE,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	connName, [MAX_NAME_LEN],	IPSECTUNNEL_CONNNAME,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	lcIdType, ,	IPSECTUNNEL_LCIDTYPE,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rtIdType, ,	IPSECTUNNEL_LCIDTYPE,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	lcId, [MAX_NAME_LEN],	IPSECTUNNEL_LCID,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	rtId, [MAX_NAME_LEN],	IPSECTUNNEL_RTID,	STRING_T, IPSECTUNNEL_T, 0, 0,0,0)
+// ike Advanced setup
+MIBDEF(unsigned long,	ikeLifeTime, ,	IPSECTUNNEL_IKELIFETIME,	DWORD_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ikeEncr, ,	IPSECTUNNEL_IKEENCR,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ikeAuth, ,	IPSECTUNNEL_IKEAUTH,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ikeKeyGroup, ,	IPSECTUNNEL_IKEKEYGROUP,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned long,	ipsecLifeTime, ,	IPSECTUNNEL_IPSECLIFETIME,	DWORD_T, IPSECTUNNEL_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipsecPfs, ,	IPSECTUNNEL_IPSECPFS,	BYTE_T, IPSECTUNNEL_T, 0, 0,0,0)
+#endif // #ifdef MIB_IPSECTUNNEL_IMPORT
+#endif //#ifdef VPN_SUPPORT
+
+#ifdef CONFIG_RTL_AIRTIME
+#ifdef MIB_AIRTIME_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl */
+MIBDEF(unsigned char,	macAddr, [6]          , AIRTIME_MACADDR, BYTE6_T , AIRTIME_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipAddr,  [4]          , AIRTIME_IPADDR , IA_T    , AIRTIME_T, 0, 0,0,0)
+MIBDEF(unsigned int ,   atm_time,             , AIRTIME_STATIME, DWORD_T , AIRTIME_T, 0, 0,0,0)
+MIBDEF(unsigned char,   comment, [COMMENT_LEN],	AIRTIME_COMMENT, STRING_T, AIRTIME_T, 0, 0,0,0)
+#endif /* MIB_AIRTIME_IMPORT */
+#endif /* CONFIG_RTL_AIRTIME */
+
+#if defined(_PRMT_X_TELEFONICA_ES_DHCPOPTION_)
+#ifdef MIB_DHCPDOPTION_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	enable,  , DHCP_SERVER_OPTION_ENABLED,  BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	usedFor, , DHCP_SERVER_OPTION_USEDFOR,  BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	order,   , DHCP_SERVER_OPTION_ORDER,    BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tag,     , DHCP_SERVER_OPTION_TAG,	    BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	len,	 , DHCP_SERVER_OPTION_LEN,		BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	value, [DHCP_OPT_VAL_LEN],	DHCP_SERVER_OPTION_VALUE,     BYTE_ARRAY_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ifIndex,	       , DHCP_SERVER_OPTION_IFINDEX,          BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dhcpOptInstNum,	   , DHCP_SERVER_OPTION_DHCPOPTINSTNUM,   BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dhcpConSPInstNum,  , DHCP_SERVER_OPTION_DHCPCONSPINSTNUM, BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+#endif // #ifdef MIB_DHCPDOPTION_IMPORT
+
+#ifdef MIB_DHCPCOPTION_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	enable,  , DHCP_CLIENT_OPTION_ENABLED,  BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	usedFor, , DHCP_CLIENT_OPTION_USEDFOR,  BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	order,   , DHCP_CLIENT_OPTION_ORDER,    BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	tag,     , DHCP_CLIENT_OPTION_TAG,	    BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	len,	 , DHCP_CLIENT_OPTION_LEN,		BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	value, [DHCP_OPT_VAL_LEN],	DHCP_CLIENT_OPTION_VALUE,     BYTE_ARRAY_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ifIndex,	       , DHCP_CLIENT_OPTION_IFINDEX,          BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dhcpOptInstNum,	   , DHCP_CLIENT_OPTION_DHCPOPTINSTNUM,   BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dhcpConSPInstNum,  , DHCP_CLIENT_OPTION_DHCPCONSPINSTNUM, BYTE_T, MIB_CE_DHCP_OPTION_T, 0, 0,0,0)
+#endif // #ifdef MIB_DHCPCOPTION_IMPORT
+
+#ifdef MIB_DHCPS_SERVING_POOL_IMPORT
+/* _ctype,  _cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,   enable,  ,                      DHCPS_SERVING_POOL_ENABLE,          BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned int,    poolorder,  ,                   DHCPS_SERVING_POOL_POOLORDER,       DWORD_T,        DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   poolname,   [MAX_NAME_LEN],     DHCPS_SERVING_POOL_POOLNAME,        BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   deviceType,  ,                  DHCPS_SERVING_POOL_DEVICETYPE,      BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   rsvOptCode,  ,                  DHCPS_SERVING_POOL_RSVOPTCODE,      BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   sourceinterface,  ,             DHCPS_SERVING_POOL_SOURCEINTERFACE, BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   vendorclass,[OPTION_60_LEN+1],  DHCPS_SERVING_POOL_VENDORCLASS,     BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   vendorclassflag,  ,             DHCPS_SERVING_POOL_VENDORCLASSFLAG, BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   vendorclassmode, [MODE_LEN],    DHCPS_SERVING_POOL_VENDORCLASSMODE, BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   clientid,   [OPTION_LEN],       DHCPS_SERVING_POOL_CLIENTID,        BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   clientidflag,  ,                DHCPS_SERVING_POOL_CLIENTIDFLAG,    BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   userclass,  [OPTION_LEN],       DHCPS_SERVING_POOL_USERCLASS,       BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   userclassflag,  ,               DHCPS_SERVING_POOL_USERCLASSFLAG,   BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   chaddr,     [MAC_ADDR_LEN],     DHCPS_SERVING_POOL_CHADDR,          BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   chaddrmask, [MAC_ADDR_LEN],     DHCPS_SERVING_POOL_CHADDRMASK,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   chaddrflag,  ,                  DHCPS_SERVING_POOL_CHADDRFLAG,      BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   localserved,  ,                 DHCPS_SERVING_POOL_LOCALSERVED,     BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   startaddr,  [IP_ADDR_LEN],      DHCPS_SERVING_POOL_STARTADDR,       BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   endaddr,    [IP_ADDR_LEN],      DHCPS_SERVING_POOL_ENDADDR,         BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   subnetmask, [IP_ADDR_LEN],      DHCPS_SERVING_POOL_SUBNETMASK,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   iprouter,   [IP_ADDR_LEN],      DHCPS_SERVING_POOL_IPROUTER,        BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   dnsserver1, [IP_ADDR_LEN],      DHCPS_SERVING_POOL_DNSSERVER1,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   dnsserver2, [IP_ADDR_LEN],      DHCPS_SERVING_POOL_DNSSERVER2,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   dnsserver3, [IP_ADDR_LEN],      DHCPS_SERVING_POOL_DNSSERVER3,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   domainname, [GENERAL_LEN],      DHCPS_SERVING_POOL_DOMAINNAME,      BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned int,    leasetime,  ,                   DHCPS_SERVING_POOL_LEASETIME,       DWORD_T,          DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   dhcprelayip,[IP_ADDR_LEN],      DHCPS_SERVING_POOL_DHCPRELAYIP,     BYTE_ARRAY_T,   DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned char,   dnsservermode,  ,               DHCPS_SERVING_POOL_DNSSERVERMODE,   BYTE_T,         DHCPS_SERVING_POOL_T, 0, 0,0,0)
+MIBDEF(unsigned int,    InstanceNum,  ,                 DHCPS_SERVING_POOL_INSTANCENUM,     DWORD_T,          DHCPS_SERVING_POOL_T, 0, 0,0,0)
+#endif // #ifdef MIB_DHCPS_SERVING_POOL_IMPORT
+
+#endif /* #if defined(_PRMT_X_TELEFONICA_ES_DHCPOPTION_) */
+#endif // #ifdef HOME_GATEWAY
+
+#ifdef TLS_CLIENT
+#ifdef MIB_CERTROOT_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	CERTROOT_COMMENT,	STRING_T, CERTROOT_T, 0, 0,0,0)
+#endif // #ifdef MIB_CERTROOT_IMPORT
+
+#ifdef MIB_CERTUSER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	CERTUSER_COMMENT,	STRING_T, CERTUSER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pass, [MAX_RS_PASS_LEN],	CERTROOT_PASS,	STRING_T, CERTUSER_T, 0, 0,0,0)
+#endif // #ifdef MIB_CERTUSER_IMPORT
+#endif //#ifdef TLS_CLIENT
+
+#if defined(GW_QOS_ENGINE)
+#ifdef MIB_QOS_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	entry_name, [MAX_QOS_NAME_LEN+1],	QOS_ENTRY_NAME,	STRING_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enabled, ,	QOS_ENTRY_ENABLED,	STRING_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	priority, ,	QOS_PRIORITY,	STRING_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	protocol, ,	QOS_PROTOCOL,	WORD_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	local_ip_start, [4],	QOS_LOCAL_IP_START,	IA_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	local_ip_end, [4],	QOS_LOCAL_IP_END,	IA_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	local_port_start, ,	QOS_LOCAL_PORT_START,	WORD_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	local_port_end, ,	QOS_LOCAL_PORT_END,	WORD_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	remote_ip_start, [4],	QOS_REMOTE_IP_START,	IA_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	remote_ip_end, [4],	QOS_REMOTE_IP_END,	IA_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	remote_port_start, ,	QOS_REMOTE_PORT_START,	WORD_T, QOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	remote_port_end, ,	QOS_REMOTE_PORT_END,	WORD_T, QOS_T, 0, 0,0,0)
+
+#endif // #ifdef MIB_QOS_IMPORT
+#endif // #if defined(GW_QOS_ENGINE)
+
+#if defined(CONFIG_RTL_ETH_802DOT1X_SUPPORT)
+#ifdef MIB_ETH_DOT1X_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	enabled, ,	ELAN_DOT1X_PORT_ENABLED,	STRING_T, ETHDOT1X_T, 0, 0,0,0)
+MIBDEF(unsigned short,	portnum, ,	ELAN_DOT1X_PORT_NUMBER,	WORD_T, ETHDOT1X_T, 0, 0,0,0)
+#endif // #ifdef MIB_ETH_DOT1X_IMPORT
+#endif // #if defined(CONFIG_RTL_ETH_802DOT1X_SUPPORT)
+
+#if defined(QOS_BY_BANDWIDTH)
+#ifdef MIB_IPQOS_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	entry_name, [MAX_QOS_NAME_LEN+1],	IPQOS_ENTRY_NAME,	STRING_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enabled, ,	IPQOS_ENABLED,	BYTE_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	mac, [MAC_ADDR_LEN],	IPQOS_MAC,	BYTE6_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned int,	mode, ,	IPQOS_MODE,	BYTE_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	local_ip_start, [4],	IPQOS_LOCAL_IP_START,	IA_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	local_ip_end, [4],	IPQOS_LOCAL_IP_END,	IA_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned long,	bandwidth, ,	IPQOS_BANDWIDTH,	DWORD_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned long,	bandwidth_downlink, ,	IPQOS_BANDWIDTH_DOWNLINK,	DWORD_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l7_protocol, [64+1],	IPQOS_LAYER7_PROTOCOL,	STRING_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ip6_src, [40],			IPQOS_IPV6_SRC,	STRING_T, IPQOS_T, 0, 0,0,0)
+#if defined(ADVANCED_IPQOS)
+MIBDEF(unsigned char,	dst_mac, [MAC_ADDR_LEN],	IPQOS_DST_MAC,	BYTE6_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	protocol, , IPQOS_PROTOCOL, BYTE_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	local_port_start, , IPQOS_LOCAL_PORT_START, WORD_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	local_port_end, ,	IPQOS_LOCAL_PORT_END, WORD_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	remote_ip_start, [4],	IPQOS_REMOTE_IP_START,	IA_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	remote_ip_end, [4], IPQOS_REMOTE_IP_END,	IA_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	remote_port_start, ,	IPQOS_REMOTE_PORT_START,	WORD_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned short,	remote_port_end, ,	IPQOS_REMOTE_PORT_END,	WORD_T, IPQOS_T, 0, 0,0,0)
+//0-64
+MIBDEF(unsigned char,	dscp, , IPQOS_DSCP, BYTE_T, IPQOS_T, 0, 0,0,0)
+//0-7, 802.1p
+MIBDEF(unsigned char,	vlan_pri, , IPQOS_VLAN_PRI, BYTE_T, IPQOS_T, 0, 0,0,0)
+//policy
+MIBDEF(unsigned char,	policy, , IPQOS_POLICY, BYTE_T, IPQOS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	priority, , IPQOS_PRIORITY, BYTE_T, IPQOS_T, 0, 0, 0, 0)
+MIBDEF(unsigned long,	weight, , IPQOS_WEIGHT, DWORD_T, IPQOS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	phyport, , IPQOS_PHYPORT, BYTE_T, IPQOS_T, 0, 0, 0, 0)
+//0-64
+MIBDEF(unsigned char,	remark_dscp, , IPQOS_REMARK_DSCP, BYTE_T, IPQOS_T, 0, 0,0,0)
+//0-7, 802.1p
+MIBDEF(unsigned char,	remark_vlan_pri, , IPQOS_REMARK_VLAN_PRI, BYTE_T, IPQOS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipversion,, IPQOS_IPVERSION,	BYTE_T, IPQOS_T, 0, 0,0,0)
+#endif // #if defined(ADVANCED_IPQOS)
+#ifdef QOS_CLASSIFY_BY_DSCP
+MIBDEF(unsigned char,	dscp, ,	IPQOS_DSCP,	BYTE_T, IPQOS_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_IPQOS_IMPORT
+#endif // #if defined(QOS_BY_BANDWIDTH)
+
+#ifdef QOS_OF_TR069
+#ifdef MIB_QOSQUEUE_IMPORT
+MIBDEF(unsigned char,  QueueInterface, [MAX_QUEUE_INTERFACE_LEN+1], QOSQUEUE_INTERFACE, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   QueueWeight, , QOSQUEUE_WEIGHT, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   QueuePrecedence, , QOSQUEUE_PRECEDENCE, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SchedulerAlgorithm, [4], QOSQUEUE_SCHEDULER_ALGORITHM, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(int,            ShapingRate, , QOSQUEUE_SHAPING_RATE, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   ShapingBurstSize, , QOSQUEUE_SHAPING_BURST_SIZE, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   QueueInstanceNum,  , QOSQUEUE_INSTANCENUM, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  QueueEnable, , QOSQUEUE_ENABLE, BYTE_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  QueueStatus, [MAX_STATUS_LEN+1], QOSQUEUE_STATUS, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  Alias, [MAX_ALIAS_LEN+1], QOSQUEUE_ALIAS, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  TrafficClasses, [256+1], QOSQUEUE_TRAFFIC_CLASSES, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  QueueKey, , QOSQUEUE_KEY, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  REDThreshold, , QOSQUEUE_RED_THRESHOLD, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  REDPercentage, , QOSQUEUE_RED_PERCENTAGE, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DropAlgorithm, [MAX_PLOICER_STRING_LEN+1], QOSQUEUE_DROP_ALGORITHM, STRING_T, QOSQUEUE_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,  QueueBufferLength, , QOSQUEUE_BUFFER_LENGTH, DWORD_T, QOSQUEUE_T, 0, 0, 0, 0)
+
+#endif
+
+#ifdef MIB_QOSCLASS_IMPORT
+MIBDEF(unsigned char,  ClassInterface, [MAX_CLASS_INTERFACE_LEN+1], QOSCLASS_INTERFACE, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestIP, [4], QOSCLASS_DEST_IP, IA_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestMask, [4], QOSCLASS_DEST_MASK, IA_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestIPExclude, , QOSCLASS_DEST_IP_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceIP, [4], QOSCLASS_SOURCE_IP, IA_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceMask, [4], QOSCLASS_SOURCE_MASK, IA_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceIPExclude, , QOSCLASS_SOURCE_IP_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            Protocol, , QOSCLASS_PROTOCOL, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  ProtocolExclude, , QOSCLASS_PROTOCOL_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            DestPort, , QOSCLASS_DEST_PORT, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            DestPortRangeMax, , QOSCLASS_DEST_PORT_RANGE_MAX, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestPortExclude, , QOSCLASS_DEST_PORT_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            SourcePort, , QOSCLASS_SOURCE_PORT, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            SourcePortRangeMax, , QOSCLASS_SOURCE_PORT_RANGE_MAX, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourcePortExclude, , QOSCLASS_SOURCE_PORT_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceMACAddress, [MAC_ADDR_LEN], QOSCLASS_SOURCE_MAC_ADDRESS, BYTE6_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceMACExclude, , QOSCLASS_SOURCE_MAC_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestMACAddress, [MAC_ADDR_LEN], QOSCLASS_DEST_MAC_ADDRESS, BYTE6_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            DSCPCheck, , QOSCLASS_DSCP_CHECK, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            DSCPMark, , QOSCLASS_DSCP_MARK, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            EthernetPriorityCheck, , QOSCLASS_ETHERNET_PRIORITY_CHECK, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            EthernetPriorityMark, , QOSCLASS_ETHERNET_PRIORITY_MARK, DWORD_T, QOSCLASS_T, 0, 0, 0, 0 )
+MIBDEF(int,            VLANIDCheck, , QOSCLASS_VLAN_ID_CHECK, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            ClassQueue, , QOSCLASS_QUEUE, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   ClassInstanceNum,  , QOSCLASS_INSTANCENUM, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  ClassificationEnable, , QOSCLASS_ENABLE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  ClassificationStatus, [MAX_STATUS_LEN+1], QOSCLASS_STATUS, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  Alias, [MAX_ALIAS_LEN+1], QOSCLASS_ALIAS, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            ClassificationOrder, , QOSCLASS_ORDER, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceMACMask, [MAC_ADDR_LEN], QOSCLASS_SOURCE_MAC_MASK, BYTE6_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestMACMask, [MAC_ADDR_LEN], QOSCLASS_DEST_MAC_MASK, BYTE6_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestMACExclude, , QOSCLASS_DEST_MAC_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            Ethertype, , QOSCLASS_ETHERTYPE, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  EthertypeExclude, , QOSCLASS_THERTYPE_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            SSAP, , QOSCLASS_SSAP, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SSAPExclude, , QOSCLASS_SSAP_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            DSAP, , QOSCLASS_DSAP, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DSAPExclude, , QOSCLASS_DSAP_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            LLCControl, , QOSCLASS_LLC_CONTROL, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  LLCControlExclude, , QOSCLASS_LLC_CONTROL_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            SNAPOUI, , QOSCLASS_SNAPOUI, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SNAPOUIExclude, ,QOSCLASS_SANPOUI_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorClassID, [MAX_ID_LEN+1], QOSCLASS_SOURCE_VENDOR_CLASSID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorClassIDExclude, ,QOSCLASS_SOURCE_VENDOR_CLASSID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorClassIDMode, [MAX_MODE_LEN+1], QOSCLASS_SOURCE_VENDOR_CLASSID_MODE, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorClassID, [MAX_ID_LEN+1], QOSCLASS_DEST_VENDOR_CLASSID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorClassIDExclude, ,QOSCLASS_DEST_VENDOR_CLASSID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorClassIDMode, [MAX_MODE_LEN+1], QOSCLASS_DEST_VENDOR_CLASSID_MODE, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceClientID, [MAX_ID_LEN+1], QOSCLASS_SOURCE_CLIENTID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceClientIDExclude, , QOSCLASS_SOURCE_CLIENTID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestClientID, [MAX_ID_LEN+1], QOSCLASS_DEST_CLIENTID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestClientIDExclude, , QOSCLASS_DEST_CLIENTID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceUserClassID, [MAX_ID_LEN+1], QOSCLASS_SOURCE_USER_CLASSID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceUserClassIDExclude, ,QOSCLASS_SOURCE_USER_CLASSID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestUserClassID, [MAX_ID_LEN+1], QOSCLASS_DEST_USER_CLASSID, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestUserClassIDExclude, , QOSCLASS_DEST_USER_CLASSID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorSpecificInfo, [MAX_INFO_LEN+1], QOSCLASS_SOURCE_VENDOR_SPECIFIC_INFO, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorSpecificInfoExclude, , QOSCLASS_SOURCE_VENDOR_SPECIFIC_INFO_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   SourceVendorSpecificInfoEnterprise, , QOSCLASS_SOURCE_VENDOR_SPECIFIC_INFO_ENTERPRISE, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned short, SourceVendorSpecificInfoSubOption, , QOSCLASS_SOURCE_VENDOR_SPECIFIC_INFO_SUB_OPTION, WORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  SourceVendorSpecificInfoMode, [MAX_MODE_LEN+1], QOSCLASS_SOURCE_VENDOR_SPECIFIC_INFO_MODE, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorSpecificInfo, [MAX_INFO_LEN+1], QOSCLASS_DEST_VENDOR_SPECIFIC_INFO, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorSpecificInfoExclude, , QOSCLASS_DEST_VENDOR_SPECIFIC_INFO_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   DestVendorSpecificInfoEnterprise, , QOSCLASS_DEST_VENDOR_SPECIFIC_INFO_ENTERPRISE, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned short, DestVendorSpecificInfoSubOption, , QOSCLASS_DEST_VENDOR_SPECIFIC_INFO_SUB_OPTION, WORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DestVendorSpecificInfoMode, [MAX_MODE_LEN+1], QOSCLASS_DEST_VENDOR_SPECIFIC_INFO_MODE, STRING_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  TCPACK, , QOSCLASS_TCPACK, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  TCPACKExclude, , QOSCLASS_TCPACK_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   IPLengthMin, ,QOSCLASS_IP_LENGTH_MIN, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   IPLengthMax, ,QOSCLASS_IP_LENGTH_MAX, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  IPLengthExclude, , QOSCLASS_IP_LENGTH_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  DSCPExclude, , QOSCLASS_DSCP_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  EthernetPriorityExclude, , QOSCLASS_ETHERNET_PRIO_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  VLANIDExclude, , QOSCLASS_VLAN_ID_EXCLUDE, BYTE_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            OutOfBandInfo, , QOSCLASS_OUT_OF_BAND_INFO, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   ForwardingPolicy, , QOSCLASS_FORWARDING_POLICY, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            TrafficClass, , QOSCLASS_TRAFFIC_CLASS, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            ClassPolicer, , QOSCLASS_POLICER, DWORD_T, QOSCLASS_T, 0, 0, 0, 0)
+MIBDEF(int,            ClassApp, , QOSCLASS_APP, DWORD_T, QOSCLASS_T, 0, 0, 0, 0) 
+MIBDEF(unsigned short, ClassificationKey, , QOSCLASS_KEY, WORD_T, QOSCLASS_T, 0, 0, 0, 0)
+#endif
+#ifdef MIB_TR098_APP_CONFIG_IMPORT
+
+MIBDEF(unsigned short,	app_key, ,	TR098_QOS_APP_KEY	,	WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	app_enable, ,	TR098_QOS_APP_ENABLE,	BYTE_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	app_status, [MAX_STATUS_LEN],	TR098_QOS_APP_STATUS,	STRING_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	app_alias, [MAX_TR098_NAME_LEN],	TR098_QOS_APP_ALIAS,	STRING_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,   protocol_identify, [MAX_IDENTIFY_LEN], TR098_QOS_APP_PROTOCOLID,  STRING_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	app_name, [MAX_TR098_NAME_LEN], TR098_QOS_APP_NAME,	STRING_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned short,  default_policy, , TR098_QOS_APP_DFTPOLICY, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(short,  default_class, , TR098_QOS_APP_DFTCLASS, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(short,  default_policer, , TR098_QOS_APP_DFTPOLICER, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(short,  default_queue, , TR098_QOS_APP_DFTQUEUE, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(short,  default_dscp_mark, , TR098_QOS_APP_DFTDSCPMARK, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(short,  default_8021p_mark, , TR098_QOS_APP_DFT8021PMARK, WORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+MIBDEF(int,    instanceNum, , TR098_QOS_APP_INSTANCENUM, DWORD_T, TR098_APPCONF_T, 0, 0, 0, 0)
+
+#endif
+
+#ifdef MIB_TR098_FLOW_CONFIG_IMPORT
+
+MIBDEF(unsigned short,	flow_key, ,	TR098_QOS_FLOW_KEY	,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_enable, ,	TR098_QOS_FLOW_ENABLE,	BYTE_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_status, [MAX_STATUS_LEN],	TR098_QOS_FLOW_STATUS,	STRING_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_alias, [MAX_TR098_NAME_LEN],	TR098_QOS_FLOW_ALIAS,	STRING_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_type, [MAX_IDENTIFY_LEN],	TR098_QOS_FLOW_TYPE,	STRING_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_type_para, [MAX_IDENTIFY_LEN],	TR098_QOS_FLOW_TYPEPARA,	STRING_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	flow_name, [MAX_TR098_NAME_LEN], TR098_QOS_FLOW_NAME,	STRING_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,			app_identify, ,	TR098_QOS_FLOW_APPID,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(unsigned short,	qos_policy, ,	TR098_QOS_FLOW_POLICY,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,	flow_class, ,	TR098_QOS_FLOW_CLASS,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,	flow_policer, ,	TR098_QOS_FLOW_POLICER,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,	flow_queue,  ,	TR098_QOS_FLOW_QUEUE,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,	flow_dscp_mark, ,	TR098_QOS_FLOW_DSCPMARK	,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(short,	flow_8021p_mark, , TR098_QOS_FLOW_8021PMARK,	WORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+MIBDEF(int, 	instanceNum, ,TR098_QOS_FLOW_INSTANCENUM, DWORD_T, TR098_FLOWCONF_T, 0, 0, 0, 0)
+#endif
+
+//mark_qos
+#ifdef MIB_QOSPOLICER_IMPORT
+MIBDEF(unsigned int,   InstanceNum, , QOSPOLICER_INSTANCENUM, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   PolicerKey, , QOSPOLICER_KEY, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	PolicerEnable, ,	QOSPOLICER_ENABLE,	BYTE_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  Alias, [MAX_PLOICER_ALIAS_LEN+1], QOSPOLICER_ALIAS, STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+
+MIBDEF(unsigned int,   CommittedRate, , QOSPOLICER_COMMITTED_RATE, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   CommittedBurstSize, , QOSPOLICER_COMMITTED_BURSTSIZE, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   ExcessBurstSize, , QOSPOLICER_EXCESS_BURSTSIZE, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   PeakRate, , QOSPOLICER_PEAKRATE, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   PeakBurstSize, , QOSPOLICER_PEAK_BURSTSIZE, DWORD_T, QOSPOLICER_T, 0, 0, 0, 0)
+
+MIBDEF(unsigned char,  MeterType, [MAX_PLOICER_STRING_LEN+1], QOSPOLICER_METERTYPE, STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  PossibleMeterTypes, [MAX_PLOICER_STRING_LEN+1], QOSPOLICER_POSSIBLE_METERTYPE, STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  ConformingAction, [MAX_PLOICER_STRING_LEN+1], QOSPOLICER_CONFORM_ACTION, STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  PartialConformingAction, [MAX_PLOICER_STRING_LEN+1], QOSPOLICER_PARTIALCONFORM_ACTION, STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  NonConformingAction, [MAX_PLOICER_STRING_LEN+1], QOSPOLICER_NONCONFORM_ACTION , STRING_T, QOSPOLICER_T, 0, 0, 0, 0)
+#endif
+
+#ifdef MIB_QOSQUEUESTATS_IMPORT
+MIBDEF(unsigned int,   InstanceNum, , QOSQUEUESTATS_INSTANCENUM, DWORD_T, QOSQUEUESTATS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,	Enable, ,	QOSQUEUESTATS_ENABLE,	BYTE_T, QOSQUEUESTATS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  Alias, [MAX_PLOICER_ALIAS_LEN+1], QOSQUEUESTATS_ALIAS, STRING_T, QOSQUEUESTATS_T, 0, 0, 0, 0)
+MIBDEF(unsigned int,   Queue, , QOSQUEUESTATS_QUEUE, DWORD_T, QOSQUEUESTATS_T, 0, 0, 0, 0)
+MIBDEF(unsigned char,  Interface , [MAX_QUEUE_INTERFACE_LEN+1], QOSQUEUESTATS_INTERFACE, STRING_T, QOSQUEUESTATS_T, 0, 0, 0, 0)
+#endif
+#endif
+
+
+#ifdef MIB_MESH_MACFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	macAddr, [6],	MECH_ACL_MACADDR,	BYTE6_T, MACFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	MECH_ACL_COMMENT,	STRING_T, MACFILTER_T, 0, 0,0,0)
+#endif // #ifdef MIB_MESH_MACFILTER_IMPORT
+
+#ifdef MIB_WLAN_MACFILTER_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	macAddr, [6],	WLAN_ACL_ADDR_MACADDR,	BYTE6_T, MACFILTER_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	WLAN_ACL_ADDR_COMMENT,	STRING_T, MACFILTER_T, 0, 0,0,0)
+#endif // #ifdef MIB_WLAN_MACFILTER_IMPORT
+
+#ifdef MIB_WDS_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	macAddr, [6],	WLAN_WDS_MACADDR,	BYTE6_T, WDS_T, 0, 0,0,0)
+MIBDEF(unsigned int,	fixedTxRate, ,	WLAN_WDS_FIXEDTXRATE,	DWORD_T, WDS_T, 0, 0,0,0)
+MIBDEF(unsigned char,	comment, [COMMENT_LEN],	WLAN_WDS_COMMENT,	STRING_T, WDS_T, 0, 0,0,0)
+#endif // #ifdef MIB_WDS_IMPORT
+
+#ifdef FAST_BSS_TRANSITION
+#ifdef MIB_FTKH_IMPORT
+MIBDEF(unsigned char,	macAddr, [6],	WLAN_FTKH_MACADDR,	BYTE6_T, FTKH_T, 0, 0,0,0)
+MIBDEF(unsigned char,	nas_id, [50],	WLAN_FTKH_NAS_ID,	STRING_T, FTKH_T, 0, 0,0,0)
+MIBDEF(unsigned char,	key, [36],	WLAN_FTKH_KEY,	STRING_T, FTKH_T, 0, 0,0,0)
+#ifdef DOT11K
+MIBDEF(unsigned char,	opclass, ,	WLAN_FTKH_OPCLASS,	BYTE_T, FTKH_T, 0, 0,0,0)
+MIBDEF(unsigned char,   channel, ,  WLAN_FTKH_CHANNEL,  BYTE_T, FTKH_T, 0, 0,0,0)
+#endif //DOT11K
+#endif //MIB_FTKH_IMPORT
+#endif //FAST_BSS_TRANSITION
+#ifdef MIB_CONFIG_WLAN_SETTING_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl , decision_id,reinit_id*/
+MIBDEF(unsigned char,	ssid, [MAX_SSID_LEN],	SSID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	channel, ,	CHANNEL,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wlanMacAddr, [6],	WLAN_MAC_ADDR,	BYTE6_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep, ,	WEP,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+//MIBDEF(unsigned char,	wep64Key, [WEP64_KEY_LEN],	WEP64_KEY,	BYTE5_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wep64Key1, [WEP64_KEY_LEN],	WEP64_KEY1,	BYTE5_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep64Key2, [WEP64_KEY_LEN],	WEP64_KEY2,	BYTE5_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep64Key3, [WEP64_KEY_LEN],	WEP64_KEY3,	BYTE5_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep64Key4, [WEP64_KEY_LEN],	WEP64_KEY4,	BYTE5_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+//MIBDEF(unsigned char,	wep128Key, [WEP128_KEY_LEN],	WEP128_KEY,	BYTE13_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wep128Key1, [WEP128_KEY_LEN],	WEP128_KEY1,	BYTE13_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep128Key2, [WEP128_KEY_LEN],	WEP128_KEY2,	BYTE13_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep128Key3, [WEP128_KEY_LEN],	WEP128_KEY3,	BYTE13_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wep128Key4, [WEP128_KEY_LEN],	WEP128_KEY4,	BYTE13_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+MIBDEF(unsigned char,	wepDefaultKey, ,	WEP_DEFAULT_KEY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wepKeyType, ,	WEP_KEY_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+MIBDEF(unsigned short,	fragThreshold, ,	FRAG_THRESHOLD,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned short,	rtsThreshold, ,	RTS_THRESHOLD,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned short,	supportedRates, ,	SUPPORTED_RATES,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned short,	basicRates, ,	BASIC_RATES,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned short,	beaconInterval, ,	BEACON_INTERVAL,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	preambleType, ,	PREAMBLE_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+MIBDEF(unsigned char,	authType, ,	AUTH_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,   ackTimeout, , ACK_TIMEOUT, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+MIBDEF(unsigned char,	acEnabled, ,	MACAC_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acNum, ,	MACAC_NUM,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(MACFILTER_T,	acAddrArray, [MAX_WLAN_AC_NUM],	MACAC_ADDR,	WLAC_ARRAY_T, CONFIG_WLAN_SETTING_T, 0, wlan_acl_addr_tbl,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+MIBDEF(unsigned char,	scheduleRuleEnabled, ,	SCHEDULE_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	scheduleRuleNum, ,	SCHEDULE_TBL_NUM,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(SCHEDULE_T,	scheduleRuleArray, [MAX_SCHEDULE_NUM],	SCHEDULE_TBL,	SCHEDULE_ARRAY_T, CONFIG_WLAN_SETTING_T, 0, mib_schedule_tbl,DECISION_WLAN_SCHEDULE_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+MIBDEF(unsigned char,	hiddenSSID, ,	HIDDEN_SSID,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wlanDisabled, ,	WLAN_DISABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_DISABLE_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned long,	inactivityTime, ,	INACTIVITY_TIME,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	rateAdaptiveEnabled, ,	RATE_ADAPTIVE_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	dtimPeriod, ,	DTIM_PERIOD,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wlanMode, ,	MODE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	networkType, ,	NETWORK_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	iappDisabled, ,	IAPP_DISABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	protectionDisabled, ,	PROTECTION_DISABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	defaultSsid, [MAX_SSID_LEN],	DEFAULT_SSID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	blockRelay, ,	BLOCK_RELAY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_BLOCK_RELAY_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	maccloneEnabled, ,	MACCLONE_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wlanBand, ,	BAND,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned int,	fixedTxRate, ,	FIX_RATE,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	turboMode, ,	TURBO_MODE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	RFPowerScale, ,	RFPOWER_SCALE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+MIBDEF(unsigned char,	retryLimit, ,	RETRY_LIMIT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	regulatoryDomain, [MAX_REGULATORY_DOMAIN],	REGULATORY_DOMAIN,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+
+//Mutilcast 
+MIBDEF(unsigned int,	lowestMlcstRate, ,	LOWEST_MLCST_RATE,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned int,	mc2u_disable, ,	MC2U_DISABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+// WPA stuffs
+MIBDEF(unsigned char,	encrypt, ,	ENCRYPT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	enableSuppNonWpa, ,	ENABLE_SUPP_NONWPA,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	suppNonWpa, ,	SUPP_NONWPA,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaAuth, ,	WPA_AUTH,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaCipher, ,	WPA_CIPHER_SUITE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaPSK, [MAX_PSK_LEN+1],	WPA_PSK,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned long,	rs_reauth_to, ,	RS_REAUTH_TO,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	func_off, ,	FUNC_OFF,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned long,	wpaGroupRekeyTime, ,	WPA_GROUP_REKEY_TIME,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	rsIpAddr, [4],	RS_IP,	IA_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	rsPort, ,	RS_PORT,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	rsPassword, [MAX_RS_PASS_LEN],	RS_PASSWORD,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,   rs2IpAddr, [4],  RS2_IP,  IA_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,  rs2Port, ,       RS2_PORT,        WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,   rs2Password, [MAX_RS_PASS_LEN],  RS2_PASSWORD,    STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	enable1X, ,	ENABLE_1X,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpaPSKFormat, ,	PSK_FORMAT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRsEnabled, ,	ACCOUNT_RS_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRsIpAddr, [4],	ACCOUNT_RS_IP,	IA_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	accountRsPort, ,	ACCOUNT_RS_PORT,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRsPassword, [MAX_RS_PASS_LEN],	ACCOUNT_RS_PASSWORD,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRs2IpAddr, [4],	ACCOUNT_RS2_IP,	IA_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	accountRs2Port, ,	ACCOUNT_RS2_PORT,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRs2Password, [MAX_RS_PASS_LEN],	ACCOUNT_RS2_PASSWORD,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRsUpdateEnabled, ,	ACCOUNT_RS_UPDATE_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	accountRsUpdateDelay, ,	ACCOUNT_RS_UPDATE_DELAY,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	macAuthEnabled, ,	MAC_AUTH_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	rsMaxRetry, ,	RS_MAXRETRY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	rsIntervalTime, ,	RS_INTERVAL_TIME,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	accountRsMaxRetry, ,	ACCOUNT_RS_MAXRETRY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned short,	accountRsIntervalTime, ,	ACCOUNT_RS_INTERVAL_TIME,	WORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpa2PreAuth, ,	WPA2_PRE_AUTH,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpa2Cipher, ,	WPA2_CIPHER_SUITE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+#ifdef CONFIG_IEEE80211W
+MIBDEF(unsigned char,	wpa11w, ,	IEEE80211W,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wpa2EnableSHA256, ,	SHA256_ENABLE, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif
+// WDS stuffs
+MIBDEF(unsigned char,	wdsEnabled, ,	WDS_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)///////////////////////////////////!!!!!!!!!!
+MIBDEF(unsigned char,	wdsNum, ,	WDS_NUM,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(WDS_T,	wdsArray, [MAX_WDS_NUM],	WDS,	WDS_ARRAY_T, CONFIG_WLAN_SETTING_T, 0, wlan_wds_tbl,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wdsEncrypt, ,	WDS_ENCRYPT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wdsWepKeyFormat, ,	WDS_WEP_FORMAT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wdsWepKey, [WEP128_KEY_LEN*2+1],	WDS_WEP_KEY,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wdsPskFormat, ,	WDS_PSK_FORMAT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wdsPsk, [MAX_PSK_LEN+1],	WDS_PSK,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+#ifdef FAST_BSS_TRANSITION
+MIBDEF(unsigned char,	ft_enable, ,	FT_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ft_over_ds, ,	FT_OVER_DS,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+#ifdef DOT11K
+MIBDEF(unsigned char,	dot11k_enable, ,	DOT11K_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+#ifdef CONFIG_IEEE80211V
+MIBDEF(unsigned char,	dot11v_enable, ,	DOT11V_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+//=========add for MESH=========
+MIBDEF(unsigned char,	meshEnabled, ,	MESH_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)////////////////////////////////!!!!!!!!
+MIBDEF(unsigned char,	meshRootEnabled, ,	MESH_ROOT_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshID, [33],	MESH_ID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+// for backbone security
+MIBDEF(unsigned char,	meshEncrypt, ,	MESH_ENCRYPT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshWpaPSKFormat, ,	MESH_PSK_FORMAT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshWpaPSK, [MAX_PSK_LEN+1],	MESH_WPA_PSK,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshWpaAuth, ,	MESH_WPA_AUTH,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshWpa2Cipher, ,	MESH_WPA2_CIPHER_SUITE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#ifdef RTK_MESH_METRIC_REFINE
+MIBDEF(unsigned char,	meshCrossbandEnabled, ,	MESH_CROSSBAND_ENABLED, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#endif
+MIBDEF(unsigned char,	meshAclEnabled, ,	MESH_ACL_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	meshAclNum, ,	MESH_ACL_NUM,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+//#if defined(CONFIG_RTK_MESH) && defined(_MESH_ACL_ENABLE_) // below code copy above ACL code
+MIBDEF(MACFILTER_T,	meshAclAddrArray, [MAX_MESH_ACL_NUM],	MESH_ACL_ADDR,	MESH_ACL_ARRAY_T, CONFIG_WLAN_SETTING_T, 0, mib_mech_acl_tbl,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+//#endif
+#ifdef CONFIG_PMKCACHE
+MIBDEF(unsigned char,	maxpmksa, ,	MAX_PMKSA,	BYTE_T, CONFIG_WLAN_SETTING_T, 32, 0,0,0)//PMKCache
+#endif
+
+// for WMM
+MIBDEF(unsigned char,	wmmEnabled, ,	WMM_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	uapsdEnabled, ,	UAPSD_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+#ifdef WLAN_EASY_CONFIG
+MIBDEF(unsigned char,	acfEnabled, ,	EASYCFG_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfMode, ,	EASYCFG_MODE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfSSID, [MAX_SSID_LEN],	EASYCFG_SSID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfKey, [MAX_ACF_KEY_LEN+1],	EASYCFG_KEY,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfDigest, [MAX_ACF_DIGEST_LEN+1],	EASYCFG_DIGEST,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfAlgReq, ,	EASYCFG_ALG_REQ,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfAlgSupp, ,	EASYCFG_ALG_SUPP,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfRole, ,	EASYCFG_ROLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfScanSSID, [MAX_SSID_LEN],	EASYCFG_SCAN_SSID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	acfWlanMode, ,	EASYCFG_WLAN_MODE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#endif // #ifdef WLAN_EASY_CONFIG
+
+/*for P2P_SUPPORT*/
+MIBDEF(unsigned int,	p2p_type	, ,		P2P_TYPE,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	p2p_intent	, ,		P2P_INTENT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	p2p_listen_channel, ,	P2P_LISTEN_CHANNEL,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	p2p_op_channel, ,	P2P_OPERATION_CHANNEL,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+
+
+#ifdef WIFI_SIMPLE_CONFIG
+MIBDEF(unsigned char,	wscDisable, ,	WSC_DISABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscMethod, ,	WSC_METHOD,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscConfigured, ,	WSC_CONFIGURED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscAuth, ,	WSC_AUTH,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscEnc, ,	WSC_ENC,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscManualEnabled, ,	WSC_MANUAL_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscUpnpEnabled, ,	WSC_UPNP_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscRegistrarEnabled, ,	WSC_REGISTRAR_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscSsid, [MAX_SSID_LEN],	WSC_SSID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscPsk, [MAX_PSK_LEN+1],	WSC_PSK,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wscConfigByExtReg, ,	WSC_CONFIGBYEXTREG,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif // #ifdef WIFI_SIMPLE_CONFIG
+
+#ifdef WLAN_HS2_CONFIG
+MIBDEF(unsigned char,	hs2Enabled, ,	HS2_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+#endif
+
+//for 11N
+MIBDEF(unsigned char,	channelbonding, ,	CHANNEL_BONDING,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	controlsideband, ,	CONTROL_SIDEBAND,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	aggregation, ,	AGGREGATION,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	shortgiEnabled, ,	SHORT_GI,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	access, ,	ACCESS,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	priority, ,	PRIORITY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+// for WAPI
+#if CONFIG_RTL_WAPI_SUPPORT
+MIBDEF(unsigned char,	wapiPsk, [MAX_PSK_LEN+1],	WAPI_PSK,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wapiPskLen, ,	WAPI_PSKLEN,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wapiAuth, ,	WAPI_AUTH,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wapiPskFormat, ,	WAPI_PSK_FORMAT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wapiAsIpAddr, [4],	WAPI_ASIPADDR,	IA_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wapiMcastkey, ,	WAPI_MCASTREKEY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned long,	wapiMcastRekeyTime, ,	WAPI_MCAST_TIME,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned long,	wapiMcastRekeyPackets, ,	WAPI_MCAST_PACKETS,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	wapiUcastkey, ,	WAPI_UCASTREKEY,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned long,	wapiUcastRekeyTime, ,	WAPI_UCAST_TIME,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned long,	wapiUcastRekeyPackets, ,	WAPI_UCAST_PACKETS,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+//internal use
+MIBDEF(unsigned char,	wapiSearchCertInfo, [32],	WAPI_SEARCHINFO,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wapiSearchIndex, ,	WAPI_SEARCHINDEX,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	wapiCAInit, ,	WAPI_CA_INIT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+MIBDEF(unsigned char,	wapiCertSel, ,	WAPI_CERT_SEL,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+MIBDEF(unsigned char,	wapiAuthMode2or3Cert, ,	WAPI_AUTH_MODE_2or3_CERT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_NULL_FUNC_ID)
+
+#endif // #if CONFIG_RTL_WAPI_SUPPORT
+
+MIBDEF(unsigned char,	STBCEnabled, ,	STBC_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	LDPCEnabled, ,	LDPC_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	CoexistEnabled, ,	COEXIST_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	phyBandSelect,	, PHY_BAND_SELECT,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID) //bit1:2G bit2:5G
+MIBDEF(unsigned char,	macPhyMode,	, MAC_PHY_MODE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID) //bit0:SmSphy. bit1:DmSphy. bit2:DmDphy.
+//### add by sen_liu 2011.3.29 add TX Beamforming in 92D
+MIBDEF(unsigned char,	TxBeamforming, ,	TX_BEAMFORMING,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	TxbfMu, ,	TXBF_MU, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+//### end
+
+#ifdef STA_CONTROL
+MIBDEF(unsigned char,	stactrl_enabled, ,	STACTRL_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,   stactrl_prefer, ,  STACTRL_PREFER,    BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+#ifdef RTK_CROSSBAND_REPEATER
+MIBDEF(unsigned char,	crossband_enable, ,	CROSSBAND_ENABLE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+MIBDEF(unsigned char,	crossband_activate, , CROSSBAND_ACTIVATE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+#ifdef TDLS_SUPPORT
+MIBDEF(unsigned char,	tdls_prohibited, ,	TDLS_PROHIBITED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	tdls_cs_prohibited, , TDLS_CS_PROHIBITED, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#endif
+MIBDEF(unsigned char,	CountryStr, [4],	COUNTRY_STRING,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#ifdef CONFIG_RTL_802_1X_CLIENT_SUPPORT
+MIBDEF(unsigned char,	eapType, ,	EAP_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	eapInsideType, ,	EAP_INSIDE_TYPE,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	eapUserId, [MAX_EAP_USER_ID_LEN+1],	EAP_USER_ID,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	rsUserName, [MAX_RS_USER_NAME_LEN+1],	RS_USER_NAME,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	rsUserPasswd, [MAX_RS_USER_PASS_LEN+1],	RS_USER_PASSWD,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	rsUserCertPasswd, [MAX_RS_USER_CERT_PASS_LEN+1],	RS_USER_CERT_PASSWD,	STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned char,	rsBandSel, ,	RS_BAND_SEL,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#endif
+MIBDEF(unsigned int,	tx_restrict	, ,		TX_RESTRICT,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+MIBDEF(unsigned int,	rx_restrict	, ,		RX_RESTRICT,	DWORD_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+
+#ifdef	CONFIG_APP_SIMPLE_CONFIG
+MIBDEF(unsigned char,	ScEnabled, ,	SC_ENABLED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	ScPinEnabled, ,	SC_PIN_ENABLED, BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	ScSaveProfile, ,	SC_SAVE_PROFILE,	 BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_APP_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	ScSyncProfile, ,	SC_SYNC_PROFILE,	 BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_WLAN_PROPERTY_FUNC_ID,REINIT_NULL_FUNC_ID)
+MIBDEF(unsigned char,	ScPasswd, [MAX_PSK_LEN+1], SC_PASSWD, STRING_T, CONFIG_WLAN_SETTING_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WLAN_FUNC_ID)
+#endif
+
+#if defined(CONFIG_APP_APPLE_MFI_WAC)
+MIBDEF(unsigned char,	MfiWACConfigured, ,	MFIWAC_CONFIGURED,	BYTE_T, CONFIG_WLAN_SETTING_T, 0, 0,0,0)
+#endif
+
+#endif // #ifdef MIB_CONFIG_WLAN_SETTING_IMPORT
+
+#if defined(MIB_CWMP_WLANCONF_IMPORT)
+MIBDEF(unsigned char,	InstanceNum, ,	CWMP_WLANCONF_INSTANCENUM,	BYTE_T, CWMP_WLANCONF_T, 0, 0,0,0)
+MIBDEF(unsigned char,	RootIdx, ,	CWMP_WLANCONF_ROOT_IDX,	BYTE_T, CWMP_WLANCONF_T, 0, 0,0,0)
+MIBDEF(unsigned char,	VWlanIdx, ,	CWMP_WLANCONF_VWLAN_IDX,	BYTE_T, CWMP_WLANCONF_T, 0, 0,0,0)
+MIBDEF(unsigned char,	IsConfigured, ,CWMP_WLANCONF_ISCONFIGURED,	BYTE_T, CWMP_WLANCONF_T, 0, 0,0,0)
+MIBDEF(unsigned char,	RfBandAvailable, ,CWMP_WLANCONF_RFBAND,	BYTE_T, CWMP_WLANCONF_T, 0, 0,0,0)
+#endif //#if defined(MIB_CWMP_WLANCONF_IMPORT)
+
+
+#ifdef MIB_CAPWAP_WLAN_CONFIG_IMPORT
+MIBDEF(unsigned char,	enable, , CAPWAP_CFG_WLAN_ENABLE, BYTE_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,)
+MIBDEF(unsigned char,	keyType, , CAPWAP_CFG_KEY_TYPE, BYTE_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pskFormat, , CAPWAP_CFG_PSK_FORMAT, BYTE_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(char,			key, [MAX_PSK_LEN+1], CAPWAP_CFG_KEY, STRING_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(char,			ssid,[MAX_SSID_LEN], CAPWAP_CFG_SSID, STRING_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	bssid, [6], CAPWAP_CFG_BSSID, BYTE6_T, CAPWAP_WLAN_CONFIG_T, 0, 0,0,0)
+#endif // #ifdef MIB_CAPWAP_WLAN_CONFIG_IMPORT
+
+#ifdef MIB_CAPWAP_WTP_CONFIG_IMPORT
+MIBDEF(unsigned char,	wtpId, ,	CAPWAP_CFG_WTP_ID,	BYTE_T,	CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	radioNum, ,	CAPWAP_CFG_RADIO_NUM,	BYTE_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wlanNum, , CAPWAP_CFG_WLAN_NUM,	BYTE_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	powerScale, [MAX_CAPWAP_RADIO_NUM],	CAPWAP_CFG_RFPOWER_SCALE, BYTE_ARRAY_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(unsigned char,	channel, [MAX_CAPWAP_RADIO_NUM],	CAPWAP_CFG_CHANNEL, BYTE_ARRAY_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(CAPWAP_WLAN_CONFIG_T, wlanConfig, [MAX_CAPWAP_RADIO_NUM][MAX_CAPWAP_WLAN_NUM], CAPWAP_CFG_WLAN, CAPWAP_ALL_WLANS_CONFIG_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+MIBDEF(char, 			fwId, [MAX_CAPWAP_FWID_BUF_SIZE], CAPWAP_CFG_FWID, STRING_T, CAPWAP_WTP_CONFIG_T, 0, 0,0,0)
+#endif //#ifdef MIB_CAPWAP_WTP_CONFIG_IMPORT 
+
+#ifdef MIB_WANIFACE_IMPORT
+/* _ctype,	_cname, _crepeat, _mib_name, _mib_type, _mib_parents_ctype, _default_value, _next_tbl */
+MIBDEF(unsigned int,	ifIndex, ,	WANIFACE_IFINDEX,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	napt, ,	WANIFACE_NAPT,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	cmode, ,	WANIFACE_CMODE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	brmode, ,	WANIFACE_BRMODE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppUsername, [MAX_PPP_NAME_LEN+1],	WANIFACE_PPPUSERNAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppPassword, [MAX_PPP_NAME_LEN+1],	WANIFACE_PPPPASSWD,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppAuth, ,	WANIFACE_PPPAUTH,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppACName, [MAX_NAME_LEN+1],	WANIFACE_PPPACNAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppCtype, ,	WANIFACE_PPPCTYPE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pppIdleTime, ,	WANIFACE_PPPIDLETIME,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enableIpQos, ,	WANIFACE_ENABLEQOS,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enableLanDhcp, ,	WANIFACE_ENABLELANDHCP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(int,	multicastVlan, ,	WANIFACE_MULTICAST_VLAN,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enableIGMP, ,	WANIFACE_ENABLEIGMP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+#ifdef CONFIG_ISP_IGMPPROXY_MULTIWAN
+MIBDEF(unsigned char,	onPhyIf, ,	WANIFACE_ON_PHYIF,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,	enableUPNP, ,	WANIFACE_ENABLEUPNP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	AddressType, ,	WANIFACE_ADDRESSTYPE,	BYTE_T, WANIFACE_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WAN_START_FUNC_ID)
+//DHCP_T type defined in apmib.h
+MIBDEF(unsigned char,	rip, ,	WANIFACE_RIP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipAddr,[4] ,	WANIFACE_IPADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	remoteIpAddr,[4] ,	WANIFACE_REMOTEIPADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dgw, ,	WANIFACE_DEFAULTGW,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	mtu, ,	WANIFACE_MTU,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	enable, ,	WANIFACE_ENABLE,	BYTE_T, WANIFACE_T, 0, 0,DECISION_NULL_FUNC_ID,REINIT_WAN_START_FUNC_ID)
+MIBDEF(unsigned char,	netMask,[4] ,	WANIFACE_NETMASK,	IA_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	ipunnumbered, ,	WANIFACE_IPUNNUMBERED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	vlan, ,	WANIFACE_VLAN,	BYTE_T , WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	vlanid, ,	WANIFACE_VLANID, WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	vlanpriority, ,	WANIFACE_VPRIORITY,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	LanDevInstNum, ,	WANIFACE_LANDEV_INSTNUM,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned short,	itfGroup, ,	WANIFACE_ITFGROUP,	WORD_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned long,	cpePppIfIndex, ,	WANIFACE_CPEPPPIFINDEX,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned long,	cpeIpIndex, ,	WANIFACE_CPEIPINDEX,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	connDisable, ,	WANIFACE_CONNDISABLE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	ConDevInstNum, ,	WANIFACE_TR069_CONDEVINSTNUM,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	ConIPInstNum, ,	WANIFACE_TR069_CONIPINSTNUM,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	ConPPPInstNum, ,	WANIFACE_TR069_CONPPPINSTNUM,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	autoDisTime, ,	WANIFACE_TR069_AUTODISTIME,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	warnDisDelay, ,	WANIFACE_TR069_WARNDISDELAY,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppServiceName, [MAX_NAME_LEN+1],WANIFACE_PPPSERVICENAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	WanName, [MAX_NAME_LEN+1],	WANIFACE_WANNAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	TR143UDPEchoItf, ,WANIFACE_TR069_TR143UDPECHOITF,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	PPPoEProxyEnable, ,	WANIFACE_PPPOEPROXYENABLE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	PPPoEProxyMaxUser, ,	WANIFACE_PPPOEPROXYMAXUSER,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	ServiceList, ,	WANIFACE_SERVICELIST,	WORD_T, WANIFACE_T, 0, 0,0,0)
+//TR069(1,0,0) INTERNET(2,0,0) OTHERS(4) VOIP(8)
+MIBDEF(unsigned int,	applicationtype, ,	WANIFACE_APPLICATIONTYPE,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+//TR069_INTERNET(0),INTERNET(1), TR069(2),  Other(3)
+//MIBDEF(unsigned char,	disableLanDhcp, ,	WANIFACE_DISABLELANDHCP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppIp, ,	WANIFACE_PPPIP,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	IpProtocol, ,	WANIFACE_IPPROTOCOL,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+#if 0
+MIBDEF(unsigned char,	AddrMode, ,	WANIFACE_IPV6_ADDRMODE,	BYTE_T, WANIFACE_T, 0, 0,0,0) // Bitmap, bit0: Slaac, bit1: Static, bit2: DS-lite
+MIBDEF(unsigned char,	Ipv6Addr,[IP6_ADDR_LEN] ,	WANIFACE_IPV6_IPV6ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	RemoteIpv6Addr,[IP6_ADDR_LEN] ,	WANIFACE_IPV6_REMOTEIPV6ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	Ipv6AddrPrefixLen,[IP6_ADDR_LEN] ,	WANIFACE_IPV6_IPV6ADDRPREFIXLEN,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	Ipv6Dhcp, ,	WANIFACE_IPV6_IPV6DHCP,	BYTE_T, WANIFACE_T, 0, 0,0,0)// 0: disable, 1: enable
+MIBDEF(unsigned char,	Ipv6DhcpRequest, ,	WANIFACE_IPV6_IPV6DHCPREQUEST,	BYTE_T, WANIFACE_T, 0, 0,0,0)// Bitmap, bit0: Request Address, bit1: Request Prefix
+MIBDEF(unsigned char,	RemoteIpv6EndPointAddr,[IP6_ADDR_LEN] ,	WANIFACE_IPV6_REMOTEIPV6ENDPOINTADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+#endif
+MIBDEF(unsigned char,	br_route_flag, ,	WANIFACE_BR_ROUTE_FLAG,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+/*	added by sen_liu 2012-1-23 for webpage wanList	*/
+//MIBDEF(unsigned char,	WanIfaceName, [MAX_NAME_LEN+1],	WANIFACE_NAME, STRING_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	Enabled, ,	EACHWANIFACE_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(DHCP_T,	WanType, ,	WANIFACE_WAN_TYPE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(WanServerType,	ServiceType, ,	WANIFACE_SERVICE_TYPE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dhcpHostName, [MAX_NAME_LEN+1],	WANIFACE_DHCP_HOSTNAME, STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	staticIpMtu, ,	WANIFACE_STATIC_IP_MTU,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	dhcpMtu, ,	WANIFACE_DHCP_MTU,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned int,	pppoeMtu, ,	WANIFACE_PPPOE_MTU,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dnsAuto, ,	WANIFACE_DNS_AUTO,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanIfDns1,	[4],	WANIFACE_DNS1,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanIfDns2,	[4],	WANIFACE_DNS2,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	wanIfDns3,	[4],	WANIFACE_DNS3,	IA_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(unsigned char,	vlanEnabled, , WANIFACE_VLAN_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pppCStatus, , WANIFACE_PPPCSTATUS,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,   wanMacAddr, [6], WANIFACE_MAC_ADDR,	BYTE6_T, WANIFACE_T, 0, 0,0,0)
+
+#ifdef CHECK_IPV4_DHCP_OPTION
+//option 60
+MIBDEF(unsigned short, dhcpOption60EnterpriseCode, , DHCP_OPTION60_ENTERPRISE_CODE,     WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char, dhcpOption60InstanceNum, , DHCP_OPTION60_TBL_NUM, BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULWAN_DHCP_OPTION_T, dhcpOption60Array, [MAX_DHCP_OPTION60_NUM], DHCP_OPTION60_TBL, DHCP_OPTION60_ARRAY_T, WANIFACE_T, 0, mulwan_dhcp_option60_tbl,0,0)
+
+//option 125
+MIBDEF(unsigned short, dhcpOption125EnterpriseCode, , DHCP_OPTION125_ENTERPRISE_CODE,     WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char, dhcpOption125InstanceNum, , DHCP_OPTION125_TBL_NUM, BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULWAN_DHCP_OPTION_T, dhcpOption125Array, [MAX_DHCP_OPTION125_NUM], DHCP_OPTION125_TBL, DHCP_OPTION125_ARRAY_T, WANIFACE_T, 0, mulwan_dhcp_option125_tbl,0,0)
+
+//option 43 
+//MIBDEF(DHCP_OPTION_T, dhcpOption43Array, [MAX_DHCP_OPTION43_NUM], DHCP_OPTION43_TBL, DHCP_OPTION43_ARRAY_T, WANIFACE_T, 0, wan_dhcp_option_tbl,0,0)
+#endif
+
+#ifdef CHECK_IPV6_DHCP_OPTION
+/* Add for dhcp6 option 16*/
+MIBDEF(unsigned int, dhcp6Option16EnterpriseCode, , DHCP6_OPTION16_ENTERPRISE_CODE,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char, dhcp6Option16InstanceNum, , DHCP6_OPTION16_TBL_NUM, BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULWAN_DHCP_OPTION_T, dhcp6Option16Array, [MAX_DHCP6_OPTION16_NUM], DHCP6_OPTION16_TBL, DHCP6_OPTION16_ARRAY_T, WANIFACE_T, 0, mulwan_dhcp_option16_tbl,0,0)
+
+/* Add for dhcp6 option 17*/
+MIBDEF(unsigned int, dhcp6Option17EnterpriseCode, , DHCP6_OPTION17_ENTERPRISE_CODE,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char, dhcp6Option17InstanceNum, , DHCP6_OPTION17_TBL_NUM, BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULWAN_DHCP_OPTION_T, dhcp6Option17Array, [MAX_DHCP6_OPTION17_NUM], DHCP6_OPTION17_TBL, DHCP6_OPTION17_ARRAY_T, WANIFACE_T, 0, mulwan_dhcp_option17_tbl,0,0)
+#endif
+
+/* end */
+
+#if 0 //def _PRMT_X_CT_EXT_ENABLE_IP_RULES
+MIBDEF(unsigned char,	ipRulesEnabled, ,	IPRULES_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(IPRULES_MODE_T,	ipRulesMode, ,	IPRULES_MODE,	DWORD_T, WANIFACE_T, 0, 0,0,0)//0:black list 1:white list
+MIBDEF(unsigned char,	ipRulesWan2Lan, ,	IPRULES_WAN2LAN,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	ipRulesNum, ,	IPRULES_TBL_NUM,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(IPRULES_T,	ipRulesArray, [MAX_FILTER_NUM],	IPRULES_TBL,	IPRULES_ARRAY_T, WANIFACE_T, 0, mib_iprules_tbl,0,0)
+#endif
+#if 0 //def MULTI_WAN_FIREWALL	
+MIBDEF(unsigned char,	macFilterEnabled, ,	MULTIWAN_MACFILTER_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	macFilterNum, ,	MULTIWAN_MACFILTER_TBL_NUM,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULTIWAN_MACFILTER_T,	macFilterArray, [MAX_MACFILTER_NUM],	MULTIWAN_MACFILTER_TBL,	MULTIWAN_MACFILTER_ARRAY_T, WANIFACE_T, 0, multiwan_macfilter_tbl,0,0)
+
+MIBDEF(unsigned char,	dmzEnabled,	,	MULTIWAN_DMZ_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	dmzHost, [4],	MULTIWAN_DMZ_HOST,	IA_T, WANIFACE_T, 0, 0,0,0)
+
+#ifdef MULTI_WAN_URLFILTER
+MIBDEF(unsigned char,	urlFilterEnabled, ,	MULTIWAN_URLFILTER_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(URLRULES_MODE_T,	urlFilterMode, , MULTIWAN_URLFILTER_MODE,	DWORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	urlFilterNum, ,	MULTIWAN_URLFILTER_TBL_NUM,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULTIWAN_URLFILTER_T,	urlFilterArray, [MAX_URLFILTER_NUM],	MULTIWAN_URLFILTER_TBL,	MULTIWAN_URLFILTER_ARRAY_T, WANIFACE_T, 0, mib_multiwan_url_tbl,0,0)
+#endif
+
+MIBDEF(unsigned char,	igmpproxyDisabled, ,MULTIWAN_IGMP_PROXY_DISABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+
+MIBDEF(unsigned char,	portFwEnabled, ,MULTIWAN_PORTFORWARD_ENABLED,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	portFwNum, ,	MULTIWAN_PORTFORWARD_TBL_NUM,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(MULTIWAN_PORTFORWARD_T,	portFwArray, [MAX_FILTER_NUM],	MULTIWAN_PORTFORWARD_TBL,	MULTIWAN_PORTFORWARD_ARRAY_T, WANIFACE_T, 0, multiwan_portFw_tbl,0,0)
+
+#endif
+MIBDEF(unsigned char,ipv6Enable, ,WANIFACE_IPV6_ENABLE,BYTE_T,WANIFACE_T,0,0,0,0)//enable or disable
+#ifdef CONFIG_IPV6
+MIBDEF(IPV6_LINKTYPE_T,ipv6LinkType, ,WANIFACE_IPV6_LINK_TYPE,DWORD_T,WANIFACE_T,0,0,0,0)
+MIBDEF(dhcp6cCfgParam_t,	dhcp6cCfgParam, ,	WANIFACE_IPV6_DHCPV6C_PARAM, DHCPV6C_T, WANIFACE_T, 0, 0,0,0)
+//for ipv6 wan
+MIBDEF(addrIPv6_basic_t,ipv6Alias,,WANIFACE_IPV6_ALIAS,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6Addr, ,WANIFACE_IPV6_ADDR,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)	
+MIBDEF(IPV6_ORIGIN_T,ipv6Origin, ,WANIFACE_IPV6_ORIGIN,DWORD_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6ChildPrefix, ,WANIFACE_IPV6_CHILD_PREFIX,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+
+MIBDEF(addrIPv6_basic_t,ipv6Gw, ,WANIFACE_IPV6_GW,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0) 
+MIBDEF(unsigned char,	ipv6_dnsAuto, ,	WANIFACE_IPV6_DNS_AUTO,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6dns1, ,WANIFACE_IPV6_DNS1,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0) 
+MIBDEF(addrIPv6_basic_t,ipv6dns2, ,WANIFACE_IPV6_DNS2,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+MIBDEF(unsigned char,	ipv6MldproxyDisabled, , WANIFACE_IPV6_MLD_PROXY_DISABLED, BYTE_T, WANIFACE_T, 0, 0,0,0)
+
+
+MIBDEF(IPV6_PREFIXTYPE_T,ipv6PrefixType, ,WANIFACE_IPV6_PREFIX_TYPE,DWORD_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6PrefixAlias,,WANIFACE_IPV6_PREFIX_ALIAS,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6PrefixAddr, ,WANIFACE_IPV6_PREFIX_ADDR,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)	
+MIBDEF(IPV6_ORIGIN_T,ipv6PrefixOrigin, ,WANIFACE_IPV6_PREFIX_ORIGIN,DWORD_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6PrefixChildPrefix, ,WANIFACE_IPV6_PREFIX_CHILD_PREFIX,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+
+//for ipv6 lan
+MIBDEF(addrIPv6_basic_t,ipv6AliasLan,,LANIFACE_IPV6_ALIAS,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)
+MIBDEF(addrIPv6_basic_t,ipv6AddrLan, ,LANIFACE_IPV6_ADDR,ADDR6_BASIC_T,WANIFACE_T,0,0,0,0)	
+MIBDEF(dhcp6sCfgParam_t,dhcp6sCfgParam, ,LANIFACE_IPV6_DHCPV6S_PARAM, DHCPV6S_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(radvdCfgParam_t,	radvdCfgParam, ,LANIFACE_IPV6_RADVD_PARAM,	RADVDPREFIX_T, WANIFACE_T, 0, 0,0,0)
+//MIBDEF(IPV6_PREFIXTYPE_T,ipv6LanPrefixType, ,LANIFACE_IPV6_PREFIX_TYPE,DWORD_T,WANIFACE_T,0,0,0,0)
+MIBDEF(unsigned char,ipv6LanManualConfig,,LANIFACE_IPV6_MANUAL_CONFIG,BYTE_T,WANIFACE_T,0,0,0,0)
+#endif
+
+#if defined(SINGLE_WAN_SUPPORT)
+/*for l2tp single wan mib */
+MIBDEF(unsigned char,	l2tpIpAddr, [4],	WANIFACE_L2TP_IP_ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpSubnetMask, [4],	WANIFACE_L2TP_SUBNET_MASK,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpServerIpAddr, [4],	WANIFACE_L2TP_SERVER_IP_ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpGateway, [4],	WANIFACE_L2TP_GATEWAY,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpUserName, [MAX_NAME_LEN_LONG],	WANIFACE_L2TP_USER_NAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpPassword, [MAX_NAME_LEN_LONG],	WANIFACE_L2TP_PASSWORD,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpMtuSize, ,	WANIFACE_L2TP_MTU_SIZE,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	l2tpIdleTime, ,	WANIFACE_L2TP_IDLE_TIME,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	l2tpConnectType, ,	WANIFACE_L2TP_CONNECTION_TYPE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+/*for pptp  single wan mib */
+MIBDEF(unsigned char,	pptpIpAddr, [4],	WANIFACE_PPTP_IP_ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpSubnetMask, [4],	WANIFACE_PPTP_SUBNET_MASK,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpServerIpAddr, [4],	WANIFACE_PPTP_SERVER_IP_ADDR,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpGateway, [4],	WANIFACE_PPTP_GATEWAY,	IA_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpUserName, [MAX_NAME_LEN_LONG],	WANIFACE_PPTP_USER_NAME,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpPassword, [MAX_NAME_LEN_LONG],	WANIFACE_PPTP_PASSWORD,	STRING_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pptpMtuSize, ,	WANIFACE_PPTP_MTU_SIZE,	WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned short,	pptpIdleTime, , WANIFACE_PPTP_IDLE_TIME, WORD_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpConnectType, ,	WANIFACE_PPTP_CONNECTION_TYPE,	BYTE_T, WANIFACE_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpSecurityEnabled, ,	WANIFACE_PPTP_SECURITY_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+MIBDEF(unsigned char,	pptpMppcEnabled, ,	WANIFACE_PPTP_MPPC_ENABLED,	BYTE_T, APMIB_T, 0, 0,0,0)
+#endif
+#endif // #ifdef MIB_WANIFACE_IMPORT
+

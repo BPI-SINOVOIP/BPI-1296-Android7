@@ -1,0 +1,1 @@
+../../soc/realtek/memory.h

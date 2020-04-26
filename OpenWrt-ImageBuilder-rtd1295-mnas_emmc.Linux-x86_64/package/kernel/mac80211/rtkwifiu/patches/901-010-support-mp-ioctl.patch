@@ -1,0 +1,107 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_linux.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_linux.c
+@@ -12755,31 +12755,6 @@ static const struct iw_priv_args rtw_pri
+ 	{ SIOCIWFIRSTPRIV + 0x0E, IW_PRIV_TYPE_CHAR | 1024, 0 , ""},  /* set  */
+ 	{ SIOCIWFIRSTPRIV + 0x0F, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK , ""},/* get
+  * --- sub-ioctls definitions --- */
+-
+-#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
+-	{ VENDOR_IE_SET, IW_PRIV_TYPE_CHAR | 1024 , 0 , "vendor_ie_set" },
+-	{ VENDOR_IE_GET, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "vendor_ie_get" },
+-#endif
+-#if defined(CONFIG_RTL8723B)
+-	{ MP_SetBT, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "mp_setbt" },
+-	{ MP_DISABLE_BT_COEXIST, IW_PRIV_TYPE_CHAR | 1024, 0, "mp_disa_btcoex"},
+-#endif
+-#ifdef CONFIG_WOWLAN
+-	{ MP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_mode" },
+-	{ MP_WOW_SET_PATTERN , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_set_pattern" },
+-#endif
+-#ifdef CONFIG_AP_WOWLAN
+-	{ MP_AP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "ap_wow_mode" }, /* set  */
+-#endif
+-#ifdef CONFIG_SDIO_INDIRECT_ACCESS
+-	{ MP_SD_IREAD, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iread" },
+-	{ MP_SD_IWRITE, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iwrite" },
+-#endif
+-};
+-
+-
+-static const struct iw_priv_args rtw_mp_private_args[] = {
+-	/* --- sub-ioctls definitions --- */
+ #ifdef CONFIG_MP_INCLUDED
+ 	{ MP_START , IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "mp_start" },
+ 	{ MP_PHYPARA, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "mp_phypara" },
+@@ -12825,8 +12800,29 @@ static const struct iw_priv_args rtw_mp_
+ #endif
+ 
+ #endif /* CONFIG_MP_INCLUDED */
++
++#ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
++	{ VENDOR_IE_SET, IW_PRIV_TYPE_CHAR | 1024 , 0 , "vendor_ie_set" },
++	{ VENDOR_IE_GET, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "vendor_ie_get" },
++#endif
++#if defined(CONFIG_RTL8723B)
++	{ MP_SetBT, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "mp_setbt" },
++	{ MP_DISABLE_BT_COEXIST, IW_PRIV_TYPE_CHAR | 1024, 0, "mp_disa_btcoex"},
++#endif
++#ifdef CONFIG_WOWLAN
++	{ MP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_mode" },
++	{ MP_WOW_SET_PATTERN , IW_PRIV_TYPE_CHAR | 1024, 0, "wow_set_pattern" },
++#endif
++#ifdef CONFIG_AP_WOWLAN
++	{ MP_AP_WOW_ENABLE , IW_PRIV_TYPE_CHAR | 1024, 0, "ap_wow_mode" }, /* set  */
++#endif
++#ifdef CONFIG_SDIO_INDIRECT_ACCESS
++	{ MP_SD_IREAD, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iread" },
++	{ MP_SD_IWRITE, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iwrite" },
++#endif
+ };
+ 
++
+ static iw_handler rtw_private_handler[] = {
+ 	rtw_wx_write32,					/* 0x00 */
+ 	rtw_wx_read32,					/* 0x01 */
+@@ -13008,11 +13004,9 @@ static int _rtw_ioctl_wext_private(struc
+ 	s32 k;
+ 	const iw_handler *priv;		/* Private ioctl */
+ 	const struct iw_priv_args *priv_args;	/* Private ioctl description */
+-	const struct iw_priv_args *mp_priv_args;	/*MP Private ioctl description */
+ 	const struct iw_priv_args *sel_priv_args;	/*Selected Private ioctl description */
+ 	u32 num_priv;				/* Number of ioctl */
+ 	u32 num_priv_args;			/* Number of descriptions */
+-	u32 num_mp_priv_args;			/*Number of MP descriptions */
+ 	u32 num_sel_priv_args;			/*Number of Selected descriptions */
+ 	iw_handler handler;
+ 	int temp;
+@@ -13055,10 +13049,8 @@ static int _rtw_ioctl_wext_private(struc
+ 
+ 	priv = rtw_private_handler;
+ 	priv_args = rtw_private_args;
+-	mp_priv_args = rtw_mp_private_args;
+ 	num_priv = sizeof(rtw_private_handler) / sizeof(iw_handler);
+ 	num_priv_args = sizeof(rtw_private_args) / sizeof(struct iw_priv_args);
+-	num_mp_priv_args = sizeof(rtw_mp_private_args) / sizeof(struct iw_priv_args);
+ 
+ 	if (num_priv_args == 0) {
+ 		err = -EOPNOTSUPP;
+@@ -13075,17 +13067,8 @@ static int _rtw_ioctl_wext_private(struc
+ 
+ 	/* If not found... */
+ 	if (k == num_sel_priv_args) {
+-		k = -1;
+-		sel_priv_args = mp_priv_args;
+-		num_sel_priv_args = num_mp_priv_args;
+-		while
+-		((++k < num_sel_priv_args) && strcmp(sel_priv_args[k].name, cmdname))
+-			;
+-
+-		if (k == num_sel_priv_args) {
+-			err = -EOPNOTSUPP;
+-			goto exit;
+-		}
++		err = -EOPNOTSUPP;
++		goto exit;
+ 	}
+ 
+ 	/* Watch out for sub-ioctls ! */

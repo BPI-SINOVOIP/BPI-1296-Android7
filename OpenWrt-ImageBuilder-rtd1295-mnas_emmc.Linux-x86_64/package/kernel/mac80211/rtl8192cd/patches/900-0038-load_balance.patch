@@ -1,0 +1,278 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -2959,6 +2959,8 @@ struct rf_finetune_var {
+ 	unsigned int 		tri_time5;
+ 	unsigned int 		tri_time6;
+ 	unsigned int 		tri_time7;
++
++	unsigned int		swq_max_enqueu_len;
+ #endif
+ 
+ #ifdef RTK_ATM	
+@@ -4009,6 +4011,9 @@ struct priv_shared_info {
+ 	struct tasklet_struct	rx_tasklet;
+ 	struct tasklet_struct	tx_tasklet;
+ 	struct tasklet_struct	oneSec_tasklet;
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++	struct tasklet_struct	xmit_tasklet;
++#endif
+ #endif
+ #endif
+ #ifdef PCIE_POWER_SAVING
+@@ -4808,6 +4813,9 @@ struct priv_shared_info {
+ 	struct ring_que 		skb_queue;
+ #else
+ 	struct sk_buff_head		skb_queue;
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++	struct sk_buff_head		skb_xmit_queue;
++#endif
+ #endif
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1132,6 +1132,14 @@
+ #define WIFI_11N_2040_COEXIST
+ #define WIFI_11N_2040_COEXIST_EXT
+ //#define WIFI_11N_2040_PERMIT_LOGIC
++
++//-------------------------------------------------------------
++// Do SMP LOAD BALANCE
++//-------------------------------------------------------------
++#if defined(CONFIG_SMP_LOAD_BALANCE_SUPPORT)
++#define SMP_LOAD_BALANCE_SUPPORT
++#endif
++
+ //-------------------------------------------------------------
+ // Add TX power by command
+ //-------------------------------------------------------------
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -612,6 +612,9 @@ EXTERN
+ __IRAM_WIFI_PRI3
+ #endif
+ void rtl8192cd_tx_dsr(unsigned long task_priv);
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++EXTERN void rtl8192cd_xmit_dsr(unsigned long task_priv);
++#endif
+ 
+ EXTERN int rtl8192cd_firetx(struct rtl8192cd_priv *priv, struct tx_insn *txcfg);
+ EXTERN int __rtl8192cd_firetx(struct rtl8192cd_priv *priv, struct tx_insn* txcfg);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -2115,6 +2115,11 @@ static struct iwpriv_arg mib_table[] = {
+ 	{"tri_time7",		RFFT_T, _OFFSET_RFFT(tri_time7), _SIZE_RFFT(tri_time7), 1},
+ #endif
+ #endif
++#ifdef __OSK__	
++	{"swq_max_len", 	RFFT_T, _OFFSET_RFFT(swq_max_enqueu_len), _SIZE_RFFT(swq_max_enqueu_len), 2560},
++#else
++	{"swq_max_len",		RFFT_T, _OFFSET_RFFT(swq_max_enqueu_len), _SIZE_RFFT(swq_max_enqueu_len), 8192},
++#endif
+ #endif
+ 
+ #ifdef RTK_ATM
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -1853,6 +1853,9 @@ int_retry_process:
+             if(priv->pshare->swq_use_hw_timer) {
+                 if (!priv->pshare->has_triggered_sw_tx_Q_tasklet) {
+                     priv->pshare->has_triggered_sw_tx_Q_tasklet = 1;
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++                    RTL_W32(TC4_CTRL, 0);
++#endif                    
+                     #ifdef __ECOS                
+                     priv->pshare->call_dsr = 1; /*by DSR(ECOS) at 8192cd_ecos.c  / tasklet(Linux)*/ 
+ 					#elif defined(__OSK__)
+@@ -3104,6 +3107,9 @@ static int rtl8192cd_init_sw(struct rtl8192cd_priv *priv)
+ 						tasklet_init(&priv->pshare->tx_tasklet, rtl8192cd_tx_dsr, (unsigned long)priv);
+ 						tasklet_init(&priv->pshare->oneSec_tasklet, rtl8192cd_expire_timer, (unsigned long)priv);
+ #endif
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++						tasklet_init(&priv->pshare->xmit_tasklet, rtl8192cd_xmit_dsr, (unsigned long)priv);
++#endif
+ #endif // CONFIG_PCI_HCI
+ 					}
+ 				}
+@@ -3504,6 +3510,9 @@ static int rtl8192cd_init_sw(struct rtl8192cd_priv *priv)
+ 		rtk_queue_init(&priv->pshare->skb_queue);
+ #else
+ 		skb_queue_head_init(&priv->pshare->skb_queue);
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++		skb_queue_head_init(&priv->pshare->skb_xmit_queue);
++#endif
+ #endif
+ #endif
+ 
+@@ -5472,6 +5481,9 @@ SMP_LOCK(flags);
+ 							tasklet_kill(&priv->pshare->tx_tasklet);				
+ 							tasklet_kill(&priv->pshare->oneSec_tasklet);
+ #endif
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++                            tasklet_kill(&priv->pshare->xmit_tasklet);
++#endif
+ 							SMP_LOCK(flags);
+ 							SAVE_INT_AND_CLI(flags);
+ #elif defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+@@ -9913,6 +9925,9 @@ int rtl8192cd_close(struct net_device *dev)
+ 		free_rtk_queue(priv, &priv->pshare->skb_queue);
+ #else
+ 		free_skb_queue(priv, &priv->pshare->skb_queue);
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++		free_skb_queue(priv, &priv->pshare->skb_xmit_queue);
++#endif
+ #endif
+ #endif
+ 
+@@ -9964,6 +9979,9 @@ int rtl8192cd_close(struct net_device *dev)
+ 						tasklet_kill(&priv->pshare->tx_tasklet);
+ 						tasklet_kill(&priv->pshare->oneSec_tasklet);
+ #endif
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++                        tasklet_kill(&priv->pshare->xmit_tasklet);
++#endif
+ 						SMP_LOCK(flags);
+ 						SAVE_INT_AND_CLI(flags);
+ #elif defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -1278,6 +1278,48 @@ stop_proc:
+ 	return TX_PROCEDURE_CTRL_STOP;
+ }
+ 
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++void rtl8192cd_xmit_dsr(unsigned long task_priv)
++{
++	struct rtl8192cd_priv *priv = (struct rtl8192cd_priv *)task_priv;
++#if !defined(CONFIG_USB_HCI) && !defined(CONFIG_SDIO_HCI)
++	unsigned long x;
++#endif
++	struct sk_buff *skb=NULL;
++
++	while (skb_queue_len(&priv->pshare->skb_xmit_queue) > 0) {
++		skb = skb_dequeue(&priv->pshare->skb_xmit_queue);
++		if (skb == NULL) {
++			return;
++		}
++
++        SAVE_INT_AND_CLI(x);
++        SMP_LOCK_XMIT(x);
++    
++#ifdef MCAST2UI_REFINE
++        memcpy(&skb->cb[10], skb->data, 6);
++#endif
++    
++        STARTROMEPERF(priv,0);
++    
++#ifdef SUPPORT_TX_AMSDU_SHORTCUT
++        skb->cb[47] = 0; /* clear amsdu short-cut indicate */
++#endif
++        
++		__rtl8192cd_start_xmit(skb, skb->dev, TX_NORMAL);
++        
++        STOPROMEPERF(priv,1,0);
++        RESTORE_INT(x);
++        SMP_UNLOCK_XMIT(x);
++	}
++}
++
++void rtl8192cd_xmit_smp(void *dev)
++{
++    struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
++	tasklet_schedule(&priv->pshare->xmit_tasklet);
++}
++#endif
+ 
+ __IRAM_IN_865X
+ int rtl8192cd_start_xmit(struct sk_buff *skb, struct net_device *dev)
+@@ -1354,6 +1396,46 @@ int rtl8192cd_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ #endif
+ 
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++    if(ntohs(*((UINT16 *)((UINT8 *)skb->data + ETH_ALEN*2))) == 0x888e) {
++        goto Direct_xmit;
++    }
++    
++#ifdef SW_TX_QUEUE
++    if (skb_queue_len(&priv->pshare->skb_xmit_queue) == 0) {
++        RTL_W32(TC4_CTRL, BIT26 | BIT25 | BIT24 | (RTL_MICROSECONDS_TO_GTIMERCOUNTER(1000) & 0x00FFFFFF));    
++    }
++    if (skb_queue_len(&priv->pshare->skb_xmit_queue) >= priv->pshare->rf_ft_var.swq_max_enqueu_len) {
++        printk_ratelimited("TX DROP: exceed the skb xmit queue!\n");
++        priv->ext_stats.tx_drops++;
++        dev_kfree_skb_any(skb);
++        return 0; 
++    }
++#else
++    if (compareAvailableTXBD(priv, (NUM_TX_DESC/10), VI_QUEUE, 2) ||
++        compareAvailableTXBD(priv, (NUM_TX_DESC/10), VO_QUEUE, 2) ||
++        compareAvailableTXBD(priv, (NUM_TX_DESC/10), BE_QUEUE, 2) ||
++        compareAvailableTXBD(priv, (NUM_TX_DESC/10), BK_QUEUE, 2)) {
++        if (skb_queue_len(&priv->pshare->skb_xmit_queue) >= NUM_TX_DESC/10) {
++            DEBUG_TRACE("TX DROP: exceed the skb xmit queue!\n");
++            priv->ext_stats.tx_drops++;
++            dev_kfree_skb_any(skb);
++            return 0; 
++        }
++    }
++#endif
++    skb->dev = dev;
++    skb_queue_tail(&priv->pshare->skb_xmit_queue, skb);
++
++#ifndef SW_TX_QUEUE
++    smp_call_function_single((smp_processor_id() == 0) ? 1 : 0, rtl8192cd_xmit_smp, (void *)dev, 0);
++#endif
++
++    return 0;
++    
++Direct_xmit:
++#endif
++
+ 	SAVE_INT_AND_CLI(x);
+ 	SMP_LOCK_XMIT(x);
+ 
+@@ -8006,7 +8088,9 @@ __inline__ static unsigned char rtl8192cd_swq_settimer(struct rtl8192cd_priv *pr
+                     //delay_us(SWQ_HWTIMER_DELAY - (current_time - priv->pshare->swq_last_tsf));
+                     return;
+                 }
++#ifndef SMP_LOAD_BALANCE_SUPPORT                
+                 RTL_W32(TC4_CTRL, 0);
++#endif                
+                 priv->pshare->swq_last_tsf = RTL_R32(TSFTR1);
+                 */
+ 				;
+@@ -8045,7 +8129,9 @@ __inline__ static unsigned char rtl8192cd_swq_settimer(struct rtl8192cd_priv *pr
+                 priv->pshare->swq_current_timeout = (timer_timeout == 0?1:timer_timeout);            
+                 set_timeout = RTL_MICROSECONDS_TO_GTIMERCOUNTER(set_timeout);                
+                 set_timeout = BIT26 | BIT24 | (set_timeout & 0x00FFFFFF);  //TC40INT_EN | TC4EN | TC4Data
++#ifndef SMP_LOAD_BALANCE_SUPPORT               
+                 RTL_W32(TC4_CTRL, set_timeout);
++#endif
+                 priv->pshare->swq_last_tsf = RTL_R32(TSFTR1);
+             }            
+         }
+@@ -8729,6 +8815,10 @@ void rtl8192cd_swq_timeout(unsigned long task_priv)
+ 	int           bdfull, qlen;
+ 	unsigned long x = 0;
+ 	
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++    rtl8192cd_xmit_dsr(task_priv);
++#endif
++
+ 	SMP_LOCK_XMIT(x);
+ 	SAVE_INT_AND_CLI(x);
+ 	
+@@ -8863,6 +8953,9 @@ void rtl8192cd_swq_timeout(unsigned long task_priv)
+ 	}	
+ 
+ 	priv->pshare->has_triggered_sw_tx_Q_tasklet = 0;
++#ifdef SMP_LOAD_BALANCE_SUPPORT
++    RTL_W32(TC4_CTRL, BIT26 | BIT25 | BIT24 | (RTL_MICROSECONDS_TO_GTIMERCOUNTER(1000) & 0x00FFFFFF));
++#endif
+ 
+ 	RESTORE_INT(x);		
+ 	SMP_UNLOCK_XMIT(x);	
+-- 
+2.7.4
+

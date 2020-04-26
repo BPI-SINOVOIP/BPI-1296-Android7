@@ -1,0 +1,975 @@
+--- a/Android.mk
++++ b/Android.mk
+@@ -1,7 +1,7 @@
+ LOCAL_PATH := $(call my-dir)
+ 
+ #########################
+-
++CFLAGS = -DANDROID
+ #########################
+ 
+ include $(CLEAR_VARS)
+--- a/UDPserver.c
++++ b/UDPserver.c
+@@ -26,18 +26,122 @@
+ #define __PACK__
+ #endif
+ 
++#define MAX_WLAN_NUM 2
++char wlan_chipid[2][20] = {0};
+ 
+ #define MYPORT 9034                    // the port users will be connecting to
+ #define BUFLEN 1024                      // length of the buffer
+-#define MP_TX_PACKET 0x8B71
+-#define MP_BRX_PACKET 0x8B73
+-#define MP_QUERY_STATS 	0x8B6D
++#define VALLEN 800
++
++#define MP_START_TEST		0x8B61
++#define MP_STOP_TEST		0x8B62
++#define MP_SET_RATE		0x8B63
++#define MP_SET_CHANNEL		0x8B64
++#define MP_SET_TXPOWER		0x8B65
++#define MP_CONTIOUS_TX		0x8B66
++#define MP_ARX			0x8B67
++#define MP_SET_BSSID		0x8B68
++#define MP_ANTENNA_TX		0x8B69
++#define MP_ANTENNA_RX		0x8B6A
++#define MP_SET_BANDWIDTH	0x8B6B
++#define MP_SET_PHYPARA		0x8B6C
++#define MP_QUERY_STATS		0x8B6D
++#define MP_TXPWR_TRACK		0x8B6E
++#define MP_QUERY_TSSI		0x8B6F
++#define MP_QUERY_THER		0x8B77
++#define MP_PMAC_TX		0X8BE0
++#define MP_SET_BAND		0x8B85
++#define MP_RESET_STATS		0x8B86
++#define MP_GET_TXPOWER		0x8B87
++#define MP_DIG			0x8B88
++#define MP_HELP			0x8BE6
++#define MP_IQCALIBRATE		0x8BE1
++#define MP_LCCALIBRATE		0x8BE2
++#define MP_QUERY_RX_MACPHY	0X8BE3
++#define MP_RESET_RX		0X8BE4
++#define MP_VERSION		0x8BE5
++#define MP_TX_PACKET		0x8B71
++#define MP_RX_PACKET		0x8B70
++#define MP_BRX_PACKET		0x8B73
++#define MP_QUERY_PSD		0x8BC9
++
++enum {
++	MP_START = 1,
++	MP_STOP,
++	MP_RATE,
++	MP_CHANNEL,
++	MP_TXPOWER,
++	MP_CTX,
++	MP_ARX_,
++	MP_BSSID,
++	MP_ANT_TX,
++	MP_ANT_RX,
++	MP_BANDWIDTH,
++	MP_PHYPARA,
++	MP_TX,
++	MP_BRX,
++	MP_QUERY,
++	MP_PWRTRK,
++	MP_TSSI,
++	MP_PSD,
++	MP_THER,
++	MP_PHYBAND,
++	MP_RESET_STATS_,
++	MP_GET_TXPOWER_,
++	MP_DIG_,
++	MP_HELP_,
++	MP_VERSION_,
++	MP_PMAC_TX_,
++	MP_IQC, MP_LCC,
++	MP_QUE_RX,
++	MP_RESET_RX_,
++};
++
++typedef struct mp_priv_s
++{
++	unsigned short new_priv;
++	unsigned short original_priv;
++	unsigned short ioctl_cmd;
++} mp_priv_t;
++
++#define IOCTL_SET SIOCIWFIRSTPRIV + 0xE
++#define IOCTL_GET SIOCIWFIRSTPRIV + 0xF
++
++static const mp_priv_t mp_priv[] = {
++	{MP_START, MP_START_TEST, IOCTL_SET},
++	{MP_STOP, MP_STOP_TEST, IOCTL_SET},
++	{MP_RATE, MP_SET_RATE, IOCTL_SET},
++	{MP_CHANNEL, MP_SET_CHANNEL, IOCTL_SET},
++	{MP_TXPOWER, MP_SET_TXPOWER, IOCTL_SET},
++	{MP_CTX, MP_CONTIOUS_TX, IOCTL_SET},
++	{MP_ARX_, MP_ARX, IOCTL_GET},
++	{MP_BSSID, MP_SET_BSSID, IOCTL_SET},
++	{MP_ANT_TX, MP_ANTENNA_TX, IOCTL_SET},
++	{MP_ANT_RX, MP_ANTENNA_RX, IOCTL_SET},
++	{MP_BANDWIDTH, MP_SET_BANDWIDTH, IOCTL_SET},
++	{MP_PHYPARA, MP_SET_PHYPARA, IOCTL_SET},
++	{MP_TX, MP_TX_PACKET, IOCTL_GET},
++	{MP_BRX, MP_BRX_PACKET, IOCTL_GET},
++	{MP_QUERY, MP_QUERY_STATS, IOCTL_GET},
++	{MP_PWRTRK, MP_TXPWR_TRACK, IOCTL_SET},
++	{MP_TSSI, MP_QUERY_TSSI, IOCTL_GET},
++	{MP_PSD, MP_QUERY_PSD, IOCTL_GET},
++	{MP_THER, MP_QUERY_THER, IOCTL_GET},
++	{MP_PHYBAND, MP_SET_BAND, IOCTL_SET},
++	{MP_RESET_STATS_, MP_RESET_STATS, IOCTL_SET},
++	{MP_GET_TXPOWER_, MP_GET_TXPOWER, IOCTL_GET},
++	{MP_DIG_, MP_DIG, IOCTL_SET},
++	{MP_HELP_, MP_HELP, IOCTL_SET},
++	{MP_VERSION_, MP_VERSION, IOCTL_GET},
++	{MP_PMAC_TX_, MP_PMAC_TX, IOCTL_SET},
++	{MP_IQC, MP_IQCALIBRATE, IOCTL_SET},
++	{MP_LCC, MP_LCCALIBRATE, IOCTL_SET},
++	{MP_QUE_RX, MP_QUERY_RX_MACPHY, IOCTL_GET},
++	{MP_RESET_RX_, MP_RESET_RX, IOCTL_SET},
++};
++
+ #define RTL8190_IOCTL_WRITE_REG				0x89f3
+ #define RTL8190_IOCTL_READ_REG				0x89f4
+-#define MP_CONTIOUS_TX	0x8B66
+-#define MP_TXPWR_TRACK	0x8B6E
+-#define MP_QUERY_TSSI	0x8B6F
+-#define MP_QUERY_THER 0x8B77
+ 
+ #define FLASH_DEVICE_NAME		("/dev/mtd")
+ #define FLASH_DEVICE_NAME1		("/dev/mtdblock1")
+@@ -176,262 +280,403 @@ int ReadSinguture(void)
+  * Wrapper to extract some Wireless Parameter out of the driver
+  */
+ static inline int iw_get_ext(int skfd,    /* Socket to the kernel */
+-           			char *ifname,        	/* Device name */
+-           			int request,        		/* WE ID */
+-           			struct iwreq *pwrq)    /* Fixed part of the request */
++			     char *ifname,        	/* Device name */
++			     int request,        		/* WE ID */
++			     struct iwreq *pwrq)    /* Fixed part of the request */
+ {
+-  	strncpy(pwrq->ifr_name, ifname, IFNAMSIZ);	/* Set device name */
+-  	return(ioctl(skfd, request, pwrq));			/* Do the request */
++	strncpy(pwrq->ifr_name, ifname, IFNAMSIZ);	/* Set device name */
++	return(ioctl(skfd, request, pwrq));			/* Do the request */
+ }
+ 
+ static char *get_str_token(char *data, char *token, char split)
+ {
+-        char *ptr=data;
+-        int len=0, idx=0;
++	char *ptr=data;
++	int len=0, idx=0;
+ 
+-        while (*ptr && *ptr != '\n' ) {
+-                if (*ptr == split) {
+-                        if (len <= 1)
+-                           return NULL;
+-                        memcpy(token, data, len);
+-                        /* delete ending space */
+-                        for (idx=len-1; idx>=0; idx--) {
+-                                if (token[idx] !=  ' ')
+-                                        break;
+-                        }
+-                        token[idx+1] = '\0';
+-
+-                        return ptr+1;
+-                }
+-                len++;
+-                ptr++;
+-        }
+-        return NULL;
++	while (*ptr && *ptr != '\n' ) {
++		if (*ptr == split) {
++			if (len <= 1)
++				return NULL;
++			memcpy(token, data, len);
++			/* delete ending space */
++			for (idx=len-1; idx>=0; idx--) {
++				if (token[idx] !=  ' ')
++					break;
++			}
++			token[idx+1] = '\0';
++
++			return ptr+1;
++		}
++		len++;
++		ptr++;
++	}
++	return NULL;
+ }
+ 
+ static int get_str_value(char *data, char *value)
+ {
+-        char *ptr=data;
+-        int len=0, idx, i;
++	char *ptr=data;
++	int len=0, idx, i;
++
++	while (*ptr && *ptr != '\n' && *ptr != '\r') {
++		len++;
++		ptr++;
++	}
+ 
+-        while (*ptr && *ptr != '\n' && *ptr != '\r') {
+-                len++;
+-                ptr++;
+-        }
+-
+-        /* delete leading space */
+-        idx = 0;
+-        while (len-idx > 0) {
+-                if (data[idx] != ' ')
+-                        break;
+-                idx++;
+-        }
+-        len -= idx;
+-
+-        /* delete bracing '"' */
+-        if (data[idx] == '"') {
+-                for (i=idx+len-1; i>idx; i--) {
+-                        if (data[i] == '"') {
+-                                idx++;
+-                                len = i - idx;
+-                        }
+-                        break;
+-                }
+-        }
+-
+-        if (len > 0) {
+-                memcpy(value, &data[idx], len);
+-                value[len] = '\0';
+-        }
+-        return len;
++	/* delete leading space */
++	idx = 0;
++	while (len-idx > 0) {
++		if (data[idx] != ' ')
++			break;
++		idx++;
++	}
++	len -= idx;
++
++	/* delete bracing '"' */
++	if (data[idx] == '"') {
++		for (i=idx+len-1; i>idx; i--) {
++			if (data[i] == '"') {
++				idx++;
++				len = i - idx;
++			}
++			break;
++		}
++	}
++
++	if (len > 0) {
++		memcpy(value, &data[idx], len);
++		value[len] = '\0';
++	}
++	return len;
+ }
+ 
+ char* deblank(char* input)
+ {
+-    char *output = input;
+-    int i, j;
++	char *output = input;
++	unsigned int i, j;
+ 
+-    for (i=0, j=0; i < strlen(input); i++, j++)
+-    {
+-        if (input[i] != ' ')
+-            output[j] = input[i];
+-        else
+-            j--;
+-    }
++	for (i=0, j=0; i < strlen(input); i++, j++)
++	{
++		if (input[i] != ' ')
++			output[j] = input[i];
++		else
++		j--;
++	}
+ 
+-    output[j]='\0';
++	output[j]='\0';
+ 
+-    return output;
++	return output;
+ }
+ 
+-int MP_get_ext(char *ifname, char *buf, unsigned int ext_num)
++int MP_get_ext(char *ifname, char *buf, unsigned short ext_num)
+ {
+-    	int skfd;
+-    	struct iwreq wrq;
++	int skfd;
++	struct iwreq wrq;
+ 
+-    	skfd = socket(AF_INET, SOCK_DGRAM, 0);
+-    	wrq.u.data.pointer = (caddr_t)buf;
+-    	wrq.u.data.length = strlen(buf);
++	skfd = socket(AF_INET, SOCK_DGRAM, 0);
++	wrq.u.data.pointer = (caddr_t)buf;
++	wrq.u.data.length = strlen(buf);
++#ifdef STANDARD_PRIV
++	wrq.u.data.flags = ext_num;
++	if (iw_get_ext(skfd, ifname, mp_priv[ext_num-1].ioctl_cmd, &wrq) < 0) {
++#else
++	if (iw_get_ext(skfd, ifname, mp_priv[ext_num-1].original_priv, &wrq) < 0) {
++#endif
++		printf("MP_get_ext failed\n");
++		return -1;
++	}
+ 
+-    	if (iw_get_ext(skfd, ifname, ext_num, &wrq) < 0) {
+-    		printf("MP_get_ext failed\n");
+-		    return -1;
+-    	}
+-	
+-    	close(skfd);
+-    	return 0;
++	close(skfd);
++	return 0;
++}
++
++void decimal_to_hex(char* input)
++{
++	char tmpstr[VALLEN];
++	char *ptr, token[40];
++	char val[10];
++
++	memset(tmpstr, 0, VALLEN);
++	strcpy(tmpstr, input);
++	memset(input, 0, VALLEN);
++
++	ptr = tmpstr;
++
++	ptr = strtok(tmpstr, " ");
++
++	while(ptr != NULL) {
++
++		sprintf(val, "%02x",atoi(ptr));
++		strcat(input, val);
++		ptr = strtok(NULL, " ");
++	}
+ }
+ 
++#ifdef IWPRIV_HEX
++void hex_to_decimal(char* input)
++{
++	char tmpstr[VALLEN];
++	char *ptr, token[40];
++	char val[10];
++
++	memset(tmpstr, 0, VALLEN);
++	strncpy(tmpstr, input, strlen(input));
++	memset(input, 0, strlen(input));
++
++	ptr = tmpstr;
++
++	ptr = strtok(tmpstr, " ");
++
++	while(ptr != NULL) {
++		sprintf(val, "%ld", strtol(ptr, NULL, 16));
++		strcat(input, val);
++		ptr = strtok(NULL, " ");
++		if(ptr != NULL)
++			strcat(input, " ");
++	}
++}
++#endif
++
+ enum content_type {
+-	  EFUSE_TYPE,
+-	  FLASH_TYPE,
+-	  MIB_TYPE,
+-	  NONE_TYPE
++	T_DECIMAL,
++	T_DECIMAL_TO_HEX,
++	T_HEX_TO_DECIMAL,
++	T_WLANADDR,
++	T_NONE
+ }; 
+ 
++#define NAME_TO_MIB 0
++#define MIB_TO_NAME 1
++
+ typedef struct map_def_s
+ {
+-    char name[30];
+-    char map_name[30];
+-    char type;
++	char name[50];
++	char mib[50];
++	char type;
++	char default_val[VALLEN];
+ } map_def_t;
+ 
+-static const map_def_t cmd_mib_defs[] =
++static const map_def_t cmd_flash_defs[] =
+ {
+-      {"11N_XCAP", "xcap", MIB_TYPE},
+-      {"11N_THER", "ther", MIB_TYPE},
+-      {"TX_POWER_CCK_A", "pwrlevelCCK_A",MIB_TYPE},
+-      {"TX_POWER_CCK_B", "pwrlevelCCK_B", MIB_TYPE},
+-      {"TX_POWER_HT40_1S_A", "pwrlevelHT40_1S_A", MIB_TYPE},
+-      {"TX_POWER_HT40_1S_B", "pwrlevelHT40_1S_B", MIB_TYPE},
+-      {"TX_POWER_DIFF_HT40_2S", "pwrdiffHT40_2S", MIB_TYPE},
+-      {"TX_POWER_DIFF_HT20", "pwrdiffHT20", MIB_TYPE},
+-      {"TX_POWER_DIFF_OFDM", "pwrdiffOFDM", MIB_TYPE},
+-      {"WLAN_ADDR", "hwaddr", MIB_TYPE},
+-      {"NIC1_ADDR", "hwaddr", MIB_TYPE},
+-      {"11N_TRSWPAE_C9", "trswitch", MIB_TYPE},
+-      {"11N_TRSWPAE_CC", "trswitch", MIB_TYPE},
+-      {"REG_DOMAIN", "dot11RegDomain", MIB_TYPE},
++	{"TX_POWER_CCK_A", "pwrlevelCCK_A", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_CCK_B", "pwrlevelCCK_B", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_HT40_1S_A", "pwrlevelHT40_1S_A", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_HT40_1S_B", "pwrlevelHT40_1S_B", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_DIFF_HT40_2S", "pwrdiffHT40_2S", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_DIFF_HT20",	"pwrdiffHT20", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"TX_POWER_DIFF_OFDM", "pwrdiffOFDM", T_DECIMAL_TO_HEX, "0000000000000000000000000000"},
++	{"11N_THER", "ther" , T_DECIMAL, "0"},
++	{"11N_XCAP", "xcap", T_DECIMAL, "0"},
++	{"11N_TRSWPAPE_C9", "trsw_pape_C9", T_NONE, ""},
++	{"11N_TRSWPAPE_CC", "trsw_pape_CC", T_NONE, ""},
++	{"TX_POWER_5G_HT40_1S_A", "pwrlevel5GHT40_1S_A", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_5G_HT40_1S_B", "pwrlevel5GHT40_1S_B", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_20BW1S_OFDM1T_A", "pwrdiff_5G_20BW1S_OFDM1T_A", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_40BW2S_20BW2S_A", "pwrdiff_5G_40BW2S_20BW2S_A", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_80BW1S_160BW1S_A", "pwrdiff_5G_80BW1S_160BW1S_A", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_80BW2S_160BW2S_A", "pwrdiff_5G_80BW2S_160BW2S_A", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_20BW1S_OFDM1T_B", "pwrdiff_5G_20BW1S_OFDM1T_B", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_40BW2S_20BW2S_B", "pwrdiff_5G_40BW2S_20BW2S_B", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_80BW1S_160BW1S_B", "pwrdiff_5G_80BW1S_160BW1S_B", T_DECIMAL_TO_HEX, ""},
++	{"TX_POWER_DIFF_5G_80BW2S_160BW2S_B", "pwrdiff_5G_80BW2S_160BW2S_B", T_DECIMAL_TO_HEX, ""},
++	{"WLAN_ADDR", "hwaddr", T_WLANADDR, "000000000000"},
++	{"REG_DOMAIN", "regdomain", T_DECIMAL, "0"},
+ };
+ 
+-static const map_def_t cmd_efuse_defs[] =
++static void get_mib_default(char *mib, char *mib_value, const map_def_t cmd_map_ptr[], int sz)
+ {
+-      {"11N_XCAP", "HW_11N_XCAP", EFUSE_TYPE},
+-      {"11N_THER", "HW_11N_THER", EFUSE_TYPE},
+-      {"TX_POWER_CCK_A", "HW_TX_POWER_CCK_A", EFUSE_TYPE},
+-      {"TX_POWER_CCK_B", "HW_TX_POWER_CCK_B", EFUSE_TYPE},
+-      {"TX_POWER_HT40_1S_A", "HW_TX_POWER_HT40_1S_A", EFUSE_TYPE},
+-      {"TX_POWER_HT40_1S_B", "HW_TX_POWER_HT40_1S_B", EFUSE_TYPE},
+-      {"TX_POWER_DIFF_HT40_2S", "pwrdiffHT40_2S", EFUSE_TYPE},
+-      {"TX_POWER_DIFF_HT20", "HW_TX_POWER_DIFF_HT20_A", EFUSE_TYPE},
+-      {"TX_POWER_DIFF_OFDM", "HW_TX_POWER_DIFF_HT20_OFDM_A", EFUSE_TYPE},
+-      {"WLAN_ADDR", "hwaddr", FLASH_TYPE},
+-      {"NIC1_ADDR", "hwaddr", FLASH_TYPE},
+-      {"11N_TRSWPAE_C9", "trswitch", FLASH_TYPE},
+-      {"11N_TRSWPAE_CC", "trswitch", FLASH_TYPE},
+-      {"REG_DOMAIN", "dot11RegDomain", FLASH_TYPE},
+-};
++	int i;
++	for(i = 0; i < sz; i++) {
++		if(strcmp(mib, cmd_map_ptr[i].mib)==0) {
++			if(strlen(cmd_map_ptr[i].default_val) != 0)
++				strcpy(mib_value, cmd_map_ptr[i].default_val);
++		}
++	}
++}
+ 
+ static void get_drv_mib_content(char *path, char *mib, char *mib_value)
+ {
+-        FILE *fp;
+-        char line[400], token[40], value[300], *ptr;
++	FILE *fp;
++	char line[VALLEN], token[40], value[VALLEN], *ptr;
++
++	fp = fopen(path, "r");
++	if (fp == NULL) {
++		printf("read config file [%s] failed!\n", path);
++		return;
++	}
++
++	while ( fgets(line, VALLEN, fp) ) {
++		ptr = get_str_token(line, token, ' ');
++
++		if (ptr == NULL)
++			continue;
++
++		if (get_str_value(ptr, value) == 0) {
++			continue;
++		} else {
++			deblank(token);
+ 
+-        fp = fopen(path, "r");
+-        if (fp == NULL) {
+-                printf("read config file [%s] failed!\n", path);
+-                return;
+-        }
+-
+-        while ( fgets(line, 200, fp) ) {
+-                ptr = get_str_token(line, token, ':');
+-                if (ptr == NULL)
+-                    continue;
+-
+-                if (get_str_value(ptr, value) == 0) {
+-                    continue;
+-                } else {
+-                    deblank(token);
+-
+-                    if ( strcmp(mib, token) == 0 )
+-                    {
+-                         printf("tok:[%s] mib:[%s] val:[%s]\n", token, mib, value);
+-                         strcpy(mib_value, value);
+-                         goto out;
+-                    }
++			if ( strcmp(mib, token) == 0 )
++			{
++				printf("tok:[%s] mib:[%s] val:[%s]\n", token, mib, value);
++				strcpy(mib_value, value);
++				goto out;
++			}
+                }
+        }
+ out:
+-        fclose(fp);
++	fclose(fp);
+ }
+ 
+-static int convert_str_map(char *str, char *id, map_def_t cmd_map_ptr[], int sz)
++static int convert_str_map(char *str, char *id, const map_def_t cmd_map_ptr[], int direction, int sz)
+ {
+-        int i; //, sz = sizeof(cmd_map_ptr) / sizeof(struct map_def_s);
+-                        
+-        for (i = 0; i < sz; i++) {
+-             if( strstr(str, cmd_map_ptr[i].name) != NULL ) {
+-        	        // printf("convert [%s] to [%s]\n", str, cmd_map_ptr[i].name);
+-                  strcpy(id, cmd_map_ptr[i].map_name);
+-                  return cmd_map_ptr[i].type;
+-             }
+-        }
++	int i; //, sz = sizeof(cmd_map_ptr) / sizeof(struct map_def_s);
++
++	if(direction == NAME_TO_MIB) {
++		for (i = 0; i < sz; i++) {
++
++			if( strstr(str, cmd_map_ptr[i].name) != NULL ) {
++				// printf("convert [%s] to [%s]\n", str, cmd_map_ptr[i].name);
++				strcpy(id, cmd_map_ptr[i].mib);
++				return cmd_map_ptr[i].type;
++			}
++		}
++	} else if(direction == MIB_TO_NAME) {
++		for (i = 0; i < sz; i++) {
++
++			if( strstr(str, cmd_map_ptr[i].mib) != NULL ) {
++				// printf("convert [%s] to [%s]\n", str, cmd_map_ptr[i].name);
++				strcpy(id, cmd_map_ptr[i].name);
++				return cmd_map_ptr[i].type;
++			}
++		}
++	}
+ 
+-        strcpy(id, "unsupported");
+-        return NONE_TYPE;
++	strcpy(id, "unsupported");
++	return T_NONE;
+ }
+ 
+-static void read_mib_content_from_drv(char *str, char *mib_value)
++static void read_mib_content_from_flash(char *str, char *mib_value)
+ {
+-        char file_name[40];
+-        char full_path[100];
+-        char mib[64];
++	char mib_file[100]="/tmp/mib.txt";
++	char cmd[100];
++	char mib[64];
++	int wlan_idx=0;
++	char type;
++	char netif[10]={0};
++
++	//printf("%s\n", str);
++
++	if(strstr(str,"TRSWPAPE_C9") || strstr(str,"TRSWPAPE_CC")) {
++		strcpy(mib_value,"0");
++		return;
++	} else if(strstr(str,"WLAN_ADDR")) {
++		if(strlen(str) == strlen("HW_WLAN1_WLAN_ADDR1")) {
++			int sub_wlan_idx=0;
++			sscanf(str, "HW_WLAN%d_WLAN_ADDR%d", &wlan_idx, &sub_wlan_idx);
++			sprintf(netif,"wlan_%s-%d", wlan_chipid[wlan_idx], sub_wlan_idx);
++			//printf("%s\n",netif);
++		} else {
++			sscanf(str, "HW_WLAN%d_WLAN_ADDR", &wlan_idx);
++			sprintf(netif,"wlan_%s", wlan_chipid[wlan_idx]);
++			//printf("%s\n",netif);
++		}
++
++		sprintf(cmd, "%s list | grep \"%s hwaddr\" > %s", FACTORY_BIN, netif, mib_file);
++		//printf("%s",cmd);
++		system(cmd);
++        } else {
++		sscanf(str, "HW_WLAN%d", &wlan_idx);
++		sprintf(netif,"wlan_%s", wlan_chipid[wlan_idx]);
+ 
+-        char wlan_idx=0;
++		//printf("get wlan idx:%d str:%s\n", wlan_idx, str);
+ 
+-        sscanf(str, "HW_WLAN%d", &wlan_idx);
++		sprintf(cmd, "%s list | grep %s > %s", FACTORY_BIN, netif, mib_file);
++		system(cmd);
++	}
+ 
+-        printf("get wlan idx:%d str:%s\n", wlan_idx, str);
++	sprintf(cmd, "%s -i \'s/=/ /g\' %s", SED_BIN, mib_file);
++	system(cmd);
+ 
+-        sprintf(full_path, "%s%d/%s", "/proc/wlan", wlan_idx, "mib_all");
++	sprintf(cmd, "%s -i \'s/%s //g\' %s", SED_BIN, netif, mib_file);
++	system(cmd);
+ 
+-        convert_str_map( str, mib, cmd_mib_defs, sizeof(cmd_mib_defs) / sizeof(struct map_def_s));
++	type = convert_str_map( str, mib, cmd_flash_defs, NAME_TO_MIB, sizeof(cmd_flash_defs) / sizeof(struct map_def_s));
+ 
+-        get_drv_mib_content(full_path, mib, mib_value);
++	get_drv_mib_content(mib_file, mib, mib_value);
++
++	//load default value if flash doesn't have this calibration parameter.
++	if(strlen(mib_value)==0)
++		get_mib_default(mib, mib_value, cmd_flash_defs, sizeof(cmd_flash_defs) / sizeof(struct map_def_s));
+ }
+ 
+-static void write_mib_content_to_drv(char *str, char *run_cmd)
++static void write_mib_content_to_flash(char *str, char *run_cmd)
+ {
+-       char efuse[64];
+-       char token[40], value[300], *ptr;                	
+-       char wlan_idx=0;
+-       char type;
++	char efuse[64];
++	char token[40], value[VALLEN], *ptr;
++	int wlan_idx=0;
++	char type;
+ 
+-       sscanf(str, "HW_WLAN%d", &wlan_idx);
++	sscanf(str, "HW_WLAN%d", &wlan_idx);
+ 
+-       // printf("get wlan idx:%d str:%s\n", wlan_idx, str);
++	//printf("get wlan idx:%d str:%s\n", wlan_idx, str);
+ 
+-       ptr = get_str_token(str, token, ' ');
+-       if (ptr == NULL)
+-            return;
++	ptr = get_str_token(str, token, ' ');
++	if (ptr == NULL)
++		return;
+ 
+-       if (get_str_value(ptr, value) == 0) 
+-            return;
++	if (get_str_value(ptr, value) == 0)
++		return;
+               
+-       type = convert_str_map( (token + strlen("HW_WLAN0_")), efuse, cmd_efuse_defs, sizeof(cmd_efuse_defs) / sizeof(struct map_def_s));
++	type = convert_str_map( (token + strlen("HW_WLAN0_")), efuse, cmd_flash_defs, NAME_TO_MIB, sizeof(cmd_flash_defs) / sizeof(struct map_def_s));
+ 
+-       deblank(value);
++	if(type == T_DECIMAL_TO_HEX)
++		decimal_to_hex(value);
++	else
++		deblank(value);
+        
+-       // printf("get flash:[%s] val:[%s] mib:[%s]\n", token, value, efuse);
++	//printf("get flash:[%s] val:[%s] mib:[%s]\n", token, value, efuse);
+ 
+-       if (FLASH_TYPE == type) {
+-             sprintf(run_cmd, "echo flash wlan%d write %s=%s", wlan_idx, efuse, value);
+-       } else if (EFUSE_TYPE == type) {
+-             sprintf(run_cmd, "echo iwpriv wlan%d efuse_set %s=%s", wlan_idx, efuse, value);
+-       }
+-              
+-       return;	   
+-       // get_drv_mib_content(full_path, mib, mib_value);
++	if(type == T_NONE)
++		sprintf(run_cmd, "echo \"try set wlan%d %s %s\"", wlan_idx, efuse, value);
++	else if(type == T_WLANADDR && strlen(token)==strlen("HW_WLAN1_WLAN_ADDR1") ) {
++		int sub_wlan_idx=0;
++		//sprintf(run_cmd, "echo \"openwrt don't need to flash vap mac address\"");
++		sscanf(str, "HW_WLAN%d_WLAN_ADDR%d", &wlan_idx, &sub_wlan_idx);
++		sprintf(run_cmd, "%s set \"wlan_%s-%d %s\" \"%s\"", FACTORY_BIN, wlan_chipid[wlan_idx], sub_wlan_idx, efuse, value);
++	}
++	else
++		sprintf(run_cmd, "%s set \"wlan_%s %s\" \"%s\"", FACTORY_BIN, wlan_chipid[wlan_idx], efuse, value);
++
++	return;
++	// get_drv_mib_content(full_path, mib, mib_value);
++}
++
++void get_chipid(int wlan_index)
++{
++	FILE *fp;
++	char ChipId[100];
++	char run_cmd[200];
++	const int chip_id_len=8;
++
++	sprintf(run_cmd, "cat /proc/wlan%d/mib_all | grep chipVersion | awk -F' ' '{print $2}' | cut -c 1-%d", wlan_index, chip_id_len);
++	/* Open the command for reading. */
++	fp = popen(run_cmd, "r");
++	if (fp == NULL) {
++		printf("Failed to run command\n" );
++		return;
++	}
++
++	if(fgets(ChipId, sizeof(ChipId)-1, fp) != NULL) {
++	//	printf("ChipId=%s\n", ChipId);
++		memset(wlan_chipid[wlan_index], 0, sizeof(wlan_chipid[wlan_index]));
++		if(!strncmp(ChipId , "RTL8812c", chip_id_len) || !strncmp(ChipId, "RTL8812t", chip_id_len))
++			sprintf(wlan_chipid[wlan_index], "RTL8812A");
++		else
++			strncpy(wlan_chipid[wlan_index], ChipId, chip_id_len);
++		printf("wlan_chipid[%d]=%s\n", wlan_index, wlan_chipid[wlan_index]);
++
++	}
+ }
+ 
+ int main(int argc, char *argv[]) {
+@@ -443,10 +688,12 @@ int main(int argc, char *argv[]) {
+ 	FILE *fp;
+ 	char buf[BUFLEN], buf_tmp[BUFLEN],*pbuf,
+ 	pre_result[BUFLEN];				// buffer that stores message
+-	static char cmdWrap[500];
++	static char cmdWrap[BUFLEN];
+ 	static int rwHW=0;
+-    static int is_run=1;
+-  
++	static int is_run=1;
++	char run_cmd[100];
++	int i;
++
+ 	if( argc==2 && (!strcmp(argv[1], "version")) ) 
+ 	{
+ 		printf("version : %s\n",DAEMON_VERSION);
+@@ -459,6 +706,9 @@ int main(int argc, char *argv[]) {
+ 		exit(1);
+ 	}
+ 
++	for(i=0; i< MAX_WLAN_NUM; i++)
++		get_chipid(i);
++
+ 	my_addr.sin_family = AF_INET;         		// host byte order
+ 	my_addr.sin_port = htons(MYPORT);     	// short, network byte order
+ 	my_addr.sin_addr.s_addr = INADDR_ANY; 	// automatically fill with my IP
+@@ -474,19 +724,25 @@ int main(int argc, char *argv[]) {
+ 
+ 	addr_len = sizeof(struct sockaddr);
+ 
+-	printf("MP AUTOMATION daemon (ver 1.2)\n");
++	printf("MP AUTOMATION daemon %s\n", DAEMON_VERSION);
+ 	//Self reading flash!!!
+ 	#if 	0
+ 	if(!ReadSinguture())
+ 	{
+ 		printf("HW Settting Error!!\n");
+ 	}
+-	#endif	
++	#endif
++
++	sprintf(run_cmd, "%s load", FACTORY_BIN);
++	system(run_cmd);
++
+ 	// main loop : wait for the client
+ 	while (1) {
+ 		//receive the command from the client
+ 		memset(buf, 0, BUFLEN);
+-		memset(cmdWrap, 0, 500);
++		memset(buf_tmp, 0, BUFLEN);
++		memset(cmdWrap, 0, BUFLEN);
++		memset(pre_result, 0, BUFLEN);
+ 		rwHW = 0;
+ 		is_run = 1;
+ 		
+@@ -530,21 +786,21 @@ int main(int argc, char *argv[]) {
+ 	#if 1	//wlan0
+ 		if (!memcmp(buf, "iwpriv wlan0 mp_tssi", 20)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan0", buf_tmp, MP_QUERY_TSSI);
++			MP_get_ext("wlan0", buf_tmp, MP_TSSI);
+ 			strcpy(buf, buf_tmp);
+ 			printf("buf= %s\n",buf);
+ 			usleep(1000);
+ 		}
+ 		else if (!memcmp(buf, "iwpriv wlan0 mp_ther", 20)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan0", buf_tmp, MP_QUERY_THER);
++			MP_get_ext("wlan0", buf_tmp, MP_THER);
+ 			strcpy(buf, buf_tmp);
+ 			printf("buf= %s\n",buf);
+ 			usleep(1000);
+ 		}
+ 		else if (!memcmp(buf, "iwpriv wlan0 mp_query", 21)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan0", buf_tmp, MP_QUERY_STATS);
++			MP_get_ext("wlan0", buf_tmp, MP_QUERY);
+ 			strcpy(buf, buf_tmp);
+ 			usleep(1000);
+ 			printf("w0 2b= %s\n",buf);
+@@ -553,21 +809,21 @@ int main(int argc, char *argv[]) {
+ 	#if 1	//wlan1 
+ 		else if (!memcmp(buf, "iwpriv wlan1 mp_tssi", 20)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan1", buf_tmp, MP_QUERY_TSSI);
++			MP_get_ext("wlan1", buf_tmp, MP_TSSI);
+ 			strcpy(buf, buf_tmp);
+ 			printf("buf= %s\n",buf);
+ 			usleep(1000);
+ 		}
+ 		else if (!memcmp(buf, "iwpriv wlan1 mp_ther", 20)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan1", buf_tmp, MP_QUERY_THER);
++			MP_get_ext("wlan1", buf_tmp, MP_THER);
+ 			strcpy(buf, buf_tmp);
+ 			printf("buf= %s\n",buf);
+ 			usleep(1000);
+ 		}
+ 		else if (!memcmp(buf, "iwpriv wlan1 mp_query", 21)) {
+ 			strcpy(buf, pre_result);
+-			MP_get_ext("wlan1", buf_tmp, MP_QUERY_STATS);
++			MP_get_ext("wlan1", buf_tmp, MP_QUERY);
+ 			strcpy(buf, buf_tmp);
+ 			usleep(1000);
+ 			printf("w1 2b= %s\n",buf);
+@@ -576,6 +832,9 @@ int main(int argc, char *argv[]) {
+ 		else 
+ 		{
+ 			if ( (!memcmp(buf, "flash read", 10)) ) {
++#ifdef IWPRIV_HEX
++				char* keyword;
++#endif
+ 				is_run = 0;
+ 				if ((fp = fopen(WIFI_MP_TMP_FILE, "r")) == NULL)
+ 					fprintf(stderr, "opening " WIFI_MP_TMP_FILE " failed !\n");
+@@ -584,7 +843,17 @@ int main(int argc, char *argv[]) {
+ 					fgets(buf, BUFLEN, fp);
+ 					buf[BUFLEN-1] = '\0';
+ 					fclose(fp);
+-				}	
++				}
++#ifdef IWPRIV_HEX
++				if(strstr(buf, "read_reg") || 
++				   strstr(buf, "read_rf") || 
++				   strstr(buf, "mp_psd") ||
++				   strstr(buf, "mp_version")) {
++					keyword = strchr(buf, ':');
++					if(keyword && (strlen(buf) > (unsigned int)(keyword+1-buf)))
++						hex_to_decimal(keyword+1);
++				}
++#endif
+ 				sprintf(pre_result, "data:%s", buf);
+ 			}
+ 			//ack to the client
+@@ -596,16 +865,16 @@ int main(int argc, char *argv[]) {
+ 			
+ 			if (!memcmp(buf, "iwpriv wlan0 mp_brx stop", 24)) {
+ 				strcpy(buf, "stop");
+-				MP_get_ext("wlan0", buf, MP_BRX_PACKET);
++				MP_get_ext("wlan0", buf, MP_BRX);
+ 			}
+ 			else if (!memcmp(buf, "iwpriv wlan0 mp_tx", 18) && buf[18] == ' ') {
+ 				memcpy(buf_tmp, buf+19, strlen(buf)-19);
+-				MP_get_ext("wlan0", buf_tmp, MP_TX_PACKET);
++				MP_get_ext("wlan0", buf_tmp, MP_TX);
+ 				strcpy(buf, buf_tmp);
+ 			}
+ 			else if (!memcmp(buf, "iwpriv wlan0 mp_ctx", 19) && buf[19] == ' ') {
+ 				memcpy(buf_tmp, buf+20, strlen(buf)-20);
+-				MP_get_ext("wlan0", buf_tmp, MP_CONTIOUS_TX);
++				MP_get_ext("wlan0", buf_tmp, MP_CTX);
+ 				strcpy(buf, buf_tmp);;
+ 			}
+ 			else if(!memcmp(buf, "iwpriv wlan0 read_reg", 21)){
+@@ -640,16 +909,16 @@ int main(int argc, char *argv[]) {
+ #if 1  //wlan 1
+ 			else if (!memcmp(buf, "iwpriv wlan1 mp_brx stop", 24)) {
+ 				strcpy(buf, "stop");
+-				MP_get_ext("wlan1", buf, MP_BRX_PACKET);
++				MP_get_ext("wlan1", buf, MP_BRX);
+ 			}
+ 			else if (!memcmp(buf, "iwpriv wlan1 mp_tx", 18) && buf[18] == ' ') {
+ 				memcpy(buf_tmp, buf+19, strlen(buf)-19);
+-				MP_get_ext("wlan1", buf_tmp, MP_TX_PACKET);
++				MP_get_ext("wlan1", buf_tmp, MP_TX);
+ 				strcpy(buf, buf_tmp);
+ 			}
+ 			else if (!memcmp(buf, "iwpriv wlan1 mp_ctx", 19) && buf[19] == ' ') {
+ 				memcpy(buf_tmp, buf+20, strlen(buf)-20);
+-				MP_get_ext("wlan1", buf_tmp, MP_CONTIOUS_TX);
++				MP_get_ext("wlan1", buf_tmp, MP_CTX);
+ 				strcpy(buf, buf_tmp);;
+ 			}
+ 			else if(!memcmp(buf, "iwpriv wlan1 read_reg", 21)){
+@@ -699,9 +968,9 @@ int main(int argc, char *argv[]) {
+ #endif
+ 				if (!memcmp(buf, "flash get", 9))
+ 				{
+-					char mib_val[64];
++					char mib_val[VALLEN]={0};
+           
+-					read_mib_content_from_drv(buf+10, mib_val);
++					read_mib_content_from_flash(buf+10, mib_val);
+ 					// sprintf(cmdWrap, "flash gethw %s", buf+10);
+ 					sprintf(cmdWrap, "echo %s=%s", buf+10, mib_val); 
+ 					rwHW = 1;
+@@ -712,7 +981,7 @@ int main(int argc, char *argv[]) {
+ 				if (!memcmp(buf, "flash set", 9)) 
+ 				{
+ 					// sprintf(cmdWrap, "flash sethw %s", buf+10);
+-					write_mib_content_to_drv(buf+10, cmdWrap);
++					write_mib_content_to_flash(buf+10, cmdWrap);
+ 
+ 					// sprintf(cmdWrap, "echo %s", buf+10); 
+ 					
+@@ -729,8 +998,12 @@ int main(int argc, char *argv[]) {
+ 				
+ 				if(rwHW == 1)
+ 				{
+-					//printf("UDP Server cmdWrap=%s\n",cmdWrap);
++					printf("UDP Server cmdWrap=%s\n",cmdWrap);
+ 					system(cmdWrap);
++					if(! (strstr(cmdWrap, "unsupported") || strstr(cmdWrap, "echo")) ) {
++						sprintf(run_cmd, "%s save", FACTORY_BIN);
++						system(run_cmd);
++					}
+ 				}
+ 				else
+ 				{
+@@ -747,7 +1020,7 @@ int main(int argc, char *argv[]) {
+ 			strcpy(pre_result, buf);
+ 			strcpy(buf, buf_tmp);
+ 			
+-			//printf("UDP Server buf=%s pre_result=%s\n",buf,pre_result);
++			printf("UDP Server buf=%s pre_result=%s\n",buf,pre_result);
+ 		}
+ 
+ 		if (memcmp(buf, "flash set", 9) != 0) {
+--- a/rtk_arch.h
++++ b/rtk_arch.h
+@@ -38,7 +38,17 @@
+ //=======================================
+ 
+ #define dump_cmd  {int iii; printf("%s cmd=",__FILE__);	for( iii=0 ; iii<argc ;iii++ ) 		printf("%s ",argv[iii]);	printf("\n");}
+-#define DAEMON_VERSION	"svn:( date:2015-07-08 )"
++#define DAEMON_VERSION	"DHC 2016-12-06"
++
++#ifdef ANDROID
++#define FACTORY_BIN "/system/bin/factory"
++#define SED_BIN "busybox sed"
++#define STANDARD_PRIV
++#define IWPRIV_HEX
++#else
++#define FACTORY_BIN "/usr/local/bin/factory"
++#define SED_BIN "sed"
++#endif
+ 
+ #endif // _RTK_ARCH_H_
+ 

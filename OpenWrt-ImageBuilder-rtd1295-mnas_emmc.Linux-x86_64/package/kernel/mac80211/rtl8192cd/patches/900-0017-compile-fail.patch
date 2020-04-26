@@ -1,0 +1,152 @@
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
+@@ -1261,6 +1261,7 @@ IotEngine(
+ 				
+ 				// for USB 2.0 STA detect
+ 				if(pstat && pstat->IOTPeer == HT_IOT_PEER_BROADCOM) {
++#ifdef CONFIG_RTL8672
+ 					if(curr_tx_pkts > 4000) {
+ 						if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_80 && priv->pmib->dot11BssType.net_work_type & WIRELESS_11AC) {
+ 							unsigned int sta_curr_tx_pkts = (pstat->tx_pkts2 - pstat->tx_pkts2_pre) - (pstat->tx_fail - pstat->tx_fail_pre);
+@@ -1291,6 +1292,7 @@ IotEngine(
+ 						if(pstat->is_legacy_USB)
+ 							under_thd = 1;
+ 					}
++#endif //#ifdef CONFIG_RTL8672
+ 				}
+ 			}
+ 			else
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalPrecompInc.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalPrecompInc.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalPrecompInc.h
+@@ -1,7 +1,7 @@
+ #ifndef __INC_PRECOMPINC_H
+ #define __INC_PRECOMPINC_H
+ 
+-#if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
++#if (!defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)) || defined(RTK_129X_PLATFORM)
+ //HAL Shared with Driver
+ #include "StatusCode.h"
+ #include "HalDbgCmd.h"
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -98,7 +98,7 @@ static int check_arp_spoofing(struct rtl
+ #include "ifport.h"
+ #endif
+ 
+-#ifdef __ECOS
++#if defined(__ECOS) || defined(CONFIG_RTL_MLD_SNOOPING)
+ #define uint32 unsigned int
+ #define uint16 unsigned short
+ #define int16 short
+@@ -7966,7 +7966,7 @@ void rtl8192cd_rx_isr(struct rtl8192cd_p
+ 				rtl_cache_sync_wback(priv, (unsigned long)bus_to_virt(phw->rx_infoL[tail].paddr-CONFIG_LUNA_SLAVE_PHYMEM_OFFSET), RX_BUF_LEN - sizeof(struct rx_frinfo)-64, PCI_DMA_FROMDEVICE);
+ #endif
+ 				pdesc->Dword0 = set_desc((tail == (NUM_RX_DESC_IF(priv) - 1)? RX_EOR : 0) | RX_OWN | (RX_BUF_LEN - sizeof(struct rx_frinfo)-64));
+-				SMP_UNLOCK_SKB(x);
++				//SMP_UNLOCK_SKB(x);
+ 			}
+ 
+ 	rx_done:
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXRxDesc.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXRxDesc.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXRxDesc.c
+@@ -485,7 +485,11 @@ DumpRxPktContent88XX(
+ #endif
+ }
+ 
++#ifdef RTK_129X_PLATFORM
++#define RXBD_RXTAG_POLLING_CNT  10000
++#else
+ #define RXBD_RXTAG_POLLING_CNT  100
++#endif
+ #define RXBD_RXTAG_MASK         0x1FFF
+ 
+ 
+@@ -537,7 +541,7 @@ QueryRxDesc88XX_V1 (
+ #if RXBD_READY_CHECK_METHOD
+         RXBDDword0 = nonCacheAddr->Dword0;
+ 
+-#if 1 /*eric-8822 ??  dirty fix for RX Throughput*/
++#ifndef RTK_129X_PLATFORM /*eric-8822 ??  dirty fix for RX Throughput*/
+ 			//break;
+ 
+ 		if(GET_DESC_FIELD(RXBDDword0, RXBD_DW0_TOTALRXPKTSIZE_MSK, RXBD_DW0_TOTALRXPKTSIZE_SH) == 0xffff)
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -7532,6 +7532,11 @@ void /*__devexit*/MDL_EXIT rtl8192cd_pro
+         remove_proc_entry( "nat25filter", rtl8192cd_proc_root );
+ #endif
+ 
++#ifdef DOT11K
++        remove_proc_entry( "rm_ap_channel_report", rtl8192cd_proc_root );
++        remove_proc_entry( "rm_neighbor_report", rtl8192cd_proc_root );
++#endif
++
+ #if (BEAMFORMING_SUPPORT == 1)
+         remove_proc_entry( "mib_txbf", rtl8192cd_proc_root );
+ #endif
+@@ -7915,7 +7920,6 @@ int rtl8192cd_show_wifi_debug(char *dev_
+ 	return 0;
+ }
+ 
+-
+ EXPORT_SYMBOL(rtl8192cd_show_wifi_debug);
+ EXPORT_SYMBOL(rtl8192cd_proc_debug);
+ #endif
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -2064,10 +2064,8 @@ static void translate_rateIndex_to_rateS
+ 	);
+ }
+ 
+-
+-static char * show_sta_trx_rate(struct rtl8192cd_priv *priv, struct stat_info	*pstat)
++static char * show_sta_trx_rate(struct rtl8192cd_priv *priv, struct stat_info	*pstat, char* strRate)
+ {
+-	char strRate[100]="";
+ 	char strTxRate[100]="";
+ 	char strRxRate[100]="";
+ 	
+@@ -2101,7 +2099,7 @@ static char * show_sta_trx_rate(struct r
+ 		pstat->rx_splcp? "s" : " ",
+ 		(pstat->rx_rate >= VHT_RATE_ID) ? "  ":((pstat->rx_rate >= HT_RATE_ID)?(pstat->rx_rate >= HT_RATE_ID+10?" 	":" 	 "):(pstat->rx_rate/2 >= 11?"		 ":"		 ")));
+ 	}
+-	return strRate;
++
+ }
+ 
+ static void assoc_expire(struct rtl8192cd_priv *priv)
+@@ -6216,6 +6214,7 @@ void rtl8192cd_expire_timer(unsigned lon
+ 		struct stat_info	*pstat;
+ 		PRT_BEAMFORMING_INFO	pBeamInfo = &(priv->pshare->BeamformingInfo);
+ 		char strMuRate[20];
++		char strRate[100];
+ 		unsigned char e1e2_to_gid[MAX_NUM_BEAMFORMEE_MU][MAX_NUM_BEAMFORMEE_MU]={{2,2,4,6,8,10},
+   							{1,1,12,14,16,18},
+   							{3,11,20,20,22,24},
+@@ -6236,12 +6235,13 @@ void rtl8192cd_expire_timer(unsigned lon
+ 					}
+ 						
+ 					translate_txforce_to_rateStr(strMuRate, (0x7f & pEntry->mu_tx_rate));
++					show_sta_trx_rate(priv, pstat, strRate);
+ 					panic_printk("[%d][P %d][SND %d %d] %s (MU TX %s) (CSI %d %d) (TP %3d,%3d)\n", 
+ 					   pstat->aid, 
+ 					   (pstat->muPartner)?pstat->muPartner->aid:0, 
+ 					   priv->pshare->rf_ft_var.mu_ok[pEntry->mu_reg_index], 
+ 					   priv->pshare->rf_ft_var.mu_fail[pEntry->mu_reg_index], 
+-					   show_sta_trx_rate(priv, pstat), 
++					   strRate, 
+ 					   strMuRate,
+ 					   priv->pshare->rf_ft_var.mu_BB_ok, 
+ 					   priv->pshare->rf_ft_var.mu_BB_fail, 

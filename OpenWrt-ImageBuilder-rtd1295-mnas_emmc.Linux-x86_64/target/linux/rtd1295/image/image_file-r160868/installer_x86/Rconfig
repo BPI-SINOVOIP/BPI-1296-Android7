@@ -1,0 +1,1251 @@
+choice
+	prompt "Flash Type"
+	default FLASH_TYPE_EMMC
+config FLASH_TYPE_EMMC
+	bool "EMMC"
+config FLASH_TYPE_NAND
+	bool "NAND"
+endchoice
+
+
+menuconfig FLASH_EMMC_SIZE_16G
+	depends on FLASH_TYPE_EMMC
+	bool "16G [14592MB]"
+menuconfig FLASH_EMMC_SIZE_32G
+	depends on FLASH_TYPE_EMMC
+	bool "32G [29184MB]"
+menuconfig FLASH_EMMC_SIZE_4G
+	depends on FLASH_TYPE_EMMC
+	bool "4G [3648MB]"
+menuconfig FLASH_EMMC_SIZE_8G
+	depends on FLASH_TYPE_EMMC
+	bool "8G [7296MB]"
+
+choice
+	prompt "Flash Manufacturer"
+	default FLASH_MANUFACTURER_HYNIX
+	depends on FLASH_TYPE_NAND
+config FLASH_MANUFACTURER_HYNIX
+	bool "HYNIX"
+config FLASH_MANUFACTURER_SAMSUNG
+	bool "SAMSUNG"
+config FLASH_MANUFACTURER_MICRON
+	bool "MICRON"
+config FLASH_MANUFACTURER_ST
+	bool "ST"
+config FLASH_MANUFACTURER_TOSHIBA
+	bool "TOSHIBA"
+endchoice
+
+choice
+	prompt "SAMSUNG Flash"
+	depends on FLASH_MANUFACTURER_SAMSUNG
+config FLASH_SAMSUNG_K9F8G08U0M
+	bool "SAMSUNG K9F8G08U0M/128-MByte/4-KByte/256-KByte"
+config FLASH_SAMSUNG_K9F1G08U0B
+	bool "SAMSUNG K9F1G08U0B/128-MByte/2-KByte/128-KByte"
+config FLASH_SAMSUNG_K9F2G08U0B
+	bool "SAMSUNG K9F2G08U0B/256-MByte/2-KByte/128-KByte"
+config FLASH_SAMSUNG_K9G4G08U0A
+	bool "SAMSUNG K9G4G08U0A/512-MByte/2-KByte/256-KByte"
+config FLASH_SAMSUNG_K9G4G08U0B
+	bool "SAMSUNG K9G4G08U0B/512-MByte/2-KByte/256-KByte"
+config FLASH_SAMSUNG_K9F4G08U0B
+	bool "SAMSUNG K9F4G08U0B/512-MByte/2-KByte/128-KByte"
+config FLASH_SAMSUNG_K9G8G08U0M
+	bool "SAMSUNG K9G8G08U0M/1024-MByte/2-KByte/256-KByte"
+config FLASH_SAMSUNG_K9G8G08U0A
+	bool "SAMSUNG K9G8G08U0A/1024-MByte/2-KByte/256-KByte"
+config FLASH_SAMSUNG_K9K8G08U0A
+	bool "SAMSUNG K9K8G08U0A/1024-MByte/2-KByte/128-KByte"
+endchoice
+
+choice
+	prompt "HYNIX Flash"
+	depends on FLASH_MANUFACTURER_HYNIX
+config FLASH_HYNIX_HY27UF081G2A
+	bool "HYNIX HY27UF081G2A/128-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_H27U1G8F2B
+	bool "HYNIX H27U1G8F2B/128-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_HY27UF082G2A
+	bool "HYNIX HY27UF082G2A/256-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_HY27UF082G2B
+	bool "HYNIX HY27UF082G2B/256-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_H27U2G8F2C
+	bool "HYNIX H27U2G8F2C/256-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_HY27UF084G2M
+	bool "HYNIX HY27UF084G2M/512-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_HY27UT084G2M
+	bool "HYNIX HY27UT084G2M/512-MByte/2-KByte/256-KByte"
+config FLASH_HYNIX_HY27UT084G2A
+	bool "HYNIX HY27UT084G2A/512-MByte/2-KByte/256-KByte"
+config FLASH_HYNIX_HY27UF084G2B
+	bool "HYNIX HY27UF084G2B/512-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_H27U4G8F2D
+	bool "HYNIX H27U4G8F2D/512-MByte/2-KByte/128-KByte"
+config FLASH_HYNIX_HY27UT088G2A
+	bool "HYNIX HY27UT088G2A/1024-MByte/2-KByte/256-KByte"
+config FLASH_HYNIX_H27U8G8T2B
+	bool "HYNIX H27U8G8T2B/1024-MByte/4-KByte/512-KByte"
+config FLASH_HYNIX_H27UAG8T2A
+	bool "HYNIX H27UAG8T2A/1024-MByte/4-KByte/512-KByte"
+config FLASH_HYNIX_H27UBG8T2B
+	bool "HYNIX H27UBG8T2B/256-MByte/8-KByte/2048-KByte"
+config FLASH_HYNIX_H27UBG8T2C
+	bool "HYNIX H27UBG8T2C/4096-MByte/8-KByte/2048-KByte"
+config FLASH_HYNIX_H27UCG8T2B
+	bool "HYNIX H27UCG8T2B/8192-MByte/16-KByte/4096-KByte"
+endchoice
+
+choice
+	prompt "ST Flash"
+	depends on FLASH_MANUFACTURER_ST
+config FLASH_ST_NAND01GW3B2BN6
+	bool "ST NAND01GW3B2BN6/128-MByte/2-KByte/128-KByte"
+config FLASH_ST_NAND01GW3B2CN6
+	bool "ST NAND01GW3B2CN6/128-MByte/2-KByte/128-KByte"
+config FLASH_ST_NAND02GW3B2DN6
+	bool "ST NAND02GW3B2DN6/256-MByte/2-KByte/128-KByte"
+config FLASH_ST_NAND04GW3B2DN6
+	bool "ST NAND04GW3B2DN6/512-MByte/2-KByte/128-KByte"
+config FLASH_ST_NAND04GW3B2B
+	bool "ST NAND04GW3B2B/512-MByte/2-KByte/128-KByte"
+config FLASH_ST_NAND04GW3C2B
+	bool "ST NAND04GW3C2B/512-MByte/2-KByte/256-KByte"
+config FLASH_ST_NAND08GW3C2BN6
+	bool "ST NAND08GW3C2BN6/1024-MByte/2-KByte/256-KByte"
+endchoice
+
+choice
+	prompt "TOSHIBA Flash"
+	depends on FLASH_MANUFACTURER_TOSHIBA
+config FLASH_TOSHIBA_TC58NVG0S3C
+	bool "TOSHIBA TC58NVG0S3C/128-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58NVG0S3E
+	bool "TOSHIBA TC58NVG0S3E/128-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58NVG1S3C
+	bool "TOSHIBA TC58NVG1S3C/256-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58NVG1S3E
+	bool "TOSHIBA TC58NVG1S3E/256-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58NVG2S3E
+	bool "TOSHIBA TC58NVG2S3E/512-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58BVG0S3H
+	bool "TOSHIBA TC58BVG0S3H/128-MByte/2-KByte/128-KByte"
+config FLASH_TOSHIBA_TC58TEG5DCJT
+	bool "TOSHIBA TC58TEG5DCJT/4096-MByte/16-KByte/4096-KByte"
+config FLASH_TOSHIBA_TC58TEG6DCJT
+	bool "TOSHIBA TC58TEG6DCJT/8192-MByte/16-KByte/4096-KByte"
+endchoice
+
+choice
+	prompt "MICRON Flash"
+	depends on FLASH_MANUFACTURER_MICRON
+config FLASH_MICRON_MT29F1G08ABADA
+	bool "MICRON MT29F1G08ABADA/128-MByte/2-KByte/128-KByte"
+config FLASH_MICRON_MT29F2G08AAD
+	bool "MICRON MT29F2G08AAD/256-MByte/2-KByte/128-KByte"
+config FLASH_MICRON_MT29F2G08ABAEA
+	bool "MICRON MT29F2G08ABAEA/256-MByte/2-KByte/128-KByte"
+config FLASH_MICRON_MT29F4G08ABADA
+	bool "MICRON MT29F4G08ABADA/512-MByte/2-KByte/128-KByte"
+config FLASH_MICRON_MT29F4G08ABAEA
+	bool "MICRON MT29F4G08ABAEA/256-MByte/2-KByte/128-KByte"
+config FLASH_MICRON_MT29F32G08CBACA
+	bool "MICRON MT29F32G08CBACA/4096-MByte/4-KByte/1024-KByte"
+config FLASH_MICRON_MT29F64G08CBAAA
+	bool "MICRON MT29F64G08CBAAA/8192-MByte/8-KByte/2048-KByte"
+config FLASH_MICRON_MT29F64G08CBABA
+	bool "MICRON MT29F64G08CBABA/8192-MByte/8-KByte/2048-KByte"
+config FLASH_MICRON_MT29F32G08CBADA
+	bool "MICRON MT29F32G08CBADA/4096-MByte/8-KByte/2048-KByte"
+config FLASH_MICRON_MX30LF1G08AM
+	bool "MICRON MX30LF1G08AM/128-MByte/2-KByte/128-KByte"
+endchoice
+
+if FLASH_EMMC_SIZE_16G
+	config FLASH_TYPE
+	string
+	default "emmc"
+	config 16G_FLASH_SIZE_KB
+	int
+	default 14942208
+endif
+
+if FLASH_EMMC_SIZE_32G
+	config FLASH_TYPE
+	string
+	default "emmc"
+	config 32G_FLASH_SIZE_KB
+	int
+	default 29884416
+endif
+
+if FLASH_EMMC_SIZE_4G
+	config FLASH_TYPE
+	string
+	default "emmc"
+	config 4G_FLASH_SIZE_KB
+	int
+	default 3735552
+endif
+
+if FLASH_EMMC_SIZE_8G
+	config FLASH_TYPE
+	string
+	default "emmc"
+	config 8G_FLASH_SIZE_KB
+	int
+	default 7471104
+endif
+
+
+if FLASH_SAMSUNG_K9F8G08U0M
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9F8G08U0M"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 4096
+	config FLASH_OOB_SIZE
+	int
+	default 4096
+endif
+
+if FLASH_SAMSUNG_K9F1G08U0B
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9F1G08U0B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9F2G08U0B
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9F2G08U0B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9G4G08U0A
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9G4G08U0A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9G4G08U0B
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9G4G08U0B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9F4G08U0B
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9F4G08U0B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9G8G08U0M
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9G8G08U0M"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9G8G08U0A
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9G8G08U0A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_SAMSUNG_K9K8G08U0A
+	config FLASH_PARTNAME
+	string
+	default "SAMSUNG K9K8G08U0A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UF081G2A
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UF081G2A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_H27U1G8F2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27U1G8F2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UF082G2A
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UF082G2A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UF082G2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UF082G2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_H27U2G8F2C
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27U2G8F2C"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UF084G2M
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UF084G2M"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UT084G2M
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UT084G2M"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UT084G2A
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UT084G2A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UF084G2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UF084G2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_H27U4G8F2D
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27U4G8F2D"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_HY27UT088G2A
+	config FLASH_PARTNAME
+	string
+	default "HYNIX HY27UT088G2A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_HYNIX_H27U8G8T2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27U8G8T2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 512
+	config FLASH_PAGE_SIZE
+	int
+	default 4096
+	config FLASH_OOB_SIZE
+	int
+	default 4096
+endif
+
+if FLASH_HYNIX_H27UAG8T2A
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27UAG8T2A"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 512
+	config FLASH_PAGE_SIZE
+	int
+	default 4096
+	config FLASH_OOB_SIZE
+	int
+	default 4096
+endif
+
+if FLASH_HYNIX_H27UBG8T2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27UBG8T2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 2048
+	config FLASH_PAGE_SIZE
+	int
+	default 8192
+	config FLASH_OOB_SIZE
+	int
+	default 8192
+endif
+
+if FLASH_HYNIX_H27UBG8T2C
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27UBG8T2C"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 4194304
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 2048
+	config FLASH_PAGE_SIZE
+	int
+	default 8192
+	config FLASH_OOB_SIZE
+	int
+	default 8192
+endif
+
+if FLASH_HYNIX_H27UCG8T2B
+	config FLASH_PARTNAME
+	string
+	default "HYNIX H27UCG8T2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 8388608
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 4096
+	config FLASH_PAGE_SIZE
+	int
+	default 16384
+	config FLASH_OOB_SIZE
+	int
+	default 16384
+endif
+
+if FLASH_ST_NAND01GW3B2BN6
+	config FLASH_PARTNAME
+	string
+	default "ST NAND01GW3B2BN6"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND01GW3B2CN6
+	config FLASH_PARTNAME
+	string
+	default "ST NAND01GW3B2CN6"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND02GW3B2DN6
+	config FLASH_PARTNAME
+	string
+	default "ST NAND02GW3B2DN6"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND04GW3B2DN6
+	config FLASH_PARTNAME
+	string
+	default "ST NAND04GW3B2DN6"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND04GW3B2B
+	config FLASH_PARTNAME
+	string
+	default "ST NAND04GW3B2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND04GW3C2B
+	config FLASH_PARTNAME
+	string
+	default "ST NAND04GW3C2B"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_ST_NAND08GW3C2BN6
+	config FLASH_PARTNAME
+	string
+	default "ST NAND08GW3C2BN6"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 1048576
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 256
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58NVG0S3C
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58NVG0S3C"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58NVG0S3E
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58NVG0S3E"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58NVG1S3C
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58NVG1S3C"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58NVG1S3E
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58NVG1S3E"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58NVG2S3E
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58NVG2S3E"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58BVG0S3H
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58BVG0S3H"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_TOSHIBA_TC58TEG5DCJT
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58TEG5DCJT"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 4194304
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 4096
+	config FLASH_PAGE_SIZE
+	int
+	default 16384
+	config FLASH_OOB_SIZE
+	int
+	default 16384
+endif
+
+if FLASH_TOSHIBA_TC58TEG6DCJT
+	config FLASH_PARTNAME
+	string
+	default "TOSHIBA TC58TEG6DCJT"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 8388608
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 4096
+	config FLASH_PAGE_SIZE
+	int
+	default 16384
+	config FLASH_OOB_SIZE
+	int
+	default 16384
+endif
+
+if FLASH_MICRON_MT29F1G08ABADA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F1G08ABADA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_MICRON_MT29F2G08AAD
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F2G08AAD"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_MICRON_MT29F2G08ABAEA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F2G08ABAEA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_MICRON_MT29F4G08ABADA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F4G08ABADA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 524288
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_MICRON_MT29F4G08ABAEA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F4G08ABAEA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 262144
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+
+if FLASH_MICRON_MT29F32G08CBACA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F32G08CBACA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 4194304
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 1024
+	config FLASH_PAGE_SIZE
+	int
+	default 4096
+	config FLASH_OOB_SIZE
+	int
+	default 4096
+endif
+
+if FLASH_MICRON_MT29F64G08CBAAA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F64G08CBAAA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 8388608
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 2048
+	config FLASH_PAGE_SIZE
+	int
+	default 8192
+	config FLASH_OOB_SIZE
+	int
+	default 8192
+endif
+
+if FLASH_MICRON_MT29F64G08CBABA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F64G08CBABA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 8388608
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 2048
+	config FLASH_PAGE_SIZE
+	int
+	default 8192
+	config FLASH_OOB_SIZE
+	int
+	default 8192
+endif
+
+if FLASH_MICRON_MT29F32G08CBADA
+	config FLASH_PARTNAME
+	string
+	default "MICRON MT29F32G08CBADA"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 4194304
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 2048
+	config FLASH_PAGE_SIZE
+	int
+	default 8192
+	config FLASH_OOB_SIZE
+	int
+	default 8192
+endif
+
+if FLASH_MICRON_MX30LF1G08AM
+	config FLASH_PARTNAME
+	string
+	default "MICRON MX30LF1G08AM"
+	config FLASH_TYPE
+	string
+	default "nand"
+	config FLASH_SIZE_KB
+	int
+	default 131072
+	config FLASH_ERASE_SIZE_KB
+	int
+	default 128
+	config FLASH_PAGE_SIZE
+	int
+	default 2048
+	config FLASH_OOB_SIZE
+	int
+	default 2048
+endif
+

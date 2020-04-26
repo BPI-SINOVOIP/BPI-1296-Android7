@@ -1,0 +1,22 @@
+
+obj-$(CPTCFG_RTL8188EU) += rtl8188eu/
+obj-$(CPTCFG_RTL8188FU) += rtl8188fu/
+obj-$(CPTCFG_RTL8189ES) += rtl8189es/
+obj-$(CPTCFG_RTL8189FS) += rtl8189fs/
+obj-$(CPTCFG_RTL8192CU) += rtl8192cu/
+obj-$(CPTCFG_RTL8192EE) += rtl8192ee/
+obj-$(CPTCFG_RTL8192EU) += rtl8192eu/
+obj-$(CPTCFG_RTL8723BS) += rtl8723bs/
+obj-$(CPTCFG_RTL8723BU) += rtl8723bu/
+obj-$(CPTCFG_RTL8723DU) += rtl8723du/
+obj-$(CPTCFG_RTL8811AU) += rtl8811au/
+obj-$(CPTCFG_RTL8812AE) += rtl8812ae/
+obj-$(CPTCFG_RTL8812AU) += rtl8812au/
+obj-$(CPTCFG_RTL8814AU) += rtl8814au/
+obj-$(CPTCFG_RTL8821AS) += rtl8821as/
+obj-$(CPTCFG_RTL8821CS) += rtl8821cs/
+obj-$(CPTCFG_RTL8821AU) += rtl8821au/
+obj-$(CPTCFG_RTL8821CU) += rtl8821cu/
+obj-$(CPTCFG_RTL8822BE) += rtl8822be/
+obj-$(CPTCFG_RTL8822BU) += rtl8822bu/
+obj-$(CPTCFG_RTL8822BS) += rtl8822bs/

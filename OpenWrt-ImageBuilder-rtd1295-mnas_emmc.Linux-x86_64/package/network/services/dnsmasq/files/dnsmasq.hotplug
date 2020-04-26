@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ "$ACTION" = ifup ] || exit 0
+
+lockf=/var/lock/dnsmasq.lock
+
+/etc/init.d/dnsmasq enabled && lock $lockf && /etc/init.d/dnsmasq start && sleep 1
+lock -u $lockf

@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "ACS"
+msgstr ""
+
+msgid "ACS connection settings"
+msgstr ""
+
+msgid "Device"
+msgstr ""
+
+msgid "Hardware version"
+msgstr ""
+
+msgid "Hostname"
+msgstr ""
+
+msgid "Interface"
+msgstr ""
+
+msgid "Local"
+msgstr ""
+
+msgid "Manufacturer"
+msgstr ""
+
+msgid "OUI"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Path"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Product class"
+msgstr ""
+
+msgid "Serial number"
+msgstr ""
+
+msgid "Software version"
+msgstr ""
+
+msgid "TR-069 device options"
+msgstr ""
+
+msgid "Transport scheme"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "easycwmp"
+msgstr ""
+
+msgid "easycwmpd daemon options"
+msgstr ""

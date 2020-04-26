@@ -1,0 +1,288 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_aes.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_aes.c
+@@ -658,6 +658,9 @@ static void aes_tx(struct rtl8192cd_priv
+ 
+ 	UINT32	offset = 0;
+ 	UINT32	hdrlen  = get_hdrlen(priv, hdr);
++#ifdef RTK_129X_PLATFORM
++	dma_addr_t tmpaddr;
++#endif
+ 
+ 	memset((void *)mic_iv, 0, 16);
+ 	memset((void *)mic_header1, 0, 16);
+@@ -875,12 +878,31 @@ static void aes_tx(struct rtl8192cd_priv
+     offset += 8;
+ 
+ #ifdef CONFIG_PCI_HCI
++#ifdef RTK_129X_PLATFORM
++	tmpaddr = get_physical_addr(priv, hdr, hdrlen + 8, PCI_DMA_TODEVICE);
++	rtl_cache_sync_wback(priv, tmpaddr, hdrlen + 8, PCI_DMA_TODEVICE);
++	pci_unmap_single(priv->pshare->pdev, tmpaddr, hdrlen + 8, PCI_DMA_TODEVICE);
++	if (llc) {
++		tmpaddr = get_physical_addr(priv, llc, 8, PCI_DMA_TODEVICE);
++		rtl_cache_sync_wback(priv, tmpaddr, 8, PCI_DMA_TODEVICE);
++		pci_unmap_single(priv->pshare->pdev, tmpaddr, 8, PCI_DMA_TODEVICE);
++	}
++
++	tmpaddr = get_physical_addr(priv, pframe, plen, PCI_DMA_TODEVICE);
++	rtl_cache_sync_wback(priv, tmpaddr, plen, PCI_DMA_TODEVICE);
++	pci_unmap_single(priv->pshare->pdev, tmpaddr, plen, PCI_DMA_TODEVICE);
++
++	tmpaddr = get_physical_addr(priv, txmic, 8, PCI_DMA_TODEVICE);
++	rtl_cache_sync_wback(priv, tmpaddr, 8, PCI_DMA_TODEVICE);
++	pci_unmap_single(priv->pshare->pdev, tmpaddr, 8, PCI_DMA_TODEVICE);
++#else
+ 	rtl_cache_sync_wback(priv, (unsigned long)hdr, hdrlen + 8, PCI_DMA_TODEVICE);
+ 	if (llc)
+ 		rtl_cache_sync_wback(priv, (unsigned long)llc, 8, PCI_DMA_TODEVICE);
+ 	rtl_cache_sync_wback(priv, (unsigned long)pframe, plen, PCI_DMA_TODEVICE);
+ 	rtl_cache_sync_wback(priv, (unsigned long)txmic, 8, PCI_DMA_TODEVICE);
+ #endif
++#endif
+ 
+     _DEBUG_INFO("--txmic=%X %X %X %X %X %X %X %X\n",
+     txmic[0], txmic[1], txmic[2], txmic[3],
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -1372,12 +1372,16 @@ void realtek_set_security(struct rtl8192
+ 	for (i = 0; i < crypto.n_ciphers_pairwise; i++) {
+ 		switch (crypto.ciphers_pairwise[i]) {
+ 		case WLAN_CIPHER_SUITE_WEP40:
+-			rtk->cipher = WLAN_CIPHER_SUITE_WEP40;
+-			realtek_auth_wep(priv, _WEP_40_PRIVACY_);
+-			break;
+ 		case WLAN_CIPHER_SUITE_WEP104:
+-			rtk->cipher = WLAN_CIPHER_SUITE_WEP104;
+-			realtek_auth_wep(priv, _WEP_104_PRIVACY_);
++			if (rtk->wep_key_len == 5) {
++				rtk->cipher = WLAN_CIPHER_SUITE_WEP40;
++				realtek_auth_wep(priv, _WEP_40_PRIVACY_);
++			} else if (rtk->wep_key_len == 13) {
++				rtk->cipher = WLAN_CIPHER_SUITE_WEP104;
++				realtek_auth_wep(priv, _WEP_104_PRIVACY_);
++			} else {
++				NDEBUG3("Warning! rtk->wep_key_len=%dn", rtk->wep_key_len);
++			}
+ 			break;
+ 		case WLAN_CIPHER_SUITE_TKIP:
+ 			rtk->cipher |= WLAN_CIPHER_SUITE_TKIP;
+@@ -2113,6 +2117,7 @@ static int realtek_cfg80211_get_key(stru
+ 	struct key_params params;
+ 	struct stat_info	*pstat = NULL;
+ 	unsigned int cipher = 0;
++	u8 key[64] = {0};
+ 
+ 	NLENTER;
+ 
+@@ -2142,6 +2147,7 @@ static int realtek_cfg80211_get_key(stru
+     #endif
+ 
+ 	memset(&params, 0, sizeof(params));
++	params.key = key;
+ 	realtek_get_key_from_sta(priv, pstat, &params);
+ 
+ 	//_eric_cfg ?? key seq is not used ??
+@@ -2169,6 +2175,10 @@ static int realtek_cfg80211_set_default_
+ 
+ 	NLENTER;
+ 	NDEBUG2("defaukt key_index[%d] unicast[%d] multicast[%d] \n", key_index, unicast, multicast);
++	if (key_index < 4) {
++		priv->pmib->dot1180211AuthEntry.dot11PrivacyKeyIndex = key_index;
++		rtk->wep_key_len = priv->pmib->dot11DefaultKeysTable.keylen[key_index];
++	}
+ 	NLEXIT;
+ 	return 0;
+ }
+@@ -3632,6 +3642,9 @@ static int realtek_cfg80211_connect(stru
+ //=== set security 
+ 	realtek_reset_security(priv); 
+ 
++	if (sme->key_len > 0 && sme->key)
++		rtk->wep_key_len = sme->key_len;
++
+ 	realtek_set_security(priv, rtk, sme->crypto);
+ 
+ 	if(priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
+@@ -3657,6 +3670,7 @@ static int realtek_cfg80211_connect(stru
+ 		memcpy(&priv->pmib->dot11DefaultKeysTable.keytype[sme->key_idx].skey[0], sme->key, sme->key_len);
+ 
+ 		priv->pmib->dot11GroupKeysTable.dot11EncryptKey.dot11TTKeyLen = sme->key_len;
++		priv->pmib->dot1180211AuthEntry.dot11PrivacyKeyIndex = sme->key_idx;
+ 		memcpy(&priv->pmib->dot11GroupKeysTable.dot11EncryptKey.dot11TTKey.skey[0], sme->key, sme->key_len);
+ 		
+ 		if(sme->auth_type==NL80211_AUTHTYPE_SHARED_KEY)
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.h
+@@ -148,8 +148,8 @@ typedef	struct _OCTET_STRING {
+ typedef union _LARGE_INTEGER {
+ 		unsigned char 	charData[8];
+         struct {
+-			unsigned long 	HighPart;
+-			unsigned long 	LowPart;
++			u32 	HighPart;
++			u32 	LowPart;
+         } field;
+ } LARGE_INTEGER, *PLARGE_INTEGER;
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tkip.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tkip.c
+@@ -179,9 +179,9 @@ void michael(
+                 unsigned char *mic, int tx)
+ {
+ //    unsigned long int l_out, r_out;
+-    register unsigned long int l,r;
+-    register unsigned long int k0,k1;
+-    register unsigned long int m;
++    register u32 l,r;
++    register u32 k0,k1;
++    register u32 m;
+     register unsigned char a,b,c,d;
+ 
+     int num_blocks;
+@@ -384,8 +384,8 @@ static __inline__ unsigned int rotr1(uns
+ void mix_key(
+                 unsigned char    *key,
+                 unsigned char    *ta,
+-                unsigned long int pnl,  /* Least significant 16 bits of PN */
+-                unsigned long int pnh,  /* Most significant 32 bits of PN */
++                u32 pnl,  /* Least significant 16 bits of PN */
++                u32 pnh,  /* Most significant 32 bits of PN */
+                 unsigned char    *rc4key);
+ 
+ 
+@@ -439,8 +439,8 @@ static __inline__ unsigned int rotr1(uns
+ void mix_key(
+                 unsigned char    *key,
+                 unsigned char    *ta,
+-                unsigned long int pnl,  /* Least significant 16 bits of PN */
+-                unsigned long int pnh,  /* Most significant 32 bits of PN */
++                u32 pnl,  /* Least significant 16 bits of PN */
++                u32 pnh,  /* Most significant 32 bits of PN */
+                 unsigned char    *rc4key)
+ {
+ 	unsigned int p1k[5];
+@@ -658,12 +658,12 @@ void rc4_frag_encrypt(
+    ((val8>>1)&0x08) | ((val8>>3)&0x04) | ((val8>>5)&0x02) | ((val8>>7)&0x01) )
+ #define CRC32_POLY 0x04c11db7
+ 
+-static unsigned long crc32_table[256];
++static u32 crc32_table[256];
+ 
+ void init_crc32_table(void)
+ {
+ 	int i, j;
+-	unsigned long c;
++	u32 c;
+ 	unsigned char *p=(unsigned char *)&c, *p1;
+ 	unsigned char k;
+ 
+@@ -672,7 +672,7 @@ void init_crc32_table(void)
+ 	for (i = 0; i < 256; ++i)
+ 	{
+ 		k = REVERSE_BIT( (unsigned char)(i) );
+-		for (c = ((unsigned long)k) << 24, j = 8; j > 0; --j){
++		for (c = ((u32)k) << 24, j = 8; j > 0; --j){
+ 		   c = (c & 0x80000000) ? ((c << 1) ^ CRC32_POLY) : (c << 1);
+ 		}
+ 		p1 = (unsigned char *)&crc32_table[i];
+@@ -685,10 +685,10 @@ void init_crc32_table(void)
+ }
+ 
+ 
+-unsigned long crc32(unsigned char *buf, int len)
++u32 crc32(unsigned char *buf, int len)
+ {
+ 	unsigned char *p;
+-	unsigned long  crc;
++	u32  crc;
+ 
+ 	crc = 0xffffffff;       /* preload shift register, per CRC-32 spec */
+ 
+@@ -700,7 +700,7 @@ unsigned long crc32(unsigned char *buf,
+ }
+ 
+ 
+-unsigned long crc32_frag(unsigned long crc, unsigned char *buf, int len)
++u32 crc32_frag(unsigned int crc, unsigned char *buf, int len)
+ {
+ 	unsigned char *p;
+ 
+@@ -728,8 +728,8 @@ void appendICV(unsigned char *src, unsig
+ void tkip_icv(unsigned char *picv, unsigned char *frag1, unsigned int frag1_len,
+ 				unsigned char *frag2,unsigned int frag2_len)
+ {
+-	unsigned long *pcrc;
+-	unsigned long crc= 0xffffffff;
++	u32 *pcrc;
++	u32 crc= 0xffffffff;
+ 
+ 	pcrc = &crc;
+ 	if (frag1)
+@@ -1087,7 +1087,7 @@ do_encrypt:
+ 	{
+ 		/* 20100612 iv pointer is not always 4byte alignment, when qos enabled on station and ap, and mb
+ 		ssid enabled, txcfg->hdrlen is 26 for QoS*/
+-       unsigned long temp;
++       unsigned int temp;
+        temp = cpu_to_le32(((*piv) & 0x00FFFFFF) |((keyid&0x03)<<30));
+        *((unsigned char*)iv) = (temp>>24)&0xFF;
+        *(((unsigned char*)iv)+1) = (temp>>16)&0xFF;
+--- a/drivers/net/wireless/realtek/rtl8192cd/sha256.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/sha256.c
+@@ -237,7 +237,7 @@ int sha256_vector(size_t num_elem, const
+  * public domain by Tom St Denis. */
+ 
+ /* the K array */
+-static const unsigned long K[64] = {
++static const u32 K[64] = {
+ 	0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL, 0x3956c25bUL,
+ 	0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL, 0xd807aa98UL, 0x12835b01UL,
+ 	0x243185beUL, 0x550c7dc3UL, 0x72be5d74UL, 0x80deb1feUL, 0x9bdc06a7UL,
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -743,7 +743,7 @@ EXTERN void fill_bcn_desc(struct rtl8192
+ #if defined(CONFIG_VERIWAVE_CHECK)
+ EXTERN void rtl8192cd_check_veriwave_timer(unsigned long task_priv);
+ EXTERN void update_wifi_allitf_txrx_stats(struct rtl8192cd_priv *priv);
+-EXTERN unsigned long crc32(unsigned char *buf, int len);
++EXTERN u32 crc32(unsigned char *buf, int len);
+ #endif
+ EXTERN void mgt_handler(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
+ EXTERN void pwr_state(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_net80211.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_net80211.c
+@@ -895,12 +895,14 @@ int rtl_net80211_setkey(struct net_devic
+ 		   	if(priv->pmib->dot118021xAuthEntry.dot118021xAlgrthm == 0)
+ 		   	{
+ 		   		memcpy(&priv->pmib->dot11DefaultKeysTable.keytype[wk->ik_keyix].skey[0], wk->ik_keydata, wk->ik_keylen);
++				priv->pmib->dot11DefaultKeysTable.keylen[wk->ik_keyix] = wk->ik_keylen;
+ 				return 0;
+ 		   	}
+ #endif
+ #ifdef RTK_NL80211
+ 			HAPD_MSG("set WEP Key for NL80211\n");
+ 			memcpy(&priv->pmib->dot11DefaultKeysTable.keytype[wk->ik_keyix].skey[0], wk->ik_keydata, wk->ik_keylen);
++			priv->pmib->dot11DefaultKeysTable.keylen[wk->ik_keyix] = wk->ik_keylen;
+ #endif
+ 		   if(priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _WEP_40_PRIVACY_)
+ 		   	cipher = (DOT11_ENC_WEP40);
+--- a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -229,6 +229,7 @@ union Keytype {
+ 
+ struct Dot11DefaultKeysTable {
+ 	union Keytype	keytype[4];
++	unsigned long   keylen[4];
+ };
+ 
+ union TSC48 {
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.h
+@@ -267,6 +267,7 @@ struct rtknl {
+ 	unsigned int  vif_flag;
+ 	unsigned char wiphy_registered;
+ 	unsigned int  cipher;
++	unsigned int  wep_key_len;
+ 	unsigned char ndev_name[VIF_NUM][VIF_NAME_SIZE];
+ 	unsigned char ndev_name_vxd[VIF_NAME_SIZE];
+ 	unsigned char root_ifname[VIF_NAME_SIZE];

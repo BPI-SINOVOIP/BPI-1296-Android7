@@ -1,0 +1,24 @@
+Available Commands:
+	help:	This help text
+	clean:	Remove images and temporary build files
+
+Examples:
+
+0. Configurations
+i. Change default pacakges and select profile
+make menuconfig
+
+ii. Switch network settings
+Router: ./netconfig.sh router
+OTT: ./netconfig.sh ott
+
+1. (Re)build all packages and generate image:
+make -j4 V=s
+
+2. Build new packages(optional):
+Please refer to README.SDK
+Ex: make package/samba4/{clean,compile,install} V=99 -j5
+
+3. make distclean
+-This would clean all downloaded sources, except Wifi drivers, mail driver
+

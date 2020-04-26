@@ -1,0 +1,121 @@
+--- a/net/wireless/wext-compat.c
++++ b/net/wireless/wext-compat.c
+@@ -1542,6 +1542,52 @@ static const iw_handler cfg80211_handler
+ #define RTL8192CD_IOCTL_WRITE_RF_REG                   (SIOCDEVPRIVATE + 0xc)  // 0x89fc
+ #define RTL8192CD_IOCTL_READ_RF_REG                    (SIOCDEVPRIVATE + 0xd)  // 0x89fd
+ 
++#if 1//def MP_TEST
++#define MP_START_TEST  0x8B61
++#define MP_STOP_TEST   0x8B62
++#define MP_SET_RATE            0x8B63
++#define MP_SET_CHANNEL 0x8B64
++#define MP_SET_TXPOWER 0x8B65
++#define MP_CONTIOUS_TX 0x8B66
++#define MP_ARX                 0x8B67
++#define MP_SET_BSSID   0x8B68
++#define MP_ANTENNA_TX  0x8B69
++#define MP_ANTENNA_RX  0x8B6A
++#define MP_SET_BANDWIDTH 0x8B6B
++#define MP_SET_PHYPARA 0x8B6C
++#define MP_QUERY_STATS         0x8B6D
++#define MP_TXPWR_TRACK 0x8B6E
++#define MP_QUERY_TSSI  0x8B6F
++#define MP_QUERY_THER  0x8B77
++#define MP_PMAC_TX             0X8BE0
++#if defined(CONFIG_RTL_92D_SUPPORT) || defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8881A)
++#define MP_SET_BAND            0x8B85
++#endif
++#define MP_RESET_STATS 0x8B86
++#define MP_GET_TXPOWER 0x8B87
++#if defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8814AE)
++#define MP_DIG                 0x8B88
++#endif
++#if defined(CONFIG_WLAN_HAL_8814AE)
++
++#endif
++#define MP_HELP                                0x8BE6
++#if defined(CONFIG_WLAN_HAL_8814AE)
++#define MP_IQCALIBRATE         0x8BE1
++#define MP_LCCALIBRATE         0x8BE2
++#define MP_QUERY_RX_MACPHY     0X8BE3
++#define MP_RESET_RX                    0X8BE4
++#define MP_VERSION                     0x8BE5
++
++#endif
++#ifdef B2B_TEST
++// set/get convention: set(even number) get (odd number)
++#define MP_TX_PACKET   0x8B71
++#define MP_RX_PACKET   0x8B70
++#define MP_BRX_PACKET  0x8B73
++#endif
++
++#endif // MP_TEST
+ 
+ #define SIOCGIWRTLREGDUMP              0x8B78
+ 
+@@ -1574,6 +1620,65 @@ struct iw_priv_args privtab[] = {
+ #endif
+ 	{ SIOC92DAUTOCH, IW_PRIV_TYPE_CHAR | 128, 0, "autoch" },
+ #endif
++#if 1//def MP_TEST
++	{ MP_START_TEST, IW_PRIV_TYPE_NONE, 0, "mp_start" },
++	{ MP_STOP_TEST, IW_PRIV_TYPE_NONE, 0, "mp_stop" },
++	{ MP_SET_RATE, IW_PRIV_TYPE_CHAR | 40, 0, "mp_rate" },
++	{ MP_SET_CHANNEL, IW_PRIV_TYPE_CHAR | 40, 0, "mp_channel" },
++	{ MP_SET_TXPOWER, IW_PRIV_TYPE_CHAR | 40, 0, "mp_txpower" },
++	{ MP_CONTIOUS_TX, IW_PRIV_TYPE_CHAR | 128, 0, "mp_ctx" },
++	{ MP_ARX, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_arx" },
++	{ MP_SET_BSSID, IW_PRIV_TYPE_CHAR | 40, 0, "mp_bssid" },
++	{ MP_ANTENNA_TX, IW_PRIV_TYPE_CHAR | 40, 0, "mp_ant_tx" },
++	{ MP_ANTENNA_RX, IW_PRIV_TYPE_CHAR | 40, 0, "mp_ant_rx" },
++	{ MP_SET_BANDWIDTH, IW_PRIV_TYPE_CHAR | 40, 0, "mp_bandwidth" },
++	{ MP_SET_PHYPARA, IW_PRIV_TYPE_CHAR | 40, 0, "mp_phypara" },
++#ifdef B2B_TEST
++	{ MP_TX_PACKET, IW_PRIV_TYPE_CHAR | 128, IW_PRIV_TYPE_CHAR | 128, "mp_tx" },
++	{ MP_BRX_PACKET, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_brx" },
++#if 0
++	{ MP_RX_PACKET, IW_PRIV_TYPE_CHAR | 40, 0, "mp_rx" },
++#endif
++#endif
++	{ MP_QUERY_STATS, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_query" },
++	{ MP_TXPWR_TRACK, IW_PRIV_TYPE_CHAR | 40, 0, "mp_pwrtrk" },
++	{ MP_QUERY_TSSI, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_tssi" },
++#ifdef MP_PSD_SUPPORT
++	{ MP_QUERY_PSD, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_psd" },
++#endif
++	{ MP_QUERY_THER, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_ther" },
++#ifdef CONFIG_RTL_92D_SUPPORT
++	{ MP_SET_BAND, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_phyband" },
++#endif
++	{ MP_RESET_STATS, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_reset_stats" },
++	{ MP_GET_TXPOWER, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_get_pwr" },
++#if    defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8814AE)
++	{ MP_DIG, IW_PRIV_TYPE_CHAR | 40, 0, "mp_dig" },
++#endif
++
++#ifdef EN_EFUSE
++#if defined(CONFIG_WLAN_HAL_8192EE) || defined(CONFIG_WLAN_HAL_8197F)
++	{ MP_KFREE, IW_PRIV_TYPE_CHAR | 40, 0, "mp_kfree" },
++#endif
++#endif
++
++#if defined(CONFIG_WLAN_HAL_8814AE)
++	{ MP_VERSION, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_CHAR | 128, "mp_version" },
++#endif
++	{ MP_HELP, IW_PRIV_TYPE_NONE, 0, "mp_help" },
++#if 0//(IC_LEVEL >= LEVEL_8814) || (IC_LEVEL == LEVEL_92E)
++			{ MP_PMAC_TX, IW_PRIV_TYPE_CHAR | 256, 0, "mp_pmac_ctx" },
++#endif
++#if 0//(IC_LEVEL >= LEVEL_8814)
++	{ MP_IQCALIBRATE, IW_PRIV_TYPE_NONE, 0, "mp_iqc"},
++	{ MP_LCCALIBRATE, IW_PRIV_TYPE_NONE, 0, "mp_lcc"},
++	{ MP_QUERY_RX_MACPHY, IW_PRIV_TYPE_CHAR |40, IW_PRIV_TYPE_CHAR | 128, "mp_que_rx"},
++	{ MP_SET_RX_GAIN, IW_PRIV_TYPE_CHAR | 40, 0, "mp_set_rx_gain" },
++#endif
++#if 0//(IC_LEVEL >= LEVEL_8814) || (IC_LEVEL == LEVEL_92E)
++	{ MP_RESET_RX, IW_PRIV_TYPE_NONE, 0, "mp_reset_rx"},
++#endif
++#endif // MP_TEST
+ };
+ 
+ static iw_handler rtl_private_handler[] =

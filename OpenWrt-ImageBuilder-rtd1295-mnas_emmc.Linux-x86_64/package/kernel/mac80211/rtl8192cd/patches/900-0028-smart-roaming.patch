@@ -1,0 +1,1635 @@
+From a799efb5d8181e1c822aaaa30f68eff7716ae9a0 Mon Sep 17 00:00:00 2001
+From: ywchen <ywchen@realtek.com>
+Date: Tue, 11 Jul 2017 18:57:58 +0800
+Subject: [PATCH] smart roaming
+
+---
+ 8192cd.h                   |  62 ++++
+ 8192cd_11v.c               |  34 ++-
+ 8192cd_cfg.h               |  13 +
+ 8192cd_headers.h           |  33 ++-
+ 8192cd_ioctl.c             | 259 +++++++++++++++++
+ 8192cd_osdep.c             |  32 +-
+ 8192cd_proc.c              |   4 +
+ 8192cd_psk.c               |  11 +
+ 8192cd_rx.c                |  26 +-
+ 8192cd_smart_roaming.c     | 709 +++++++++++++++++++++++++++++++++++++++++++++
+ 8192cd_sme.c               |  49 ++++
+ 8192cd_util.h              |   3 +
+ dot11k/8192cd_11k_beacon.c |   4 +
+ ieee802_mib.h              |   9 +
+ 14 files changed, 1242 insertions(+), 6 deletions(-)
+ create mode 100755 8192cd_smart_roaming.c
+
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -822,6 +822,14 @@ enum _HT_CHANNEL_WIDTH {
+ 	HT_CHANNEL_WIDTH_5		= 5
+ };
+ 
++#ifdef RTK_SMART_ROAMING
++enum _ROAM_TYPE {
++	WLAN_STA_INFO      = 1,
++	ASSOC_NEW_STA      = 2,
++	ASSOC_OVER_THE_DS  = 3,
++	ASSOC_OVER_THE_AIR = 4,
++};
++#endif
+ 
+ #ifdef RTK_AC_SUPPORT
+ enum _HT_CHANNEL_WIDTH_AC {
+@@ -1742,6 +1750,9 @@ struct dot11k_stat_info
+     enum MEASUREMENT_RESULT measure_result;
+     struct dot11k_beacon_measurement_req beacon_req;
+     unsigned char beacon_report_num;
++#ifdef RTK_SMART_ROAMING
++    unsigned char neighbor_ap_num;
++#endif
+     struct dot11k_beacon_measurement_report beacon_report[MAX_BEACON_REPORT];  
+ };
+ 
+@@ -2040,6 +2051,10 @@ struct stat_info {
+    struct	dot11v_stat_info wnm;
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	int prepare_to_free;
++#endif
++
+ #ifdef TCP_ACK_ACC
+ 	struct list_head	tcp_ses_list;
+ 	struct list_head	tcp_ses_active_list[TCP_SESSION_MAX_ENTRY];
+@@ -3289,6 +3304,41 @@ struct sta_mac_rssi {
+ 	unsigned char 			status;		
+ };
+ 
++#ifdef RTK_SMART_ROAMING
++struct sta_probe_info {
++	unsigned char			addr[MACADDRLEN];
++	unsigned char			rssi;	
++};
++struct sta_neighbor_info {
++	unsigned char			addr[MACADDRLEN];
++	unsigned char			rssi;
++	unsigned char 			used;
++	unsigned char 			Entry;
++};
++
++#define SMART_ROAMING_BLOCK_HASH_SIZE	1
++#define SMART_ROAMING_BLOCK_MAX_NUM		8
++
++struct smart_roaming_block_link_list {
++    struct smart_roaming_block_link_list    *next_hash;
++    struct smart_roaming_block_link_list    **pprev_hash;
++};
++struct smart_roaming_block_entry {
++	unsigned char		used;
++	unsigned char		mac[MACADDRLEN];
++	unsigned char		aging;
++	struct smart_roaming_block_link_list    link_list;
++};
++struct smart_roaming_block_data {
++    unsigned char		sr_block_status;            // 0: no blocking
++#ifdef SMP_SYNC
++    spinlock_t          sr_block_lock;
++#endif
++    struct smart_roaming_block_link_list	*sr_block_machash[SMART_ROAMING_BLOCK_HASH_SIZE];
++    struct smart_roaming_block_entry		*sr_block_ent;
++};
++#endif
++
+ #ifdef PROC_STA_CONN_FAIL_INFO
+ struct sta_conn_fail_info {
+ 	unsigned char 		used;
+@@ -5604,6 +5654,18 @@ typedef struct rtl8192cd_priv {
+ 	struct sta_mac_rssi     probe_sta[MAX_PROBE_REQ_STA];
+ 	unsigned int			ProbeReqEntryOccupied;	
+ 	unsigned int			ProbeReqEntryNum;	
++
++#ifdef RTK_SMART_ROAMING
++	struct timer_list		send_timer_wlan0;
++	struct timer_list		send_timer_wlan1;
++	struct sta_neighbor_info neigbor_sta[MAX_NEIGHBOR_STA];
++	unsigned int			NeighborStaEntryOccupied; //collect neigbor channel unicast info 	
++	unsigned int			NeighborStaEntryNum;
++	unsigned char			wlanid;   // 0: 5G	1: 2.4G
++	unsigned char			sta_flag; //sta support 11k :10  11v: 11
++	struct smart_roaming_block_data	sr_block;
++#endif
++
+ #ifdef STA_ASSOC_STATISTIC	
+ 	struct sta_mac_rssi     reject_sta[MAX_PROBE_REQ_STA];
+ 	struct sta_mac_rssi     removed_sta[MAX_PROBE_REQ_STA];
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_11v.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_11v.c
+@@ -235,7 +235,12 @@ void send_bss_trans_event(struct rtl8192
+ 	else
+ 		pstat->expire_to = MAX_FTREASSOC_DEADLINE;
+ 
+-	if(issue_BSS_Trans_Req(priv, priv->transition_list[i].addr, NULL) == SUCCESS) {
++#ifdef RTK_SMART_ROAMING
++	if(issue_BSS_Trans_Req(priv, priv->bssTransPara.addr, NULL) == SUCCESS ) 
++#else
++	if(issue_BSS_Trans_Req(priv, priv->transition_list[i].addr, NULL) == SUCCESS)
++#endif
++	{
+ 		pstat->bssTransExpiredTime = 0;
+ 		pstat->bssTransTriggered = TRUE;
+ 		priv->startCounting = TRUE;
+@@ -259,7 +264,11 @@ void process_BssTransReq(struct rtl8192c
+ 			continue;
+ 		}
+ 		
++#ifdef RTK_SMART_ROAMING
++		pstat = get_stainfo(priv, priv->bssTransPara.addr);
++#else	
+ 		pstat = get_stainfo(priv, priv->transition_list[i].addr);		
++#endif
+ 		if(pstat) {
+ 			if(priv->pmib->wnmEntry.Is11kDaemonOn) {			//collect neighbor report by dot11k daemon
+ 				if(pstat->rcvNeighborReport) 
+@@ -292,7 +301,11 @@ void BssTrans_ExpiredTimer(struct rtl819
+ 		if((priv->transition_list_bitmask[i>>3] & (1<<(i&7))) == 0) 
+ 			continue;
+ 
++#ifdef RTK_SMART_ROAMING
++		pstat = get_stainfo(priv, priv->bssTransPara.addr);
++#else	
+ 		pstat = get_stainfo(priv, priv->transition_list[i].addr);
++#endif
+ 		if(pstat) {
+ 			if(pstat->bssTransTriggered) 	// client does not reply bss trans request
+ 				pstat->bssTransExpiredTime++;
+@@ -322,6 +335,18 @@ void BssTrans_DiassocTimer(struct rtl819
+ 				if((priv->transition_list_bitmask[i>>3] & (1<<(i&7))) == 0) 
+ 					continue;
+ 
++#ifdef RTK_SMART_ROAMING
++				pstat = get_stainfo(priv, priv->bssTransPara.addr);
++				if(!pstat) {
++					panic_printk("Cant find associated STA (%02x%02x%02x%02x%02x%02x)\n",
++						priv->bssTransPara.addr[0], priv->bssTransPara.addr[1], priv->bssTransPara.addr[2]
++						,priv->bssTransPara.addr[3], priv->bssTransPara.addr[4], priv->bssTransPara.addr[5]);
++				} else {
++					panic_printk("issue diassoc to trigger bss transition!!\n");
++					issue_disassoc(priv, priv->bssTransPara.addr, _RSON_DISASSOC_DUE_BSS_TRANSITION);
++					del_station(priv, pstat, 0);		
++				}
++#else
+ 				pstat = get_stainfo(priv, priv->transition_list[i].addr);
+ 				if(!pstat) {
+ 					panic_printk("Cant find associated STA (%02x%02x%02x%02x%02x%02x)\n",
+@@ -332,6 +357,7 @@ void BssTrans_DiassocTimer(struct rtl819
+ 					issue_disassoc(priv, priv->transition_list[i].addr, _RSON_DISASSOC_DUE_BSS_TRANSITION);
+ 					del_station(priv, pstat, 0);		
+ 				}
++#endif
+ 				priv->startCounting  = FALSE;
+ 			}   
+ 			RESTORE_INT(flags);
+@@ -382,6 +408,7 @@ void set_BssTransPara(struct rtl8192cd_p
+ 	priv->bssTransPara.FomUser = TRUE;
+ 	
+ 	memcpy(priv->bssTransPara.addr, tmpbuf, MACADDRLEN);
++#ifndef RTK_SMART_ROAMING
+ 	priv->bssTransPara.chan_until = tmpbuf[MACADDRLEN];
+ 
+        for(i = 0, empty_slot = -1; i < MAX_NEIGHBOR_REPORT; i++) {
+@@ -396,8 +423,11 @@ void set_BssTransPara(struct rtl8192cd_p
+         {
+                 i = empty_slot;
+         }
+-	
++#endif
+    	DOT11VTRACE("(%s)line=%d, i = %d\n", __FUNCTION__, __LINE__, i);
++#ifdef RTK_SMART_ROAMING
++	process_BssTransReq(priv);
++#endif
+ }
+ 
+ int issue_BSS_Trans_Req(struct rtl8192cd_priv *priv, unsigned char *da, unsigned char dialog_token)
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -3620,6 +3620,19 @@
+ #define DOT11D
+ #endif
+ 
++//-------------------------------------------------------------
++// Support smart roaming
++//-------------------------------------------------------------
++#ifdef CONFIG_RTK_SMART_ROAMING
++#define RTK_SMART_ROAMING
++#ifndef CH_LOAD_CAL
++#define CH_LOAD_CAL
++#endif
++#endif
++#ifdef RTK_SMART_ROAMING
++#define MAX_NEIGHBOR_STA	64
++#endif
++
+ 
+ #if 0//defined(HS2_SUPPORT) || defined(DOT11K) || defined(CH_LOAD_CAL)
+ #define CU_TO           RTL_MILISECONDS_TO_JIFFIES(210)         // 200ms to calculate bbp channel load
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -1510,7 +1510,7 @@ EXTERN char is_ac2g(struct rtl8192cd_pri
+ void one_path_cca_power_save(struct rtl8192cd_priv *priv, int enable);
+ #endif
+ 
+-#if defined(HS2_SUPPORT) || defined(RTK_NL80211)/*survey_dump*/ || defined(DOT11K) || defined(CH_LOAD_CAL)
++#if defined(HS2_SUPPORT) || defined(RTK_NL80211)/*survey_dump*/ || defined(DOT11K) || defined(CH_LOAD_CAL) || defined(RTK_SMART_ROAMING)
+ EXTERN void start_bbp_ch_load(struct rtl8192cd_priv *priv, unsigned int units);
+ EXTERN unsigned int read_bbp_ch_load(struct rtl8192cd_priv *priv);
+ EXTERN void channle_loading_measurement(struct rtl8192cd_priv *priv);
+@@ -2956,6 +2956,37 @@ EXTERN void issue_TPC_report(struct rtl8
+ 
+ #undef EXTERN
+ 
++#ifdef RTK_SMART_ROAMING
++
++/*-----------------------------------------------------------------------------
++								8192cd_smart_roaming.c
++------------------------------------------------------------------------------*/
++#ifndef _8192CD_SMART_ROAMING_C_
++#define EXTERN  extern
++#else
++#define EXTERN
++#endif
++
++EXTERN void send_roam_info(unsigned long task_priv);
++EXTERN void add_neighbor_unicast_sta(struct rtl8192cd_priv *priv,unsigned char* addr, unsigned char rssi);
++EXTERN void clear_send_info(struct rtl8192cd_priv *priv);
++EXTERN void construct_netlink_send(struct rtl8192cd_priv *priv);
++EXTERN void notify_new_sta(struct rtl8192cd_priv *priv, unsigned char *mac, int type, unsigned char rssi);
++EXTERN void timer_ready(struct rtl8192cd_priv *priv);
++EXTERN void timer_del(struct rtl8192cd_priv *priv);
++EXTERN int rtl_netlink_init(void);
++EXTERN void rtl_netlink_exit(void);
++
++EXTERN void smart_roaming_block_init(struct rtl8192cd_priv *priv);
++EXTERN void smart_roaming_block_deinit(struct rtl8192cd_priv *priv);
++EXTERN void smart_roaming_block_expire(struct rtl8192cd_priv *priv, unsigned char *mac);
++EXTERN unsigned char smart_roaming_block_check_request(struct rtl8192cd_priv *priv, unsigned char *mac);
++EXTERN void smart_roaming_block_add(struct rtl8192cd_priv *priv, unsigned char *mac);
++
++
++#undef EXTERN
++
++#endif //8192cd_smart_roaming.c
+ 
+ #ifdef DOT11K
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -98,6 +98,16 @@
+ #endif
+ #define RTL8192CD_IOCTL_SHOWSC			        0x8BCD
+ 
++#ifdef RTK_SMART_ROAMING
++#define RTL8192CD_IOCTL_SILENCE_STA	        	0x8BF7
++#define RTL8192CD_IOCTL_UNSILENCE_STA	        	0x8BFB
++#define RTL8192CD_IOCTL_FREE_STA	        	0x8BF8
++#if defined(STA_CONTROL) && STA_CONTROL_ALGO == STA_CONTROL_ALGO3
++#define RTL8192CD_IOCTL_UPDATE_STA				0x8BF9 
++#define RTL8192CD_IOCTL_DELETE_STA				0x8BFA //20170105
++#endif
++#endif
++
+ 
+ #define SIOCGIWRTLSTAINFO		0x8B30
+ #define SIOCGIWRTLSTANUM		0x8B31
+@@ -340,6 +350,9 @@ int g_port_mapping=FALSE;
+ 
+ #define SAVEPID_IOCTL			0x8BB0   //PID ioctl
+ #define DEQUEUEDATA_IOCTL		0x8BB1   //DEQUEUE ioctl
++#if defined(RTK_SMART_ROAMING) && defined(RTK_129X_PLATFORM)
++#define GETPID_IOCTL			0x8BB2   //GETPID_IOCTL
++#endif
+ 
+ #ifdef _MESH_ACL_ENABLE_
+ #define SIOCSMESHACLADD		0x8BB5
+@@ -682,6 +695,15 @@ struct iw_priv_args privtab[] = {
+     { RTL8192CD_IOCTL_CLEAR_ACL_TABLE, IW_PRIV_TYPE_CHAR | 40, IW_PRIV_TYPE_BYTE | 128, "clear_acl_table" },
+ #endif//tsananiu//
+ #endif
++#ifdef RTK_SMART_ROAMING
++	{ RTL8192CD_IOCTL_SILENCE_STA, IW_PRIV_TYPE_CHAR | 128, 0, "silence_sta" },
++	{ RTL8192CD_IOCTL_UNSILENCE_STA, IW_PRIV_TYPE_CHAR | 128, 0, "unsilence_sta" },
++	{ RTL8192CD_IOCTL_FREE_STA, IW_PRIV_TYPE_CHAR | 128, 0, "free_sta" },
++#if defined(STA_CONTROL) && STA_CONTROL_ALGO == STA_CONTROL_ALGO3
++	{ RTL8192CD_IOCTL_UPDATE_STA, IW_PRIV_TYPE_CHAR | 128, 0, "update_stactrl" },
++	{ RTL8192CD_IOCTL_DELETE_STA, IW_PRIV_TYPE_CHAR | 128, 0, "delete_stactrl" },//20170105
++#endif 
++#endif
+ #ifdef BR_SHORTCUT
+ 	{ SIOCLEARBRSC, IW_PRIV_TYPE_CHAR | 40, 0, "clear_brsc" },
+ 	{ SIOCLONEEARBRSC, IW_PRIV_TYPE_CHAR | 40, 0, "clear_onebrsc" },
+@@ -2123,6 +2145,16 @@ static struct iwpriv_arg mib_table[] = {
+ #endif    
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++    {"block_aging",		BYTE_T, _OFFSET(sr_profile.block_aging),	_SIZE(sr_profile.block_aging),	10},
++    {"signal_min",		BYTE_T, _OFFSET(sr_profile.signal_min),	_SIZE(sr_profile.signal_min),	25},
++    {"load_min",		BYTE_T, _OFFSET(sr_profile.load_min),	_SIZE(sr_profile.load_min),	80},
++    {"speed_weight",	BYTE_T, _OFFSET(sr_profile.speed_weight),	_SIZE(sr_profile.speed_weight),100},
++    {"signal_weight",	BYTE_T, _OFFSET(sr_profile.signal_weight),	_SIZE(sr_profile.signal_weight),1},
++    {"load_weight",		BYTE_T, _OFFSET(sr_profile.load_weight),	_SIZE(sr_profile.load_weight),	0},
++    {"linktime_min",		INT_T,	_OFFSET(sr_profile.linktime_min),        _SIZE(sr_profile.linktime_min),  180},
++#endif
++
+ #ifdef A4_STA
+ 	{"a4_enable",			RFFT_T,	_OFFSET_RFFT(a4_enable), _SIZE_RFFT(a4_enable), 2},
+ #endif
+@@ -6274,6 +6306,200 @@ int del_sta(struct rtl8192cd_priv *priv,
+ }
+ 
+ 
++#ifdef RTK_SMART_ROAMING
++int silence_sta(struct rtl8192cd_priv *priv, unsigned char *data)
++{
++#ifndef SMP_SYNC
++	unsigned long	flags;
++#endif
++
++	struct stat_info *pstat;
++	unsigned char macaddr[MACADDRLEN], tmpbuf[3];
++
++	DOT11_DISASSOCIATION_IND Disassociation_Ind;
++	int i;
++	
++	if (!netif_running(priv->dev))
++		return 0;
++	
++	for(i=0; i<MACADDRLEN; i++)
++	{
++		tmpbuf[0] = data[2*i];
++		tmpbuf[1] = data[2*i+1];
++		tmpbuf[2] = 0;
++		macaddr[i] = (unsigned char)_atoi((char *)tmpbuf, 16);
++	}
++	
++	
++	DEBUG_INFO("silence_sta %02X%02X%02X%02X%02X%02X\n",
++		macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++	
++   	#ifdef A4_STA
++		if(priv->pshare->rf_ft_var.a4_enable)
++			a4_sta_del(priv, macaddr);
++    #endif
++
++	pstat = get_stainfo(priv, macaddr);
++	if(pstat && !list_empty(&(pstat->asoc_list)))   //associated AP keep silence and deauth sta
++		{		
++        issue_deauth(priv, macaddr, _RSON_DISAOC_STA_LEAVING_);
++
++		pstat->prepare_to_free = 1;
++	}
++			
++	if(priv->sr_block.sr_block_status)
++		smart_roaming_block_add(priv, macaddr);
++
++	return 1;
++}
++
++int unsilence_sta(struct rtl8192cd_priv *priv, unsigned char *data)
++{
++#ifndef SMP_SYNC
++        unsigned long   flags;
++#endif
++
++        struct stat_info *pstat;
++        unsigned char macaddr[MACADDRLEN], tmpbuf[3];
++
++        int i;
++
++        if (!netif_running(priv->dev))
++                return 0;
++
++        for(i=0; i<MACADDRLEN; i++)
++        {
++                tmpbuf[0] = data[2*i];
++                tmpbuf[1] = data[2*i+1];
++                tmpbuf[2] = 0;
++                macaddr[i] = (unsigned char)_atoi((char *)tmpbuf, 16);
++        }
++
++
++        DEBUG_INFO("unsilence_sta %02X%02X%02X%02X%02X%02X\n",
++                macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++
++        if(priv->sr_block.sr_block_status)
++                smart_roaming_block_expire(priv, macaddr);
++
++        return 1;
++}
++
++int free_sta(struct rtl8192cd_priv *priv, unsigned char *data)
++{
++#ifndef SMP_SYNC
++	unsigned long	flags;
++#endif
++
++	struct stat_info *pstat;
++	unsigned char macaddr[MACADDRLEN], tmpbuf[3];
++
++	int i;
++	
++	if (!netif_running(priv->dev))
++		return 0;
++	
++	for(i=0; i<MACADDRLEN; i++)
++	{
++		tmpbuf[0] = data[2*i];
++		tmpbuf[1] = data[2*i+1];
++		tmpbuf[2] = 0;
++		macaddr[i] = (unsigned char)_atoi((char *)tmpbuf, 16);
++	}
++	
++	pstat = get_stainfo(priv, macaddr);
++
++	if (pstat == NULL)		
++		return 0;
++	if (!list_empty(&pstat->asoc_list))
++	{
++		if (pstat->expire_to > 0)
++		{
++			SAVE_INT_AND_CLI(flags);
++			cnt_assoc_num(priv, pstat, DECREASE, (char *)__FUNCTION__);
++			check_sta_characteristic(priv, pstat, DECREASE);
++			RESTORE_INT(flags);
++	
++			LOG_MSG("A STA is deleted by application program - %02X:%02X:%02X:%02X:%02X:%02X\n",
++				macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++		}
++	}
++	free_stainfo(priv, pstat);
++	
++	return 1;
++}
++
++#if defined(STA_CONTROL) && STA_CONTROL_ALGO == STA_CONTROL_ALGO3
++int update_stactrl(struct rtl8192cd_priv *priv, unsigned char *data)
++{
++#ifndef SMP_SYNC
++	unsigned long	flags;
++#endif
++
++	unsigned char macaddr[MACADDRLEN], tmpbuf[3];
++
++	int i;
++	
++	if (!netif_running(priv->dev))
++		return 0;
++	
++	for(i=0; i<MACADDRLEN; i++)
++	{
++		tmpbuf[0] = data[2*i];
++		tmpbuf[1] = data[2*i+1];
++		tmpbuf[2] = 0;
++		macaddr[i] = (unsigned char)_atoi((char *)tmpbuf, 16);
++	}
++	
++	//DEBUG_INFO("update_stactrl %02X%02X%02X%02X%02X%02X\n",
++		//macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++		panic_printk("[%s] update_stactrl %02X%02X%02X%02X%02X%02X\n",
++		priv->dev->name, macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++	
++	if(priv->stactrl.stactrl_status) {		  
++		if(priv->stactrl.stactrl_prefer) {
++			stactrl_preferband_sta_add(priv,macaddr,0,1);//20170105
++		}
++	}
++	
++	return 1;
++}
++//20170105
++int delete_stactrl(struct rtl8192cd_priv *priv, unsigned char *data)
++{
++#ifndef SMP_SYNC
++	unsigned long	flags;
++#endif
++
++	unsigned char macaddr[MACADDRLEN], tmpbuf[3];
++
++	int i;
++	
++	if (!netif_running(priv->dev))
++		return 0;
++	
++	for(i=0; i<MACADDRLEN; i++)
++	{
++		tmpbuf[0] = data[2*i];
++		tmpbuf[1] = data[2*i+1];
++		tmpbuf[2] = 0;
++		macaddr[i] = (unsigned char)_atoi((char *)tmpbuf, 16);
++	}
++
++	panic_printk("delete_stactrl %02X%02X%02X%02X%02X%02X\n",
++		macaddr[0], macaddr[1], macaddr[2], macaddr[3], macaddr[4], macaddr[5]);
++	
++	if(priv->stactrl.stactrl_status) {		  
++		if(priv->stactrl.stactrl_prefer) {
++			stactrl_preferband_sta_del(priv,macaddr);
++		}
++	}
++	
++	return 1;
++}
++#endif
++#endif
++
+ static int write_eeprom(struct rtl8192cd_priv *priv, unsigned char *data)
+ {
+ 	return -1;
+@@ -12040,6 +12266,44 @@ int rtl8192cd_ioctl(struct net_device *d
+ 		ret = del_sta(priv, tmpbuf);
+ 		break;
+ 
++#ifdef RTK_SMART_ROAMING
++	case RTL8192CD_IOCTL_SILENCE_STA:
++		if ((wrq->u.data.length > sizeof_tmpbuf) ||
++			ioctl_copy_from_user(tmpbuf, (void *)wrq->u.data.pointer, wrq->u.data.length))
++			break;
++		ret = silence_sta(priv,tmpbuf);
++		break;
++
++       case RTL8192CD_IOCTL_UNSILENCE_STA:
++                if ((wrq->u.data.length > sizeof_tmpbuf) ||
++                        ioctl_copy_from_user(tmpbuf, (void *)wrq->u.data.pointer, wrq->u.data.length))
++                        break;
++                ret = unsilence_sta(priv,tmpbuf);
++                break;
++	
++	case RTL8192CD_IOCTL_FREE_STA:
++		if ((wrq->u.data.length > sizeof_tmpbuf) ||
++			ioctl_copy_from_user(tmpbuf, (void *)wrq->u.data.pointer, wrq->u.data.length))
++			break;
++		ret = free_sta(priv,tmpbuf);
++		break;
++
++#if defined(STA_CONTROL) && STA_CONTROL_ALGO == STA_CONTROL_ALGO3
++            case RTL8192CD_IOCTL_UPDATE_STA: 
++                if ((wrq->u.data.length > sizeof_tmpbuf) ||
++                    ioctl_copy_from_user(tmpbuf, (void *)wrq->u.data.pointer, wrq->u.data.length))
++                    break;
++                ret = update_stactrl(priv,tmpbuf);
++                break;
++        
++            case RTL8192CD_IOCTL_DELETE_STA://20170105
++                if ((wrq->u.data.length > sizeof_tmpbuf) ||
++                    ioctl_copy_from_user(tmpbuf, (void *)wrq->u.data.pointer, wrq->u.data.length))
++                    break;
++                ret = delete_stactrl(priv,tmpbuf);
++                break;
++#endif
++#endif
+ 
+ 	case RTL8192CD_IOCTL_WRITE_EEPROM:
+ 		if ((wrq->u.data.length > sizeof_tmpbuf) ||
+@@ -13871,6 +14135,16 @@ case MP_SET_RX_GAIN:
+ 		break;
+ 	}
+ #endif // CONFIG_RTK_MESH
++#if defined(RTK_SMART_ROAMING) && defined(RTK_129X_PLATFORM)
++	case GETPID_IOCTL:
++	{
++		printk("=>GETPID_IOCTL current->pid=%d task_pid_vnr=%d\n", current->pid, task_pid_vnr(current));
++		ioctl_copy_to_user((void *)wrq->u.data.pointer,(void *)&current->pid, sizeof(current->pid));
++		wrq->u.data.length = sizeof(current->pid);
++		ret = 0;
++		break;
++	}
++#endif
+ 
+ #ifdef CONFIG_RTL_COMAPI_CFGFILE
+ 	case SIOCCOMAPIFILE:
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -4709,6 +4709,9 @@ static int rtl8192cd_init_sw(struct rtl8
+     stactrl_init(priv);
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	smart_roaming_block_init(priv);
++#endif
+ #endif
+ 
+ #ifdef GBWC
+@@ -5941,6 +5944,9 @@ SMP_LOCK(flags);
+ #endif
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	smart_roaming_block_deinit(priv);
++#endif
+ 
+ #ifdef CONFIG_PCI_HCI
+ 	{
+@@ -8779,8 +8785,8 @@ priv->drv_state |= DRV_STATE_OPEN;
+ 	}
+ #endif
+ 
+-#if defined(CH_LOAD_CAL) || defined(HS2_SUPPORT) || defined(DOT11K)
+-#if  defined(HS2_SUPPORT) || defined(DOT11K)
++#if defined(CH_LOAD_CAL) || defined(HS2_SUPPORT) || defined(DOT11K) || defined(RTK_SMART_ROAMING)
++#if  defined(HS2_SUPPORT) || defined(DOT11K) || defined(RTK_SMART_ROAMING)
+ 	priv->pmib->dot11StationConfigEntry.cu_enable=1;
+ #endif
+ 	if(IS_ROOT_INTERFACE(priv)){
+@@ -9267,6 +9273,15 @@ priv->drv_state |= DRV_STATE_OPEN;
+     }
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	//Add timer list 
++	timer_ready(priv);
++
++	//Accept Destination Address packets.
++	RTL_W32(RCR, RTL_R32(RCR) | RCR_AAP); 
++
++#endif
++
+ #if defined(CONFIG_RTL_SIMPLE_CONFIG)
+ 	rtk_sc_init(priv);
+ #endif
+@@ -9819,6 +9834,10 @@ int rtl8192cd_close(struct net_device *d
+ 	}
+ #endif // CONFIG_RTK_MESH
+ 
++#ifdef RTK_SMART_ROAMING
++	timer_del(priv);
++#endif
++
+ #ifdef CHECK_HANGUP
+ 	if (!priv->reset_hangup)
+ #endif
+@@ -14807,6 +14826,11 @@ int MDL_INIT __rtl8192cd_init(unsigned l
+ 	if (!get_nl_eventd_sk())
+ 		rtk_eventd_netlink_init();
+ #endif
++
++#ifdef RTK_SMART_ROAMING
++	rtl_netlink_init();
++#endif
++
+ 	return 0;
+ }
+ #endif
+@@ -14946,6 +14970,10 @@ void MDL_EXIT rtl8192cd_exit (void)
+ 
+ 	rtl8192cd_chr_exit();
+ #endif
++
++#ifdef RTK_SMART_ROAMING
++	rtl_netlink_exit();
++#endif
+ }
+ #else // not __KERNEL__
+ void MDL_EXIT rtl8192cd_exit(void *data)
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -5297,6 +5297,10 @@ static int dump_one_stainfo(int num, str
+ 	}
+ #endif	
+ 
++#ifdef RTK_SMART_ROAMING
++    PRINT_SINGL_ARG("    prepare_to_free: ", pstat->prepare_to_free, "%d");   
++#endif
++
+ #ifdef SBWC
+ 	if ( (OPMODE & WIFI_AP_STATE) && (pstat->SBWC_mode != SBWC_MODE_DISABLE) )
+ 	{
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.c
+@@ -3846,6 +3846,9 @@ cont_msg:
+ 
+ 				DEBUG_INFO("\nWPA2: 4-way handshake done\n");
+ 				PSKDEBUG("WPA2: 4-way handshake done\n");
++#ifdef RTK_SMART_ROAMING
++				notify_new_sta(priv, pstat->hwaddr,ASSOC_NEW_STA, pstat->rssi);
++#endif
+ 
+ 			}
+ #endif	// RTL_WPA2
+@@ -4890,6 +4893,14 @@ int psk_indicate_evt(struct rtl8192cd_pr
+ 				if (ret != 0) {
+ 					DEBUG_ERR("parse IE error [%x]!\n", ret);
+ 				}
++				else {
++					#ifdef RTK_SMART_ROAMING
++					if(pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT)		
++						panic_printk("repeater sta connect\n");			
++					else
++						notify_new_sta(priv, pstat->hwaddr, ASSOC_NEW_STA, pstat->rssi);
++					#endif
++				}
+ 				
+ 				if (!priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
+ 					priv->wpa_global_info->MulticastCipher = pstat->wpa_sta_info->MulticastCipher_1x;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -4413,7 +4413,12 @@ static int rtl8192cd_rx_procNullPkt(stru
+         }
+ 		return 1;
+ 	}
+-
++#ifdef RTK_SMART_ROAMING
++	else if(pstat->prepare_to_free) {
++		issue_deauth(priv,GetAddr2Ptr(pframe), _RSON_DISAOC_STA_LEAVING_);
++		return 1;
++	}
++#endif
+ 	// for AR5007 IOT ISSUE
+ 	if ((!GetPwrMgt(pframe)) && (GetTupleCache(pframe) == 0) // because this is special case for AR5007, so use GetTupleCache with Seq-Num and Frag-Num, GetSequenceis also ok
+ 		 && (OPMODE & WIFI_AP_STATE) && (IS_BSSID(priv, GetAddr1Ptr(pframe))) 
+@@ -5420,6 +5425,25 @@ int validate_mpdu(struct rtl8192cd_priv
+ 	}
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING	
++	if (memcmp(GET_MY_HWADDR, GetAddr1Ptr(pframe), MACADDRLEN)){
++		if (pfrinfo->to_fr_ds == 0x02){
++			add_neighbor_unicast_sta(priv,GetAddr2Ptr(pframe),pfrinfo->rssi);
++		}
++		
++		if(!IS_MCAST(GetAddr1Ptr(pframe))) {
++			#ifdef MBSSID
++			if(GET_ROOT(priv)->pmib->miscEntry.vap_enable) {
++				if(vap_idx == -1)
++					return 1;
++			}
++			else
++			#endif
++				return 1;
++		}
++	}	
++#endif
++
+ #if 0
+ 	// check power save state
+ 	if ((opmode & WIFI_AP_STATE)
+--- /dev/null
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_smart_roaming.c
+@@ -0,0 +1,709 @@
++
++/*
++ *  Software Smart Roaming routines
++ *
++ *  $Id: rtl_smart_roaming.c, v 1.4.4.2 2016/04/30 05:27:28 Tracy Exp $
++ *
++ *  Copyright (c) 2009 Realtek Semiconductor Corp.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 as
++ *  published by the Free Software Foundation.
++ */
++
++#define _8192CD_SMART_ROAMING_C_
++
++#include <net/sock.h>
++#include <linux/netlink.h>
++#include <linux/skbuff.h>
++#include <linux/module.h>
++#include <linux/timer.h>
++#include "8192cd.h"
++#include "8192cd_util.h"
++#include "8192cd_headers.h"
++
++#define NETLINK_RTK 31
++#define MAX_PAYLOAD	2048
++
++
++struct timer_list		timer_wlan0;
++struct timer_list		timer_wlan1;
++
++struct sock *rtl_smart_roaming_nl = NULL;
++
++int wlan0_used,wlan1_used,msg_dropcounter;
++
++int pid;
++
++//init timer when wlan interface up
++void timer_ready(struct rtl8192cd_priv *priv)
++{
++	if (!strcmp(priv->dev->name, "wlan0")){
++		init_timer(&priv->send_timer_wlan0);
++		priv->send_timer_wlan0.expires = jiffies+RTL_SECONDS_TO_JIFFIES(5);
++		priv->send_timer_wlan0.data = (unsigned long) priv;
++		priv->send_timer_wlan0.function = send_roam_info;
++		timer_wlan0 = priv->send_timer_wlan0;
++		wlan0_used = 1;
++	}
++
++	if (!strcmp(priv->dev->name, "wlan1")){
++		init_timer(&priv->send_timer_wlan1);
++		priv->send_timer_wlan1.expires = jiffies+RTL_SECONDS_TO_JIFFIES(5);
++		priv->send_timer_wlan1.data = (unsigned long) priv;
++		priv->send_timer_wlan1.function = send_roam_info;
++		timer_wlan1 = priv->send_timer_wlan1;
++		wlan1_used = 1;
++	}
++}
++
++//delete timer when wlan interface down
++void timer_del(struct rtl8192cd_priv *priv)
++{
++	if (!strcmp(priv->dev->name, "wlan0")){
++		if (timer_pending(&priv->send_timer_wlan0)){
++			del_timer_sync(&priv->send_timer_wlan0);
++			wlan0_used = 0;
++		}
++	}
++
++	if (!strcmp(priv->dev->name, "wlan1")){
++		if (timer_pending(&priv->send_timer_wlan1)){
++			del_timer_sync(&priv->send_timer_wlan1);
++			wlan1_used = 0;
++		}
++	}
++}
++
++//netlink send msg 
++void rtl_netlink_rcv(struct sk_buff *skb) 
++{
++	struct nlmsghdr *nlh = NULL;
++	unsigned char *message;
++	
++	if(skb == NULL) {				
++		panic_printk(KERN_INFO "%s: skb is NULL\n", __FUNCTION__);		
++		return ;	
++	}
++
++	nlh=(struct nlmsghdr*)skb->data;
++	//printk(KERN_INFO "kernel received msg payload:%s\n",(unsigned char*)NLMSG_DATA(nlh));
++
++	message = NLMSG_DATA(nlh);
++
++	if (*message == 'S')
++	{
++		pid = nlh->nlmsg_pid; //pid of sending process 
++		if (wlan0_used)	
++			add_timer(&timer_wlan0);			
++		if (wlan1_used)
++			add_timer(&timer_wlan1);
++	}
++	
++	if (*message == 'E')
++	{
++		if(timer_pending(&timer_wlan0)){
++			del_timer_sync(&timer_wlan0);
++			wlan0_used = 0;
++		}
++		if(timer_pending(&timer_wlan1)){ 
++			del_timer_sync(&timer_wlan1);
++			wlan1_used = 0;
++		}
++	}		
++}
++
++//netlink send msg 
++void rtl_netlink_sendmsg(int pid, struct sock *nl_sk,char *data, int data_len)
++{
++	struct nlmsghdr *nlh;
++	struct sk_buff *skb;
++	unsigned int skblen;
++	unsigned char *datab;
++	const char *fn;
++	int err;
++	
++	if(data_len > MAX_PAYLOAD)
++	{
++		err = -ENOBUFS;		
++		fn = "data_len";		
++		goto msg_fail;
++	}
++	
++	skblen = NLMSG_SPACE(data_len + 4); //+len
++	skb = alloc_skb(skblen, GFP_ATOMIC);
++	
++	if(!skb)
++	{
++		err = -ENOBUFS;		
++		fn = "alloc_skb";		
++		goto msg_fail;
++	}
++	
++	nlh = nlmsg_put(skb,0,0,0,skblen-sizeof(*nlh),0);
++	
++	if(!nlh)
++	{
++		err = -ENOBUFS;		
++		fn = "nlmsg_put";		
++		goto msg_fail_skb;
++	}
++	
++#if defined(__LINUX_3_10__)
++	NETLINK_CB(skb).portid = 0; //from kernel 
++#else
++	NETLINK_CB(skb).pid = 0; //from kernel 
++#endif
++	NETLINK_CB(skb).dst_group = 0; //unicast
++
++	datab = NLMSG_DATA(nlh);
++	memset(datab, 0, data_len+4); 
++	memcpy(datab,&data_len,4); //+ total len
++	memcpy(datab+4,data, data_len);
++
++
++		
++	nlh->nlmsg_len = NLMSG_HDRLEN + data_len + 4;
++	
++	//printk("check data_len before send=%d\n",data_len);
++	err= netlink_unicast(nl_sk, skb, pid, MSG_DONTWAIT);
++
++	if (err < 0)
++	{
++		fn = "nlmsg_unicast";				
++		goto msg_fail;	 //nlmsg_unicast already kfree_skb 
++	}
++	
++	return;
++	
++msg_fail_skb:	
++	kfree_skb(skb);
++	
++msg_fail:	
++	if (msg_dropcounter < 100){
++		msg_dropcounter++;
++	}
++	if(msg_dropcounter == 3){
++		if(timer_pending(&timer_wlan0)){
++			del_timer_sync(&timer_wlan0);
++			wlan0_used = 0;
++		}
++		if(timer_pending(&timer_wlan1)){ 
++			del_timer_sync(&timer_wlan1);
++			wlan1_used = 0;
++		}
++		panic_printk("[%s] free timer due to lost of daemon\n", __FUNCTION__);
++	}
++	else if(msg_dropcounter < 3){
++		panic_printk("[%s] drop msg: pid=%d msglen=%d %s: err=%d\n",__FUNCTION__, pid, data_len, fn, err);
++	}
++	else{
++		return;
++	}
++	return;
++}
++
++void notify_new_sta(struct rtl8192cd_priv *priv, unsigned char *mac,int type, unsigned char rssi)
++{
++	int offset =0;
++	
++	unsigned char send_buf[10]={0};
++	unsigned char channel_util;
++	
++	if (!strcmp(priv->dev->name, "wlan0"))
++		priv->wlanid = 0;
++	else if (!strcmp(priv->dev->name, "wlan1"))
++		priv->wlanid = 1;
++
++	send_buf[offset] = type;
++	offset+=sizeof(unsigned char);
++
++	memcpy(send_buf+offset,&(priv->wlanid),sizeof(unsigned char));
++	offset+=sizeof(unsigned char);
++
++    memcpy(send_buf+offset,&(priv->pmib->dot11RFEntry.dot11channel),sizeof(unsigned char));
++    offset+=sizeof(unsigned char);
++
++	channel_util = 255 - priv->ext_stats.ch_utilization;
++	memcpy(send_buf+offset,&(channel_util),sizeof(channel_util));
++	offset+=sizeof(channel_util);	
++
++	memcpy(send_buf+offset, mac, MACADDRLEN);
++	offset += MACADDRLEN;
++
++	memcpy(send_buf+offset,&(rssi),sizeof(rssi));
++	offset+=sizeof(rssi);	    
++
++	rtl_netlink_sendmsg(pid,rtl_smart_roaming_nl,send_buf,offset);
++}
++
++//Get neighbor channel unicast Null data rssi 
++void add_neighbor_unicast_sta(struct rtl8192cd_priv *priv,unsigned char* addr, unsigned char rssi)
++{
++	int i, idx=-1, idx2 =0;
++	unsigned char rssi_input;	
++	for (i = 0; i < MAX_NEIGHBOR_STA; i++) {
++		if (priv->neigbor_sta[i].used == 0) {
++			if (idx < 0)
++				idx = i; //search for empty entry
++			continue;
++		}
++		if (!memcmp(priv->neigbor_sta[i].addr, addr, MACADDRLEN)) {
++			idx2 = i;
++			break;      // check if it is already in the list
++		}
++	}
++	if (idx >= 0){
++		rssi_input = rssi;
++		memcpy(priv->neigbor_sta[idx].addr, addr, MACADDRLEN);	
++		priv->neigbor_sta[idx].used = 1;		
++		priv->neigbor_sta[idx].Entry = idx;   //check which entry is the neighbor sta recorded
++		priv->neigbor_sta[idx].rssi = rssi_input;
++		priv->NeighborStaEntryOccupied++;
++		
++	}
++	else if (idx2){
++		rssi_input = ((priv->neigbor_sta[idx2].rssi * 7)+(rssi * 3)) / 10;			
++		priv->neigbor_sta[idx2].rssi = rssi_input;
++		
++		return;
++	}
++	else if (priv->NeighborStaEntryOccupied == MAX_NEIGHBOR_STA) {// sta list full, need to replace sta
++			idx = priv->NeighborStaEntryNum;	
++			for (i = 0; i < MAX_NEIGHBOR_STA; i++) {
++				if (!memcmp(priv->neigbor_sta[i].addr, addr, MACADDRLEN))					
++					return;		// check if it is already in the list			
++			}
++			memcpy(priv->neigbor_sta[idx].addr, addr, MACADDRLEN);		
++			priv->neigbor_sta[idx].used = 1;
++			priv->neigbor_sta[idx].Entry = idx;		
++			priv->neigbor_sta[idx].rssi = rssi;
++			priv->NeighborStaEntryNum++;			
++			if( priv->NeighborStaEntryNum == MAX_NEIGHBOR_STA)	
++				priv->NeighborStaEntryNum = 0; // Reset entry counter;
++			return;
++		}
++}
++
++//construct associated sta info 
++unsigned char construct_assoc_sta(struct rtl8192cd_priv *priv,unsigned char *send_buf, int * offset)
++{
++	struct stat_info	*pstat;
++	struct list_head	*phead, *plist;
++	unsigned char	data_rate;
++	unsigned char	assoc_num = 0;
++	unsigned int	link_time = 0;
++#ifdef SMP_SYNC
++	unsigned long flags = 0;
++#endif
++	
++	phead = &priv->asoc_list;
++	
++	if (list_empty(phead)) {
++		return 0;
++	}
++	
++	SMP_LOCK_ASOC_LIST(flags);
++	plist = phead->next;
++
++	//construct associated sta info
++	while (plist != phead) {
++		
++		pstat = list_entry(plist, struct stat_info, asoc_list);
++		plist = plist->next;		
++
++#ifdef CONFIG_RTK_MESH
++		if( isMeshPoint(pstat))
++			continue;
++#endif
++#ifdef WDS
++		if(pstat->state & WIFI_WDS)
++			continue;
++#endif
++//printk("pstat->IOTPeer=%d\n",pstat->IOTPeer);
++		if (pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT)
++		    continue;
++
++		if(pstat->expire_to==0) // exclude expired STA
++			continue;	
++
++		memcpy(send_buf+*offset,&(pstat->hwaddr), MACADDRLEN);
++		*offset += MACADDRLEN;
++		
++		memcpy(send_buf+*offset,&(pstat->rssi),sizeof(unsigned char));
++		*offset+=sizeof(unsigned char);
++
++		//data rate only when tx pkts increase within 5s
++		if (pstat->tx_pkts > pstat->tx_pkts_pre)
++			data_rate = (pstat->current_tx_rate >= VHT_RATE_ID) ? ((pstat->current_tx_rate - VHT_RATE_ID)%10):((pstat->current_tx_rate >= HT_RATE_ID)? (pstat->current_tx_rate - HT_RATE_ID) : pstat->current_tx_rate/2);
++		else
++			data_rate = 255; //will not trigger data_rate threshold
++
++		memcpy(send_buf+*offset,&data_rate,sizeof(unsigned char));
++		*offset+=sizeof(unsigned char);
++		
++		//host byte order convert to network byte order
++		link_time=htonl(pstat->link_time);			 	
++		memcpy(send_buf+*offset,&(link_time),sizeof(link_time));
++		*offset+=sizeof(link_time);
++
++        assoc_num++;
++	}
++	SMP_UNLOCK_ASOC_LIST(flags);	
++	return assoc_num;
++}
++
++//construct 11k neighbor report info
++int construct_neighbor_report(struct rtl8192cd_priv *priv,unsigned char *send_buf,int * offset)
++{	
++	struct stat_info	*pstat;
++	struct list_head	*phead, *plist;
++	int i;
++	
++#ifdef SMP_SYNC
++	unsigned long flags = 0;
++#endif
++	
++	phead = &priv->asoc_list;
++	
++	if (list_empty(phead)) {
++		return 0;
++	}
++	
++	SMP_LOCK_ASOC_LIST(flags);
++	plist = phead->next;
++	
++	while (plist != phead) {
++			
++		pstat = list_entry(plist, struct stat_info, asoc_list);
++		plist = plist->next;	
++		
++#ifdef CONFIG_RTK_MESH
++		if( isMeshPoint(pstat))
++			continue;
++#endif
++#ifdef WDS
++		if(pstat->state & WIFI_WDS)
++			continue;
++#endif
++		if (pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT)
++		    continue;
++
++		if(pstat->expire_to==0) // exclude expired STA
++			continue;		
++#if defined(DOT11K) && defined(CONFIG_IEEE80211V)
++		if (pstat->rcvNeighborReport && pstat->rm.neighbor_ap_num)
++		{
++			//check assoc sta support 11k or 11v
++			if (pstat->rm.rm_cap[0] & 0x10){
++				if(pstat->bssTransSupport)
++					priv->sta_flag = 11;
++				else
++					priv->sta_flag = 10; 
++			}
++							
++			memcpy(send_buf+*offset,&(priv->sta_flag),sizeof(unsigned char));
++			*offset+=sizeof(unsigned char);					
++			
++			memcpy(send_buf+*offset,&(pstat->hwaddr),MACADDRLEN);
++			*offset+=MACADDRLEN;		
++
++			memcpy(send_buf+*offset,&(pstat->rm.neighbor_ap_num),sizeof(unsigned char));
++			*offset+=sizeof(unsigned char);
++			
++			for (i = 0 ; i < pstat->rm.neighbor_ap_num; i++)
++			{		
++				memcpy(send_buf+*offset,&(priv->rm_neighbor_report[i].bssid),6);
++				*offset+=MACADDRLEN;				
++				
++				memcpy(send_buf+*offset,&(priv->rm_neighbor_report[i].subelemnt.preference),1);
++				*offset+=sizeof(unsigned char);	
++				
++				memcpy(send_buf+*offset,&(pstat->rm.beacon_report[i].info.RCPI),1);
++				*offset+=sizeof(unsigned char);	
++			}
++
++		}
++#endif
++	}
++	SMP_UNLOCK_ASOC_LIST(flags);
++	
++	return 1;
++}
++
++//clear all info after send 
++void clear_send_info(struct rtl8192cd_priv *priv)
++{
++	priv->NeighborStaEntryOccupied = 0;	
++	memset(&priv->neigbor_sta, 0, sizeof(priv->neigbor_sta));
++}
++
++//construct all wlan info and send 
++void construct_netlink_send(struct rtl8192cd_priv *priv)
++{
++	int offset=0, assoc_offset, i;
++	unsigned int neighbor_sta_num, assoc_sta_num, sta_num;
++	unsigned char send_buf[2048]={0};
++	unsigned char channel_util;
++		
++	send_buf[offset] = WLAN_STA_INFO;
++	offset+=sizeof(unsigned char);
++	if (!strcmp(priv->dev->name, "wlan0"))
++		priv->wlanid = 0;
++	else if (!strcmp(priv->dev->name, "wlan1"))
++		priv->wlanid = 1;
++	memcpy(send_buf+offset,&(priv->wlanid),sizeof(unsigned char));
++	offset+=sizeof(unsigned char);
++
++	memcpy(send_buf+offset,&(priv->pmib->dot11RFEntry.dot11channel),sizeof(unsigned char));
++	offset+=sizeof(unsigned char);
++
++	channel_util = 255 - priv->ext_stats.ch_utilization;
++	memcpy(send_buf+offset,&(channel_util),sizeof(channel_util));
++	offset+=sizeof(channel_util);	
++	
++	neighbor_sta_num = priv->NeighborStaEntryOccupied;
++	sta_num = htonl(neighbor_sta_num);
++	memcpy(send_buf+offset,&sta_num,sizeof(neighbor_sta_num));
++	offset+=sizeof(sta_num);	
++
++	//construct neighbor unicast table info
++	for (i = 0; i < neighbor_sta_num; i++)
++	{
++		memcpy(send_buf+offset,&(priv->neigbor_sta[i].addr) ,MACADDRLEN);
++		offset += MACADDRLEN;	
++
++        send_buf[offset] = priv->neigbor_sta[i].rssi;
++        offset++;		
++	}
++	
++	assoc_offset = offset;
++	offset += sizeof(assoc_sta_num);
++	assoc_sta_num = construct_assoc_sta(priv,send_buf,&offset);
++	assoc_sta_num = htonl(assoc_sta_num);
++	memcpy(send_buf+assoc_offset,&assoc_sta_num,sizeof(unsigned int));
++
++	construct_neighbor_report(priv,send_buf,&offset);
++
++	//send all wlan info via netlink
++	rtl_netlink_sendmsg(pid,rtl_smart_roaming_nl,send_buf,offset);
++}
++
++
++int rtl_netlink_init(void) 
++{
++
++#if defined(__LINUX_3_10__)
++	struct netlink_kernel_cfg cfg = {
++		.input = rtl_netlink_rcv,
++	};
++
++	rtl_smart_roaming_nl = netlink_kernel_create(&init_net, NETLINK_RTK, &cfg);
++#else	
++	rtl_smart_roaming_nl = netlink_kernel_create(&init_net, NETLINK_RTK, 0, rtl_netlink_rcv, NULL, THIS_MODULE);
++#endif
++		
++	if(!rtl_smart_roaming_nl)
++	{
++		panic_printk(KERN_ERR "rtl_smart_roaming_nl: Cannot create netlink socket");
++		return -ENOMEM;
++	}
++	
++	return 0;
++}
++
++void rtl_netlink_exit(void) 
++{
++	netlink_kernel_release(rtl_smart_roaming_nl);	
++}
++
++__inline__ static int smart_roaming_block_mac_hash(unsigned char *networkAddr, int hash_size)
++{
++    unsigned long x;
++
++    x = networkAddr[0] ^ networkAddr[1] ^ networkAddr[2] ^ networkAddr[3] ^ networkAddr[4] ^ networkAddr[5];
++
++    return x & (hash_size - 1);
++}
++__inline__ static void smart_roaming_block_mac_hash_link(struct smart_roaming_block_link_list *link, struct smart_roaming_block_link_list **head)
++{
++    link->next_hash = *head;
++
++    if (link->next_hash != NULL)
++        link->next_hash->pprev_hash = &link->next_hash;
++    *head = link;
++    link->pprev_hash = head;
++}
++__inline__ static void smart_roaming_block_mac_hash_unlink(struct smart_roaming_block_link_list *link)
++{
++    *(link->pprev_hash) = link->next_hash;
++    if (link->next_hash != NULL)
++        link->next_hash->pprev_hash = link->pprev_hash;
++    link->next_hash = NULL;
++    link->pprev_hash = NULL;
++}
++
++
++void smart_roaming_block_init(struct rtl8192cd_priv *priv)
++{
++	priv->sr_block.sr_block_status = 1;
++
++    /* memory allocated structure*/
++    priv->sr_block.sr_block_ent = (struct smart_roaming_block_entry *)
++                kmalloc((sizeof(struct smart_roaming_block_entry) * SMART_ROAMING_BLOCK_MAX_NUM), GFP_ATOMIC);
++    if (!priv->sr_block.sr_block_ent) {
++        panic_printk(KERN_ERR "Can't kmalloc for smart_roaming_block_entry (size %d)\n", sizeof(struct smart_roaming_block_entry) * SMART_ROAMING_BLOCK_MAX_NUM);
++        goto err;
++    }          
++    memset(priv->sr_block.sr_block_machash, 0, sizeof(priv->sr_block.sr_block_machash));
++    memset(priv->sr_block.sr_block_ent, 0, sizeof(struct smart_roaming_block_entry) * SMART_ROAMING_BLOCK_MAX_NUM);
++
++#ifdef SMP_SYNC
++    spin_lock_init(&(priv->sr_block.sr_block_lock));
++#endif
++
++    return;
++
++err:
++    if(priv->sr_block.sr_block_ent) 
++        kfree(priv->sr_block.sr_block_ent);
++
++    return;
++}
++
++void smart_roaming_block_deinit(struct rtl8192cd_priv *priv)
++{
++	priv->sr_block.sr_block_status = 0;
++
++	if(priv->sr_block.sr_block_ent)
++		kfree(priv->sr_block.sr_block_ent);              
++}
++
++static struct smart_roaming_block_entry *smart_roaming_block_lookup(struct rtl8192cd_priv *priv, unsigned char *mac)
++{
++    unsigned long offset;
++    int hash;
++    struct smart_roaming_block_link_list	*link;
++    struct smart_roaming_block_entry		*ent;
++
++    offset = (unsigned long)(&((struct smart_roaming_block_entry *)0)->link_list);
++    hash = smart_roaming_block_mac_hash(mac, SMART_ROAMING_BLOCK_HASH_SIZE);
++    link = priv->sr_block.sr_block_machash[hash];
++    while (link != NULL)
++    {
++        ent = (struct smart_roaming_block_entry *)((unsigned long)link - offset);
++        if (ent->used && !memcmp(ent->mac, mac, MACADDRLEN))
++        {
++            return ent;
++        }
++        link = link->next_hash;
++    }
++
++    return NULL;
++}
++
++void smart_roaming_block_add(struct rtl8192cd_priv *priv, unsigned char *mac)
++{
++    struct smart_roaming_block_entry * ent = NULL;
++    int i, hash;
++
++    unsigned long flags;    
++    SAVE_INT_AND_CLI(flags);
++#ifdef SMP_SYNC  
++	SMP_LOCK_SR_BLOCK_LIST(flags);
++#endif
++    for (i=0; i<SMART_ROAMING_BLOCK_MAX_NUM; i++)
++    {
++        if (!priv->sr_block.sr_block_ent[i].used)
++        {
++            ent = &(priv->sr_block.sr_block_ent[i]);
++            break;
++        }
++    }
++
++    if(ent)
++    {
++		ent->used = 1;
++        memcpy(ent->mac, mac, MACADDRLEN);
++        ent->aging = priv->pmib->sr_profile.block_aging;
++        hash = smart_roaming_block_mac_hash(mac, SMART_ROAMING_BLOCK_HASH_SIZE);
++        smart_roaming_block_mac_hash_link(&(ent->link_list), &(priv->sr_block.sr_block_machash[hash]));
++#ifdef SMP_SYNC 
++		SMP_UNLOCK_SR_BLOCK_LIST(flags);
++#endif
++		RESTORE_INT(flags); 		   
++        return;
++    }
++#ifdef SMP_SYNC
++	SMP_UNLOCK_SR_BLOCK_LIST(flags);
++#endif
++	RESTORE_INT(flags); 		   
++    return;
++}
++
++void smart_roaming_block_expire(struct rtl8192cd_priv *priv, unsigned char *mac)
++{
++	int i;
++	unsigned long offset;
++	struct smart_roaming_block_link_list *link, *temp_link;
++	struct smart_roaming_block_entry * ent;
++
++	unsigned long flags = 0;	
++	SAVE_INT_AND_CLI(flags);
++#ifdef SMP_SYNC
++	SMP_LOCK_SR_BLOCK_LIST(flags);
++#endif	
++	offset = (unsigned long)(&((struct smart_roaming_block_entry *)0)->link_list);
++
++	for (i=0; i<SMART_ROAMING_BLOCK_HASH_SIZE; i++)
++	{
++		link = priv->sr_block.sr_block_machash[i];
++		while (link != NULL)
++		{
++			temp_link = link->next_hash;
++			ent = (struct smart_roaming_block_entry *)((unsigned long)link - offset);
++			if(ent->used && !mac && ent->aging)
++			{
++				ent->aging -= 1;
++				if(ent->aging == 0)
++				{
++					ent->used = 0;
++					smart_roaming_block_mac_hash_unlink(link);
++				}
++			}
++			else if(ent->used && mac && !memcmp(ent->mac, mac, MACADDRLEN)){
++				ent->used = 0;
++				smart_roaming_block_mac_hash_unlink(link);
++			}			
++			link = temp_link;
++		}
++	}
++	
++	RESTORE_INT(flags);
++#ifdef SMP_SYNC
++	SMP_UNLOCK_SR_BLOCK_LIST(flags);	
++#endif
++}
++
++unsigned char smart_roaming_block_check_request(struct rtl8192cd_priv *priv, unsigned char *mac)
++{
++    struct smart_roaming_block_entry	*block_ent;
++    unsigned char ret = 0;
++    unsigned long flags = 0;
++	
++    SAVE_INT_AND_CLI(flags);
++#ifdef SMP_SYNC
++    SMP_LOCK_SR_BLOCK_LIST(flags);
++#endif	
++    block_ent =  smart_roaming_block_lookup(priv, mac);
++    if(block_ent && block_ent->used && block_ent->aging)
++		ret = 1;
++	
++    RESTORE_INT(flags);
++#ifdef SMP_SYNC
++	SMP_UNLOCK_SR_BLOCK_LIST(flags);
++#endif
++    return ret;
++}
++
++
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -717,6 +717,25 @@ void add_sta_assoc_status(struct rtl8192
+ 	add_MAC_RSSI_Entry(priv, addr, rssi, status, priv->assoc_sta, &(priv->AssocStatusEntryOccupied), &(priv->AssocStatusEntryNum));
+ }
+ #endif
++
++#ifdef RTK_SMART_ROAMING
++void send_roam_info(unsigned long task_priv)
++{
++	unsigned long flags;
++	struct rtl8192cd_priv *priv = (struct rtl8192cd_priv *)task_priv;
++	SMP_LOCK(flags);
++	construct_netlink_send(priv);
++	clear_send_info(priv);  //clear after send
++	SMP_UNLOCK(flags);
++
++	//modify timer for sending periodically 
++	if (!strcmp(priv->dev->name, "wlan0"))
++		mod_timer(&priv->send_timer_wlan0, jiffies+RTL_SECONDS_TO_JIFFIES(5));
++	if (!strcmp(priv->dev->name, "wlan1"))
++		mod_timer(&priv->send_timer_wlan1, jiffies+RTL_SECONDS_TO_JIFFIES(5));
++}
++#endif
++
+ #ifdef WIFI_SIMPLE_CONFIG
+ /* WPS2DOTX   */
+ #if defined(__OSK__) && defined(CONFIG_WSC)
+@@ -6034,6 +6053,9 @@ void rtl8192cd_expire_timer(unsigned lon
+     }
+ #endif // STA_CONTROL
+ 
++#ifdef RTK_SMART_ROAMING
++	smart_roaming_block_expire(priv, NULL);
++#endif
+ #ifdef A4_STA
+     a4_sta_expire(priv);
+ #endif
+@@ -21249,6 +21271,10 @@ unsigned int OnAssocReq(struct rtl8192cd
+     }
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	if(priv->sr_block.sr_block_status && smart_roaming_block_check_request(priv, GetAddr2Ptr(pframe)))
++		return FAIL;
++#endif
+ 
+ #ifdef WIFI_WMM
+ 	if (QOS_ENABLE) {
+@@ -22197,6 +22223,13 @@ OnAssocReqSuccess:
+ 	}
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	if(pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT) 		
++		panic_printk("repeater sta connect\n");			
++	else
++		notify_new_sta(priv, pstat->hwaddr,ASSOC_NEW_STA, pfrinfo->rssi);
++#endif
++
+ 	return SUCCESS;
+ 
+ asoc_class2_error:
+@@ -22597,6 +22630,11 @@ send_rsp:
+     }
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++	if(priv->sr_block.sr_block_status && smart_roaming_block_check_request(priv, GetAddr2Ptr(pframe)))
++		goto OnProbeReqFail;
++#endif
++
+     #ifdef CONFIG_RTK_MESH
+     if(pmib->dot1180211sInfo.meshSilence) {
+         return FAIL;
+@@ -23637,6 +23675,11 @@ unsigned int OnAuth(struct rtl8192cd_pri
+     }
+ #endif
+ 
++#ifdef RTK_SMART_ROAMING
++		if(priv->sr_block.sr_block_status && smart_roaming_block_check_request(priv, GetAddr2Ptr(pframe)))
++			return FAIL;		
++#endif
++
+ 	if (pstat == NULL) {
+ 		struct rtl8192cd_priv *priv_del = NULL;
+ 		struct stat_info *pstat_del = NULL;
+@@ -23781,6 +23824,12 @@ unsigned int OnAuth(struct rtl8192cd_pri
+ 					pfrinfo->pktlen - WLAN_HDR_A3_LEN, &status)) {
+ 				goto auth_fail; 
+ 			}
++#ifdef RTK_SMART_ROAMING
++			if(pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT) 		
++				panic_printk("repeater sta connect\n");			
++			else
++				notify_new_sta(priv, GetAddr2Ptr(pframe),ASSOC_OVER_THE_AIR, pfrinfo->rssi);
++#endif
+ 			if (!pstat->wpa_sta_info->r1kh) {
+ 				printk("Delay auth response due to pull key\n");
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -288,6 +288,9 @@
+ #define SMP_LOCK_STACONTROL_LIST(__x__)  spin_lock_irqsave(&priv->stactrl.stactrl_lock, (__x__))
+ #define SMP_UNLOCK_STACONTROL_LIST(__x__) spin_unlock_irqrestore(&priv->stactrl.stactrl_lock, (__x__))
+ 
++#define SMP_LOCK_SR_BLOCK_LIST(__x__)		spin_lock_irqsave(&priv->sr_block.sr_block_lock, (__x__))
++#define SMP_UNLOCK_SR_BLOCK_LIST(__x__)		spin_unlock_irqrestore(&priv->sr_block.sr_block_lock, (__x__))
++
+ #define SMP_LOCK_ACL(__x__)
+ #define SMP_UNLOCK_ACL(__x__)
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/dot11k/8192cd_11k_beacon.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/dot11k/8192cd_11k_beacon.c
+@@ -1033,6 +1033,10 @@ int rm_get_beacon_report(struct rtl8192c
+                 len++;
+                 memcpy(result_buf + len, pstat->rm.beacon_report, pstat->rm.beacon_report_num * sizeof(struct dot11k_beacon_measurement_report));
+                 len += pstat->rm.beacon_report_num * sizeof(struct dot11k_beacon_measurement_report);
++	#ifdef RTK_SMART_ROAMING
++		pstat->rcvNeighborReport = TRUE;
++		pstat->rm.neighbor_ap_num = pstat->rm.beacon_report_num;
++	#endif
+ 	#ifdef CONFIG_IEEE80211V
+ 		  if(WNM_ENABLE && 
+ 		  	pstat->bssTransSupport &&
+--- a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -959,6 +959,16 @@ struct StaControl {
+     unsigned int  stactrl_param_4;    // retry Y         
+     unsigned int  stactrl_param_5;    // timer Z    
+ };
++    
++struct SmartRoamingProfile {
++	unsigned char	block_aging;
++	unsigned char	signal_min;
++	unsigned char	load_min;
++	unsigned char	speed_weight;
++	unsigned char	signal_weight;
++	unsigned char	load_weight;
++	unsigned int	linktime_min;
++};
+ 
+ 
+ struct Dot11FastBSSTransitionEntry {
+@@ -1040,6 +1050,7 @@ struct wifi_mib {
+     struct HotSpotConfigEntry		hs2Entry;	// add for HS2_SUPPORT, Hotspot 2.0 Release 1
+     struct Dot11FastBSSTransitionEntry	dot11FTEntry;
+ 	struct StaControl			    staControl;	// add for sta control
++	struct SmartRoamingProfile		sr_profile;	//add for smart roaming
+ 	struct Dot11WNMEntry 		    wnmEntry;	
+ };
+ 

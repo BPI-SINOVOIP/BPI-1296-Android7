@@ -1,0 +1,32 @@
+diff --git a/networking/udhcp/dhcpc.c b/networking/udhcp/dhcpc.c
+index 4f65217..d66958c 100644
+--- a/networking/udhcp/dhcpc.c
++++ b/networking/udhcp/dhcpc.c
+@@ -996,7 +996,11 @@ static int udhcp_raw_socket(int ifindex)
+ 	sock.sll_ifindex = ifindex;
+ 	xbind(fd, (struct sockaddr *) &sock, sizeof(sock));
+ 
+-#if 0 /* Several users reported breakage when BPF filter is used */
++#if 1
++	/* Several users reported breakage when BPF filter is used
++	 * But, commit ffc3a93 should have fixed it.
++	 * Also, OTT needs BPF to pass multicast storm problem.
++	 * */
+ 	if (CLIENT_PORT == 68) {
+ 		/* Use only if standard port is in use */
+ 		/*
+@@ -1044,8 +1048,12 @@ static int udhcp_raw_socket(int ifindex)
+ 		};
+ 		/* Ignoring error (kernel may lack support for this) */
+ 		if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &filter_prog,
+-				sizeof(filter_prog)) >= 0)
+-			log1("Attached filter to raw socket fd"); // log?
++				sizeof(filter_prog)) >= 0) {
++			bb_info_msg("Attached filter to raw socket fd");
++		} else {
++			bb_info_msg("Can't set SO_ATTACH_FILTER on raw socket errno:%s",
++					strerror(errno));
++		}
+ 	}
+ #endif
+ 

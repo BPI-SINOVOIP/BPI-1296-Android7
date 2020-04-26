@@ -1,0 +1,245 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -327,7 +327,7 @@ EXTERN void cnt_assoc_num(struct rtl8192
+ #ifdef INDICATE_LINK_CHANGE
+ EXTERN void indicate_sta_link_change(struct rtl8192cd_priv *priv, struct stat_info *pstat, int act, char *func);
+ #endif
+-EXTERN int get_assoc_sta_num(struct rtl8192cd_priv *priv, int mode);
++EXTERN int get_assoc_sta_num(struct rtl8192cd_priv *priv, int mode, unsigned char assoc_lock);
+ EXTERN void event_indicate(struct rtl8192cd_priv *priv, unsigned char *mac, int event);
+ #ifdef WIFI_HAPD
+ EXTERN int event_indicate_hapd(struct rtl8192cd_priv *priv, unsigned char *mac, int event, unsigned char *extra);
+@@ -597,6 +597,7 @@ EXTERN __IRAM_IN_865X int rtl8192cd_star
+ #define		rtl8192cd_start_xmit_noM2U		rtl8192cd_start_xmit
+ #endif
+ EXTERN int rtl8192cd_wlantx(struct rtl8192cd_priv *priv, struct tx_insn *txcfg);
++EXTERN int rtl8192cd_wlantx_noxmitlock(struct rtl8192cd_priv *priv, struct tx_insn *txcfg);
+ EXTERN
+ #ifdef __OSK__
+ __IRAM_WIFI_PRI3
+@@ -604,6 +605,7 @@ __IRAM_WIFI_PRI3
+ void rtl8192cd_tx_dsr(unsigned long task_priv);
+ 
+ EXTERN int rtl8192cd_firetx(struct rtl8192cd_priv *priv, struct tx_insn *txcfg);
++EXTERN int rtl8192cd_firetx_noxmitlock(struct rtl8192cd_priv *priv, struct tx_insn* txcfg);
+ EXTERN int __rtl8192cd_firetx(struct rtl8192cd_priv *priv, struct tx_insn* txcfg);
+ #ifdef CONFIG_PCI_HCI
+ EXTERN void rtl8192cd_signin_txdesc(struct rtl8192cd_priv *priv, struct tx_insn* txcfg);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -1131,8 +1131,9 @@ if(txcfg->pstat)
+ 
+ 
+ int rtl8192cd_tx_slowPath(struct rtl8192cd_priv *priv, struct sk_buff *skb, struct stat_info *pstat,
+-				struct net_device *dev, struct net_device *wdsDev, struct tx_insn *txcfg)
++				struct net_device *dev, struct net_device *wdsDev, struct tx_insn *txcfg, unsigned char bxmit_lock)
+ {
++	int firetx_value;
+ 
+ 	//SMP_LOCK_XMIT(flags);
+ #ifdef CONFIG_RTL_WAPI_SUPPORT
+@@ -1250,7 +1251,12 @@ int rtl8192cd_tx_slowPath(struct rtl8192
+ #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+ 	if (__rtl8192cd_firetx(priv, txcfg) == CONGESTED)
+ #else
+-	if (rtl8192cd_wlantx(priv, txcfg) == CONGESTED)
++	if(bxmit_lock)
++		firetx_value = rtl8192cd_wlantx(priv, txcfg);
++	else
++		firetx_value = rtl8192cd_wlantx_noxmitlock(priv, txcfg);
++
++	if(firetx_value == CONGESTED)
+ #endif
+ 	{
+ 		//SMP_LOCK_XMIT(flags);
+@@ -1414,7 +1420,7 @@ int rtl8192cd_start_xmit_noM2U(struct sk
+ __IRAM_WIFI_PRI3
+ #endif
+ static int amsdu_xmit(struct rtl8192cd_priv *priv, struct stat_info *pstat, struct tx_insn *txcfg, int tid,
+-				int from_isr, struct net_device *wdsDev, struct net_device *dev)
++				int from_isr, struct net_device *wdsDev, struct net_device *dev, unsigned char bxmit_lock)
+ {
+ 	int q_num, max_size, is_first=1, total_len=0, total_num=0;
+ 	struct sk_buff *pskb;
+@@ -1579,7 +1585,7 @@ static int amsdu_xmit(struct rtl8192cd_p
+ 		{
+ 			pstat->tx_sc_amsdu_pkts_slow++;
+ #endif
+-		rtl8192cd_tx_slowPath(priv, pskb, pstat, dev, wdsDev, txcfg);
++		rtl8192cd_tx_slowPath(priv, pskb, pstat, dev, wdsDev, txcfg, bxmit_lock);
+ #ifdef SUPPORT_TX_AMSDU_SHORTCUT
+ 		}
+ #endif
+@@ -1704,7 +1710,7 @@ void amsdu_timeout(struct rtl8192cd_priv
+ 			{
+ 				int ret;
+ 
+-				ret = amsdu_xmit(priv_this, pstat, txcfg, tid, 1, wdsDev, priv->dev);
++				ret = amsdu_xmit(priv_this, pstat, txcfg, tid, 1, wdsDev, priv->dev, 0);
+ 				
+ 				if (ret == 0) // not finish
+ 					pstat->amsdu_timer_id[tid] = amsdu_timer_add(priv_this, pstat, tid, 1) + 1;
+@@ -1856,7 +1862,7 @@ void amsdu_timeout(struct rtl8192cd_priv
+ 			pstat->amsdu_timer_id[priority] = 0;
+ 		}
+ 		txcfg->q_num = q_num;
+-		if (amsdu_xmit(priv, pstat, txcfg, priority, 0, wdsDev, priv->dev) == 0) // not finish
++		if (amsdu_xmit(priv, pstat, txcfg, priority, 0, wdsDev, priv->dev, 1) == 0) // not finish
+ 			pstat->amsdu_timer_id[priority] = amsdu_timer_add(priv, pstat, priority, 0) + 1;
+ 		else
+ 			add_timer = 0;
+@@ -9246,7 +9252,7 @@ int __rtl8192cd_start_xmit(struct sk_buf
+ #ifdef SMP_SYNC
+ 	unsigned long flags;
+ #endif
+-
++	unsigned char assoc_lock = 0;
+ 
+ 	DECLARE_TXCFG(txcfg, tx_insn);
+ 
+@@ -9858,7 +9864,14 @@ int __rtl8192cd_start_xmit(struct sk_buf
+ 	if (!wdsDev)
+ #endif
+ 	{
+-        temp = get_assoc_sta_num(priv, 1);        
++#ifdef TCP_ACK_ACC
++	if(tx_flag==TX_NO_TCPACK_ACC)
++		assoc_lock = FALSE;
++	else
++#else
++		assoc_lock = TRUE;
++#endif
++        temp = get_assoc_sta_num(priv, 1, assoc_lock);        
+ 		if (temp == 0) {
+ #ifdef RTK_BR_EXT
+ 			if(!((OPMODE & WIFI_STATION_STATE) && priv->pmib->ethBrExtInfo.macclone_enable && !priv->macclone_completed)){
+@@ -11395,7 +11408,7 @@ just_skip:
+ 
+ 	/* ==================== Slow path of packet TX process ==================== */
+ 	SMP_UNLOCK_XMIT(flags);
+-	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg) == TX_PROCEDURE_CTRL_STOP) {
++	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg, 1) == TX_PROCEDURE_CTRL_STOP) {
+ 		SMP_LOCK_XMIT(flags);
+ 		goto stop_proc;
+ 	}
+@@ -11661,7 +11674,14 @@ int __rtl8192cd_start_xmit(struct sk_buf
+ 	if (!wdsDev)
+ #endif
+ 	{
+-        temp = get_assoc_sta_num(priv, 1);        
++#ifdef TCP_ACK_ACC
++	if(tx_flag==TX_NO_TCPACK_ACC)
++		assoc_lock = FALSE;
++	else
++#else
++		assoc_lock = TRUE;
++#endif
++        temp = get_assoc_sta_num(priv, 1, assoc_lock);        
+ 		if (temp == 0) {
+ #ifdef RTK_BR_EXT
+ 			if(!((OPMODE & WIFI_STATION_STATE) && priv->pmib->ethBrExtInfo.macclone_enable && !priv->macclone_completed)){
+@@ -12290,7 +12310,7 @@ just_skip:
+ 
+ 	/* ==================== Slow path of packet TX process ==================== */
+ 	SMP_UNLOCK_XMIT(flags);
+-	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg) == TX_PROCEDURE_CTRL_STOP) {
++	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg, 1) == TX_PROCEDURE_CTRL_STOP) {
+ 		SMP_LOCK_XMIT(flags);
+ 		goto stop_proc;
+ 	}
+@@ -12319,6 +12339,11 @@ int	rtl8192cd_wlantx(struct rtl8192cd_pr
+ {
+ 	return (rtl8192cd_firetx(priv, txcfg));
+ }
++
++int	rtl8192cd_wlantx_noxmitlock(struct rtl8192cd_priv *priv, struct tx_insn* txcfg)
++{
++	return (rtl8192cd_firetx_noxmitlock(priv, txcfg));
++}
+ #endif
+ 
+ #ifdef TX_SHORTCUT
+@@ -14466,6 +14491,26 @@ int rtl8192cd_firetx(struct rtl8192cd_pr
+ 	RESTORE_INT(x);
+ 	return ret;
+ #else
++	return (__rtl8192cd_firetx(priv, txcfg));
++#endif
++}
++
++
++int rtl8192cd_firetx_noxmitlock(struct rtl8192cd_priv *priv, struct tx_insn* txcfg)
++{
++#ifdef RX_TASKLET
++//#ifndef SMP_SYNC
++	unsigned long x;
++//#endif
++	int ret;
++
++	SAVE_INT_AND_CLI(x);
++
++	ret = __rtl8192cd_firetx(priv, txcfg);
++
++	RESTORE_INT(x);
++	return ret;
++#else
+ 	return (__rtl8192cd_firetx(priv, txcfg));
+ #endif
+ }
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.h
+@@ -22,6 +22,7 @@
+ 
+ #ifdef CONFIG_RTK_MESH
+ #define rtl8192cd_wlantx(p,t)	rtl8192cd_firetx(p, t)
++#define rtl8192cd_wlantx_noxmitlock(p,t)	rtl8192cd_firetx_noxmitlock(p, t)
+ #endif
+ 
+ enum _TX_QUEUE_ {
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_psk.c
+@@ -2264,7 +2264,7 @@ static void ResendTimeout(unsigned long
+ 						mod_timer(&priv->wpa_global_info->GKRekeyTimer, jiffies + RTL_SECONDS_TO_JIFFIES(priv->pmib->dot1180211AuthEntry.dot11GKRekeyTime));
+ 
+ 					// if only one sta and group key rekey fail, don't disconnect the sta
+-					if (get_assoc_sta_num(priv, 0) == 1) {
++					if (get_assoc_sta_num(priv, 0, TRUE) == 1) {
+ #ifdef DEBUG_PSK
+ 						printk("!!!!DO NOT disconnect STA under 1 client case!!!\n");
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+@@ -5230,7 +5230,7 @@ void indicate_sta_link_change(struct rtl
+  * Use this function to get the number of associated station, no matter
+  * it is expired or not. And don't count WDS peers in.
+  */
+-int get_assoc_sta_num(struct rtl8192cd_priv *priv, int mode)
++int get_assoc_sta_num(struct rtl8192cd_priv *priv, int mode, unsigned char assoc_lock)
+ {
+ 	struct list_head *phead, *plist;
+ 	struct stat_info *pstat;
+@@ -5243,7 +5243,8 @@ int get_assoc_sta_num(struct rtl8192cd_p
+ 	sta_num = 0;
+ 	phead = &priv->asoc_list;
+ 	
+-	SMP_TRY_LOCK_ASOC_LIST(flags, locked);
++	if(assoc_lock)
++		SMP_TRY_LOCK_ASOC_LIST(flags, locked);
+ 	
+ 	plist = phead->next;
+ 	while (plist != phead) {
+@@ -5267,10 +5268,12 @@ int get_assoc_sta_num(struct rtl8192cd_p
+ 		} 
+ 	}
+ 	
++	if(assoc_lock) {
+ #ifdef SMP_SYNC
+-	if(locked)
++		if(locked)
+ #endif
+-	SMP_UNLOCK_ASOC_LIST(flags);
++		SMP_UNLOCK_ASOC_LIST(flags);
++	}
+ 
+ 	return sta_num;
+ }

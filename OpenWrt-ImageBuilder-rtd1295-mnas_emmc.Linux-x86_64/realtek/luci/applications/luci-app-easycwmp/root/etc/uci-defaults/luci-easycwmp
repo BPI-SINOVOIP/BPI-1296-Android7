@@ -1,0 +1,16 @@
+#!/bin/sh
+
+/etc/init.d/easycwmpd enabled && {
+	/etc/init.d/easycwmpd stop
+	/etc/init.d/easycwmpd disable
+}
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.easycwmp
+	set ucitrack.easycwmp=easycwmp
+	set ucitrack.easycwmp.init=easycwmp
+	commit ucitrack
+EOF
+
+rm -f /tmp/luci-indexcache
+exit 0

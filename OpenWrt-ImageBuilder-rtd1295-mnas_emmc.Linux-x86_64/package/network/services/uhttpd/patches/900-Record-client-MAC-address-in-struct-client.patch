@@ -1,0 +1,127 @@
+diff --git a/client.c b/client.c
+index 73e0e49..7c83f7d 100644
+--- a/client.c
++++ b/client.c
+@@ -23,6 +23,16 @@
+ #include "uhttpd.h"
+ #include "tls.h"
+ 
++//#define DEBUG
++
++#include <ifaddrs.h>
++#include <sys/ioctl.h>
++#include <linux/if.h>
++#include <net/if_arp.h>
++#ifdef DEBUG
++#include <arpa/inet.h>
++#endif
++
+ static LIST_HEAD(clients);
+ static bool client_done = false;
+ 
+@@ -587,6 +597,76 @@ static void set_addr(struct uh_addr *addr, void *src)
+ 	}
+ }
+ 
++static void set_peer_ha(struct client *cl, int sfd)
++{
++	struct ifaddrs *ifaddr, *ifa;
++	struct sockaddr_in *sin;
++	struct ifreq ifr;
++	struct arpreq areq;
++	struct in_addr *srv_addr_in = NULL;
++	int err;
++
++	memset(&ifr, 0, sizeof(struct ifreq));
++	memset(&areq, 0, sizeof(struct arpreq));
++	sin = (struct sockaddr_in *) &areq.arp_pa;
++	sin->sin_family = AF_INET; /* Only IPv4 is supported */
++	sin->sin_addr = cl->peer_addr.in;
++
++	if(getifaddrs(&ifaddr) < 0) {
++#ifdef DEBUG
++		fprintf(stderr, "[uhttpd]Failed to get local interfaces!");
++#endif
++		strncpy(areq.arp_dev, "br-lan", 15);
++	}
++	else {
++		srv_addr_in = &cl->srv_addr.in;
++		for (ifa = ifaddr; ifa && ifa->ifa_addr; ifa = ifa->ifa_next) {
++			if (ifa->ifa_addr->sa_family == AF_INET \
++                          && !memcmp(srv_addr_in, &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr, sizeof(struct in_addr))) {
++				strncpy(areq.arp_dev, ifa->ifa_name, 15);
++				strncpy(ifr.ifr_name, ifa->ifa_name, 15);
++				err = ioctl(sfd, SIOCGIFHWADDR, &ifr);
++				if (!err) {
++					memcpy(&cl->target_ha.sa_data, ifr.ifr_hwaddr.sa_data, sizeof(cl->target_ha.sa_data));
++					cl->target_ha.sa_data[0] |= 0x2;
++				}
++#ifdef DEBUG
++				fprintf(stderr, "[uhttpd]Found connected server interface: %s\n", areq.arp_dev);
++				fprintf(stderr, "[uhttpd]Target MAC: ");
++				for (int i=0; i<6; i++){
++					fprintf(stderr, "%02x:", cl->target_ha.sa_data[i]);
++				}
++				fprintf(stderr, "\n");
++#endif
++				break;
++			}
++		}
++
++		if(!areq.arp_dev[0]) {
++			strncpy(areq.arp_dev, "br-lan", 15);
++		}
++#ifdef DEBUG
++		fprintf(stderr, "[uhttpd]Server interface: %s\n", areq.arp_dev);
++#endif
++		freeifaddrs(ifaddr);
++	}
++
++	err = ioctl(sfd, SIOCGARP, (caddr_t) &areq);
++
++	if (!err) {
++		//if (areq.arp_ha.sa_family == AF_UNIX)
++		cl->peer_ha.sa_family = areq.arp_ha.sa_family;
++		memcpy(&cl->peer_ha.sa_data, areq.arp_ha.sa_data, sizeof(cl->peer_ha.sa_data));
++#ifdef DEBUG
++		fprintf(stderr, "[uhttpd]Peer MAC: ");
++		for (int i=0; i<6; i++){
++			fprintf(stderr, "%02x:", cl->peer_ha.sa_data[i]);
++		}
++		fprintf(stderr, "\n");
++#endif
++	}
++}
++
+ bool uh_accept_client(int fd, bool tls)
+ {
+ 	static struct client *next_client;
+@@ -611,6 +691,13 @@ bool uh_accept_client(int fd, bool tls)
+ 	getsockname(sfd, (struct sockaddr *) &addr, &sl);
+ 	set_addr(&cl->srv_addr, &addr);
+ 
++	if (cl->peer_addr.family == AF_INET) {
++#ifdef DEBUG
++		fprintf(stderr, "[uhttpd]Peer IP:%s\n", inet_ntoa(cl->peer_addr.in));
++#endif
++		set_peer_ha(cl, sfd);
++	}
++
+ 	cl->us = &cl->sfd.stream;
+ 	if (tls) {
+ 		uh_tls_client_attach(cl);
+diff --git a/uhttpd.h b/uhttpd.h
+index 897d4b3..8af6ae2 100644
+--- a/uhttpd.h
++++ b/uhttpd.h
+@@ -256,6 +256,7 @@ struct client {
+ 	int http_code;
+ 	struct http_request request;
+ 	struct uh_addr srv_addr, peer_addr;
++	struct sockaddr target_ha, peer_ha;
+ 
+ 	struct blob_buf hdr;
+ 	struct dispatch dispatch;
+-- 
+2.7.4
+

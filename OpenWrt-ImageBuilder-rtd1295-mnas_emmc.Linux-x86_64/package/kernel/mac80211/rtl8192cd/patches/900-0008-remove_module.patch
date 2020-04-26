@@ -1,0 +1,445 @@
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -4956,17 +4956,12 @@ struct cfg80211_ops realtek_cfg80211_ops
+ #endif
+ };
+ 
+-static void  rtk_create_dev(struct rtknl *rtk,int idx)
++static void  rtk_create_dev(struct rtknl *rtk, struct device *dev, int idx)
+ {
+ 	/* define class here */
+ 	unsigned char zero[] = {0, 0, 0, 0, 0, 0};
+-    rtk->cl = class_create(THIS_MODULE, rtk_dev_name[idx]); 
+  
+-    /* create first device */
+-    rtk->dev = device_create(rtk->cl, NULL, rtk_wifi_dev[idx], NULL, rtk_dev_name[idx]);
+-
+- 	dev_set_name(rtk->dev, rtk_dev_name[idx]);
+-  	printk("Device Name = %s \n", dev_name(rtk->dev));
++    	rtk->dev = dev;
+ 
+ 	printk("VIF_NUM=%d\n", VIF_NUM);
+ 	memset(rtk->ndev_name, 0, VIF_NUM*VIF_NAME_SIZE);
+@@ -4979,9 +4974,31 @@ static void  rtk_create_dev(struct rtknl
+ 	memcpy(rtk->root_mac, rtk_fake_addr, ETH_ALEN);
+ }
+ 
++void rtk_unregister_wiphy(struct rtknl *rtk)
++{
++	if(rtk->wiphy_registered){
++		wiphy_unregister(rtk->wiphy);
++		rtk->wiphy_registered = false;
++	}
++}
++
++void rtk_free_wiphy(struct rtknl *rtk)
++{
++	rtk_phy_idx--;
++
++	printk("remove cfg80211 device[%d]\n", rtk_phy_idx);
++
++	rtk_phy[rtk_phy_idx] = NULL;
++
++	if(rtk->wiphy) {
++		wiphy_free(rtk->wiphy);
++		rtk->wiphy = NULL;
++	}
++}
++
+ 
+ //struct rtknl *realtek_cfg80211_create(struct rtl8192cd_priv *priv)
+-struct rtknl *realtek_cfg80211_create(void) 
++struct rtknl *realtek_cfg80211_create(struct device *dev)
+ {
+ 	struct wiphy *wiphy;
+ 	struct rtknl *rtk;
+@@ -5007,7 +5024,7 @@ struct rtknl *realtek_cfg80211_create(vo
+ 		wiphy_free(wiphy);
+ 		return NULL;
+ 	}
+-	rtk_create_dev(rtk,rtk_phy_idx);	
++	rtk_create_dev(rtk,dev,rtk_phy_idx);
+ 	rtk_phy[rtk_phy_idx] = rtk;
+ 	rtk_phy_idx++;
+ 
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.h
+@@ -299,7 +299,7 @@ int read_flash_hw_mac_vap( unsigned char
+ #endif
+ unsigned char is_WRT_scan_iface(unsigned char* if_name); //eric-vap
+ void realtek_cfg80211_inform_ss_result(struct rtl8192cd_priv *priv);
+-struct rtknl *realtek_cfg80211_create(void); 
++struct rtknl *realtek_cfg80211_create(struct device *dev); 
+ int realtek_rtknl_init(struct rtknl *rtk);
+ int realtek_cfg80211_init(struct rtknl *rtk,struct rtl8192cd_priv *priv); 
+ int realtek_interface_add(struct rtl8192cd_priv *priv, struct rtknl *rtk, const char *name, 
+@@ -307,7 +307,8 @@ int realtek_interface_add(struct rtl8192
+ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int event, unsigned char *extra);
+ void close_vxd_vap(struct rtl8192cd_priv *priv_root);
+ int check_5M10M_config(struct rtl8192cd_priv *priv);
+-
++void rtk_free_wiphy(struct rtknl *rtk);
++void rtk_unregister_wiphy(struct rtknl *rtk);
+ 
+ 
+ #endif /* RTK_NL80211 */
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -11297,7 +11297,13 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 		if(wdev->priv == NULL)
+ 		{
+ 			NDEBUG2("init for root device\n");
+-			rtk = realtek_cfg80211_create();
++#ifdef CONFIG_PCI_HCI
++			rtk = realtek_cfg80211_create(&pdev->dev);
++#elif defined(CONFIG_USB_HCI)
++			rtk = realtek_cfg80211_create(&pusb_intf->dev);
++#elif defined(CONFIG_SDIO_HCI)
++			rtk = realtek_cfg80211_create(&psdio_func->dev);
++#endif
+                }
+ 		else // mark_rpt
+ 		{		
+@@ -13679,6 +13685,36 @@ void rtl8192cd_init_one_cfg80211(struct
+ }
+ #endif
+ 
++static void rtl8192cd_disable_IMR(struct rtl8192cd_priv *priv)
++{
++#ifdef CONFIG_WLAN_HAL
++	if (IS_HAL_CHIP(priv))
++	{
++		GET_HAL_INTERFACE(priv)->DisableIMRHandler(priv);
++	} else
++#endif
++	{
++#ifdef CONFIG_PCI_HCI
++#ifdef CONFIG_RTL_88E_SUPPORT
++		if (GET_CHIP_VER(priv) == VERSION_8188E) {
++			RTL_W32(REG_88E_HIMR, 0);
++			RTL_W32(REG_88E_HIMRE, 0);
++		} else
++#endif
++
++#ifdef CONFIG_RTL_8812_SUPPORT
++		if (GET_CHIP_VER(priv) == VERSION_8812E) {
++			RTL_W32(REG_HIMR0_8812, 0);
++			RTL_W32(REG_HIMR1_8812, 0);
++		} else 
++#endif
++		{
++			RTL_W32(HIMR, 0);
++		}
++#endif //CONFIG_PCI_HCI
++	}
++}
++
+ void rtl8192cd_deinit_one(struct rtl8192cd_priv *priv)
+ {
+ 	struct net_device *dev;
+@@ -13703,6 +13739,8 @@ void rtl8192cd_deinit_one(struct rtl8192
+ #endif
+ 	}
+ 
++	rtl8192cd_disable_IMR(priv);
++
+ #ifdef WDS
+ 	num = (priv->pshare->type >> WDS_SHIFT) & WDS_MASK;
+ 	for (i = 0; i < num; i++) {
+@@ -13841,6 +13879,10 @@ void rtl8192cd_deinit_one(struct rtl8192
+ 	rtl8192cd_proc_remove(dev);
+ #endif
+ 
++#ifdef RTK_NL80211
++	rtk_unregister_wiphy(priv->rtk);
++#endif
++
+ #ifdef CONFIG_PCI_HCI
+ #ifdef CONFIG_NET_PCI
+ #ifdef USE_IO_OPS
+@@ -13991,6 +14033,10 @@ void rtl8192cd_deinit_one(struct rtl8192
+ #else
+ 	kfree(dev);
+ #endif
++
++#ifdef RTK_NL80211
++	rtk_free_wiphy(priv->rtk);
++#endif
+ 	printk("=====>> EXIT %s <<=====\n", __func__);
+ }
+ 
+@@ -14264,7 +14310,7 @@ int rtl_wlan_customPassthru_init(void)
+ 	//strcpy(passThru_flag_wlan,"0");
+ 	passThruStatusWlan=0;
+ #ifdef CONFIG_RTL_PROC_NEW
+-	proc_create_data("custom_Passthru_wlan", 0, NULL,&wlan_custom_Passthru_proc_fops, NULL);
++	resPassThruWlan = proc_create_data("custom_Passthru_wlan", 0, NULL,&wlan_custom_Passthru_proc_fops, NULL);
+ #else
+ 	resPassThruWlan = create_proc_entry("custom_Passthru_wlan", 0, NULL);	
+ 	if(resPassThruWlan)
+@@ -14284,7 +14330,11 @@ void __exit rtl_wlan_customPassthru_exit
+ {
+ #ifdef CONFIG_PROC_FS
+ 	if (resPassThruWlan) {
+-		remove_proc_entry("custom_Passthru_wlan", resPassThruWlan);				
++#ifdef CONFIG_RTL_PROC_NEW
++		remove_proc_entry("custom_Passthru_wlan", NULL);
++#else
++		remove_proc_entry("custom_Passthru_wlan", resPassThruWlan);			
++#endif	
+ 		resPassThruWlan = NULL;
+ 	}
+ #endif	
+@@ -14367,20 +14417,20 @@ error:
+ 	return ret;
+ }
+ 
+-
+ static void MDL_DEVEXIT rtk_remove_one(struct pci_dev *pdev)
+ {
+ 	struct net_device *dev = pci_get_drvdata(pdev);
++	int cur_index;
+ 	if (!dev)
+ 		BUG();
+ 	
+ 	pci_set_drvdata(pdev, NULL);
+ 
+-	wlan_index--;
++	cur_index = --wlan_index;
+ 
+-	if (NULL != wlan_device[wlan_index].priv) {
+-		rtl8192cd_deinit_one(wlan_device[wlan_index].priv);
+-		wlan_device[wlan_index].priv = NULL;
++	if (NULL != wlan_device[cur_index].priv) {
++		rtl8192cd_deinit_one(wlan_device[cur_index].priv);
++		wlan_device[cur_index].priv = NULL;
+ 	}
+ }
+ 
+@@ -14449,6 +14499,7 @@ static struct pci_driver rtl8192cd_drive
+ #else
+ 	remove: 	rtk_remove_one,
+ #endif
++	shutdown:	rtk_remove_one,
+ };
+ #endif // CONFIG_NET_PCI
+ #endif // CONFIG_PCI_HCI
+@@ -14553,7 +14604,7 @@ int MDL_INIT __rtl8192cd_init(unsigned l
+ #if (defined(__KERNEL__) && !defined(CONFIG_WIRELESS_LAN_MODULE)) || defined(__OSK__)
+ 	for (wlan_index = 0; wlan_index < ARRAY_SIZE(wlan_device); wlan_index++)
+ #else
+-#if defined(RTK_NL80211) /*dual phy support //eric-sync ??*/
++#if defined(RTK_NL80211) && !defined(RTK_129X_PLATFORM)/*dual phy support //eric-sync ??*/
+ 	for (wlan_index=0; wlan_index<ARRAY_SIZE(wlan_device); wlan_index++)
+ #else
+ 	if (wlan_index < ARRAY_SIZE(wlan_device))
+@@ -14798,6 +14849,10 @@ void MDL_EXIT rtl8192cd_exit (void)
+ 
+ 	drv_registered = FALSE;
+ 
++#ifdef CONFIG_RTL_CUSTOM_PASSTHRU
++	rtl_wlan_customPassthru_exit();
++#endif
++
+ #ifdef CONFIG_PCI_HCI
+ #ifndef CONFIG_NET_PCI
+ 	for (idx = 0; idx < ARRAY_SIZE(wlan_device) ; idx++) {
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalDef.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalDef.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/HalDef.h
+@@ -449,6 +449,11 @@ typedef VOID
+     INPUT	HAL_PADAPTER		Adapter
+ );
+ 
++typedef VOID
++(*NicDisableIMRHandler)(
++    INPUT	HAL_PADAPTER		Adapter
++);
++
+ typedef BOOLEAN
+ (*NicInterruptRecognizedHandler)(
+     INPUT   HAL_PADAPTER    Adapter,
+@@ -1026,6 +1031,7 @@ typedef struct _HAL_INTERFACE_COMMON_{
+ 
+     //3 ISR Related 
+     NicEnableIMRHandler                     EnableIMRHandler;
++    NicDisableIMRHandler                    DisableIMRHandler;
+ #if IS_EXIST_PCI || IS_EXIST_EMBEDDED
+     NicInterruptRecognizedHandler           InterruptRecognizedHandler;
+     NicGetInterruptHandler                  GetInterruptHandler;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.c
+@@ -53,6 +53,28 @@ EnableIMR88XX(
+ 
+ }
+ 
++VOID
++DisableIMR88XX(
++    IN  HAL_PADAPTER    Adapter
++)
++{
++    HAL_RTL_W32(REG_HIMR0, 0);
++    HAL_RTL_W32(REG_HIMR1, 0);
++
++#if IS_RTL88XX_MAC_V2
++    if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v2) {
++        HAL_RTL_W32(REG_HIMR2, 0);
++        HAL_RTL_W32(REG_HIMR3, 0);
++    }
++#endif //IS_RTL88XX_MAC_V2
++
++#if 0//CFG_HAL_TX_AMSDU
++    if ( IS_HARDWARE_TYPE_8814A(Adapter) ) {
++        HAL_RTL_W32(REG_FTIMR, 0);
++    }
++#endif
++
++}
+ 
+ //
+ // Description:
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8192E/RTL8192EE/Hal8192EEGen.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8192E/RTL8192EE/Hal8192EEGen.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8192E/RTL8192EE/Hal8192EEGen.c
+@@ -214,6 +214,7 @@ hal_Associate_8192EE(
+     //
+     pHalFunc->InitIMRHandler                    = InitIMR88XX;
+     pHalFunc->EnableIMRHandler                  = EnableIMR88XX;
++    pHalFunc->DisableIMRHandler                 = DisableIMR88XX;
+     pHalFunc->InterruptRecognizedHandler        = InterruptRecognized88XX;
+     pHalFunc->GetInterruptHandler               = GetInterrupt88XX;
+     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8814A/RTL8814AE/Hal8814AEGen.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8814A/RTL8814AE/Hal8814AEGen.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8814A/RTL8814AE/Hal8814AEGen.c
+@@ -142,6 +142,7 @@ hal_Associate_8814AE(
+     //
+     pHalFunc->InitIMRHandler                    = InitIMR88XX;
+     pHalFunc->EnableIMRHandler                  = EnableIMR88XX;
++    pHalFunc->DisableIMRHandler                 = DisableIMR88XX;
+     pHalFunc->InterruptRecognizedHandler        = InterruptRecognized88XX;
+     pHalFunc->GetInterruptHandler               = GetInterrupt88XX;
+     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8881A/Hal8881AGen.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8881A/Hal8881AGen.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8881A/Hal8881AGen.c
+@@ -273,6 +273,7 @@ hal_Associate_8881A(
+     //
+     pHalFunc->InitIMRHandler                    = InitIMR88XX;
+     pHalFunc->EnableIMRHandler                  = EnableIMR88XX;
++    pHalFunc->DisableIMRHandler                 = DisableIMR88XX;
+     pHalFunc->InterruptRecognizedHandler        = InterruptRecognized88XX;
+     pHalFunc->GetInterruptHandler               = GetInterrupt88XX;
+     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/EdcaTurboCheck.c
+@@ -722,8 +722,10 @@ IotEngine(
+ 	int assoc_num = GET_ROOT(priv)->assoc_num;
+ #ifdef MBSSID
+ 	if (GET_ROOT(priv)->pmib->miscEntry.vap_enable){
+-		for (i=0; i<RTL8192CD_NUM_VWLAN; ++i)
+-		assoc_num += GET_ROOT(priv)->pvap_priv[i]-> assoc_num;
++		for (i=0; i<RTL8192CD_NUM_VWLAN; ++i) {
++			if(IS_DRV_OPEN(GET_ROOT(priv)->pvap_priv[i]))
++				assoc_num += GET_ROOT(priv)->pvap_priv[i]-> assoc_num;
++		}
+ 	}
+ #endif	
+ #ifdef UNIVERSAL_REPEATER
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXIsr.h
+@@ -32,6 +32,11 @@ EnableIMR88XX(
+     IN  HAL_PADAPTER    Adapter
+ );
+ 
++VOID
++DisableIMR88XX(
++    IN  HAL_PADAPTER    Adapter
++);
++
+ HAL_IMEM
+ BOOLEAN
+ InterruptRecognized88XX(
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.c
+@@ -145,6 +145,7 @@ hal_Associate_8822BE(
+     //
+     pHalFunc->InitIMRHandler                    = InitIMR88XX;
+     pHalFunc->EnableIMRHandler                  = EnableIMR88XX;
++    pHalFunc->DisableIMRHandler                 = DisableIMR88XX;
+     pHalFunc->InterruptRecognizedHandler        = InterruptRecognized88XX;
+     pHalFunc->GetInterruptHandler               = GetInterrupt88XX;
+     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8197F/Hal8197FGen.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8197F/Hal8197FGen.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/RTL8197F/Hal8197FGen.c
+@@ -225,6 +225,7 @@ hal_Associate_8197F(
+     //
+     pHalFunc->InitIMRHandler                    = InitIMR88XX;
+     pHalFunc->EnableIMRHandler                  = EnableIMR88XX;
++    pHalFunc->DisableIMRHandler                 = DisableIMR88XX;
+     pHalFunc->InterruptRecognizedHandler        = InterruptRecognized88XX;
+     pHalFunc->GetInterruptHandler               = GetInterrupt88XX;
+     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -5194,6 +5194,7 @@ typedef struct rtl8192cd_priv {
+ 
+ #ifdef _INCLUDE_PROC_FS_
+ 	struct proc_dir_entry	*proc_root;
++	char				proc_name[IFNAMSIZ];
+ 	unsigned int			txdesc_num;
+ 	unsigned char			*phypara_file_start;
+ 	unsigned char			*phypara_file_end;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -7243,6 +7243,7 @@ void MDL_DEVINIT rtl8192cd_proc_init(str
+         printk("create proc root failed!\n");
+         return;
+     }
++    strncpy(priv->proc_name, dev->name, IFNAMSIZ);
+ 
+     RTK_CREATE_PROC_READ_ENTRY(p, "mib_all", rtl8192cd_proc_mib_all);	
+ 
+@@ -7531,6 +7532,9 @@ void /*__devexit*/MDL_EXIT rtl8192cd_pro
+         remove_proc_entry( "nat25filter", rtl8192cd_proc_root );
+ #endif
+ 
++#if (BEAMFORMING_SUPPORT == 1)
++        remove_proc_entry( "mib_txbf", rtl8192cd_proc_root );
++#endif
+ 
+ #ifdef DFS
+         remove_proc_entry( "mib_dfs", rtl8192cd_proc_root );
+@@ -7686,7 +7690,7 @@ void /*__devexit*/MDL_EXIT rtl8192cd_pro
+ 		remove_proc_entry( "drop_rxpkt_rate", rtl8192cd_proc_root );
+ #endif
+         remove_proc_entry( "thermal", rtl8192cd_proc_root );
+-        remove_proc_entry( dev->name, NULL );
++	remove_proc_entry( priv->proc_name, NULL );
+         rtl8192cd_proc_root = NULL;
+     }
+ }

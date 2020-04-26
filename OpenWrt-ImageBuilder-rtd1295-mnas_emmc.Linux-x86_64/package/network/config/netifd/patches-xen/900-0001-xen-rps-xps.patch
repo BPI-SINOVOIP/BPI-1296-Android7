@@ -1,0 +1,16 @@
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -1404,11 +1404,11 @@ system_if_apply_rps_xps(struct device *d
+ 		return;
+ 
+ 	max = (1 << n_cpus) - 1;
+-	val = (s->rps_mask > 0 && s->rps_mask < max) ? s->rps_mask : max;
++	val = (1 << (n_cpus-1));//(s->rps_mask > 0 && s->rps_mask < max) ? s->rps_mask : max;
+ 	snprintf(dev_buf, sizeof(dev_buf), "/sys/class/net/%s/queues/*/rps_cpus", dev->ifname);
+ 	system_if_set_rps_xps_val(dev_buf, s->rps ? val : 0);
+ 
+-	val = (s->xps_mask > 0 && s->xps_mask < max) ? s->xps_mask : max;
++	val = (1 << (n_cpus-1));//(s->xps_mask > 0 && s->xps_mask < max) ? s->xps_mask : max;
+ 	snprintf(dev_buf, sizeof(dev_buf), "/sys/class/net/%s/queues/*/xps_cpus", dev->ifname);
+ 	system_if_set_rps_xps_val(dev_buf, s->xps ? val : 0);
+ }

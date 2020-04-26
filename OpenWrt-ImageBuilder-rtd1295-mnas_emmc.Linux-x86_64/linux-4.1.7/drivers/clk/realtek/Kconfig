@@ -1,0 +1,15 @@
+config COMMON_CLK_REALTEK
+	bool "Clock driver for realtek"
+	default y if ARCH_RTD129x || ARCH_RTD139x
+	select RTK_MMIO 
+	select RESET_CONTROLLER
+
+config COMMON_CLK_RTD129X
+	bool "Clock driver for RTD129x"
+	select COMMON_CLK_REALTEK
+	default y if ARCH_RTD129x
+
+config COMMON_CLK_RTD139X
+	bool "Clock driver for RTD139x"
+	select COMMON_CLK_REALTEK
+	default y if ARCH_RTD139x

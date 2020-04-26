@@ -1,0 +1,16 @@
+--- a/hostapd/ctrl_iface.c
++++ b/hostapd/ctrl_iface.c
+@@ -199,9 +199,11 @@ static struct hostapd_config *hostapd_ct
+ 			conf->secondary_channel = atoi(val);
+ 		else if ((val = get_option(opt, "hw_mode=")))
+ 			conf->hw_mode = atoi(val);
+-		else if ((val = get_option(opt, "ieee80211n=")))
++		else if ((val = get_option(opt, "ieee80211n="))) {
+ 			conf->ieee80211n = atoi(val);
+-		else
++			if(conf->ieee80211n == 0)
++				conf->ieee80211ac = 0;
++		} else
+ 			break;
+ 	}
+ 

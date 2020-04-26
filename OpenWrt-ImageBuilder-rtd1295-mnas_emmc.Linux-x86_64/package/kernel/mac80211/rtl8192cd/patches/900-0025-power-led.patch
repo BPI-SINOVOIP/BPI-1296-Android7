@@ -1,0 +1,235 @@
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -34,6 +34,11 @@
+ 
+ #include "./8192cd_cfg.h"
+ 
++#ifdef RTD129X_POWER_LED
++#include <linux/gpio.h>
++#include <linux/of_gpio.h>
++#endif
++
+ #if !defined(__KERNEL__) && !defined(__ECOS)
+ #include "./sys-support.h"
+ #endif
+@@ -5216,6 +5221,9 @@ typedef struct rtl8192cd_priv {
+ 	unsigned long			up_time;
+ 	unsigned int			auto_channel_step;
+ 
++#ifdef RTD129X_POWER_LED
++	struct timer_list		rtd129x_led_timer;
++#endif
+ #ifdef CONFIG_RTK_MESH
+     struct timer_list       mesh_expire_timer;
+     struct wlan_ethhdr_t    ethhdr;
+@@ -6039,6 +6047,10 @@ typedef struct rtl8192cd_priv {
+ #ifdef USER_ADDIE
+ 	struct user_ie 			user_ie_list[MAX_USER_IE];
+ #endif
++
++#ifdef RTD129X_POWER_LED
++	unsigned char power_led_gpio;
++#endif
+ } RTL8192CD_PRIV, *PRTL8192CD_PRIV;
+ 
+ struct rtl8192cd_chr_priv {
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -2502,6 +2502,27 @@ void rtl_netif_rx(struct rtl8192cd_priv
+ #ifdef __OSK__
+ 		toswcore_cnt++;
+ #endif
++#ifdef RTD129X_POWER_LED
++		if(pskb->len > priv->pmib->dot1180211sInfo.mesh_led_len) {
++			struct rtl8192cd_priv *original_priv=NULL;
++			if(strncmp(priv->dev->name, "wlan1",5)==0 && priv->mesh_priv_sc!=NULL!=0) {
++				original_priv=priv;
++				priv = priv->mesh_priv_sc;
++			}
++
++			if(strcmp(GET_ROOT(priv)->dev->name,"wlan0")!=0 && IS_DRV_OPEN(GET_ROOT(priv)) ) {
++				printk("Mesh LED Wrong Devce Name %s or is disabled\n", GET_ROOT(priv)->dev->name);
++			}else{
++				if(!GET_ROOT(priv)->power_led_gpio) {
++					GET_ROOT(priv)->power_led_gpio=TRUE;
++					gpio_direction_output(RTD129X_LED_GPIO, RTD129X_LED_ON);
++				}
++				mod_timer(&GET_ROOT(priv)->rtd129x_led_timer, jiffies+RTD129X_LED_EXPIRE_TO);
++			}
++			if(original_priv)
++				priv=original_priv;
++		}
++#endif
+ 		netif_rx(pskb);
+ #endif
+ 
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1103,6 +1103,10 @@
+ #endif
+ //#define MESH_ESTABLISH_RSSI_THRESHOLD
+ //#define MESH_BOOTSEQ_AUTH
++#ifdef CONFIG_RTD129X_MESH_LED
++#define RTD129X_POWER_LED
++#endif
++
+ #endif // CONFIG_RTK_MESH
+ 
+ 
+@@ -2999,6 +3003,13 @@
+ #endif
+ #endif
+ 
++#ifdef RTD129X_POWER_LED
++#define RTD129X_LED_GPIO			101+21
++#define RTD129X_LED_OFF				0
++#define RTD129X_LED_ON				1
++#define RTD129X_LED_EXPIRE_TO		RTL_MILISECONDS_TO_JIFFIES(40)
++#endif
++
+ #ifdef CONFIG_RTK_MESH
+ //GANTOE for automatic site survey 2008/12/10
+ #define SS_RAND_DEFER		300
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -7621,6 +7621,14 @@ priv->pshare->curr_band =0; //init curr_
+         priv->mesh_path_lock_owner = -1;         
+         #endif
+ 
++	
++#ifdef RTD129X_POWER_LED
++	init_timer(&priv->rtd129x_led_timer);
++        priv->rtd129x_led_timer.expires = jiffies+RTD129X_LED_EXPIRE_TO;
++	priv->rtd129x_led_timer.data = (unsigned long) priv;
++	priv->rtd129x_led_timer.function = rtd129x_led_timer_expire;
++#endif
++
+         #if defined(RTK_MESH_AODV_STANDALONE_TIMER)
+ 		init_timer(&priv->mesh_expire_timer);
+         #ifdef __KERNEL__
+@@ -14458,6 +14466,10 @@ static void MDL_DEVEXIT rtk_remove_one(s
+ 		rtl8192cd_deinit_one(wlan_device[cur_index].priv);
+ 		wlan_device[cur_index].priv = NULL;
+ 	}
++
++#ifdef RTD129X_POWER_LED
++	gpio_free(RTD129X_LED_GPIO);
++#endif
+ }
+ 
+ 
+@@ -14829,6 +14841,12 @@ int MDL_INIT rtl8192cd_init(void)
+ 	}
+ #endif
+ 
++#ifdef RTD129X_POWER_LED
++	if(gpio_request(RTD129X_LED_GPIO, "WIFI LED")) {
++		printk("Request GPIO(%d) Fail\n", RTD129X_LED_GPIO);
++	}
++#endif
++
+ #if defined(CONFIG_RTL_ULINKER_WLAN_DELAY_INIT)
+ 	static char initated = 0;
+ 	if (initated == 0)
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
+@@ -330,6 +330,13 @@ int proxyupdate_table_expire(DRV_PRIV* p
+ }
+ #endif // PU_STANDARD
+ 
++#ifdef RTD129X_POWER_LED
++void rtd129x_led_timer_expire(DRV_PRIV* priv)
++{
++	gpio_direction_output(RTD129X_LED_GPIO, RTD129X_LED_OFF);
++    priv->power_led_gpio=FALSE;
++}
++#endif
+ 
+ #if defined(RTK_MESH_AODV_STANDALONE_TIMER)
+ void mesh_standalone_timer_expire(DRV_PRIV* priv)
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -2387,6 +2387,9 @@ EXTERN int notify_path_found(unsigned ch
+ #else
+ #define EXTERN
+ #endif
++#ifdef RTD129X_POWER_LED
++void rtd129x_led_timer_expire(DRV_PRIV* priv);
++#endif
+ EXTERN void mesh_standalone_timer_expire(struct rtl8192cd_priv*);
+ EXTERN int init_mesh(struct rtl8192cd_priv *priv);
+ EXTERN unsigned int acl_query(struct rtl8192cd_priv *priv, unsigned char *sa);
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -1211,6 +1211,10 @@ static struct iwpriv_arg mib_table[] = {
+ 	{"meshaclnum",			INT_T,			_OFFSET(dot1180211sInfo.mesh_acl_num), 			_SIZE(dot1180211sInfo.mesh_acl_num),		0},
+ 	{"meshacladdr", 		ACL_T,			_OFFSET(dot1180211sInfo.mesh_acl_addr), 		_SIZE(dot1180211sInfo.mesh_acl_addr),		0},
+ #endif
++#ifdef RTD129X_POWER_LED
++	{"mesh_led_len", 		INT_T,			_OFFSET(dot1180211sInfo.mesh_led_len), 		_SIZE(dot1180211sInfo.mesh_led_len),		1450},
++	{"mesh_led_hdr_len", 		INT_T,			_OFFSET(dot1180211sInfo.mesh_led_hdr_len), 		_SIZE(dot1180211sInfo.mesh_led_hdr_len),		30},
++#endif //RTD129X_POWER_LED
+ 
+ #endif
+ 
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -771,6 +771,10 @@ struct Dot1180211sInfo{
+     unsigned int	mesh_acl_mode;
+     unsigned char	mesh_acl_addr[NUM_ACL][MACADDRLEN];
+     unsigned int	mesh_acl_num;
++#ifdef RTD129X_POWER_LED
++    unsigned int	mesh_led_len;
++    unsigned int	mesh_led_hdr_len;
++#endif
+ 
+     unsigned short	mesh_reserved1;
+     unsigned short	mesh_reserved2;
+Index: compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+===================================================================
+--- compat-wireless-2016-01-10.orig/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ compat-wireless-2016-01-10/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -9788,6 +9788,27 @@ int __rtl8192cd_start_xmit_out(struct sk
+ 	priv = GET_DEV_PRIV(dev);
+ 
+ #if defined(CONFIG_RTK_MESH)
++#ifdef RTD129X_POWER_LED
++	if(skb->len > (priv->pmib->dot1180211sInfo.mesh_led_len+priv->pmib->dot1180211sInfo.mesh_led_hdr_len)) {
++        struct rtl8192cd_priv *original_priv=NULL;
++        if(strncmp(priv->dev->name, "wlan1",5)==0 && priv->mesh_priv_sc!=NULL!=0) {
++            original_priv=priv;
++            priv = priv->mesh_priv_sc;
++        }
++
++        if(strcmp(GET_ROOT(priv)->dev->name,"wlan0")!=0 && IS_DRV_OPEN(GET_ROOT(priv)) ) {
++            printk("Mesh LED Wrong Devce Name %s or is disabled\n", GET_ROOT(priv)->dev->name);
++        }else{
++	        if(!GET_ROOT(priv)->power_led_gpio) {
++                GET_ROOT(priv)->power_led_gpio=TRUE;
++				gpio_direction_output(RTD129X_LED_GPIO, RTD129X_LED_ON);
++		    }
++		    mod_timer(&GET_ROOT(priv)->rtd129x_led_timer, jiffies+RTD129X_LED_EXPIRE_TO);
++        }
++        if(original_priv)
++            priv=original_priv;
++    }
++#endif
+ 	if(dev == priv->mesh_dev) {
+ 		if(ptxcfg->is_11s == 1) {
+ 			memcpy(txcfg, ptxcfg, sizeof(*ptxcfg));

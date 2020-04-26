@@ -1,0 +1,1363 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/os_intfs.c
+@@ -2189,7 +2189,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2520,6 +2520,10 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2717,7 +2721,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/core/rtw_vht.c
+@@ -586,19 +586,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -709,6 +708,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
++
++	rtw_build_vht_cap(padapter, pcap);
+ 
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_mcs_map_to_bitmap(u8 *mcs_ma
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/ioctl_cfg80211.c
+@@ -6644,6 +6644,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6657,8 +6660,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/os_intfs.c
+@@ -202,7 +202,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ /*
+  * DHCWIFI-73: Enable 11AC products GO/Soft-AP default VHT80. rtw_vht_enable = 2
+  */
+-int rtw_vht_enable = 2; //0:disable, 1:enable, 2:force auto enable
++int rtw_vht_enable = 1; //0:disable, 1:enable, 2:force auto enable
+ module_param(rtw_vht_enable, int, 0644);
+ int rtw_ampdu_factor = 7;
+ 
+@@ -2385,7 +2385,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-	rtw_cfg80211_init_wiphy(padapter);
++	//rtw_cfg80211_init_wiphy(padapter);
+ 	rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2706,6 +2706,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2895,7 +2898,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_vht.c
+@@ -602,18 +602,17 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 	
+ 	/* B0 B1 Maximum MPDU Length */
+ 	SET_VHT_CAPABILITY_ELE_MAX_MPDU_LENGTH(pcap, 2); 
+@@ -699,6 +698,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); //indicate we support highest rx rate is 600Mbps.
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); //indicate we support highest tx rate is 600Mbps.
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
++
++	rtw_build_vht_cap(padapter, pcap);
+ 
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_vht.h
+@@ -130,6 +130,7 @@ void	rtw_vht_use_default_setting(_adapte
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+ void	VHT_caps_handler(_adapter *padapter, PNDIS_802_11_VARIABLE_IEs pIE);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
+@@ -6327,6 +6327,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 	
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6340,8 +6343,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (IsSupported5G(padapter->registrypriv.wireless_mode)) {	
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if(bands)
++		if(bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
+@@ -135,7 +135,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ /*
+  * DHCWIFI-73: Enable 11AC products GO/Soft-AP default VHT80. rtw_vht_enable = 2
+  */
+-int rtw_vht_enable = 2; //0:disable, 1:enable, 2:force auto enable
++int rtw_vht_enable = 1; //0:disable, 1:enable, 2:force auto enable
+ int rtw_ampdu_factor = 7;
+ int rtw_vht_rate_sel = 0;
+ #endif //CONFIG_80211AC_VHT
+@@ -1839,7 +1839,7 @@ int _netdev_vir_if_open(struct net_devic
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		padapter->bup = _TRUE;
+@@ -2168,7 +2168,7 @@ int _netdev_if2_open(struct net_device *
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		padapter->bup = _TRUE;
+@@ -2480,6 +2480,10 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2716,7 +2720,7 @@ int _netdev_open(struct net_device *pnet
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		rtw_led_control(padapter, LED_CTL_NO_LINK);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/core/rtw_vht.c
+@@ -653,19 +653,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -776,7 +775,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
+@@ -6074,6 +6074,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6087,8 +6090,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (IsSupported5G(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/os_intfs.c
+@@ -157,7 +157,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ /*
+  * DHCWIFI-73: Enable 11AC products GO/Soft-AP default VHT80. rtw_vht_enable = 2
+  */
+-int rtw_vht_enable = 2; //0:disable, 1:enable, 2:force auto enable
++int rtw_vht_enable = 1; //0:disable, 1:enable, 2:force auto enable
+ int rtw_ampdu_factor = 7;
+ int rtw_vht_rate_sel = 0;
+ #endif /* CONFIG_80211AC_VHT */
+@@ -2170,7 +2170,7 @@ int _netdev_vir_if_open(struct net_devic
+ 			goto _netdev_virtual_iface_open_error;
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2486,6 +2486,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2722,7 +2725,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/core/rtw_vht.c
+@@ -604,18 +604,17 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 	
+ 	/* B0 B1 Maximum MPDU Length */
+ 	SET_VHT_CAPABILITY_ELE_MAX_MPDU_LENGTH(pcap, 2); 
+@@ -707,6 +706,21 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); //indicate we support highest rx rate is 600Mbps.
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); //indicate we support highest tx rate is 600Mbps.
+ 
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
++
++	rtw_build_vht_cap(padapter, pcap);
++
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/include/rtw_vht.h
+@@ -129,6 +129,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
+@@ -6346,6 +6346,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 	
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6359,8 +6362,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (IsSupported5G(padapter->registrypriv.wireless_mode)) {	
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if(bands)
++		if(bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/os_intfs.c
+@@ -134,7 +134,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ /*
+  * DHCWIFI-73: Enable 11AC products GO/Soft-AP default VHT80. rtw_vht_enable = 2
+  */
+-int rtw_vht_enable = 2; //0:disable, 1:enable, 2:force auto enable
++int rtw_vht_enable = 1; //0:disable, 1:enable, 2:force auto enable
+ int rtw_ampdu_factor = 7;
+ int rtw_vht_rate_sel = 0;
+ #endif //CONFIG_80211AC_VHT
+@@ -1839,7 +1839,7 @@ int _netdev_vir_if_open(struct net_devic
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		padapter->bup = _TRUE;
+@@ -2167,7 +2167,7 @@ int _netdev_if2_open(struct net_device *
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		padapter->bup = _TRUE;
+@@ -2481,6 +2481,10 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2722,7 +2726,7 @@ int _netdev_open(struct net_device *pnet
+ 		}
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ #endif
+ 
+ 		rtw_led_control(padapter, LED_CTL_NO_LINK);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/core/rtw_vht.c
+@@ -586,19 +586,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -709,7 +708,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8      *pcap;
++	u32     len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_mcs_map_to_bitmap(u8 *mcs_ma
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
+@@ -6608,6 +6608,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6621,8 +6624,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[NL80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, NL80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/os_intfs.c
+@@ -2390,7 +2390,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-	rtw_cfg80211_init_wiphy(padapter);
++	//rtw_cfg80211_init_wiphy(padapter);
+ 	rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2711,6 +2711,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2899,7 +2902,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/core/rtw_vht.c
+@@ -586,19 +586,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -710,6 +709,21 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
+ 
++}
++
++u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
++	u8	*pcap;
++	u32	len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
++
++	rtw_build_vht_cap(padapter, pcap);
++
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_mcs_map_to_bitmap(u8 *mcs_ma
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
+@@ -6619,6 +6619,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6632,8 +6635,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[NL80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, NL80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/os_intfs.c
+@@ -2428,7 +2428,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-	rtw_cfg80211_init_wiphy(padapter);
++	//rtw_cfg80211_init_wiphy(padapter);
+ 	rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2749,6 +2749,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2937,7 +2940,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/core/rtw_vht.c
+@@ -653,19 +653,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -776,6 +775,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
++
++	rtw_build_vht_cap(padapter, pcap);
+ 
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
+@@ -6167,6 +6167,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6180,8 +6183,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/os_intfs.c
+@@ -161,7 +161,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ /*
+  * DHCWIFI-73: Enable 11AC products GO/Soft-AP default VHT80. rtw_vht_enable = 2
+  */
+-int rtw_vht_enable = 2; //0:disable, 1:enable, 2:force auto enable
++int rtw_vht_enable = 1; //0:disable, 1:enable, 2:force auto enable
+ int rtw_ampdu_factor = 7;
+ int rtw_vht_rate_sel = 0;
+ #endif /* CONFIG_80211AC_VHT */
+@@ -2258,7 +2258,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2581,6 +2581,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2769,7 +2772,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/core/rtw_vht.c
+@@ -581,12 +581,11 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+@@ -594,8 +593,8 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
+ 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -713,7 +712,21 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/include/rtw_vht.h
+@@ -125,6 +125,7 @@ u64	rtw_vht_mcs_map_to_bitmap(u8 *mcs_ma
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
+@@ -6629,6 +6629,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6642,8 +6645,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[NL80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, NL80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/os_intfs.c
+@@ -205,7 +205,7 @@ int rtw_bfee_rf_number = 0; /*Beamformee
+ #endif /* CONFIG_80211N_HT */
+ 
+ #ifdef CONFIG_80211AC_VHT
+-int rtw_vht_enable = 2; /* 0:disable, 1:enable, 2:force auto enable */
++int rtw_vht_enable = 1; /* 0:disable, 1:enable, 2:force auto enable */
+ module_param(rtw_vht_enable, int, 0644);
+ 
+ int rtw_ampdu_factor = 7;
+@@ -2446,7 +2446,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-	rtw_cfg80211_init_wiphy(padapter);
++	//rtw_cfg80211_init_wiphy(padapter);
+ 	rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2890,6 +2890,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -3078,7 +3081,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/core/rtw_vht.c
+@@ -653,19 +653,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -763,7 +762,18 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
+@@ -6127,6 +6127,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6140,8 +6143,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (IsSupported5G(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/core/rtw_vht.c
+@@ -653,19 +653,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -776,7 +775,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32 rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv        *pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv *pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
+@@ -6197,6 +6197,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6210,8 +6213,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (is_supported_5g(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/os_intfs.c
+@@ -2320,7 +2320,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2643,6 +2643,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2831,7 +2834,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/core/rtw_vht.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/core/rtw_vht.c
+@@ -653,19 +653,18 @@ u32	rtw_build_vht_op_mode_notify_ie(_ada
+ 	return len;
+ }
+ 
+-u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++void rtw_build_vht_cap(_adapter *padapter, u8 *pcap)
+ {
+ 	u8	bw, rf_type, rf_num, rx_stbc_nss = 0;
+ 	u16	HighestRate;
+-	u8	*pcap, *pcap_mcs;
+-	u32	len = 0;
++	u8	*pcap_mcs;
+ 	u32 rx_packet_offset, max_recvbuf_sz;
+ 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
+ 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
+ 	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
+ 
+-	pcap = pvhtpriv->vht_cap;
+-	_rtw_memset(pcap, 0, 32);
++	if (!pcap)
++		return;
+ 
+ 	/* B0 B1 Maximum MPDU Length */
+ 	rtw_hal_get_def_var(padapter, HAL_DEF_RX_PACKET_OFFSET, &rx_packet_offset);
+@@ -763,7 +762,20 @@ u32	rtw_build_vht_cap_ie(_adapter *padap
+ 
+ 	SET_VHT_CAPABILITY_ELE_MCS_RX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest rx rate is 600Mbps. */
+ 	SET_VHT_CAPABILITY_ELE_MCS_TX_HIGHEST_RATE(pcap, HighestRate); /* indicate we support highest tx rate is 600Mbps. */
++}
++
++u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf)
++{
++	struct registry_priv *pregistrypriv = &padapter->registrypriv;
++	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
++	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
++	u8 *pcap;
++	u32 len = 0;
++
++	pcap = pvhtpriv->vht_cap;
++	_rtw_memset(pcap, 0, 32);
+ 
++	rtw_build_vht_cap(padapter, pcap);
+ 	pbuf = rtw_set_ie(pbuf, EID_VHTCapability, 12, pcap, &len);
+ 
+ 	return len;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/include/rtw_vht.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/include/rtw_vht.h
+@@ -130,6 +130,7 @@ u64	rtw_vht_rate_to_bitmap(u8 *pVHTRate)
+ void	rtw_vht_use_default_setting(_adapter *padapter);
+ u32	rtw_build_vht_operation_ie(_adapter *padapter, u8 *pbuf, u8 channel);
+ u32	rtw_build_vht_op_mode_notify_ie(_adapter *padapter, u8 *pbuf, u8 bw);
++void	rtw_build_vht_cap(_adapter *padapter, u8 *pcap);
+ u32	rtw_build_vht_cap_ie(_adapter *padapter, u8 *pbuf);
+ void	update_sta_vht_info_apmode(_adapter *padapter, PVOID psta);
+ void	update_hw_vht_param(_adapter *padapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
+@@ -6616,6 +6616,9 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ 	struct ieee80211_supported_band *bands;
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct wiphy *wiphy = pwdev->wiphy;
++#ifdef CONFIG_80211AC_VHT
++	struct registry_priv    *pregistrypriv = &padapter->registrypriv;
++#endif
+ 
+ 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
+ 
+@@ -6632,8 +6635,16 @@ void rtw_cfg80211_init_wiphy(_adapter *p
+ #ifdef CONFIG_IEEE80211_BAND_5GHZ
+ 	if (IsSupported5G(padapter->registrypriv.wireless_mode)) {
+ 		bands = wiphy->bands[IEEE80211_BAND_5GHZ];
+-		if (bands)
++		if (bands) {
+ 			rtw_cfg80211_init_ht_capab(padapter, &bands->ht_cap, IEEE80211_BAND_5GHZ, rf_type);
++			#ifdef CONFIG_80211AC_VHT
++			if (pregistrypriv->vht_enable) {
++				bands->vht_cap.vht_supported = TRUE;
++				rtw_vht_use_default_setting(padapter);
++				rtw_build_vht_cap(padapter, (u8 *)(&bands->vht_cap.cap));
++			}
++			#endif
++		}
+ 	}
+ #endif
+ 	/* init regulary domain */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/os_intfs.c
+@@ -2248,7 +2248,7 @@ int _netdev_vir_if_open(struct net_devic
+ #endif
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-	rtw_cfg80211_init_wiphy(padapter);
++	//rtw_cfg80211_init_wiphy(padapter);
+ 	rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 
+@@ -2569,6 +2569,9 @@ int rtw_os_ndevs_register(struct dvobj_p
+ 				rtw_warn_on(1);
+ 				break;
+ 			}
++#ifdef CONFIG_IOCTL_CFG80211
++			rtw_cfg80211_init_wiphy(adapter);
++#endif
+ 		}
+ 	}
+ 
+@@ -2757,7 +2760,7 @@ int _netdev_open(struct net_device *pnet
+ 		rtw_intf_start(padapter);
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+-		rtw_cfg80211_init_wiphy(padapter);
++		//rtw_cfg80211_init_wiphy(padapter);
+ 		rtw_cfg80211_init_wdev_data(padapter);
+ #endif
+ 

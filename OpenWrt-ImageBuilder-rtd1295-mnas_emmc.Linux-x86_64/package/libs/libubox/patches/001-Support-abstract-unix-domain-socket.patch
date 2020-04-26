@@ -1,0 +1,12 @@
+--- a/usock.c
++++ b/usock.c
+@@ -79,6 +79,9 @@ static int usock_unix(int type, const ch
+ 		return -1;
+ 	}
+ 	strcpy(sun.sun_path, host);
++	if('@' == host[0]) {
++		sun.sun_path[0] = '\0';
++	}
+ 
+ 	return usock_connect(type, (struct sockaddr*)&sun, sizeof(sun), AF_UNIX, socktype, server);
+ }

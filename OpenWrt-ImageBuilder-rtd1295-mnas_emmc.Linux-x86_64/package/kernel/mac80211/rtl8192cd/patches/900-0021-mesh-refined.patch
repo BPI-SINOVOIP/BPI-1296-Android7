@@ -1,0 +1,318 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
+@@ -275,7 +275,7 @@ int match_tx_cache(struct rtl8192cd_priv
+ 
+         ret = 1;
+ 
+-        mesh_txsc_debug("%s %d %02x:%02x:%02x:%02x:%02x:%02x-%02x:%02x:%02x:%02x:%02x:%02x match cache\n",__func__,__LINE__,
++        mesh_txsc_debug("%s %d dst:%02x:%02x:%02x:%02x:%02x:%02x src:%02x:%02x:%02x:%02x:%02x:%02x match cache\n",__func__,__LINE__,
+                 priv->mesh_txcache.ether_da[0],priv->mesh_txcache.ether_da[1],priv->mesh_txcache.ether_da[2],
+                 priv->mesh_txcache.ether_da[3],priv->mesh_txcache.ether_da[4],priv->mesh_txcache.ether_da[5],
+                 priv->mesh_txcache.ether_sa[0],priv->mesh_txcache.ether_sa[1],priv->mesh_txcache.ether_sa[2],
+@@ -539,7 +539,7 @@ int dot11s_datapath_decision(struct sk_b
+         if(match_tx_cache(priv,skb,ptxinsn)) {
+                 goto dot11s_datapath_decision_end;
+         }     
+-        mesh_tx_debug("%s %d %02x:%02x:%02x:%02x:%02x:%02x-%02x:%02x:%02x:%02x:%02x:%02x not match to mesh_txcache\n"
++        mesh_tx_debug("%s %d dst:%02x:%02x:%02x:%02x:%02x:%02x src:%02x:%02x:%02x:%02x:%02x:%02x not match to mesh_txcache\n"
+             ,__func__,__LINE__,*(unsigned char *)skb->data,*(unsigned char *)(skb->data+1),*(unsigned char *)(skb->data+2)
+             ,*(unsigned char *)(skb->data+3),*(unsigned char *)(skb->data+4),*(unsigned char *)(skb->data+5)
+             ,*(unsigned char *)(skb->data+6),*(unsigned char *)(skb->data+7),*(unsigned char *)(skb->data+8)
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_util.c
+@@ -177,9 +177,10 @@ int remove_proxy_owner(DRV_PRIV *priv, u
+             pxEntry = (struct proxy_table_entry *)(priv->proxy_table->entry_array[i].data);
+             if(memcmp(owner,pxEntry->owner,MACADDRLEN)==0){
+                 priv->proxy_table->entry_array[i].dirty = 0;
+-                mesh_proxy_debug("[%s %d]Delete Proxy entry of %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",           
+-                            __func__,__LINE__,pxEntry->owner[0],pxEntry->owner[1],pxEntry->owner[2],pxEntry->owner[3],pxEntry->owner[4],pxEntry->owner[5],
+-                            pxEntry->sta[0],pxEntry->sta[1],pxEntry->sta[2],pxEntry->sta[3],pxEntry->sta[4],pxEntry->sta[5]);
++                mesh_proxy_debug("[%s %d]Delete Proxy Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",           
++                            __func__,__LINE__,
++                            pxEntry->sta[0],pxEntry->sta[1],pxEntry->sta[2],pxEntry->sta[3],pxEntry->sta[4],pxEntry->sta[5],
++				pxEntry->owner[0],pxEntry->owner[1],pxEntry->owner[2],pxEntry->owner[3],pxEntry->owner[4],pxEntry->owner[5]);
+             }    
+         }
+     }    
+@@ -216,9 +217,10 @@ int remove_proxy_entry(DRV_PRIV *priv, u
+         if(process)
+         {
+             HASH_DELETE(priv->proxy_table,sta);
+-            mesh_proxy_debug("[%s %d]Delete Proxy entry of %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                            __func__,__LINE__, pPXEntry->owner[0], pPXEntry->owner[1],pPXEntry->owner[2],pPXEntry->owner[3],pPXEntry->owner[4],pPXEntry->owner[5],
+-                            sta[0],sta[1],sta[2],sta[3],sta[4],sta[5]);
++            mesh_proxy_debug("[%s %d]Delete Proxy Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
++                            __func__,__LINE__,
++                            sta[0],sta[1],sta[2],sta[3],sta[4],sta[5],
++				pPXEntry->owner[0], pPXEntry->owner[1],pPXEntry->owner[2],pPXEntry->owner[3],pPXEntry->owner[4],pPXEntry->owner[5]);
+             #if defined(CONFIG_RTL_MESH_CROSSBAND)
+             sync_proxy_info(priv->mesh_priv_sc, sta, 2); //delete proxy info of another band 
+             #endif
+@@ -251,19 +253,19 @@ int mesh_proxy_update(DRV_PRIV *priv, un
+         Entry.aging_time = 0;
+         HASH_INSERT(priv->proxy_table, Entry.sta, &Entry);
+ 
+-        mesh_proxy_debug("[A6 forwardding]Insert Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                            Entry.owner[0],Entry.owner[1],Entry.owner[2],Entry.owner[3],Entry.owner[4],Entry.owner[5],
+-                            Entry.sta[0],Entry.sta[1],Entry.sta[2],Entry.sta[3],Entry.sta[4],Entry.sta[5]);
++        mesh_proxy_debug("[A6 forwardding]Insert Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
++                            Entry.sta[0],Entry.sta[1],Entry.sta[2],Entry.sta[3],Entry.sta[4],Entry.sta[5],
++                            Entry.owner[0],Entry.owner[1],Entry.owner[2],Entry.owner[3],Entry.owner[4],Entry.owner[5]);
+         
+         #if defined(CONFIG_RTL_MESH_CROSSBAND)
+         sync_proxy_info(priv->mesh_priv_sc,Entry.sta, 0); //refresh proxy info of another band 
+         #endif
+     } else if(memcmp(pProxyEntry->owner, owner, MACADDRLEN)) {
+ 
+-        mesh_proxy_debug("[A6 forwardding]Update Proxy table:from %02x:%02x:%02x:%02x:%02x:%02x to  %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
++        mesh_proxy_debug("[A6 forwardding]Update Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy from %02x:%02x:%02x:%02x:%02x:%02x to %02x:%02x:%02x:%02x:%02x:%02x\n",
++                        pProxyEntry->sta[0],pProxyEntry->sta[1],pProxyEntry->sta[2],pProxyEntry->sta[3],pProxyEntry->sta[4],pProxyEntry->sta[5],
+                         pProxyEntry->owner[0],pProxyEntry->owner[1],pProxyEntry->owner[2],pProxyEntry->owner[3],pProxyEntry->owner[4],pProxyEntry->owner[5],
+-                        owner[0],owner[1],owner[2],owner[3],owner[4],owner[5],
+-                        pProxyEntry->sta[0],pProxyEntry->sta[1],pProxyEntry->sta[2],pProxyEntry->sta[3],pProxyEntry->sta[4],pProxyEntry->sta[5]);
++                        owner[0],owner[1],owner[2],owner[3],owner[4],owner[5]);
+ 
+ 
+ 
+@@ -279,9 +281,9 @@ int mesh_proxy_update(DRV_PRIV *priv, un
+         #endif
+     } else {
+         pProxyEntry->aging_time = 0;
+-        mesh_proxy_debug("[A6 forwardding]Refresh Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                            pProxyEntry->owner[0],pProxyEntry->owner[1],pProxyEntry->owner[2],pProxyEntry->owner[3],pProxyEntry->owner[4],pProxyEntry->owner[5],
+-                            pProxyEntry->sta[0],pProxyEntry->sta[1],pProxyEntry->sta[2],pProxyEntry->sta[3],pProxyEntry->sta[4],pProxyEntry->sta[5]);
++        mesh_proxy_debug("[A6 forwardding]Refresh Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
++                            pProxyEntry->sta[0],pProxyEntry->sta[1],pProxyEntry->sta[2],pProxyEntry->sta[3],pProxyEntry->sta[4],pProxyEntry->sta[5],
++                            pProxyEntry->owner[0],pProxyEntry->owner[1],pProxyEntry->owner[2],pProxyEntry->owner[3],pProxyEntry->owner[4],pProxyEntry->owner[5]);
+ 
+         #if defined(CONFIG_RTL_MESH_CROSSBAND)
+         sync_proxy_info(priv->mesh_priv_sc, pProxyEntry->sta, 0); //refresh proxy info of another band 
+@@ -312,12 +314,13 @@ static int __mesh_proxy_insert(struct rt
+         pEntry->aging_time = -1;  /*never timeout*/         
+ 
+         if(memcmp(pEntry->owner, GET_MY_HWADDR, MACADDRLEN)) {
+-            mesh_proxy_debug("[%s %d]Update Proxy table from %02x:%02x:%02x:%02x:%02x:%02x to %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                            __func__,__LINE__, pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5],
++            mesh_proxy_debug("[%s %d]Update Proxy table Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy from %02x:%02x:%02x:%02x:%02x:%02x to %02x:%02x:%02x:%02x:%02x:%02x\n",
++			   __func__,__LINE__,
++                            pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5],
++                            pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5],
+                             priv->pmib->dot11OperationEntry.hwaddr[0], priv->pmib->dot11OperationEntry.hwaddr[1],
+                             priv->pmib->dot11OperationEntry.hwaddr[2], priv->pmib->dot11OperationEntry.hwaddr[3],
+-                            priv->pmib->dot11OperationEntry.hwaddr[4], priv->pmib->dot11OperationEntry.hwaddr[5],                                
+-                            pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5]);
++                            priv->pmib->dot11OperationEntry.hwaddr[4], priv->pmib->dot11OperationEntry.hwaddr[5]);                           
+             memcpy(pEntry->owner, GET_MY_HWADDR, MACADDRLEN);
+         
+             #if defined(RTL_MESH_TXCACHE)
+@@ -331,9 +334,10 @@ static int __mesh_proxy_insert(struct rt
+             #endif    
+         }
+         else {
+-            mesh_proxy_debug("[%s %d]Refresh Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                            __func__,__LINE__,pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5],
+-                            pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5]); 
++            mesh_proxy_debug("[%s %d]Refresh Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
++                            __func__,__LINE__,
++                            pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5], 
++				pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5]);
+             SMP_UNLOCK_MESH_PROXY(flags);
+ 
+         }
+@@ -347,9 +351,10 @@ static int __mesh_proxy_insert(struct rt
+         
+         SMP_UNLOCK_MESH_PROXY(flags);
+         
+-        mesh_proxy_debug("[%s %d]Insert Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
+-                __func__,__LINE__,Entry.owner[0],Entry.owner[1],Entry.owner[2],Entry.owner[3],Entry.owner[4],Entry.owner[5],
+-                Entry.sta[0],Entry.sta[1],Entry.sta[2],Entry.sta[3],Entry.sta[4],Entry.sta[5]);
++        mesh_proxy_debug("[%s %d]Insert Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
++                __func__,__LINE__,
++                Entry.sta[0],Entry.sta[1],Entry.sta[2],Entry.sta[3],Entry.sta[4],Entry.sta[5],
++		Entry.owner[0],Entry.owner[1],Entry.owner[2],Entry.owner[3],Entry.owner[4],Entry.owner[5]);
+         
+         #if defined(PU_STANDARD_SME)
+         issue_proxyupdate_ADD(priv, sta);
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
+@@ -403,11 +403,12 @@ int pathsel_modify_table_entry(DRV_PRIV
+ 
+ 
+ 
+-        mesh_route_debug("Update Path of %02x:%02x:%02x:%02x:%02x:%02x-%02x:%02x:%02x:%02x:%02x:%02x\n\tMetric from %d to %d\n\tDSN from %u tp %u\n",
++        mesh_route_debug("Update Path of Dest:%02x:%02x:%02x:%02x:%02x:%02x NextHop:%02x:%02x:%02x:%02x:%02x:%02x\n\tMetric from %d to %d\n\tDSN from %u tp %u\n",
++                pEntry->destMAC[0],pEntry->destMAC[1],pEntry->destMAC[2],
++                pEntry->destMAC[3],pEntry->destMAC[4],pEntry->destMAC[5],
+                 pEntry->nexthopMAC[0],pEntry->nexthopMAC[1],pEntry->nexthopMAC[2],
+                 pEntry->nexthopMAC[3],pEntry->nexthopMAC[4],pEntry->nexthopMAC[5],
+-                pEntry->destMAC[0],pEntry->destMAC[1],pEntry->destMAC[2],
+-                pEntry->destMAC[3],pEntry->destMAC[4],pEntry->destMAC[5],entry->metric,pEntry->metric,entry->dsn,pEntry->dsn);
++		entry->metric,pEntry->metric,entry->dsn,pEntry->dsn);
+ 
+ 
+         RESTORE_INT(flags);
+@@ -449,7 +450,7 @@ int sync_proxy_info(struct rtl8192cd_pri
+ 
+     if(action == 2) { //delete        
+         if(pEntry) {           
+-            mesh_proxy_debug("[Sync]Remove Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
++            mesh_proxy_debug("[Sync]Remove Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
+                             pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5],
+                             pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5]);
+             HASH_DELETE(priv->proxy_table, sta);
+@@ -463,7 +464,7 @@ int sync_proxy_info(struct rtl8192cd_pri
+     else if(action == 0) { //refresh aging time only
+         if(pEntry) {
+             pEntry->aging_time = 0;
+-            mesh_proxy_debug("[Sync]Refresh Proxy table: %02x:%02x:%02x:%02x:%02x:%02x/%02x:%02x:%02x:%02x:%02x:%02x\n",
++            mesh_proxy_debug("[Sync]Refresh Proxy table: Entry:%02x:%02x:%02x:%02x:%02x:%02x Proxy:%02x:%02x:%02x:%02x:%02x:%02x\n",
+                             pEntry->owner[0],pEntry->owner[1],pEntry->owner[2],pEntry->owner[3],pEntry->owner[4],pEntry->owner[5],
+                             pEntry->sta[0],pEntry->sta[1],pEntry->sta[2],pEntry->sta[3],pEntry->sta[4],pEntry->sta[5]);
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_debug.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_debug.h
+@@ -98,9 +98,9 @@ enum _module_define_ {
+ 	#define _MODULE_DEFINE _IOCTL_
+ 	#define _MODULE_NAME	"ioctl"
+ 
+-#elif defined(_8192CD_PROC_C_)
+-	#define _MODULE_DEFINE _PROC_
+-	#define _MODULE_NAME	"proc"
++//#elif defined(_8192CD_PROC_C_)
++//	#define _MODULE_DEFINE _PROC_
++//	#define _MODULE_NAME	"proc"
+ 
+ #elif defined(_8192CD_TX_C_)
+ 	#define _MODULE_DEFINE _TX_
+@@ -179,7 +179,7 @@ enum _module_define_ {
+ 	
+ #elif defined(_MESH_RX_C_)
+ 	#define _MODULE_DEFINE _MESH_RX_
+-	#define _MODULE_NAME	"mehs_rx"
++	#define _MODULE_NAME	"mesh_rx"
+ 
+ #elif defined(_MESH_SECURITY_C_)
+ 	#define _MODULE_DEFINE _MESH_SECURITY_
+@@ -197,9 +197,9 @@ enum _module_define_ {
+ 	#define _MODULE_DEFINE _PWR_CTRL_
+ 	#define _MODULE_NAME	"pwr_ctrl"
+ 
+-#elif defined(_MESH_PROC_C_)
+-	#define _MODULE_DEFINE _MESH_PROC_
+-	#define _MODULE_NAME	"mesh_proc"
++//#elif defined(_MESH_PROC_C_)
++//	#define _MODULE_DEFINE _MESH_PROC_
++//	#define _MODULE_NAME	"mesh_proc"
+ 
+ #elif defined(_MESH_11KV_C_)
+ 	//not yet
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -12983,7 +12983,9 @@ register_driver:
+         if(mesh_num>0) {/*the first wlan interface with mesh enabled*/
+             if(tmp_priv == NULL) 
+             {
++#ifndef RTK_129X_PLATFORM
+                 GET_MIB(priv)->dot1180211sInfo.mesh_enable = 1;
++#endif
+                 dev = alloc_etherdev(0);	// mesh allocate ethernet device BUT don't have priv memory (Because share root priv)
+                 if (!dev) {
+                     printk(KERN_ERR "alloc_etherdev() mesh error!\n");
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -351,7 +351,7 @@
+ //-------------------------------------------------------------
+ // Debug function
+ //-------------------------------------------------------------
+-//#define _DEBUG_RTL8192CD_		// defined when debug print is used
++#define _DEBUG_RTL8192CD_		// defined when debug print is used
+ #define _IOCTL_DEBUG_CMD_		// defined when read/write register/memory command is used in ioctl
+ //#define _AMPSDU_AMSDU_DEBUG_		// defined when debug for ampdu_amsdu
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg80211.c
+@@ -62,7 +62,7 @@
+ #include <net80211/ieee80211_ioctl.h>
+ #include "./8192cd_net80211.h"  
+ 
+-//#define DEBUG_NL80211
++#define DEBUG_NL80211
+ #ifdef DEBUG_NL80211
+ //#define NLENTER	{}
+ //#define NLEXIT {}
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_rx.c
+@@ -73,12 +73,16 @@ int rx_dispatch_mesh(DRV_PRIV *priv, str
+ 				|| !((pstat->mesh_neighbor_TBL.State == MP_SUPERORDINATE_LINK_UP) || (pstat->mesh_neighbor_TBL.State == MP_SUBORDINATE_LINK_UP)
+ 				|| (pstat->mesh_neighbor_TBL.State == MP_SUBORDINATE_LINK_DOWN_E))) // Recived Local Link State Announcement from  DOWN to UP
+ 		{
+-		
++			unsigned char *addr1, *addr2;
+ 			RESTORE_INT(flags);
+ 			if( !IS_MCAST(da) && frame_type == WIFI_11S_MESH && pstat == NULL)
+ 				issue_deauth_MP(priv, (void *)GetAddr2Ptr(pframe), _RSON_UNSPECIFIED_, 1);
+ //
+-			DEBUG_ERR("Rx a Mesh packet but there does not have a corresponding station info\n");
++			addr1 = GetAddr1Ptr(pframe);
++			addr2 = GetAddr2Ptr(pframe);
++			DEBUG_ERR("Rx a Mesh packet but there does not have a corresponding station info addr1=%02X:%02X:%02X:%02X:%02X:%02X addr2=%02X:%02X:%02X:%02X:%02X:%02X\n", 
++			addr1[0], addr1[1], addr1[2], addr1[3], addr1[4], addr1[5],
++			addr2[0], addr2[1], addr2[2], addr2[3], addr2[4], addr2[5]);
+ 			goto out;
+ 		}
+ 		RESTORE_INT(flags);
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
+@@ -53,16 +53,11 @@ typedef struct rtl8190_priv DRV_PRIV;
+ 
+ //#define mesh_proxy_debug panic_printk
+ #if defined(_MESH_DEBUG_)
+-#define mesh_tx_debug(msg, args...) 
+-#define mesh_txsc_debug(msg, args...) 
+-#define mesh_sme_debug(msg, args...)  
+-#define mesh_proxy_debug(msg, args...) 
+-#define mesh_route_debug(msg, args...)
+-//#define mesh_tx_debug panic_printk
+-//#define mesh_txsc_debug panic_printk
+-//#define mesh_sme_debug panic_printk
+-//#define mesh_proxy_debug panic_printk
+-//#define mesh_route_debug panic_printk
++#define mesh_tx_debug DEBUG_INFO
++#define mesh_txsc_debug DEBUG_INFO
++#define mesh_sme_debug DEBUG_INFO
++#define mesh_proxy_debug DEBUG_INFO
++#define mesh_route_debug DEBUG_INFO
+ #elif defined(MESH_LOG)
+ #define mesh_tx_debug scrlog_printk
+ #define mesh_txsc_debug scrlog_printk
+@@ -83,7 +78,7 @@ typedef struct rtl8190_priv DRV_PRIV;
+ 
+ 
+ #ifdef  _MESH_DEBUG_
+-#define MESH_DEBUG_MSG(msg, args...)		printk(KERN_ERR msg,  ## args)
++#define MESH_DEBUG_MSG(msg, args...)		printk(msg,  ## args)
+ //#define MESH_BOOTSEQ_STRESS_TEST
+ 
+ #else
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
+@@ -2363,9 +2363,9 @@ void mesh_peer_link_timer(unsigned long
+         if (time_after(jiffies, pstat->mesh_neighbor_TBL.BSexpire_LLSAperiod))
+         {
+ 
+-            MESH_DEBUG_MSG("\nMesh: Peer link retry expire!!, MAC:%02X:%02X:%02X:%02X:%02X:%02X, State=%d, Retry=%d\n"
++            DEBUG_WARN("\nMesh: Peer link retry expire!!, MAC:%02X:%02X:%02X:%02X:%02X:%02X, State=%d, Retry=%d\n"
+                            , pstat->hwaddr[0], pstat->hwaddr[1], pstat->hwaddr[2], pstat->hwaddr[3], pstat->hwaddr[4], pstat->hwaddr[5], pstat->mesh_neighbor_TBL.State, pstat->mesh_neighbor_TBL.retry);
+
+             switch (pstat->mesh_neighbor_TBL.State)
+             {
+                 case MP_OPEN_SENT:	// TOR
+@@ -4476,7 +4476,7 @@ unsigned int OnBeacon_MP(DRV_PRIV *priv,
+                     && (WIFI_ASOC_STATE & pstat->state)
+                     && (MP_SUPERORDINATE_LINK_UP == pstat->mesh_neighbor_TBL.State || MP_SUPERORDINATE_LINK_DOWN == pstat->mesh_neighbor_TBL.State))
+             {
+-                MESH_DEBUG_MSG("Mesh: OnBeacon, Issue LocalLinkStateAnnouncement\n");
++                DEBUG_INFO("Mesh: OnBeacon, Issue LocalLinkStateAnnouncement\n");
+                 issue_LocalLinkStateANNOU_MP(priv, pfrinfo, pstat);
+ 
+                 // Update oneself peer pstat.

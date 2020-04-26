@@ -1,0 +1,7 @@
+
+config interface 'guest'
+        option proto 'static'
+        option ipaddr '192.168.2.1'
+        option netmask '255.255.255.0'
+        option _orig_ifname 'wlan1-1'
+        option _orig_bridge 'false'

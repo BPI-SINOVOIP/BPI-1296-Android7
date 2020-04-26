@@ -1,0 +1,16 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -11413,12 +11413,9 @@ just_skip:
+ #endif
+ 
+ 	/* ==================== Slow path of packet TX process ==================== */
+-	SMP_UNLOCK_XMIT(flags);
+-	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg, 1) == TX_PROCEDURE_CTRL_STOP) {
+-		SMP_LOCK_XMIT(flags);
++	if (rtl8192cd_tx_slowPath(priv, skb, pstat, dev, wdsDev, txcfg, 0) == TX_PROCEDURE_CTRL_STOP) {
+ 		goto stop_proc;
+ 	}
+-	SMP_LOCK_XMIT(flags);
+ 
+ #ifdef __KERNEL__
+ 	dev->trans_start = jiffies;

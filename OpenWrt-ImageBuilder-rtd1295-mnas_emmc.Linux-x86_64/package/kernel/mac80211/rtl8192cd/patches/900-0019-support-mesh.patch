@@ -1,0 +1,1845 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1284,13 +1284,6 @@
+ #endif
+ 
+ #if defined(A4_STA) 
+-#if defined(WDS)
+-	#error "A4_STA and WDS can't be used together\n"
+-#endif
+-#if defined(CONFIG_RTK_MESH)
+-	#error "A4_STA and MESH can't be used together\n"
+-#endif
+-
+ #define A4_STA_OUT_REALTEK 0
+ #define A4_STA_OUT_CUSTOMER_1 1
+ #define A4_STA_OUI A4_STA_OUT_CUSTOMER_1
+@@ -2747,11 +2740,6 @@
+ #endif
+ 
+ //#define NUM_TX_DESC_HQ    64
+-#if defined (CONFIG_SLOT_0_TX_BEAMFORMING) || defined (CONFIG_SLOT_1_TX_BEAMFORMING) || defined (CONFIG_SOC_TX_BEAMFORMING)
+-#define BEAMFORMING_SUPPORT  1
+-#else
+-#define BEAMFORMING_SUPPORT  0
+-#endif
+ 
+ #if defined(CONFIG_RTL_8812_SUPPORT) || defined(CONFIG_WLAN_HAL_8881A) || defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
+ #define RTK_AC_SUPPORT
+@@ -3180,7 +3168,7 @@
+ 
+ #ifdef RX_BUFFER_GATHER
+ #ifdef __LINUX_2_6__
+-#define MAX_SKB_BUF     2280
++#define MAX_SKB_BUF     2344
+ #elif defined(__ECOS)
+ #define MAX_SKB_BUF     MCLBYTES //2048
+ #else
+@@ -3269,7 +3257,8 @@
+ 
+ 
+ #ifdef SUPPORT_TX_MCAST2UNI
+-#define MAX_IP_MC_ENTRY		8
++#define MAX_IP_MC_ENTRY		16
++#define MAX_IP_SRC_ENTRY	8
+ #define MAX_FLOODING_MAC_NUM 32
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -10686,66 +10686,89 @@ void AddDelMCASTGroup2STA(struct rtl8192
+ #ifdef CONFIG_RTK_MESH
+ static void AddDelMCASTGroup2Mesh(struct rtl8192cd_priv *priv, unsigned char *mac2addr, int add)
+ {
+-    int i, free=-1, found=0;
++    int i, j, k, table_num, free = -1;    
++    struct path_sel_entry* pPathEntry;
+     struct proxy_table_entry*   pProxyEntry;
+-    struct path_sel_entry *pEntry;  
+-    struct rtl8192cd_priv * orig_priv;
++    struct mesh_ip_mcast_info* ipmac_info;
++   
+ #ifdef SMP_SYNC
+-    unsigned long proxy_flag = 0;
+     unsigned long path_flag = 0;
+-#endif
+-#ifdef SMP_SYNC
+-    unsigned long flags = 0;
++    unsigned long proxy_flag = 0;
+ #endif
+     
+-    /*if we can not find the sta in asoc_list, search mesh proxy table to see if it is proxied by remote mesh node*/   
+-    orig_priv = priv;
+     priv = GET_ROOT(priv)->mesh_priv_first;
++
++    /* delete first*/ 
+     SMP_LOCK_MESH_PROXY(proxy_flag); 
+-    pProxyEntry = (struct proxy_table_entry*) HASH_SEARCH(priv->proxy_table, mac2addr+6);
+-    if(pProxyEntry) {
+         SMP_LOCK_MESH_PATH(path_flag);
+-        pEntry = (struct path_sel_entry *)HASH_SEARCH( priv->pathsel_table, pProxyEntry->owner);
+-        if(pEntry) {
+-            for (i=0; i<MAX_IP_MC_ENTRY; i++) {
+-                if (pEntry->ipmc[i].used && !memcmp(pEntry->ipmc[i].mcmac, mac2addr, 6)) {
+-                    found = 1;
+-                    break;
++    table_num = 1 << priv->pathsel_table->table_size_power;
++    for (i = 0; i < table_num; i++) {
++        if (priv->pathsel_table->entry_array[i].dirty) 
++        { 
++            pPathEntry = ((struct path_sel_entry*)priv->pathsel_table->entry_array[i].data);  
++            for (j=0; j<MAX_IP_MC_ENTRY; j++) {
++                ipmac_info = &pPathEntry->ipmc[j];
++                if (ipmac_info->used && !memcmp(ipmac_info->mcmac, mac2addr, MACADDRLEN)) {
++                    for(k = 0; k < MAX_IP_SRC_ENTRY; k++) {
++                        if(ipmac_info->srcValid[k] && !memcmp(ipmac_info->srcMac[k], mac2addr+MACADDRLEN, MACADDRLEN)) {
++                            ipmac_info->srcValid[k] = 0;
++                            ipmac_info->srcCount--;
++                            if(ipmac_info->srcCount == 0) {
++                                ipmac_info->used = 0;
++                                pPathEntry->ipmc_num--;                        
++                            }                                 
++                            goto add_entry;
+                 }
+-                if (free == -1 && !pEntry->ipmc[i].used)
+-                    free = i;
+             }
+ 
+ 
+-            if (found) {
+-                if (!add) { // delete entry
+-                    pEntry->ipmc[i].used = 0;
+-                    pEntry->ipmc_num--;
+                 }
+             }
+-            else { // not found
+-                if (!add) {
+-                    if (priv->dev)
+-                        ;//printk("%s: Delete MC entry not found!\n", priv->dev->name);
+                 }
+-                else { // add entry
+-                    if (free == -1)  { // no free entry
+-                        if (priv->dev)
+-                            ;//printk("%s: MC entry full!\n", priv->dev->name);
+                     }
+-                    else {
+-                        memcpy(pEntry->ipmc[free].mcmac, mac2addr, 6);
+-                        pEntry->ipmc[free].used  = 1;
+-                        pEntry->ipmc_num++;
++
++
++add_entry: 
++    /* add back if need*/
++    if(add) {
++        pProxyEntry = (struct proxy_table_entry*) HASH_SEARCH(priv->proxy_table, mac2addr+MACADDRLEN);
++        if(pProxyEntry) {
++            pPathEntry = (struct path_sel_entry *)HASH_SEARCH( priv->pathsel_table, pProxyEntry->owner);               
++            if(pPathEntry) {
++                for (j=0; j<MAX_IP_MC_ENTRY; j++) {
++                    ipmac_info = &pPathEntry->ipmc[j];
++                     if (ipmac_info->used && !memcmp(ipmac_info->mcmac, mac2addr, MACADDRLEN)) {
++                         for(k = 0; k < MAX_IP_SRC_ENTRY; k++) {
++                             if(ipmac_info->srcValid[k] == 0) {
++                                 ipmac_info->srcValid[k] = 1;
++                                 memcpy(ipmac_info->srcMac[k], mac2addr+MACADDRLEN, MACADDRLEN);                                 
++                                 ipmac_info->srcCount++;
++                                 break;
++                             }
+                     }
++                         break;
++                     }
++                     if (free == -1 && !pPathEntry->ipmc[j].used)
++                         free = j;
+                 }
++
++                if(j == MAX_IP_MC_ENTRY && free >= 0) { /*not found, and has free entry*/
++                    memcpy(pPathEntry->ipmc[free].mcmac, mac2addr, 6);
++                    pPathEntry->ipmc[free].used  = 1;
++                    pPathEntry->ipmc_num++;
++
++                    pPathEntry->ipmc[free].srcValid[0] = 1;
++                    memcpy(pPathEntry->ipmc[free].srcMac[0],mac2addr+MACADDRLEN, MACADDRLEN);                   
++                    pPathEntry->ipmc[free].srcCount = 1;
++
+             }                
+         }
+-        SMP_UNLOCK_MESH_PATH(path_flag);
+     }    
++    }
++    
++    SMP_UNLOCK_MESH_PATH(path_flag);   
+     SMP_UNLOCK_MESH_PROXY(proxy_flag); 
+     
+-    priv = orig_priv;
+ }
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -4489,6 +4489,10 @@ static int rtl8192cd_init_sw(struct rtl8
+ #ifdef CONFIG_RTK_MESH
+ 	if(GET_MIB(priv)->dot1180211sInfo.mesh_enable == 1)	// plus add 0217, not mesh mode should not do below function
+ 	{
++        #ifdef A4_STA
++        priv->pshare->rf_ft_var.a4_enable = 0;
++        #endif
++
+ 	DOT11_InitQueue2(priv->pathsel_queue, MAXQUEUESIZE2, MAXDATALEN2);
+         priv->pmib->dot11sKeysTable.keyid = 0;
+         priv->pmib->dot11sKeysTable.keyInCam = TRUE;
+@@ -4667,6 +4671,12 @@ static int rtl8192cd_init_sw(struct rtl8
+ 	if (IS_ROOT_INTERFACE(priv))
+ #endif
+ 	{
++		#ifdef A4_STA
++		if (priv->pmib->dot11WdsInfo.wdsEnabled) {
++			priv->pshare->rf_ft_var.a4_enable = 0;
++		}
++		#endif
++
+ #ifdef LAZY_WDS
+ 		if (priv->pmib->dot11WdsInfo.wdsEnabled == WDS_LAZY_ENABLE) {
+ 			priv->pmib->dot11WdsInfo.wdsNum = 0;
+@@ -9795,10 +9805,7 @@ int rtl8192cd_close(struct net_device *d
+ #ifdef CONFIG_RTK_MESH
+ 	if (dev->base_addr == 1)
+ 	{
+-    	#if defined(RTK_MESH_AODV_STANDALONE_TIMER)
+-        if (timer_pending(&priv->mesh_expire_timer))
+-           del_timer_sync(&priv->mesh_expire_timer);
+-        #endif
++		mesh_close(priv);
+ 		RESTORE_INT(flags);
+ 		SMP_UNLOCK(flags);
+ 		return 0;
+@@ -13112,8 +13119,8 @@ register_driver:
+             priv->mesh_priv_first = priv;
+         } // end of if(mesh_num>0)
+ 
+-        priv->RreqEnd = 0;
+-        priv->RreqBegin = 0;
++        priv->rreq_head = NULL;
++        priv->rreq_tail = NULL;
+ 
+         pann_mpp_tb = (struct mpp_tb*)kmalloc(sizeof(struct mpp_tb), GFP_ATOMIC);
+         if(!pann_mpp_tb)
+@@ -13184,7 +13191,7 @@ register_driver:
+             printk("init_hash_table \"proxyupdate_table\" error!!\n");
+         }
+ #endif
+-        rc = init_hash_table(pathsel_table, 8, MACADDRLEN, sizeof(struct path_sel_entry), crc_hashing, search_default, insert_default, delete_default,traverse_default);
++        rc = init_hash_table(pathsel_table, PATHSEL_TABLE_SIZE, MACADDRLEN, sizeof(struct path_sel_entry), crc_hashing, search_default, insert_default, delete_default,traverse_default);
+         if(rc == HASH_TABLE_FAILED)
+         {
+             printk("init_hash_table \"pathsel_table\" error!!\n");
+@@ -15463,8 +15470,10 @@ struct net_device *get_shortcut_dev(unsi
+                         #endif
+                         {
+                             #ifdef CONFIG_RTK_MESH
+-                            if( isMeshPoint(pstat))
+-                                {dev = priv->mesh_dev;}
++                            if( isMeshPoint(pstat)) {
++                                if(priv->mesh_priv_first->pmib->dot1180211sInfo.mesh_portal_enable)
++                                     dev = priv->mesh_dev;
++                            }
+                             else
+                             #endif
+                                 {dev = priv->dev;}
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -1083,14 +1083,24 @@ static __inline__ unsigned int check_icv
+ 
+         if (pstat) {
+             if (OPMODE & WIFI_AP_STATE) {
+-#if defined(WDS) || defined(CONFIG_RTK_MESH)
++#if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
+                 if (get_tofr_ds((unsigned char *)get_pframe(pfrinfo)) == 3){
+ #if defined(CONFIG_RTK_MESH)
+                     if(priv->pmib->dot1180211sInfo.mesh_enable) {
+                         privacy = (IS_MCAST(GetAddr1Ptr((unsigned char *)get_pframe(pfrinfo)))) ? _NO_PRIVACY_ : priv->pmib->dot11sKeysTable.dot11Privacy;
+                     } else
+ #endif
+-                        {privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;}
++                    #if defined(WDS)
++                    if(priv->pmib->dot11WdsInfo.wdsEnabled) {
++                        privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
++                    } else
++                    #endif
++                    #if defined(A4_STA)
++                    if (priv->pshare->rf_ft_var.a4_enable) {
++                        privacy = get_sta_encrypt_algthm(priv, pstat);
++                    } else
++                    #endif
++                    {;}
+                 }
+                 else
+ #endif	/*	defined(WDS) || defined(CONFIG_RTK_MESH)	*/
+@@ -3485,10 +3495,12 @@ int rx_shortcut(struct rtl8192cd_priv *p
+     unsigned short tpcache=0;
+ 
+ #if defined(CONFIG_RTK_MESH) && defined(RX_RL_SHORTCUT)
+-    struct path_sel_entry pathEntry;
++    int mesh_sc_ret;
+     unsigned char to_mesh = 0;
+     struct MESH_HDR *meshHdrPt;
+     unsigned char meshDest[MACADDRLEN];
++    unsigned char meshNextHop[MACADDRLEN];
++    struct rtl8192cd_priv *dest_priv;
+ #endif
+     struct rx_sc_entry *prxsc_entry = NULL;
+     unsigned char is_qos_datafrm=0;
+@@ -3505,7 +3517,7 @@ int rx_shortcut(struct rtl8192cd_priv *p
+ #if defined(CONFIG_RTK_MESH) && !defined(RX_RL_SHORTCUT)
+ 
+     // RTK mesh doesn't support shortcut now -- chris 071909.
+-    if (GET_MIB(priv)->dot1180211sInfo.mesh_enable)
++    if (GET_MIB(priv)->dot1180211sInfo.mesh_enable && pfrinfo->is_11s)
+         goto shouldnot_rxsc;
+ #endif
+ 
+@@ -3575,9 +3587,14 @@ int rx_shortcut(struct rtl8192cd_priv *p
+ 
+ #if defined(CONFIG_RTK_MESH) && defined(RX_RL_SHORTCUT)
+             if (pfrinfo->is_11s) {
+-                if(mesh_shortcut_update(priv, pfrinfo, pstat, idx, &pathEntry, &to_mesh, &meshHdrPt) != 0) {
++                mesh_sc_ret = mesh_shortcut_update(priv, pfrinfo, prxsc_entry, &dest_priv, meshNextHop, &to_mesh, &meshHdrPt);
++                if(mesh_sc_ret == -1) {
+                     goto shouldnot_rxsc;
+                 }
++                else if(mesh_sc_ret == 1) {
++                    rtl_kfree_skb(priv, pfrinfo->pskb, _SKB_RX_);
++                    return 1;
++                }
+ 
+                 if(to_mesh == 0) {
+                     memcpy(meshDest, meshHdrPt->DestMACAddr, MACADDRLEN);/*backup mesh addr5 */
+@@ -3589,11 +3606,7 @@ int rx_shortcut(struct rtl8192cd_priv *p
+ #endif //CONFIG_RTK_MESH
+ 
+ #ifdef WDS
+-            if (pfrinfo->to_fr_ds == 3
+-#ifdef CONFIG_RTK_MESH
+-                && priv->pmib->dot11WdsInfo.wdsEnabled
+-#endif
+-            ) {
++            if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled) {
+                 if (memcmp(GetAddr4Ptr(pframe), prxsc_entry->rx_wlanhdr.addr4, 6))
+                     goto shouldnot_rxsc;
+                 pfrinfo->pskb->dev = getWdsDevByAddr(priv, GetAddr2Ptr(pframe));
+@@ -3638,11 +3651,7 @@ int rx_shortcut(struct rtl8192cd_priv *p
+             {
+ 
+ #ifdef WDS
+-                if (pfrinfo->to_fr_ds == 3
+-#ifdef CONFIG_RTK_MESH
+-                    && priv->pmib->dot11WdsInfo.wdsEnabled
+-#endif
+-                )
++                if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled)
+                     privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
+ 
+                 else
+@@ -3793,16 +3802,16 @@ int rx_shortcut(struct rtl8192cd_priv *p
+                             priv->ext_stats.rx_data_drops++;
+                             DEBUG_ERR("RX DROP: TTL=0\n");
+                             rtl_kfree_skb(priv, pfrinfo->pskb, _SKB_RX_);
+-                            return 0;
++                            return 1;
+                         }
+ 
+-                        dst_pstat = get_stainfo(pathEntry.priv, pathEntry.nexthopMAC);
++                        dst_pstat = get_stainfo(dest_priv, meshNextHop);
+                         if(dst_pstat) {
+                             do_process = 0;
+                             if (do_rc) {
+                                 *(unsigned long *)&(pfrinfo->pskb->cb[4]) = dst_pstat;
+                                 pfrinfo->pskb->cb[3] = RELAY_11S;
+-                                pfrinfo->pskb->dev = pathEntry.priv->dev; /*temprarily save the priv to nexthop*/
++                                pfrinfo->pskb->dev = dest_priv->dev; /*temprarily save the priv to nexthop*/
+                                 if (reorder_ctrl_check(priv, pstat, pfrinfo)) {
+                                     do_process = 1;
+                                 }
+@@ -3819,10 +3828,10 @@ int rx_shortcut(struct rtl8192cd_priv *p
+                                 rtl_atomic_inc(&priv->rtl_tx_skb_cnt);
+                                 #endif
+ 
+-                                txcfg.priv = pathEntry.priv;
++                                txcfg.priv = dest_priv;
+                                 txcfg.is_11s = RELAY_11S;
+                                 pfrinfo->pskb->dev = priv->mesh_dev;         
+-                                priv = pathEntry.priv;
++                                priv = dest_priv;
+                                 SMP_LOCK_XMIT(x);                                 
+                                 __rtl8192cd_start_xmit_out(pfrinfo->pskb, dst_pstat, &txcfg); 
+                                 SMP_UNLOCK_XMIT(x);                                
+@@ -3887,17 +3896,11 @@ int rx_shortcut(struct rtl8192cd_priv *p
+ #endif
+ 
+ 
+-
+-#if defined(WDS)
+-                if ((pfrinfo->to_fr_ds==3
+-#ifdef CONFIG_RTK_MESH
+-                    && priv->pmib->dot11WdsInfo.wdsEnabled
+-#endif
+-                     ) ||
+-                    (dst_pstat == NULL) || !(dst_pstat->state & WIFI_ASOC_STATE))
+-#else
+-                if ((dst_pstat == NULL) || (!(dst_pstat->state & WIFI_ASOC_STATE)))
+-#endif
++                if ((dst_pstat == NULL) || (!(dst_pstat->state & WIFI_ASOC_STATE))
++                    #if defined(WDS)
++                    || (pfrinfo->to_fr_ds==3 && priv->pmib->dot11WdsInfo.wdsEnabled)
++                    #endif
++                )
+ 				{
+                    
+ #ifdef A4_STA
+@@ -5526,8 +5529,7 @@ int validate_mpdu(struct rtl8192cd_priv
+ 			if( 1 == GET_MIB(priv)->dot1180211sInfo.mesh_enable)
+ 			{
+ 				reuse = rx_dispatch_mesh(priv, pfrinfo);
+-				break;
+-			}
++			} else
+ #endif
+ 
+ #ifdef A4_STA
+@@ -5537,13 +5539,15 @@ int validate_mpdu(struct rtl8192cd_priv
+ 													,vap_idx
+ #endif
+ 				);
+-				break;
+-			}
++			} else
+ #endif
+ 
+ #ifdef WDS
+-			reuse = rtl8192cd_rx_dispatch_wds(priv, pfrinfo);
++			if (priv->pmib->dot11WdsInfo.wdsEnabled) {
++				reuse = rtl8192cd_rx_dispatch_wds(priv, pfrinfo);
++			} else
+ #endif
++			{;}
+ 			break;
+ 	}
+ 
+@@ -6875,14 +6879,24 @@ void rtl88XX_rx_isr(struct rtl8192cd_pri
+ 							rtl8192cd_ICV++;
+ 						} else {
+ 							if (OPMODE & WIFI_AP_STATE) {
+-                                #if defined(WDS) || defined(CONFIG_RTK_MESH)
++                                #if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
+ 								if (get_tofr_ds((unsigned char *)get_pframe(pfrinfo)) == 3){
+                                     #if defined(CONFIG_RTK_MESH)
+ 									if(priv->pmib->dot1180211sInfo.mesh_enable) {
+ 										privacy = (IS_MCAST(GetAddr1Ptr((unsigned char *)get_pframe(pfrinfo)))) ? _NO_PRIVACY_ : priv->pmib->dot11sKeysTable.dot11Privacy;
+ 									} else
+                                     #endif
+-										{privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;}
++                                    #if defined(WDS)
++									if(priv->pmib->dot11WdsInfo.wdsEnabled) {
++										privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
++									} else
++                                    #endif
++                                    #if defined(A4_STA)
++									if (priv->pshare->rf_ft_var.a4_enable) {
++										privacy = get_sta_encrypt_algthm(priv, pstat);
++									} else
++                                    #endif
++									{;}
+ 								}
+ 								else
+                                 #endif	/*	defined(WDS) || defined(CONFIG_RTK_MESH)	*/
+@@ -7728,14 +7742,24 @@ void rtl8192cd_rx_isr(struct rtl8192cd_p
+ 							rtl8192cd_ICV++;
+ 						} else {
+ 							if (OPMODE & WIFI_AP_STATE) {
+-#if defined(WDS) || defined(CONFIG_RTK_MESH)
++#if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
+ 								if (get_tofr_ds((unsigned char *)get_pframe(pfrinfo)) == 3){
+ #if defined(CONFIG_RTK_MESH)
+ 									if(priv->pmib->dot1180211sInfo.mesh_enable) {
+ 										privacy = (IS_MCAST(GetAddr1Ptr((unsigned char *)get_pframe(pfrinfo)))) ? _NO_PRIVACY_ : priv->pmib->dot11sKeysTable.dot11Privacy;
+ 									} else
+ #endif
+-										{privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;}
++#if defined(WDS)
++									if(priv->pmib->dot11WdsInfo.wdsEnabled) {
++										privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
++									} else
++#endif
++#if defined(A4_STA)
++									if (priv->pshare->rf_ft_var.a4_enable) {
++										privacy = get_sta_encrypt_algthm(priv, pstat);
++									} else
++#endif
++									{;}
+ 								}
+ 								else
+ #endif	/*	defined(WDS) || defined(CONFIG_RTK_MESH)	*/
+@@ -8194,8 +8218,8 @@ static struct rx_frinfo *defrag_frame_ma
+ 	sa  = pfrinfo->sa;
+ 	len = pfrinfo->pktlen;
+ 
+-#ifdef A4_STA
+-    if(pfrinfo->to_fr_ds == 3 && priv->pshare->rf_ft_var.a4_enable) {
++#if defined(CONFIG_RTK_MESH) || defined(WDS) || defined(A4_STA)
++    if(pfrinfo->to_fr_ds == 3) {
+         da = GetAddr1Ptr(pframe);
+         sa = GetAddr2Ptr(pframe);
+     }
+@@ -8203,34 +8227,17 @@ static struct rx_frinfo *defrag_frame_ma
+ 
+ 	/*---------first of all check if sa is assocated---------*/
+ 	if (OPMODE & WIFI_AP_STATE) {
+-#if defined(CONFIG_RTK_MESH) || defined(WDS)
+-		// for 802.11s case, pstat will not be NULL, because we have check it in validate-mpdu
+-		if (pfrinfo->to_fr_ds == 3) {
+-			pstat = get_stainfo(priv, GetAddr2Ptr(pframe));
+-			if (pstat == NULL){
+-				priv->ext_stats.rx_data_drops++;
+-				DEBUG_ERR("RX Drop: WDS rx data with pstat == NULL\n");
+-				goto free_skb_in_defrag;
+-			} else {
+-				goto check_privacy;
+-			}
+-		}
+-		else
+-#endif
+-		{
+-#ifdef A4_STA
+-            if (priv->pshare->rf_ft_var.a4_enable) {
+-                pstat = a4_rx_check_reuse_ap(priv, pfrinfo);
+-            }
+-            else
+-#endif
+         #ifdef HW_FILL_MACID
+             pstat = get_stainfo_fast(priv,sa,pfrinfo->macid);               
+         #else
+             pstat = get_stainfo(priv,sa);               
+         #endif //#ifdef HW_FILL_MACID
+ 
++        #ifdef A4_STA
++        if (priv->pshare->rf_ft_var.a4_enable && pstat) {
++            pstat = a4_rx_check_reuse_ap(priv, pstat, pfrinfo);
+         }
++        #endif 
+ 	}
+ #ifdef CLIENT_MODE
+ 	else if (OPMODE & WIFI_STATION_STATE) {
+@@ -8241,6 +8248,15 @@ static struct rx_frinfo *defrag_frame_ma
+ 		pstat = get_stainfo(priv, sa);
+ #endif
+ 
++#if defined(CONFIG_RTK_MESH) || defined(WDS)
++	if(pfrinfo->to_fr_ds == 3 && (priv->pmib->dot11WdsInfo.wdsEnabled || priv->pmib->dot1180211sInfo.mesh_enable)) {
++		if (pstat == NULL){
++			priv->ext_stats.rx_data_drops++;
++			panic_printk("RX Drop: WDS/MESH rx data with pstat == NULL\n");
++			goto free_skb_in_defrag;
++		} 
++	} else
++#endif
+ 	if (pstat == NULL)
+ 	{
+ 		status = _RSON_CLS2_;
+@@ -8263,18 +8279,23 @@ check_privacy:
+ #endif
+ 
+ 	if (OPMODE & WIFI_AP_STATE) {
+-#ifdef CONFIG_RTK_MESH
+-		//modify by Joule for SECURITY
+-		if(pfrinfo->is_11s)
+-			privacy = IS_MCAST(da) ? _NO_PRIVACY_ : get_sta_encrypt_algthm(priv, pstat);
+-		else
+-#endif
+-#ifdef WDS
+-		if (pfrinfo->to_fr_ds == 3)
+-			privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
+-		else
+-#endif
+-		privacy = get_sta_encrypt_algthm(priv, pstat);
++		#if defined(CONFIG_RTK_MESH) || defined(WDS) || defined(A4_STA)
++		if(pfrinfo->to_fr_ds == 3) {
++			#ifdef CONFIG_RTK_MESH
++			if(pfrinfo->is_11s)
++				privacy = IS_MCAST(da) ? _NO_PRIVACY_ : get_sta_encrypt_algthm(priv, pstat);
++			else
++			#endif
++			#ifdef WDS
++			if (priv->pmib->dot11WdsInfo.wdsEnabled)
++				privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
++			else
++			#endif
++				privacy = get_sta_encrypt_algthm(priv, pstat);
++        	}
++        	else
++		#endif
++			privacy = get_sta_encrypt_algthm(priv, pstat);
+ 	}
+ #ifdef CLIENT_MODE
+ 	else {
+@@ -8577,86 +8598,73 @@ free_skb_in_defrag:
+ 
+ static struct rx_frinfo *defrag_frame(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo)
+ {
+-	struct sk_buff *pskb = get_pskb(pfrinfo);
+-	struct rx_frinfo *prx_frinfo = NULL;
+-	unsigned int encrypt;
+-	unsigned char *pframe;
++    struct sk_buff *pskb = get_pskb(pfrinfo);
++    struct rx_frinfo *prx_frinfo = NULL;
++    unsigned int encrypt;
++    unsigned char *pframe;
++    int drop = 0;
+ 
+-	// rx a encrypt packet but encryption is not enabled in local mib, discard it
+-	pframe = get_pframe(pfrinfo);
+-	encrypt = GetPrivacy(pframe);
++    
++    pframe = get_pframe(pfrinfo);
++    encrypt = GetPrivacy(pframe);
+ 
+-//modify by Joule for SECURITY
+-// here maybe need do some tune; plus
+-#ifdef CONFIG_RTK_MESH	/*-------*/
+-	if (encrypt && (
+-		(pfrinfo->to_fr_ds==3 && (
+-#ifdef WDS
+-		GET_MIB(priv)->dot1180211sInfo.mesh_enable ==0	?
+-		priv->pmib->dot11WdsInfo.wdsPrivacy==_NO_PRIVACY_ :
+-#endif
+-		priv->pmib->dot11sKeysTable.dot11Privacy ==_NO_PRIVACY_	)) ||
+-		(pfrinfo->to_fr_ds!=3 && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm==_NO_PRIVACY_
+-#if defined(CONFIG_RTL_WAPI_SUPPORT)
+-			&& priv->pmib->wapiInfo.wapiType==wapiDisable
+-#endif
+-		)))
+-#else	/*-------*/
+-// origin
+-#ifdef WDS
+-	if (encrypt && (
+-			(pfrinfo->to_fr_ds==3 && priv->pmib->dot11WdsInfo.wdsPrivacy==_NO_PRIVACY_) ||
+-			(pfrinfo->to_fr_ds!=3 && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm==_NO_PRIVACY_))
+-#if defined(CONFIG_RTL_WAPI_SUPPORT)
+-			&& priv->pmib->wapiInfo.wapiType==wapiDisable
+-#endif
+-	)
+-#else
+-	if (encrypt && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _NO_PRIVACY_
+-#if defined(CONFIG_RTL_WAPI_SUPPORT)
+-			&& priv->pmib->wapiInfo.wapiType==wapiDisable
+-#endif
+-	)
+-#endif
+-#endif/*-------*/
+-	{
+-		priv->ext_stats.rx_data_drops++;
+-		DEBUG_ERR("RX DROP: Discard a encrypted packet!\n");
+-		rtl_kfree_skb(priv, pskb, _SKB_RX_);
+-		return (struct rx_frinfo *)NULL;
+-	}
++    /* rx a encrypt packet but encryption is not enabled in local mib, discard it*/
++    /* rx a non-encrypt packet but encryption is not enabled in local mib, discard it*/
++    
++    #if defined(CONFIG_RTK_MESH) || defined(WDS) || defined(A4_STA)
++    if(pfrinfo->to_fr_ds==3) {
++        #ifdef CONFIG_RTK_MESH
++        if(GET_MIB(priv)->dot1180211sInfo.mesh_enable) {
++            if((encrypt && GET_MIB(priv)->dot11sKeysTable.dot11Privacy ==_NO_PRIVACY_) ||
++               (!encrypt && GET_MIB(priv)->dot11sKeysTable.dot11Privacy !=_NO_PRIVACY_))
++            drop = 1;
++        } else
++        #endif
++        #ifdef WDS
++        if(GET_MIB(priv)->dot11WdsInfo.wdsEnabled) {
++            if((encrypt && GET_MIB(priv)->dot11WdsInfo.wdsPrivacy ==_NO_PRIVACY_) ||
++               (!encrypt && GET_MIB(priv)->dot11WdsInfo.wdsPrivacy !=_NO_PRIVACY_))
++                drop = 1;
++        } else
++        #endif
++        #ifdef A4_STA
++        if(priv->pshare->rf_ft_var.a4_enable) {
++            if((encrypt && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _NO_PRIVACY_) ||
++               (!encrypt && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm != _NO_PRIVACY_))
++                drop = 1;
++        } else
++        #endif
++        {;}
++    } else       
++    #endif
++    {
++        if(encrypt && priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _NO_PRIVACY_
++            #if defined(CONFIG_RTL_WAPI_SUPPORT)
++            && priv->pmib->wapiInfo.wapiType==wapiDisable
++            #endif
++        )
++        {
++            drop = 1;
++        }
++    }
+ 
+-#ifdef CONFIG_RTK_MESH
+-        if (pfrinfo->to_fr_ds==3 && !encrypt && (
+-#ifdef WDS
+-		GET_MIB(priv)->dot1180211sInfo.mesh_enable ==0	?
+-		priv->pmib->dot11WdsInfo.wdsPrivacy!=_NO_PRIVACY_ :
+-#endif
+-		(priv->pmib->dot11sKeysTable.dot11Privacy != _NO_PRIVACY_ && !IS_MCAST(pfrinfo->da)))) {
+-		priv->ext_stats.rx_data_drops++;
+-		DEBUG_ERR("RX DROP: Discard a un-encrypted WDS/MESH packet!\n");
+-		rtl_kfree_skb(priv, pskb, _SKB_RX_);
+-		SNMP_MIB_INC(dot11WEPExcludedCount, 1);
+-		return (struct rx_frinfo *)NULL;
+-	}
+-#else
+-//origin
+-#ifdef WDS
+-	if (pfrinfo->to_fr_ds==3 && !encrypt && priv->pmib->dot11WdsInfo.wdsPrivacy!=_NO_PRIVACY_) {
+-		priv->ext_stats.rx_data_drops++;
+-		DEBUG_ERR("RX DROP: Discard a un-encrypted WDS packet!\n");
+-		rtl_kfree_skb(priv, pskb, _SKB_RX_);
+-		SNMP_MIB_INC(dot11WEPExcludedCount, 1);
+-		return (struct rx_frinfo *)NULL;
+-	}
+-#endif
+-#endif
+-	prx_frinfo = defrag_frame_main(priv, pfrinfo);
++    if(drop) {
++        priv->ext_stats.rx_data_drops++;
++        if(encrypt) {
++            DEBUG_ERR("RX DROP: Discard a encrypted packet!\n");
++        }
++        else {           
++            SNMP_MIB_INC(dot11WEPExcludedCount, 1);
++            DEBUG_ERR("RX DROP: Discard a un-encrypted 4-address(WDS/MESH/A4_STA) packet!\n");
++        }
++        rtl_kfree_skb(priv, pskb, _SKB_RX_);
++        return (struct rx_frinfo *)NULL;
++    }
+ 
+-	return prx_frinfo;
++    prx_frinfo = defrag_frame_main(priv, pfrinfo);
++    return prx_frinfo;
+ }
+ 
+-
+ static int auth_filter(struct rtl8192cd_priv *priv, struct stat_info *pstat,
+ 				struct rx_frinfo *pfrinfo)
+ {
+@@ -9376,16 +9384,16 @@ static int process_datafrme(struct rtl81
+ 		else
+ #endif
+ #ifdef WDS
+-		if (pfrinfo->to_fr_ds == 3) {
++		if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled) {
+ 			pstat = get_stainfo(priv, GetAddr2Ptr(pframe));
+ 			pskb->dev = getWdsDevByAddr(priv, GetAddr2Ptr(pframe));
+ 		}
+ 		else
+ #endif
+-		{
+ #ifdef A4_STA
+-			if (pfrinfo->to_fr_ds == 3 &&  priv->pshare->rf_ft_var.a4_enable)
++			if (pfrinfo->to_fr_ds == 3 &&  priv->pshare->rf_ft_var.a4_enable) }
+ 				pstat = get_stainfo(priv, GetAddr2Ptr(pframe));
++			}
+ 			else
+ #endif
+             {
+@@ -9396,7 +9404,6 @@ static int process_datafrme(struct rtl81
+             #endif //#ifdef HW_FILL_MACID
+ 
+             }
+-		}
+ 
+ #if defined(CONFIG_RTL_WAPI_SUPPORT)
+ #if defined(CONFIG_PCI_HCI)
+@@ -9420,7 +9427,7 @@ static int process_datafrme(struct rtl81
+ 
+ 		// log rx statistics...
+ #ifdef  WDS
+-		if (pfrinfo->to_fr_ds == 3) {
++		if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled) {
+ 			privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
+ 		}
+ 		else
+@@ -9545,7 +9552,7 @@ static int process_datafrme(struct rtl81
+ #endif
+ 
+ 		// AP always receive unicast frame only
+-#ifdef WDS
++#if defined(WDS) || defined(A4_STA)
+ 		if (pfrinfo->to_fr_ds!=3 && IS_MCAST(da))
+ #else
+ 		if (IS_MCAST(da))
+@@ -9729,12 +9736,11 @@ mcast_netif_rx:
+ 				dst_pstat = a4_sta_lookup(priv, da);
+ #endif
+ 
++			if ((dst_pstat == NULL) || (!(dst_pstat->state & WIFI_ASOC_STATE))
+ #ifdef WDS
+-			if ((pfrinfo->to_fr_ds==3) ||
+-				(dst_pstat == NULL) || !(dst_pstat->state & WIFI_ASOC_STATE))
+-#else
+-			if ((dst_pstat == NULL) || (!(dst_pstat->state & WIFI_ASOC_STATE)))
++				|| (pfrinfo->to_fr_ds==3 && priv->pmib->dot11WdsInfo.wdsEnabled)
+ #endif
++			)
+ 			{
+ #ifndef __ECOS
+ 				if (priv->pmib->dot11OperationEntry.guest_access
+@@ -9877,11 +9883,12 @@ mcast_netif_rx:
+ #endif
+ 				{
+ #if (defined(EAP_BY_QUEUE) || defined(INCLUDE_WPA_PSK)) && (!defined(WIFI_HAPD) || defined(HAPD_DRV_PSK_WPS)) && (!defined(RTK_NL80211))
+-#ifdef WDS
+-				if ((pfrinfo->to_fr_ds != 3) && (*(unsigned short *)(SKB_MAC_HEADER(pskb) + MACADDRLEN*2) == __constant_htons(0x888e)))
+-#else
++				#ifdef WDS
++				if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled) {
++					;
++				} else
++				#endif
+ 				if (*(unsigned short *)(SKB_MAC_HEADER(pskb) + MACADDRLEN*2) == __constant_htons(0x888e))
+-#endif
+ 				{
+ 					if (IEEE8021X_FUN
+ #ifdef INCLUDE_WPA_PSK
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_tx.c
+@@ -10193,9 +10193,9 @@ int __rtl8192cd_start_xmit_out(struct sk
+     struct net_device *dev = skb->dev;
+     struct sk_buff *newskb = NULL;
+     struct net_device *wdsDev = NULL;
+-#if defined(SUPPORT_TX_AMSDU) && defined(CONFIG_RTK_MESH)
+-	int block_mesh = 0;
+-    #endif
++#ifdef CONFIG_RTK_MESH
++    int block_mesh = 0;
++#endif
+ #if defined(CONFIG_RTL8672) || defined(TX_SHORTCUT)
+     int k;
+ #endif
+@@ -10400,13 +10400,9 @@ int __rtl8192cd_start_xmit_out(struct sk
+ 
+ 
+ #ifdef SUPPORT_TX_AMSDU
+-    #ifdef CONFIG_RTK_MESH
++    #if defined(CONFIG_RTK_MESH) && !defined(MESH_AMSDU)
+     if(dev == priv->mesh_dev){
+-
+-        #if !defined(MESH_AMSDU)
+         block_mesh = 1;
+-        #endif
+-        
+     }
+     #endif
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh.h
+@@ -170,18 +170,16 @@ typedef struct rtl8190_priv DRV_PRIV;
+ #define MESH_PEER_LINK_CAP_CAPACITY_MASK	(BIT(12)|BIT(11)|BIT(10)|BIT(9)|BIT(8)|BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0))	// MASK of Peer capacity(capacity)
+ #define MESH_PEER_LINK_CAP_FLAGS_MASK		(BIT(7)|BIT(6)|BIT(5))	// MASK of Peer capacity (flags, Because 1byte)
+ 
+-
+-#define MAX_MPP_NUM 				15
++#define PATHSEL_TABLE_SIZE          4  /* the real size is power of 2*/
++#define MAX_MPP_NUM 				15  /* it should be ((1<<PATHSEL_TABLE_SIZE) - 1) */
+ #define DATA_SKB_BUFFER_SIZE 		7 		// acutal size is power of 2
+-#define AODV_RREQ_TABLE_SIZE 		128 	// must equal 2^DATA_SKB_BUFFER_SIZE
+-#define PROXY_TABLE_SIZE 			7  		// acutal size is power of 2
+-// #define PATHSEL_TABLE_SIZE			128
++#define PROXY_TABLE_SIZE 			8  		// acutal size is power of 2
+ 
+ #define _MESH_HEADER_TTL_  			MAX_MPP_NUM
+ 
+ // the following two parameters must be power of 2
+ #define SZ_HASH_IDX1 8
+-#define SZ_HASH_IDX2 128
++#define SZ_HASH_IDX2 512
+ 
+ #ifdef	MESH_ESTABLISH_RSSI_THRESHOLD
+ #define	DEFAULT_ESTABLISH_RSSI_THRESHOLD	25;	//RSSI range : 0~100 (Decimal)
+@@ -331,6 +329,7 @@ struct MESH_Profile { // mesh_profile Co
+ 
+ struct MESH_Share {
+ 	unsigned short	seq;
++	unsigned short  seqMcast;
+ 	UINT8			PUseq;
+ };
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_proc.c
+@@ -691,7 +691,7 @@ int mesh_pathsel_routetable_info(char *b
+ 
+     int isPortal;
+     struct path_sel_entry * ptable;
+-    int i=0, j=0;
++    int i=0, j=0,k;
+ 
+     struct pann_mpp_tb_entry * mpptable;
+     unsigned long now =  jiffies;
+@@ -785,6 +785,13 @@ int mesh_pathsel_routetable_info(char *b
+                 for (j=0; j<MAX_IP_MC_ENTRY; j++) {
+                     if (ptable->ipmc[j].used) {
+                         PRINT_ARRAY_ARG("    mcmac: ",  ptable->ipmc[j].mcmac, "%02x", MACADDRLEN);
++                        if (ptable->ipmc[j].srcCount) {
++                            for(k = 0;k < MAX_IP_SRC_ENTRY; k++) {
++                                if(ptable->ipmc[j].srcValid[k]) {
++                                    PRINT_ARRAY_ARG("      client: ",  ptable->ipmc[j].srcMac[k], "%02x", MACADDRLEN);
++                                }
++                            }
++                        }   
+                     }
+                 }
+ #endif            
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.c
+@@ -31,6 +31,20 @@ unsigned short getMeshSeq(DRV_PRIV *priv
+     return priv->pshare->meshare.seq;
+ }
+ 
++unsigned short getMeshMCastSeq(DRV_PRIV *priv)
++{
++#ifndef SMP_SYNC
++    unsigned long flags;
++#endif
++    SAVE_INT_AND_CLI(flags);
++    if(priv->pshare->meshare.seqMcast == 0xffff)
++        priv->pshare->meshare.seqMcast = 1;
++    else
++        priv->pshare->meshare.seqMcast++;
++    RESTORE_INT(flags);
++    return priv->pshare->meshare.seqMcast;
++}
++
+ 
+ unsigned short getMeshMulticastSeq(DRV_PRIV *priv)
+ {
+@@ -68,7 +82,7 @@ UINT8 getPUSeq(DRV_PRIV *priv)
+ 
+ // return 0: duplicate
+ // return 1: ok
+-unsigned short chkMeshSeq(struct path_sel_entry *pPathselEntry, unsigned char *srcMac, unsigned short seq)
++unsigned short chkMeshSeq(struct path_sel_entry *pPathselEntry, unsigned short seq)
+ {
+     unsigned short idx = seq & (SZ_HASH_IDX2 - 1);
+ 
+@@ -95,42 +109,31 @@ int insert_PREQ_entry(unsigned char *tar
+     retryEntry= (struct mesh_rreq_retry_entry*) HASH_SEARCH(priv->mesh_rreq_retry_queue, targetMac);
+     if(	retryEntry== NULL)
+     {
+-        mesh_route_debug("PREQ to find %02x:%02x:%02x:%02x:%02x:%02x queued at %lu\n",
+-                targetMac[0],targetMac[1],targetMac[2],targetMac[3],targetMac[4],targetMac[5],jiffies);
+-        if(((priv->RreqEnd+1) % AODV_RREQ_TABLE_SIZE) == priv->RreqBegin) /*check if priv->RreqMAC is full*/
+-        {
+-            u8 *oldmac = priv->RreqMAC[priv->RreqBegin];
+-            retryEntry= (struct mesh_rreq_retry_entry*) HASH_SEARCH(priv->mesh_rreq_retry_queue, oldmac);
+-
+-            // retryEntry might be null for the first time
+-            // It has a potential bug when search_entry retun NULL (why?) but it it indeed a new round
+-            if(retryEntry) 
+-            { 
+-                struct sk_buff *poldskb;
+-                poldskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+-                while(poldskb)
+-                {
+-                    dev_kfree_skb_any(poldskb);
+-                    poldskb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
+-                }
+-
+-                HASH_DELETE(priv->mesh_rreq_retry_queue,retryEntry->MACAddr);				
+-            }
+-            priv->RreqBegin = (priv->RreqBegin + 1)%AODV_RREQ_TABLE_SIZE;
+-        }
+-
+         rreqEntry.TimeStamp = rreqEntry.createTime = jiffies;		
+         rreqEntry.Retries = 0;
+         memcpy(rreqEntry.MACAddr, targetMac, MACADDRLEN);		
+         rreqEntry.pktqueue.head = rreqEntry.pktqueue.tail = 0;
+-        
+         if(HASH_TABLE_SUCCEEDED != HASH_INSERT(priv->mesh_rreq_retry_queue, targetMac, &rreqEntry)) {
+             ret = 1;
+             goto ret;
+         }
+-        
+-        memcpy(priv->RreqMAC[(priv->RreqEnd)], targetMac, MACADDRLEN);		
+-        (priv->RreqEnd) = ((priv->RreqEnd) + 1)%AODV_RREQ_TABLE_SIZE;
++
++        mesh_route_debug("PREQ to find %02x:%02x:%02x:%02x:%02x:%02x queued at %lu\n",
++                targetMac[0],targetMac[1],targetMac[2],targetMac[3],targetMac[4],targetMac[5],jiffies);  
++
++        retryEntry = (struct mesh_rreq_retry_entry*) HASH_SEARCH(priv->mesh_rreq_retry_queue, targetMac);
++
++
++        if(priv->rreq_head == NULL) {           
++            retryEntry->rreq_prev = retryEntry->rreq_next =  NULL;
++            priv->rreq_head = priv->rreq_tail = retryEntry;
++        }
++        else {
++            retryEntry->rreq_next = NULL;
++            retryEntry->rreq_prev = priv->rreq_tail;
++            priv->rreq_tail->rreq_next = retryEntry;
++            priv->rreq_tail = retryEntry;
++        }      
+     }
+     else
+     {
+@@ -139,10 +142,11 @@ int insert_PREQ_entry(unsigned char *tar
+         retryEntry->TimeStamp=retryEntry->createTime=jiffies;		
+         retryEntry->Retries = 0;					
+     }
+-
++    
++ret:
+     RESTORE_INT(flags);
+     SMP_UNLOCK_MESH_PREQ(flags);
+-ret:
++    
+     return ret;
+ }
+ 
+@@ -288,8 +292,6 @@ void aodv_expire(void *task_priv)
+     DRV_PRIV *priv = (DRV_PRIV *)task_priv;
+     struct sk_buff *pskb;
+     struct mesh_rreq_retry_entry *retryEntry;
+-    unsigned char zero_addr[MACADDRLEN] = {0};
+-    int i=0;		 
+     
+     unsigned long flags;
+     #ifdef SMP_SYNC
+@@ -298,17 +300,9 @@ void aodv_expire(void *task_priv)
+     SAVE_INT_AND_CLI(flags);
+     SMP_LOCK_MESH_PREQ(flags);
+ 
+-
+-    for(i=(priv->RreqBegin);i!=(priv->RreqEnd);i=((i+1)%AODV_RREQ_TABLE_SIZE)) 
++    retryEntry = priv->rreq_head;
++    while(retryEntry) 
+     {
+-        retryEntry= (struct mesh_rreq_retry_entry*) HASH_SEARCH(priv->mesh_rreq_retry_queue,priv->RreqMAC[i]);
+-        if(retryEntry == NULL) {
+-            if( i != priv->RreqBegin )
+-                memcpy(priv->RreqMAC[ i ], zero_addr, MACADDRLEN);			 
+-            priv->RreqBegin = (priv->RreqBegin+1)%AODV_RREQ_TABLE_SIZE;
+-            continue;
+-        }
+-
+         if(time_after(jiffies, (UINT32)(retryEntry->TimeStamp)+ HWMP_NETDIAMETER_TRAVERSAL_TIME)) {
+             if (retryEntry->Retries > HWMP_MAX_PREQ_RETRIES )
+             {
+@@ -323,9 +317,23 @@ void aodv_expire(void *task_priv)
+                 }
+                 HASH_DELETE(priv->mesh_rreq_retry_queue,retryEntry->MACAddr);
+ 
+-                if( i != priv->RreqBegin )
+-                    memcpy(priv->RreqMAC[i], zero_addr, MACADDRLEN);				 
+-                priv->RreqBegin = (priv->RreqBegin+1)%AODV_RREQ_TABLE_SIZE;
++    
++                if(retryEntry == priv->rreq_head) { /*head*/
++                    priv->rreq_head = retryEntry->rreq_next;
++                }
++
++                if(retryEntry == priv->rreq_tail) {
++                    priv->rreq_tail = retryEntry->rreq_prev;
++                }
++
++                if(retryEntry->rreq_prev) {
++                    retryEntry->rreq_prev->rreq_next = retryEntry->rreq_next;
++                }
++
++                if(retryEntry->rreq_next) {
++                    retryEntry->rreq_next->rreq_prev = retryEntry->rreq_prev;
++                }                
++
+ 
+ #if defined(RTK_MESH_REMOVE_PATH_AFTER_AODV_TIMEOUT)
+                 SMP_LOCK_MESH_PATH(path_flag);
+@@ -348,6 +356,8 @@ void aodv_expire(void *task_priv)
+ 
+             } // (retryEntry->ptr!=NULL) and (not too old)
+         } // if(time_after) 
++
++        retryEntry = retryEntry->rreq_next;
+     } // end of for(i=(priv->RreqBegin);i<AODV_RREQ_TABLE_SIZE;i++)
+ 
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_route.h
+@@ -39,6 +39,8 @@ __PACK struct mesh_rreq_retry_entry {
+     long int			createTime;
+     unsigned char		Retries; // add by chuangch, the num of rreq retries
+     struct pkt_queue    pktqueue;
++	struct mesh_rreq_retry_entry *rreq_next;
++	struct mesh_rreq_retry_entry *rreq_prev;
+ }__WLAN_ATTRIB_PACK__;
+ 
+ 
+@@ -74,6 +76,11 @@ __PACK struct proxyupdate_table_entry	 {
+ __PACK struct mesh_ip_mcast_info {
+ 	int					used;
+ 	unsigned char		mcmac[MACADDRLEN];
++
++    /*src record*/
++    unsigned char srcCount;
++    unsigned char srcValid[MAX_IP_SRC_ENTRY];
++    unsigned char srcMac[MAX_IP_SRC_ENTRY][MACADDRLEN];	
+ };
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_rx.c
+@@ -139,8 +139,15 @@ out:
+ 
+ 
+ #ifdef RX_RL_SHORTCUT
++/*---------------------------------------------------------------
++	return value:
++	0:	shortcut ok
++	1:	discard this packet
++	-1:	can't do shortcut, data path should be continued
++ ---------------------------------------------------------------*/
++
+ int mesh_shortcut_update(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, 
+-             struct stat_info *pstat, int idx, struct path_sel_entry *pEntry, unsigned char *to_mesh, struct MESH_HDR **meshHdrPt)
++             struct rx_sc_entry* rxsc, DRV_PRIV **dest_priv, unsigned char* meshNextHop, unsigned char *to_mesh, struct MESH_HDR **meshHdrPt)
+ {
+ #ifdef SMP_SYNC
+     unsigned long flags;
+@@ -152,17 +159,35 @@ int mesh_shortcut_update(DRV_PRIV *priv,
+     DRV_PRIV * orig_priv = priv;
+ 
+     *to_mesh = 0;
+-    if (memcmp(GetAddr4Ptr(pframe), pstat->rx_sc_ent[idx].rx_wlanhdr.addr4, MACADDRLEN)){
++    priv = (DRV_PRIV *)priv->mesh_priv_first;
++
++    mesh_header = *meshHdrPt = (struct MESH_HDR *)getMeshHeader(orig_priv, orig_priv->pmib->dot11sKeysTable.dot11Privacy, pframe); 
++    if( mesh_header ) 
++    {
++        if(mesh_header->TTL < 1 || _MESH_HEADER_TTL_ < mesh_header->TTL || mesh_header->mesh_flag != 0x01 || mesh_header->SrcMACAddr[0] & 0x01)
++            return 1;
++    } 
++    else {
++        return 1;
++    }
++
++
++    if (memcmp(pfrinfo->sa, rxsc->rx_wlanhdr.addr4, MACADDRLEN) ||
++        memcmp(mesh_header->DestMACAddr, rxsc->rx_wlanhdr.meshhdr.DestMACAddr, 6) ||
++        memcmp(mesh_header->SrcMACAddr, rxsc->rx_wlanhdr.meshhdr.SrcMACAddr, 6)
++       )
++    {
+         return -1;
+     }
+ 
+-    priv = (DRV_PRIV *)priv->mesh_priv_first;
+-    if (memcmp(GetAddr3Ptr(pframe), GET_MY_HWADDR, MACADDRLEN)) {
++
++    if (memcmp(pfrinfo->da, GET_MY_HWADDR, MACADDRLEN)) {
+ 
+         SMP_LOCK_MESH_PATH(flags);
+-        pPathselEntry = HASH_SEARCH(priv->pathsel_table, GetAddr3Ptr(pframe));
++        pPathselEntry = HASH_SEARCH(priv->pathsel_table, pfrinfo->da);
+         if (pPathselEntry) {	            
+-            memcpy(pEntry, pPathselEntry, sizeof(struct path_sel_entry));
++            memcpy(meshNextHop, pPathselEntry->nexthopMAC,MACADDRLEN);
++            *dest_priv = pPathselEntry->priv;
+             *to_mesh = 1;
+         }
+         SMP_UNLOCK_MESH_PATH(flags);
+@@ -171,30 +196,27 @@ int mesh_shortcut_update(DRV_PRIV *priv,
+             return -1;	
+     }
+ 
+-    mesh_header = *meshHdrPt = (struct MESH_HDR *)getMeshHeader(orig_priv, orig_priv->pmib->dot11sKeysTable.dot11Privacy, pframe); 
+-    if( mesh_header ) 
+-    {
+-        if(1 > mesh_header->TTL || mesh_header->mesh_flag != 0x01) 
+-            return -1;
+-
+-        if (memcmp(mesh_header->DestMACAddr, pstat->rx_sc_ent[idx].rx_wlanhdr.meshhdr.DestMACAddr, 6) ||
+-            memcmp(mesh_header->SrcMACAddr, pstat->rx_sc_ent[idx].rx_wlanhdr.meshhdr.SrcMACAddr, 6)) {
+-            return -1;
+-        }
+-
+-    } 
+-    else {
+-        return -1;
+-    }
+ 	
+ 	
+     //6 addresss format, update pathsel and proxy timer 
+     SMP_LOCK_MESH_PATH(flags);
+     pPathselEntry = HASH_SEARCH(priv->pathsel_table, pfrinfo->sa); 
+-    if (pPathselEntry != NULL)
++    if(pPathselEntry) {
++        if(IS_MCAST(mesh_header->DestMACAddr) ){ // filter packets due to duplicate                                       
++            if(!chkMeshSeq(pPathselEntry, mesh_header->segNum)) {  
++                SMP_UNLOCK_MESH_PATH(flags);
++                return 1;
++            }            
++        }     
+         pPathselEntry->update_time = jiffies;
++    }
++    else {/*drop loop multicast packet*/
++        SMP_UNLOCK_MESH_PATH(flags);
++        return 1;
++    }
+     SMP_UNLOCK_MESH_PATH(flags);
+ 
++
+     SMP_LOCK_MESH_PROXY(flags);
+     pProxyEntry = (struct proxy_table_entry*) HASH_SEARCH(priv->proxy_table, mesh_header->SrcMACAddr);
+     if (pProxyEntry != NULL)
+@@ -205,7 +227,6 @@ int mesh_shortcut_update(DRV_PRIV *priv,
+         pProxyEntry->aging_time = 0;
+     SMP_UNLOCK_MESH_PROXY(flags);
+ 
+-
+     return 0;
+ }
+ 
+@@ -215,31 +236,23 @@ int mesh_shortcut_update(DRV_PRIV *priv,
+ 	pfrinfo->is_11s =1  => 802.11 header
+ 	pfrinfo->is_11s =8  => 802.3  header + mesh header
+ */
+-int relay_11s_dataframe_mcast(DRV_PRIV *priv, struct sk_buff *skb, int privacy, struct rx_frinfo *pfrinfo)
++int relay_11s_dataframe_mcast(DRV_PRIV *priv, struct sk_buff *skb, int privacy, struct rx_frinfo *pfrinfo, DRV_PRIV *orig_priv)
+ {	
+-    struct list_head *phead, *plist;
+-    struct stat_info *pstat;
+-    struct sk_buff *pnewskb = NULL, *pnewskb_send = NULL;
+-    unsigned char prehop[MACADDRLEN], nexthop[MACADDRLEN];
++    struct sk_buff *pnewskb = NULL;
+     unsigned char force_m2u = 0, sta_count = 0;
+-    struct path_sel_entry* pPathEntry;    
+     struct tx_insn tx_insn;
+-    DRV_PRIV *xmit_priv = NULL;    
+-    UINT16 seqNum;  
+-    int i,j,table_num;
+-
+-
+-    unsigned long flags = 0;
+-
+-    memcpy(prehop, GetAddr2Ptr(skb->data), MACADDRLEN);
++    int ret = 0;
+     pnewskb = skb_copy(skb, GFP_ATOMIC);
+-    if(skb_p80211_to_ether(skb->dev, privacy, pfrinfo) == FAIL){ // for e.g., CISCO CDP which has unsupported LLC's vendor ID
++    if(skb_p80211_to_ether(skb->dev, privacy, pfrinfo) == FAIL){
+         DEBUG_ERR("RX DROP: skb_p80211_to_ether fail!\n");
+-        return -1; 
++        orig_priv->ext_stats.rx_data_drops++;
++        ret = -1;
++        goto relay_end;
+     } 
+ 
++
+     if(1 > pfrinfo->mesh_header.TTL) {        
+-        return 0;
++        goto relay_end;
+     }
+ 
+     if (pnewskb) {  
+@@ -247,7 +260,7 @@ int relay_11s_dataframe_mcast(DRV_PRIV *
+         if(pfrinfo->is_11s&1) 
+         {
+             pfrinfo->is_11s = 2;/*replace wlan_header with eth_header, but keep the mesh header*/
+-            if(skb_p80211_to_ether(pnewskb->dev, privacy, pfrinfo) == FAIL){ // for e.g., CISCO CDP which has unsupported LLC's vendor ID        
++            if(skb_p80211_to_ether(pnewskb->dev, privacy, pfrinfo) == FAIL){
+                 pfrinfo->is_11s = 1;
+                 goto relay_end;
+             }
+@@ -297,7 +310,7 @@ relay_end:
+     }
+     /*roll back to original value*/
+     get_pskb(pfrinfo) = skb;
+-    return 0;
++    return ret;
+ 
+ }
+ 
+@@ -305,7 +318,7 @@ relay_end:
+ 	pfrinfo->is_11s =1  => 802.11 header
+ 	pfrinfo->is_11s =8  => 802.3  header + mesh header
+ */
+-int relay_11s_dataframe_ucast(DRV_PRIV *priv, struct sk_buff *skb, int privacy, struct rx_frinfo *pfrinfo)
++int relay_11s_dataframe_ucast(DRV_PRIV *priv, struct sk_buff *skb, int privacy, struct rx_frinfo *pfrinfo, DRV_PRIV *orig_priv)
+ {
+     unsigned long flags = 0;
+     struct path_sel_entry *pEntry;	    
+@@ -354,7 +367,9 @@ int relay_11s_dataframe_ucast(DRV_PRIV *
+         if(pfrinfo->is_11s&1) 
+         {
+             pfrinfo->is_11s = 2;
+-            if(skb_p80211_to_ether(skb->dev, privacy, pfrinfo) == FAIL) { // for e.g., CISCO CDP which has unsupported LLC's vendor ID
++            if(skb_p80211_to_ether(skb->dev, privacy, pfrinfo) == FAIL) {
++                DEBUG_ERR("RX DROP: skb_p80211_to_ether fail!\n");
++                orig_priv->ext_stats.rx_data_drops++;
+                 return -1;
+             }
+         }
+@@ -420,8 +435,6 @@ int __process_11s_datafrme(DRV_PRIV *pri
+     struct path_sel_entry *pPathselEntry;
+     struct stat_info *dapstat = NULL;    
+     int do_process;
+-    int ret;
+-
+     
+     pframe = get_pframe(pfrinfo);
+     pskb = get_pskb(pfrinfo);    
+@@ -444,12 +457,8 @@ int __process_11s_datafrme(DRV_PRIV *pri
+     
+     pPathselEntry = HASH_SEARCH(priv->pathsel_table, pfrinfo->sa);
+     if(pPathselEntry) {
+-    
+-        // Usually, IS_MCAST(A3) = IS_MCAST(A1) for a multicast frame
+-        // However, when using unicast to simulate multicast, A1 is unicast but A3 is not 
+-        // On the other hand, if a maliciuos host issues multicast for A1 but unicast for A3, a flooding would happen if not chcking A1
+-        if(IS_MCAST(pfrinfo->da) ){ // filter packets due to duplicate                                       
+-            if(!chkMeshSeq(pPathselEntry, pfrinfo->sa, meshHdrPtr->segNum)) {  
++        if(IS_MCAST(meshHdrPtr->DestMACAddr) ){ // filter packets due to duplicate                                       
++            if(!chkMeshSeq(pPathselEntry, meshHdrPtr->segNum)) {  
+                 SMP_UNLOCK_MESH_PATH(flags);
+                 return FAIL;
+             }            
+@@ -478,11 +487,9 @@ int __process_11s_datafrme(DRV_PRIV *pri
+     privacy = get_sta_encrypt_algthm(orig_priv, pstat);
+     if(IS_MCAST(pfrinfo->da))
+     {  
+-
+        if (!orig_priv->pmib->dot11OperationEntry.block_relay)
+         {
+-            ret = relay_11s_dataframe_mcast(priv,pskb, /*pskb->dev,*/ privacy, pfrinfo);
+-            if(ret < 0) {
++            if(relay_11s_dataframe_mcast(priv, pskb, privacy, pfrinfo, orig_priv) < 0) {               
+                 return FAIL;
+             }
+             else {
+@@ -493,92 +500,26 @@ int __process_11s_datafrme(DRV_PRIV *pri
+     } 
+     else			
+     {
+-
+         if( memcmp(pfrinfo->da, GET_MY_HWADDR, MACADDRLEN)== 0)
+         {     
+-            // filter packets that SA is myself 
+-            if ( memcmp(pfrinfo->sa, GET_MY_HWADDR, MACADDRLEN) == 0)
+-                return FAIL;
+-
+-#ifdef PU_STANDARD_RX
+-            if( Is_6AddrFormat && memcmp(GET_MY_HWADDR, addr5, MACADDRLEN) )
+-            {
+-                struct proxyupdate_table_entry Entry;
+-                struct proxy_table_entry *pEntry=NULL;
+-                struct path_sel_entry *pdstEntry=NULL;
+-
+-                //check if addr5 is my associating STA
+-                if(get_stainfo(priv, addr5)!=NULL)
+-                    goto receive_packet;
+-
+-                // check if addr5 is any other AP's STA
+-                SMP_LOCK_MESH_PROXY(flags);
+-                pEntry = HASH_SEARCH(priv->proxy_table, addr5);
+-                if( pEntry )
+-                {
+-                    pEntry->aging_time = 0;
+-                    // case: my bridged PC
+-                    //     da=me, STA = NULL, proxy != NULL 
+-                    if(memcmp(GET_MY_HWADDR, pEntry->owner, MACADDRLEN)==0) {
+-                        SMP_UNLOCK_MESH_PROXY(flags);
+-                        goto receive_packet;
+-                    }
+-
+-                    // case: I know the proxied node resided in (but not behind me)
+-                    //     da=me, STA =NULL, proxy->owner=other node -> proxy update:add
+-                    else 
+-                    {
+-                        Entry.PUflag = PU_add;
+-                        memcpy((void *)Entry.proxymac, pEntry->owner, MACADDRLEN);
+-                    }
+-                }
+-                else					
+-                {
+-                    // case: unknown entry
+-                    //  da=me, STA=NULL, proxy = NULL
+-                    //  it might be an un-recorded bridged PC happens for pEntry = NULL
+-                    Entry.PUflag = PU_delete;
+-                    memcpy((void *)Entry.proxymac, GET_MY_HWADDR, MACADDRLEN);
+-                }                    
+-                SMP_UNLOCK_MESH_PROXY(flags);
+-
+-                SMP_LOCK_MESH_PATH(flags);
+-                pdstEntry = HASH_SEARCH(priv->pathsel_table, pfrinfo->sa);
+-                if( pdstEntry){
+-                    Entry.isMultihop = pdstEntry->hopcount ;
+-                    memcpy(Entry.nexthopmac ,pdstEntry->nexthopMAC ,MACADDRLEN);
+-                    SMP_UNLOCK_MESH_PATH(flags);
+-                }
+-                else{
+-                    SMP_UNLOCK_MESH_PATH(flags);
+-                    memset((void *)Entry.nexthopmac ,0xff ,MACADDRLEN);
+-                    Entry.isMultihop =0;
+-                }
+-                memcpy(Entry.destproxymac ,pfrinfo->sa ,MACADDRLEN);
+-                memcpy((void *)Entry.proxiedmac, addr5 ,MACADDRLEN);								
+-                Entry.retry = 1U;
+-                Entry.PUSN = getPUSeq(priv);
+-                Entry.STAcount = 0x0001;
+-                Entry.update_time = jiffies;
+-                issue_proxyupdate_MP(priv,&Entry);
+-            }
+-
+-#endif // PU_STANDARD_RX
+-
+             goto receive_packet;
+-							
+-        } // if( !memcmp(pfrinfo->da, GET_MY_HWADDR, MACADDRLEN) )
++        }
+         else if (orig_priv->pmib->dot11OperationEntry.block_relay == 0)
+         { 
+             // dest is not me & relay is allow
+             dapstat = get_stainfo(priv, pfrinfo->da);
+             if(dapstat != NULL && isSTA(dapstat))
+             {
+-                // filter packets that SA is myself 
+-                if ( memcmp(pfrinfo->sa, GET_MY_HWADDR, MACADDRLEN) == 0)
++                goto receive_packet;				
++            }             
++            else if (relay_11s_dataframe_ucast(priv, pskb, privacy, pfrinfo, orig_priv) < 0)
+                     return FAIL;
+-                else
+-                {
++
++            return SUCCESS;	  
++        } 
++        return FAIL;
++    }   
++
+ receive_packet:
+                     if (skb_p80211_to_ether(pskb->dev, privacy, pfrinfo) == FAIL) {
+                         orig_priv->ext_stats.rx_data_drops++;
+@@ -592,7 +533,8 @@ to_bridge:
+                     if(pfrinfo->is_11s&1) {
+                         pskb->dev = priv->mesh_dev;
+                         if ((orig_priv->pmib->dot11BssType.net_work_type & WIRELESS_11N) &&
+-                            orig_priv->pmib->reorderCtrlEntry.ReorderCtrlEnable) {
++            orig_priv->pmib->reorderCtrlEntry.ReorderCtrlEnable) 
++        {
+                             *(unsigned long *)&(pfrinfo->pskb->cb[4]) = 0;
+                             pfrinfo->pskb->cb[3] = 0;
+                             if (reorder_ctrl_check(orig_priv, pstat, pfrinfo) == FALSE) {
+@@ -608,13 +550,5 @@ to_bridge:
+ 
+                     return SUCCESS;					
+                 }
+-            } 
+-
+-            if (relay_11s_dataframe_ucast(priv, pskb, privacy, pfrinfo))
+-                return FAIL;	
+-        } 
+-		return SUCCESS;
+-    }   
+-}
+ 
+ #endif	// CONFIG_RTK_MESH
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_sme.c
+@@ -494,7 +494,7 @@ int mesh_channel_switch_initiate(struct
+ 
+             bss_bw = HT_CHANNEL_WIDTH_20_40;
+ #ifdef RTK_AC_SUPPORT
+-            if(GET_CHIP_VER(priv)==VERSION_8812E || GET_CHIP_VER(priv)==VERSION_8881A || GET_CHIP_VER(priv)==VERSION_8814A)
++            if(priv->pmib->dot11BssType.net_work_type & WIRELESS_11AC)          
+             {
+                 if((priv->pmib->dot11Bss.t_stamp[1] & (BSS_BW_MASK << BSS_BW_SHIFT))
+                         == (HT_CHANNEL_WIDTH_80 << BSS_BW_SHIFT))
+@@ -592,6 +592,11 @@ int static mesh_DFS_check(DRV_PRIV *priv
+ 
+     if(swchnl_channel && pSwWrapper && swchnl_precedence && swchnl_ttl > 0)
+     {
++        if (swchnl_channel == priv->pmib->dot11RFEntry.dot11channel) {
++            STADEBUG("Detect DFS from other MAP with same ch %d\n", swchnl_channel);
++            return ret;
++        }
++
+         if(GET_ROOT(priv)->pmib->dot11DFSEntry.DFS_detected == 0 || (swchnl_precedence > priv->mesh_swchnl_precedence))
+         {
+ 
+@@ -650,11 +655,13 @@ int mesh_DFS_switch_channel(struct rtl81
+     {
+         if(MESH_PEER_LINK_CAP_NUM(priv) == GET_MIB(priv)->dot1180211sInfo.mesh_max_neightbor) {            
+             STADEBUG("Detect DFS and no mesh neightbor exist, rescan to join MESH\n");
+-            priv->pmib->dot11DFSEntry.DFS_detected = 0;            
++            priv->pmib->dot11DFSEntry.DFS_detected = 0;
++            priv->pshare->dfsSwitchChannel = 0;
+             priv->auto_channel = 1;
+             priv->pmib->dot11RFEntry.dot11channel = priv->available_chnl[0];
+             priv->mesh_ChannelPrecedence = 0;   
+             priv->mesh_fix_channel = 0;
++            RTL_W8(TXPAUSE, STOP_BCN);
+             start_clnt_ss(priv);
+         }
+         else {           
+@@ -3710,7 +3717,7 @@ unsigned int OnAssocRsp_MP(DRV_PRIV *pri
+     if (GET_CHIP_VER(priv)==VERSION_8188E)
+     {
+ #ifdef RATEADAPTIVE_BY_ODM
+-        ODM_RAInfo_Init(ODMPTR, pstat->aid);
++        odm_ra_info_init(ODMPTR, pstat->aid);
+ #else
+         priv->pshare->RaInfo[pstat->aid].pstat = pstat;
+         RateAdaptiveInfoInit(&priv->pshare->RaInfo[pstat->aid]);
+@@ -4578,17 +4585,6 @@ unsigned int OnDisassoc_MP(DRV_PRIV *pri
+ #endif
+     }
+ 
+-#ifdef CONFIG_RTL8186_KB
+-    if (priv->pmib->dot11OperationEntry.guest_access || (pstat && pstat->ieee8021x_ctrlport == DOT11_PortStatus_Guest))
+-    {
+-        if (priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == 0)
+-        {
+-            /* hotel style guest access */
+-            set_guestmacinvalid(priv, sa);
+-        }
+-    }
+-#endif
+-
+     // Need change state back to autehnticated
+     release_stainfo(priv, pstat);
+     init_stainfo(priv, pstat);
+@@ -5015,4 +5011,46 @@ unsigned int OnPathSelectionManagFrame(D
+     return SUCCESS;
+ }
+ 
++
++int mesh_close(DRV_PRIV *priv) 
++{
++    int i,tbl_sz;
++    struct mesh_rreq_retry_entry *retryEntry;
++    struct sk_buff *skb;
++    unsigned long flags;
++
++#if defined(RTK_MESH_AODV_STANDALONE_TIMER)
++    if (timer_pending(&priv->mesh_expire_timer))
++       del_timer_sync(&priv->mesh_expire_timer);
++#endif
++
++
++    SAVE_INT_AND_CLI(flags);
++    SMP_LOCK_MESH_PREQ(flags);
++
++    tbl_sz = 1 << priv->mesh_rreq_retry_queue->table_size_power;
++    for (i = 0; i < tbl_sz; i++)
++    {
++        if (priv->mesh_rreq_retry_queue->entry_array[i].dirty)
++        {
++            retryEntry = ((struct mesh_rreq_retry_entry*)priv->mesh_rreq_retry_queue->entry_array[i].data);
++            skb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++            while(skb)
++            {
++                dev_kfree_skb_any(skb);
++                skb = (struct sk_buff*)deque(priv,&(retryEntry->pktqueue.head),&(retryEntry->pktqueue.tail),(unsigned long)retryEntry->pktqueue.pSkb,NUM_TXPKT_QUEUE);
++            }
++            priv->mesh_rreq_retry_queue->entry_array[i].dirty = 0;
++        }        
++    }
++    priv->rreq_head = NULL;
++    priv->rreq_tail = NULL;
++
++    RESTORE_INT(flags);
++    SMP_UNLOCK_MESH_PREQ(flags);
++    
++    return 0;
++}
++
++
+ #endif	// CONFIG_RTK_MESH
+--- a/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/mesh_ext/mesh_tx.c
+@@ -28,11 +28,14 @@ struct mesh_mcast_info {
+ };
+ 
+ 
+-__inline__ void ini_txinsn(struct tx_insn* txcfg, DRV_PRIV *priv)
++__inline__ void ini_txinsn(struct tx_insn* txcfg, DRV_PRIV *priv, unsigned char isMCast)
+ {
+ 	txcfg->is_11s = 1;
+ 	txcfg->mesh_header.mesh_flag= 1;
+ 	txcfg->mesh_header.TTL = _MESH_HEADER_TTL_;
++	if(isMCast) 
++		txcfg->mesh_header.segNum = getMeshMCastSeq(priv);		
++	else
+ 	txcfg->mesh_header.segNum = getMeshSeq(priv);		
+ }
+ 
+@@ -61,6 +64,23 @@ int notify_path_found(unsigned char *des
+     }while(pskb != NULL);
+ 
+     HASH_DELETE(priv->mesh_rreq_retry_queue,retryEntry->MACAddr);
++
++    if(retryEntry == priv->rreq_head) { /*head*/
++        priv->rreq_head = retryEntry->rreq_next;
++    }
++
++    if(retryEntry == priv->rreq_tail) {
++        priv->rreq_tail = retryEntry->rreq_prev;
++    }
++    
++    if(retryEntry->rreq_prev) {
++        retryEntry->rreq_prev->rreq_next = retryEntry->rreq_next;
++    }
++    
++    if(retryEntry->rreq_next) {
++        retryEntry->rreq_next->rreq_prev = retryEntry->rreq_prev;
++    }      
++
+     
+     RESTORE_INT(flags);
+     SMP_UNLOCK_MESH_PREQ(flags); 
+@@ -507,7 +527,7 @@ int dot11s_datapath_decision(struct sk_b
+     unsigned char sta_count = 0;
+     
+     if(ptxinsn)
+-        ini_txinsn(ptxinsn, priv);
++        ini_txinsn(ptxinsn, priv, IS_MCAST(skb->data));
+     else {
+         dev_kfree_skb_any(skb);
+         return 0;
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -4347,10 +4347,6 @@ struct priv_shared_info {
+ 	unsigned char		use_hal;
+     unsigned char		use_macHalAPI;
+ 
+-#if defined(DFS) || defined(RTK_AC_SUPPORT)
+-	unsigned int		dfsSwitchChannel;
+-#endif
+-
+ #if defined(__ECOS) || defined(CONFIG_RTL865X_WTDOG) || defined(CONFIG_RTL_WTDOG)
+ 	unsigned long		wtval;
+ #endif
+@@ -5004,6 +5000,7 @@ struct priv_shared_info {
+ #endif
+ 
+ #if defined(DFS) || defined(RTK_AC_SUPPORT)
++	unsigned int			dfsSwitchChannel;
+ 	unsigned int			dfsSwitchChCountDown;
+ 	unsigned int			dfsSwCh_ongoing;
+ #endif
+@@ -5334,9 +5331,7 @@ typedef struct rtl8192cd_priv {
+ 
+ 
+     /* protected by mesh_preq_lock*/    
+-    unsigned char           RreqMAC[AODV_RREQ_TABLE_SIZE][MACADDRLEN];
+-    unsigned int            RreqBegin;
+-    unsigned int            RreqEnd;
++    struct mesh_rreq_retry_entry *rreq_head,*rreq_tail;
+     struct hash_table       *mesh_rreq_retry_queue;
+     /* End of protected by mesh_preq_lock*/
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -2308,9 +2308,10 @@ EXTERN int mesh_metric_w (struct file *f
+ #endif
+ 
+ EXTERN void aodv_expire(void *task_priv);
+-EXTERN unsigned short chkMeshSeq(struct path_sel_entry *pPathselEntry, unsigned char *srcMac, unsigned short seq);
++EXTERN unsigned short chkMeshSeq(struct path_sel_entry *pPathselEntry, unsigned short seq);
+ EXTERN void GEN_PREQ_PACKET(char *targetMac, struct rtl8192cd_priv *priv);
+ EXTERN unsigned short getMeshSeq(struct rtl8192cd_priv *priv);
++EXTERN unsigned short getMeshMCastSeq(struct rtl8192cd_priv *priv);
+ EXTERN unsigned short getMeshMulticastSeq(DRV_PRIV *priv);
+ EXTERN void init_mpp_pool(struct mpp_tb* pTB);
+ EXTERN void notifyPathSelection(struct rtl8192cd_priv *priv);
+@@ -2347,7 +2348,7 @@ EXTERN int insert_PREQ_entry(unsigned ch
+ EXTERN int process_11s_datafrme(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo, struct stat_info *pstat);
+ EXTERN int __process_11s_datafrme(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, struct stat_info *pstat, struct MESH_HDR *meshHdrPtr);
+ EXTERN int rx_dispatch_mesh(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
+-EXTERN int mesh_shortcut_update(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, struct stat_info *pstat, int idx, struct path_sel_entry *pEntry, unsigned char *to_mesh, struct MESH_HDR **meshHdrPt);
++EXTERN int mesh_shortcut_update(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, struct rx_sc_entry* rxsc, DRV_PRIV **dest_priv, unsigned char* meshNextHop,  unsigned char *to_mesh, struct MESH_HDR **meshHdrPt);
+ #undef EXTERN
+ 
+ 
+@@ -2427,6 +2428,8 @@ EXTERN void  issue_proxyupdate_ADD(struc
+ EXTERN void OnProxyUpdate_MP(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
+ EXTERN void OnProxyUpdateConfirm_MP(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
+ #endif
++
++EXTERN int mesh_close(DRV_PRIV *priv);
+ #undef EXTERN
+ 
+ 
+@@ -2545,7 +2548,7 @@ EXTERN int a4_rx_dispatch(struct rtl8192
+                     ,int vap_idx
+ #endif
+ );
+-EXTERN struct stat_info * a4_rx_check_reuse_ap(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo);
++EXTERN struct stat_info * a4_rx_check_reuse_ap(struct rtl8192cd_priv *priv, struct stat_info *pstat, struct rx_frinfo *pfrinfo);
+ EXTERN unsigned char a4_rx_check_reuse(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo, unsigned char * myhwaddr);
+ 
+ #ifdef CONFIG_RTL_PROC_NEW
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -597,15 +597,15 @@
+                                      
+ static inline int rtk_memcmp(unsigned char *addr1, unsigned char *addr2, unsigned int len)                         
+ {
+-	unsigned int k=0, result=0;
++	unsigned int k, result=0;
+ 	if(((unsigned long)(addr1)|(unsigned long)(addr2)| len) &1) {
+-		for(k; k<len; k++)
++		for(k=0; k<len; k++)
+ 			result |= (addr1[k]^addr2[k]);
+ 		return result;
+ 	} else {
+ 		unsigned short *s1 = (unsigned short *)addr1;
+ 		unsigned short *s2 = (unsigned short *)addr2;		
+-		for(k; k<(len/2); k++, s1++, s2++)
++		for(k=0; k<(len/2); k++, s1++, s2++)
+ 			result |= ((*s1) ^(*s2));
+ 		return result;		
+ 	}
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_a4_sta.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_a4_sta.c
+@@ -464,6 +464,9 @@ void a4_tx_unknown_unicast(struct rtl819
+             if (newskb)
+             {
+                 newskb->cb[2] = (char)0xff;         // not do aggregation
++                #if defined(CONFIG_RTK_MESH)
++                __rtl8192cd_start_xmit_out(newskb, pstat, NULL);
++                #endif
+                 __rtl8192cd_start_xmit_out(newskb, pstat);
+             }
+             else
+@@ -504,6 +507,9 @@ unsigned char a4_tx_mcast_to_unicast(str
+                 if (newskb)
+                 {
+                     newskb->cb[2] = (char)0xff;         // not do aggregation
++                    #if defined(CONFIG_RTK_MESH)
++                    __rtl8192cd_start_xmit_out(newskb, pstat, NULL);
++                    #endif
+                     __rtl8192cd_start_xmit_out(newskb, pstat);
+                 }
+                 else
+@@ -594,31 +600,26 @@ int a4_rx_dispatch(struct rtl8192cd_priv
+ }
+ 
+ 
+-struct stat_info *a4_rx_check_reuse_ap(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo)
++struct stat_info *a4_rx_check_reuse_ap(struct rtl8192cd_priv *priv, struct stat_info *pstat, struct rx_frinfo *pfrinfo)
+ {
+-    unsigned char *pframe = get_pframe(pfrinfo);
+-    struct stat_info *pstat = get_stainfo(priv, GetAddr2Ptr(pframe));
+-    if(pstat)
++    if((pstat->state & WIFI_A4_STA) && pfrinfo->to_fr_ds != 3) /*only recieve 4 address packet from A4 client*/
++        return NULL;
++    else if(!(pstat->state & WIFI_A4_STA) && pfrinfo->to_fr_ds == 3)
+     {
+-        if((pstat->state & WIFI_A4_STA) && pfrinfo->to_fr_ds != 3) /*only recieve 4 address packet from A4 client*/
+-            return NULL;
+-        else if(!(pstat->state & WIFI_A4_STA) && pfrinfo->to_fr_ds == 3)
++        if(priv->pshare->rf_ft_var.a4_enable == 1)
+         {
+-            if(priv->pshare->rf_ft_var.a4_enable == 1)
+-            {
+-                add_a4_client(priv, pstat);
+-            }
+-            else
+-            {
+-                return NULL;
+-            }
++            add_a4_client(priv, pstat);
+         }
+-
+-        if(pfrinfo->to_fr_ds == 3 && (pstat->state & WIFI_A4_STA))
++        else
+         {
+-            a4_sta_add(priv, pstat, pfrinfo->sa);
++            return NULL;
+         }
+     }
++
++    if(pfrinfo->to_fr_ds == 3 && (pstat->state & WIFI_A4_STA))
++    {
++        a4_sta_add(priv, pstat, pfrinfo->sa);
++    }
+     return pstat;
+ }
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_aes.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_aes.c
+@@ -1439,13 +1439,7 @@ unsigned int aesccmp_decrypt(struct rtl8
+ 
+ 	if (OPMODE & WIFI_AP_STATE)
+ 	{
+-#if defined(WDS) || defined(CONFIG_RTK_MESH)
+-		if (to_fr_ds == 3)
+-			pstat = get_stainfo (priv, GetAddr2Ptr(pframe));
+-		else
+-#endif
+-
+-#ifdef A4_STA
++#if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
+ 		if (to_fr_ds == 3)
+ 			pstat = get_stainfo (priv, GetAddr2Ptr(pframe));
+ 		else			
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_proc.c
+@@ -5304,8 +5304,10 @@ static int dump_one_stainfo(int num, str
+ 	CHECK_LEN_B;
+ 
+ #ifdef A4_STA
+-   PRINT_SINGL_ARG("    A4 STA: ", (pstat->state & WIFI_A4_STA)?"Y":"N", "%s");
+-   CHECK_LEN_B;
++	if(priv->pshare->rf_ft_var.a4_enable) {
++		PRINT_SINGL_ARG("    A4 STA: ", (pstat->state & WIFI_A4_STA)?"Y":"N", "%s");
++		CHECK_LEN_B;
++	}
+ #endif
+ 	
+ #ifdef TV_MODE
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_dfs.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_dfs.c
+@@ -445,9 +445,11 @@ void rtl8192cd_ch_avail_chk_timer(unsign
+ 	unsigned long flags;
+ #endif
+ 
++	SAVE_INT_AND_CLI(flags);
+ 	SMP_LOCK(flags);
+ 	if (!(priv->drv_state & DRV_STATE_OPEN)) {
+ 		SMP_UNLOCK(flags);
++		RESTORE_INT(flags);
+ 		return;
+ 	}
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+@@ -3112,7 +3112,7 @@ int skb_p80211_to_ether(struct net_devic
+ 			else
+ #endif // CONFIG_RTK_MESH
+ #ifdef WDS
+-			if (pfrinfo->to_fr_ds == 3)
++			if (pfrinfo->to_fr_ds == 3 && priv->pmib->dot11WdsInfo.wdsEnabled)
+ 				privacy = priv->pmib->dot11WdsInfo.wdsPrivacy;
+ 			else
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/8812_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8812_hw.c
+@@ -3692,6 +3692,7 @@ void SwitchChannel(struct rtl8192cd_priv
+ 
+ 	priv->pmib->dot11DFSEntry.DFS_detected = 0;
+ 	priv->ht_cap_len = 0;
++	update_beacon(priv);
+ 
+ #ifdef MBSSID
+ 	if (priv->pmib->miscEntry.vap_enable) {
+@@ -3700,6 +3701,7 @@ void SwitchChannel(struct rtl8192cd_priv
+ 			if (IS_DRV_OPEN(priv->pvap_priv[i])) {
+ 				priv->pvap_priv[i]->pmib->dot11RFEntry.dot11channel = ch;
+ 				priv->pvap_priv[i]->ht_cap_len = 0;
++				update_beacon(priv->pvap_priv[i]);
+ 			}
+ 		}
+ 	}

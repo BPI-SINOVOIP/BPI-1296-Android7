@@ -1,0 +1,5 @@
+###
+###	  part = (name mount_point filesystem file size)
+part = rootfs / squashfs omv/squashfs1.img 100663296
+#part = rootfs / ext4 omv/root.bin 268435456
+part = etc etc ext4 omv/etc.bin 41943040

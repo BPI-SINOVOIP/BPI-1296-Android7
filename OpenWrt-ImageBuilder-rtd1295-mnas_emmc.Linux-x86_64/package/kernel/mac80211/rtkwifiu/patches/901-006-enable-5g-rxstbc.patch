@@ -1,0 +1,88 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8811au/os_dep/linux/os_intfs.c
+@@ -147,7 +147,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if (defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
+ int rtw_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ #else
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
+@@ -112,7 +112,7 @@ int rtw_ht_enable = 1;
+ int rtw_bw_mode = 0x21;
+ int rtw_cbw40_enable = 3; // 0 :diable, bit(0): enable 2.4g, bit(1): enable 5g
+ int rtw_ampdu_enable = 1;//for enable tx_ampdu ,// 0: disable, 0x1:enable (but wifi_spec should be 0), 0x2: force enable (don't care wifi_spec)
+-int rtw_rx_stbc = 1;// 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ
++int rtw_rx_stbc = 3;// 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ
+ int rtw_ampdu_amsdu = 0;// 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on
+ // Short GI support Bit Map
+ // BIT0 - 20MHz, 0: non-support, 1: support
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/os_intfs.c
+@@ -127,7 +127,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ int rtw_ampdu_amsdu = 0;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ /* Short GI support Bit Map
+ * BIT0 - 20MHz, 0: non-support, 1: support
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/os_intfs.c
+@@ -149,7 +149,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if (defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
+ int rtw_rx_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ #else
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/os_intfs.c
+@@ -151,7 +151,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if (defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
+ int rtw_rx_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ #else
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/os_intfs.c
+@@ -127,7 +127,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if defined(CONFIG_RTL8822B) && defined(CONFIG_PCI_HCI)
+ int rtw_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ #else
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/os_intfs.c
+@@ -153,7 +153,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if (defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
+ int rtw_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */
+ #else
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/os_intfs.c
+@@ -127,7 +127,7 @@ int rtw_ht_enable = 1;
+ * 0x21 means enable 2.4G 40MHz & 5G 80MHz */
+ int rtw_bw_mode = 0x21;
+ int rtw_ampdu_enable = 1;/* for enable tx_ampdu , */ /* 0: disable, 0x1:enable */
+-int rtw_rx_stbc = 1;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
++int rtw_rx_stbc = 3;/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
+ #if defined(CONFIG_RTL8822B) && (defined(CONFIG_PCI_HCI)|| defined(CONFIG_SDIO_HCI))
+ #if defined(CONFIG_PCI_HCI)
+ int rtw_ampdu_amsdu = 2;/* 0: disabled, 1:enabled, 2:auto . There is an IOT issu with DLINK DIR-629 when the flag turn on */

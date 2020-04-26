@@ -1,0 +1,267 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/ioctl_cfg80211.c
+@@ -23,7 +23,7 @@
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0)) || defined(BUILD_OPENWRT)
+ #define STATION_INFO_SIGNAL		BIT(NL80211_STA_INFO_SIGNAL)
+ #define STATION_INFO_TX_BITRATE		BIT(NL80211_STA_INFO_TX_BITRATE)
+ #define STATION_INFO_RX_PACKETS		BIT(NL80211_STA_INFO_RX_PACKETS)
+@@ -612,7 +612,7 @@ void rtw_cfg80211_ibss_indicate_connect(
+ 	struct wlan_network  *cur_network = &(pmlmepriv->cur_network);
+ 	struct wireless_dev *pwdev = padapter->rtw_wdev;
+ 	struct cfg80211_bss *bss = NULL;
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)) || defined(BUILD_OPENWRT)
+ 	struct wiphy *wiphy = pwdev->wiphy;
+ 	int freq = 2412;
+ 	struct ieee80211_channel *notify_channel;
+@@ -620,7 +620,7 @@ void rtw_cfg80211_ibss_indicate_connect(
+ 
+ 	RTW_INFO(FUNC_ADPT_FMT"\n", FUNC_ADPT_ARG(padapter));
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)) || defined(BUILD_OPENWRT)
+ 	freq = rtw_ch2freq(cur_network->network.Configuration.DSConfig);
+ 
+ 	if (0)
+@@ -668,7 +668,7 @@ void rtw_cfg80211_ibss_indicate_connect(
+ 			RTW_PRINT(FUNC_ADPT_FMT" BSS not found !!\n", FUNC_ADPT_ARG(padapter));
+ 	}
+ 	/* notify cfg80211 that device joined an IBSS */
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)) || defined(BUILD_OPENWRT)
+ 	notify_channel = ieee80211_get_channel(wiphy, freq);
+ 	cfg80211_ibss_joined(padapter->pnetdev, cur_network->network.MacAddress, notify_channel, GFP_ATOMIC);
+ #else
+@@ -773,7 +773,7 @@ check_bss:
+ 			rtw_set_ft_status(padapter, RTW_FT_ASSOCIATED_STA);
+ #endif
+ 	} else {
+-		#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) || defined(COMPAT_KERNEL_RELEASE)
++		#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) && !defined(BUILD_OPENWRT)) || defined(COMPAT_KERNEL_RELEASE)
+ 		RTW_INFO("pwdev->sme_state(b)=%d\n", pwdev->sme_state);
+ 		#endif
+ 		rtw_cfg80211_connect_result(pwdev, cur_network->network.MacAddress
+@@ -782,7 +782,7 @@ check_bss:
+ 			, pmlmepriv->assoc_rsp + sizeof(struct rtw_ieee80211_hdr_3addr) + 6
+ 			, pmlmepriv->assoc_rsp_len - sizeof(struct rtw_ieee80211_hdr_3addr) - 6
+ 			, WLAN_STATUS_SUCCESS, GFP_ATOMIC);
+-		#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) || defined(COMPAT_KERNEL_RELEASE)
++		#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) && !defined(BUILD_OPENWRT)) || defined(COMPAT_KERNEL_RELEASE)
+ 		RTW_INFO("pwdev->sme_state(a)=%d\n", pwdev->sme_state);
+ 		#endif
+ 	}
+@@ -838,7 +838,7 @@ void rtw_cfg80211_indicate_disconnect(_a
+ 	_enter_critical_bh(&pwdev_priv->connect_req_lock, &irqL);
+ 
+ 	if (padapter->ndev_unregistering || !rtw_wdev_not_indic_disco(pwdev_priv)) {
+-		#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) || defined(COMPAT_KERNEL_RELEASE)
++		#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) && !defined(BUILD_OPENWRT)) || defined(COMPAT_KERNEL_RELEASE)
+ 		RTW_INFO("pwdev->sme_state(b)=%d\n", pwdev->sme_state);
+ 
+ 		if (pwdev->sme_state == CFG80211_SME_CONNECTING) {
+@@ -1655,7 +1655,7 @@ static int cfg80211_rtw_set_rekey_data(s
+ #endif /*CONFIG_GTK_OL*/
+ static int cfg80211_rtw_get_station(struct wiphy *wiphy,
+ 	struct net_device *ndev,
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0)) && !defined(BUILD_OPENWRT)
+ 	u8 *mac,
+ #else
+ 	const u8 *mac,
+@@ -4258,7 +4258,7 @@ exit:
+ #endif /* CONFIG_RTW_MACADDR_ACL && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)) */
+ 
+ static int	cfg80211_rtw_add_station(struct wiphy *wiphy, struct net_device *ndev,
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0)) && !defined(BUILD_OPENWRT)
+ 	u8 *mac,
+ #else
+ 	const u8 *mac,
+@@ -4290,9 +4290,9 @@ exit:
+ }
+ 
+ static int	cfg80211_rtw_del_station(struct wiphy *wiphy, struct net_device *ndev,
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0)) && !defined(BUILD_OPENWRT)
+ 	u8 *mac
+-#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0))
++#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)) && !defined(BUILD_OPENWRT)
+ 	const u8 *mac
+ #else
+ 	struct station_del_parameters *params
+@@ -4312,7 +4312,7 @@ static int	cfg80211_rtw_del_station(stru
+ 	RTW_INFO("+"FUNC_NDEV_FMT"\n", FUNC_NDEV_ARG(ndev));
+ 
+ 
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)) && !defined(BUILD_OPENWRT)
+ 	target_mac = mac;
+ #else
+ 	target_mac = params->mac;
+@@ -4391,7 +4391,7 @@ static int	cfg80211_rtw_del_station(stru
+ }
+ 
+ static int	cfg80211_rtw_change_station(struct wiphy *wiphy, struct net_device *ndev,
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0)) && !defined(BUILD_OPENWRT)
+ 	u8 *mac,
+ #else
+ 	const u8 *mac,
+@@ -4570,7 +4570,7 @@ static int cfg80211_rtw_set_monitor_chan
+ 		target_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
+ 		break;
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 11, 0)) || defined(BUILD_OPENWRT)
+ 	case NL80211_CHAN_WIDTH_5:
+ 	case NL80211_CHAN_WIDTH_10:
+ #endif
+@@ -5663,7 +5663,7 @@ static int cfg80211_rtw_mgmt_tx(struct w
+ #else
+ 	struct net_device *ndev,
+ #endif
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)) || defined(COMPAT_KERNEL_RELEASE)
++#if ((LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)) && !defined(BUILD_OPENWRT)) || defined(COMPAT_KERNEL_RELEASE)
+ 	struct ieee80211_channel *chan,
+ 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 38)) || defined(COMPAT_KERNEL_RELEASE)
+ 	bool offchan,
+@@ -5689,7 +5689,7 @@ static int cfg80211_rtw_mgmt_tx(struct w
+ #endif
+ 	u64 *cookie)
+ {
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(COMPAT_KERNEL_RELEASE)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(COMPAT_KERNEL_RELEASE) || defined(BUILD_OPENWRT)
+ 	struct ieee80211_channel *chan = params->chan;
+ 	bool offchan = params->offchan;
+ 	unsigned int wait = params->wait;
+@@ -5930,7 +5930,7 @@ exit:
+ #if defined(CONFIG_TDLS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
+ static int cfg80211_rtw_tdls_mgmt(struct wiphy *wiphy,
+ 	struct net_device *ndev,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0)) || defined(BUILD_OPENWRT)
+ 	const u8 *peer,
+ #else
+ 	u8 *peer,
+@@ -5938,10 +5938,10 @@ static int cfg80211_rtw_tdls_mgmt(struct
+ 	u8 action_code,
+ 	u8 dialog_token,
+ 	u16 status_code,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0)) || defined(BUILD_OPENWRT)
+ 	u32 peer_capability,
+ #endif
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 17, 0)) || defined(BUILD_OPENWRT)
+ 	bool initiator,
+ #endif
+ 	const u8 *buf,
+@@ -6021,7 +6021,7 @@ discard:
+ 
+ static int cfg80211_rtw_tdls_oper(struct wiphy *wiphy,
+ 	struct net_device *ndev,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0)) || defined(BUILD_OPENWRT)
+ 	const u8 *peer,
+ #else
+ 	u8 *peer,
+@@ -6779,7 +6779,7 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #endif
+ 
+ #if defined(CONFIG_PM) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0))
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0)) && !defined(BUILD_OPENWRT)
+ 	wiphy->wowlan = wowlan_stub;
+ #else
+ 	wiphy->wowlan = &wowlan_stub;
+@@ -6945,7 +6945,7 @@ int rtw_wiphy_register(struct wiphy *wip
+ {
+ 	RTW_INFO(FUNC_WIPHY_FMT"\n", FUNC_WIPHY_ARG(wiphy));
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT) || defined(BUILD_OPENWRT)
+ 	rtw_cfgvendor_attach(wiphy);
+ #endif
+ 
+@@ -6956,7 +6956,7 @@ void rtw_wiphy_unregister(struct wiphy *
+ {
+ 	RTW_INFO(FUNC_WIPHY_FMT"\n", FUNC_WIPHY_ARG(wiphy));
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT) || defined(BUILD_OPENWRT)
+ 	rtw_cfgvendor_detach(wiphy);
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/rtw_cfgvendor.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/rtw_cfgvendor.c
+@@ -22,7 +22,7 @@
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT) || defined(BUILD_OPENWRT)
+ 
+ /*
+ #include <linux/kernel.h>
+@@ -50,7 +50,7 @@ struct sk_buff *dbg_rtw_cfg80211_vendor_
+ 	struct sk_buff *skb;
+ 	unsigned int truesize = 0;
+ 
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)) && !defined(BUILD_OPENWRT)
+ 	skb = cfg80211_vendor_event_alloc(wiphy, len, event_id, gfp);
+ #else
+ 	skb = cfg80211_vendor_event_alloc(wiphy, wdev, len, event_id, gfp);
+@@ -149,7 +149,7 @@ struct sk_buff *rtw_cfg80211_vendor_even
+ {
+ 	struct sk_buff *skb;
+ 
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)) && !defined(BUILD_OPENWRT)
+ 	skb = cfg80211_vendor_event_alloc(wiphy, len, event_id, gfp);
+ #else
+ 	skb = cfg80211_vendor_event_alloc(wiphy, wdev, len, event_id, gfp);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/rtw_cfgvendor.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/rtw_cfgvendor.h
+@@ -231,7 +231,7 @@ typedef enum gscan_complete_event {
+ /* Capture the BRCM_VENDOR_SUBCMD_PRIV_STRINGS* here */
+ #define BRCM_VENDOR_SCMD_CAPA	"cap"
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) || defined(RTW_VENDOR_EXT_SUPPORT) || defined(BUILD_OPENWRT)
+ extern int rtw_cfgvendor_attach(struct wiphy *wiphy);
+ extern int rtw_cfgvendor_detach(struct wiphy *wiphy);
+ extern int rtw_cfgvendor_send_async_event(struct wiphy *wiphy,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/wifi_regd.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/wifi_regd.c
+@@ -271,7 +271,7 @@ static void _rtw_reg_apply_radar_flags(s
+ 		#if !defined(CONFIG_DFS_MASTER)
+ 		if (!(ch->flags & IEEE80211_CHAN_DISABLED)) {
+ 			ch->flags |= IEEE80211_CHAN_RADAR;
+-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
++			#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)) && !defined(BUILD_OPENWRT)
+ 			ch->flags |= (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
+ 			#else
+ 			ch->flags |= IEEE80211_CHAN_NO_IR;
+@@ -339,7 +339,7 @@ static void _rtw_reg_apply_flags(struct
+ 			if (channel_set[i].ScanType == SCAN_PASSIVE) {
+ 				#if defined(CONFIG_DFS_MASTER)
+ 				ch->flags = 0;
+-				#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
++				#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)) && !defined(BUILD_OPENWRT)
+ 				ch->flags = (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
+ 				#else
+ 				ch->flags = IEEE80211_CHAN_NO_IR;
+@@ -489,7 +489,7 @@ static void _rtw_regd_init_wiphy(struct
+ 
+ 	wiphy->reg_notifier = rtw_reg_notifier;
+ 
+-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0)) && !defined(BUILD_OPENWRT)
+ 	wiphy->flags |= WIPHY_FLAG_CUSTOM_REGULATORY;
+ 	wiphy->flags &= ~WIPHY_FLAG_STRICT_REGULATORY;
+ 	wiphy->flags &= ~WIPHY_FLAG_DISABLE_BEACON_HINTS;

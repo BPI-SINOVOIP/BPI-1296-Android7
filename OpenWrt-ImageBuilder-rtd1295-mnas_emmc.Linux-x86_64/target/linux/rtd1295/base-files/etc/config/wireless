@@ -1,0 +1,41 @@
+config wifi-device  radio0
+	option type     mac80211
+	option channel  11
+	option hwmode	11g
+	option path	'platform/9804e000.pcie/pci0000:00/0000:00:00.0'
+	option htmode	HT20
+	option country	'US'
+
+config wifi-iface
+	option device   radio0
+	option network  lan
+	option mode     ap
+	option ssid     OpenWrt_2.4G
+	option encryption none
+	option txbf	'1'
+
+config wifi-device  radio1
+	option type     mac80211
+	option channel  149
+	option hwmode	11a
+	option path	'platform/9803b000.pcie2/pci0001:01/0001:01:00.0'
+	option htmode	VHT80
+	option country	'US'
+
+config wifi-iface
+	option device   radio1
+	option network  lan
+	option mode     ap
+	option ssid     OpenWrt_5G
+	option encryption none
+	option txbf	'1'
+
+config wifi-iface
+        option device	radio1
+	option network	guest
+	option mode	ap
+	option ssid	GuestWRT_5G
+	option encryption none
+	option isolate	1
+	option guest	'enable'
+	option txbf	'1'

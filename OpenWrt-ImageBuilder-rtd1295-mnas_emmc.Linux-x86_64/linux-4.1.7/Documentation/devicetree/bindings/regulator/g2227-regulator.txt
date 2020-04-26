@@ -1,0 +1,62 @@
+GMT G2227 Regulator Driver
+==========================
+
+The deivce node should be placed in a i2c_master node. The dt-bindings value 
+is defined in 'dt-bindings/regulator/gmt,g2227.h'.
+
+Required properties :
+- compatible : shall contain only "gmt-g2227"
+
+- reg : shall contain slave address
+
+Optional properties :
+- system-power-controller : use g2227 power-off function as pm_power_off
+
+- g2227,lpoff-act : the action when long press to powerkey. shall contain 
+	only the following,
+		G2227_LPOFF_TO_SHUTDOWN: long press to shutdown,
+		G2227_LPOFF_TO_RESTART: long press to restart.
+	
+- g2227,lpoff-time : time of long press. shall contain only the following,
+	G2227_TIME_LPOFF_06S,
+	G2227_TIME_LPOFF_07S,
+	G2227_TIME_LPOFF_08S,
+	G2227_TIME_LPOFF_10S.
+
+Regulator node
+--------------
+Required properties:
+- regulator-name: shall contain only the followings,
+	dcdc1, dcdc2, dcdc3, dcdc4, dcdc5, dcdc6, ldo2, ldo3.
+
+- regulator-state-coldboot node : config regulator state should be in 
+	suspend-to-coldboot(S5). The common properties are the same as 
+	ones in regulator-state-mem node. if this node is not exist, 
+	regulator-state-mem node will be used to config.
+
+Please see 'regulator.txt' to get information of other properties.
+
+Example:
+	i2c_0 {
+		gmt-g2227@12 {
+			compatible = "gmt-g2227";
+			reg = <0x12>;
+			g2227,lpoff-act = <G2227_LPOFF_TO_SHUTDOWN>;
+			g2227,lpoff-time = <G2227_TIME_LPOFF_08S>;
+
+			dcdc2 {
+				regulator-name = "dcdc2";
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <1187500>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-initial-mode = <0>;
+				regulator-state-mem {
+					regulator-off-in-suspend;
+				};
+				regulator-state-coldboot {
+					regulator-off-in-suspend;
+				};
+			};
+		};
+	};

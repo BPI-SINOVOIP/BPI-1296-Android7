@@ -1,0 +1,21 @@
+
+menu "Power Control"
+
+config POWER_CONTROL
+    bool "Power Control Support"
+    default y
+
+
+config POWER_CONTROL_DEBUGFS
+    bool "DebugFs fpr Power Control"
+    depends on POWER_CONTROL
+    default y
+
+
+config POWER_CONTROL_RTD129x
+	bool "Power Control for RTD129x"
+	depends on POWER_CONTROL
+	select PM_GENERIC_DOMAINS
+	default y
+
+endmenu

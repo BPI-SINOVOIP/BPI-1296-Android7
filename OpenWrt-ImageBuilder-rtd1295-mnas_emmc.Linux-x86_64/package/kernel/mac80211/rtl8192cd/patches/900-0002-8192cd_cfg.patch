@@ -1,0 +1,95 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -114,11 +114,13 @@
+ 
+ #if defined(LINUX_2_6_20_) || defined(__LINUX_3_4__)
+ #ifdef CPTCFG_CFG80211_MODULE
++#ifndef RTK_129X_PLATFORM
+ #ifdef __LINUX_3_18_21__
+ #include "../../../../../linux-3.18.21/include/generated/autoconf.h"
+ #else
+ #include "../../../../../linux-3.10.49/include/generated/autoconf.h"
+ #endif
++#endif //RTK_129X_PLATFORM
+ #else //CPTCFG_CFG80211_MODULE
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
+ #include <linux/kconfig.h>
+@@ -153,6 +155,18 @@
+ #define NETDEV_NO_PRIV
+ #endif
+ 
++#ifdef RTK_129X_PLATFORM
++
++#ifdef CONFIG_RTL_819X
++#undef CONFIG_RTL_819X
++#endif
++
++#ifdef CONFIG_RTL_8197F
++#undef CONFIG_RTL_8197F
++#endif
++
++#endif //RTK_129X_PLATFORM
++
+ /*
+  *	Following Definition Sync 2.4/2.6 SDK Definitions
+  */
+@@ -196,7 +210,7 @@
+ //#endif
+ #endif
+ 
+-#if !defined(__ECOS) && !(defined(CONFIG_OPENWRT_SDK) && defined(__LINUX_3_10__)) && !defined(__OSK__) /*eric-sync ??*/
++#if !defined(__ECOS) && !(defined(CONFIG_OPENWRT_SDK) && defined(__LINUX_3_10__)) && !defined(__OSK__) && !defined(RTK_129X_PLATFORM)/*eric-sync ??*/
+ #define CONFIG_RTL_CUSTOM_PASSTHRU
+ #endif
+ 
+@@ -746,7 +760,9 @@
+ //-------------------------------------------------------------
+ //
+ #ifdef CONFIG_OPENWRT_SDK
++#ifndef NETDEV_NO_PRIV
+ #define NETDEV_NO_PRIV 1  //mark_wrt
++#endif
+ #undef EVENT_LOG //mark_wrt
+ 
+ #if defined(CPTCFG_CFG80211_MODULE)
+@@ -1045,7 +1061,7 @@
+ //-------------------------------------------------------------
+ // Support Tx AMSDU
+ //-------------------------------------------------------------
+-#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
++#if (defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)) && !defined(CONFIG_RTK_MESH)
+ #define SUPPORT_TX_AMSDU
+ #endif
+ 
+@@ -1816,19 +1832,21 @@
+ 
+ #ifdef __KERNEL__
+ #if LINUX_VERSION_CODE >= 0x02061D // linux 2.6.29
++#ifndef NETDEV_NO_PRIV
+ #define NETDEV_NO_PRIV
+ #endif
++#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29))
+ #define CONFIG_COMPAT_NET_DEV_OPS
+ #endif
+ #endif
+ 
+-#ifdef CONFIG_RTL_CUSTOM_PASSTHRU
++#if defined(CONFIG_RTL_CUSTOM_PASSTHRU) && !defined(RTK_129X_PLATFORM)
+ #undef CONFIG_RTL_CUSTOM_PASSTHRU
+ #endif
+ 
+-#ifdef CONFIG_RTL_CUSTOM_PASSTHRU_PPPOE
++#if defined(CONFIG_RTL_CUSTOM_PASSTHRU_PPPOE) && !defined(RTK_129X_PLATFORM)
+ #undef CONFIG_RTL_CUSTOM_PASSTHRU_PPPOE
+ #endif
+ 
+@@ -3763,6 +3781,7 @@
+ #define NUM_TX_DESC    128
+ #define RTL8192CD_NUM_VWLAN  4
+ #else
++#undef RTL8192CD_NUM_VWLAN
+ #define RTL8192CD_NUM_VWLAN  (8+1) //eric-vap, add one more for open-wrt scan iface
+ #endif
+ 

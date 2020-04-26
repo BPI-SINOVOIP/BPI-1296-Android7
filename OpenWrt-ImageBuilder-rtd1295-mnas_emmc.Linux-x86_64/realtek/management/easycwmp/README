@@ -1,0 +1,40 @@
+Copied from http://www.easycwmp.org/index.php/manual with fews details.
+
+EasyCwmp (CarrierWrt Mirror) install for OpenWRT Linux
+
+# EasyCwmp install for OpenWRT Linux
+EasyCwmp is mainly developed and tested with OpenWRT Linux platform (especially Attitude Adjustment version).
+
+- Download:
+
+git clone https://github.com/carrierwrt/easycwmp
+cd easycwmp
+cp -rf contrib/openwrt /path/to/openwrt/package/easycwmp-carrierwrt
+
+- Build as built-in
+
+make menuconfig   #(And then select the package as <*>)
+make
+
+- Build as package:
+
+make menuconfig   #(And then select the package as <M>)
+make package/easycwmp-carrierwrt/compile
+
+install:
+
+Build as built-in: install your OpenWRT system in your device according to the OpenWRT manuals and then  start your system and you will get easycwmp running automatically
+Build as package: copy the package to the OpenWRT system and then install it with:
+
+    opkg install
+
+And then run it with:
+
+  /etc/init.d/easycwmpd start
+
+or run it with:
+
+  /etc/init.d/easycwmpd boot
+
+Note: If you run easycwmpd with  start command then it will send inform to the ACS containing "2 PERIODIC" event and send GetRPCMethods to the ACS. And if you run easycwmpd with boot command then it will send inform to the ACS containing "1 BOOT" event.
+

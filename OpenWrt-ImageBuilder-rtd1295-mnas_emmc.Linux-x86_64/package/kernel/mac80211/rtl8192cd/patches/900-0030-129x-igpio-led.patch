@@ -1,0 +1,201 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -34,7 +34,7 @@
+ 
+ #include "./8192cd_cfg.h"
+ 
+-#ifdef RTD129X_POWER_LED
++#if defined(RTD129X_POWER_LED) || defined(RTD129X_IGPIO_LED)
+ #include <linux/gpio.h>
+ #include <linux/of_gpio.h>
+ #endif
+@@ -6257,6 +6257,9 @@ typedef struct rtl8192cd_priv {
+ #ifdef RTD129X_POWER_LED
+ 	unsigned char power_led_gpio;
+ #endif
++#ifdef RTD129X_IGPIO_LED
++	unsigned char is_request_gpio;
++#endif
+ } RTL8192CD_PRIV, *PRTL8192CD_PRIV;
+ 
+ struct rtl8192cd_chr_priv {
+@@ -6697,6 +6700,13 @@ struct ft_action_param {
+ 	unsigned char *pdata;
+ };
+ #endif
++
++#ifdef RTD129X_IGPIO_LED
++#define RTD129X_IGPIO_NUM	((GET_MIB(GET_ROOT(priv)))->dot11OperationEntry.led_igpio_num)
++#define RTD129X_IGPIO_ACTIVE	((GET_MIB(GET_ROOT(priv)))->dot11OperationEntry.igpio_high_active)
++#define RTD129X_GPIO_PIN	(RTD129X_IGPIO_NUM+101)
++#endif
++
+ 
+ #ifdef __ECOS
+ #undef ASSERT
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1114,6 +1114,13 @@
+ #endif
+ 
+ //-------------------------------------------------------------
++// RTD129X GPIO Control LED
++//-------------------------------------------------------------
++#ifdef CONFIG_RTD129X_IGPIO_LED
++#define RTD129X_IGPIO_LED
++#endif
++
++//-------------------------------------------------------------
+ // Mesh Network
+ //-------------------------------------------------------------
+ #ifdef CONFIG_RTK_MESH
+@@ -1127,6 +1134,7 @@
+ //#define MESH_BOOTSEQ_AUTH
+ #ifdef CONFIG_RTD129X_MESH_LED
+ #define RTD129X_POWER_LED
++#undef RTD129X_IGPIO_LED
+ #endif
+ 
+ #endif // CONFIG_RTK_MESH
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -1316,6 +1316,10 @@ static struct iwpriv_arg mib_table[] = {
+ #ifdef RTL8190_SWGPIO_LED
+ 	{"led_route",	INT_T,		_OFFSET(dot11OperationEntry.ledroute), _SIZE(dot11OperationEntry.ledroute), 0},
+ #endif
++#ifdef RTD129X_IGPIO_LED
++	{"led_igpio_num",INT_T,		_OFFSET(dot11OperationEntry.led_igpio_num), _SIZE(dot11OperationEntry.led_igpio_num), -1},
++	{"igpio_high_active",INT_T,	_OFFSET(dot11OperationEntry.igpio_high_active), _SIZE(dot11OperationEntry.igpio_high_active), 1},
++#endif
+ 	{"iapp_enable",	INT_T,		_OFFSET(dot11OperationEntry.iapp_enable), _SIZE(dot11OperationEntry.iapp_enable), 0},
+ 	{"block_relay",	INT_T,		_OFFSET(dot11OperationEntry.block_relay), _SIZE(dot11OperationEntry.block_relay), 0},
+ 	{"deny_any",	INT_T,		_OFFSET(dot11OperationEntry.deny_any), _SIZE(dot11OperationEntry.deny_any), 0},
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_led.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_led.c
+@@ -105,6 +105,26 @@ static void set_swGpio_LED(struct rtl819
+ }
+ #endif // RTL8190_SWGPIO_LED
+ 
++#ifdef RTD129X_IGPIO_LED
++static int set_rtd129x_igpio_led(struct rtl8192cd_priv *priv, int flag)
++{
++	unsigned char active;
++
++	if (GET_ROOT(priv)->is_request_gpio) {
++		active = (RTD129X_IGPIO_ACTIVE > 0) ? 1 : 0;
++
++		if (RTD129X_IGPIO_NUM >= 0 && RTD129X_IGPIO_NUM <= 34) {
++			if (flag)
++				gpio_direction_output(RTD129X_GPIO_PIN, 1^active);
++			else
++				gpio_direction_output(RTD129X_GPIO_PIN, active);
++
++			return SUCCESS;
++		}
++	}
++	return FAIL;
++}
++#endif
+ 
+ static void set_sw_LED0(struct rtl8192cd_priv *priv, int flag)
+ {
+@@ -114,6 +134,11 @@ static void set_sw_LED0(struct rtl8192cd
+ 		return;
+ #endif
+ 
++#ifdef RTD129X_IGPIO_LED
++	if (set_rtd129x_igpio_led(priv, flag))
++		return;
++#endif
++
+ #ifdef RTL8190_SWGPIO_LED
+     if (LED_ROUTE)
+         set_swGpio_LED(priv, 0, flag);
+@@ -201,6 +226,11 @@ static void set_sw_LED1(struct rtl8192cd
+ 		return;
+ #endif
+ 
++#ifdef RTD129X_IGPIO_LED
++	if (set_rtd129x_igpio_led(priv, flag))
++		return;
++#endif
++
+ #ifdef RTL8190_SWGPIO_LED
+ 	if (LED_ROUTE)
+ 		set_swGpio_LED(priv, 1, flag);
+@@ -244,6 +274,11 @@ static void set_sw_LED2(struct rtl8192cd
+ 		return;
+ #endif
+ 
++#ifdef RTD129X_IGPIO_LED
++	if (set_rtd129x_igpio_led(priv, flag))
++		return;
++#endif
++
+ #ifdef RTL8190_SWGPIO_LED
+ 	if (LED_ROUTE)
+ 		set_swGpio_LED(priv, 2, flag);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -8114,6 +8114,19 @@ priv->pshare->curr_band =0; //init curr_
+ #endif
+ #endif // CONFIG_PCI_HCI
+ 
++#ifdef RTD129X_IGPIO_LED
++		if (!priv->is_request_gpio) {
++			if (RTD129X_IGPIO_NUM >= 0 && RTD129X_IGPIO_NUM <= 34) {
++				if(gpio_request(RTD129X_GPIO_PIN, "WIFI LED")) {
++					printk("Request GPIO(%d) Fail\n", RTD129X_GPIO_PIN);
++				} else {
++					priv->is_request_gpio = 1;
++					printk("Request GPIO(%d) Success\n", RTD129X_GPIO_PIN);
++				}
++			}
++		}
++#endif
++
+ 		//SAVE_INT_AND_CLI(x);
+ 		SMP_LOCK(x);
+ 
+@@ -9324,6 +9337,13 @@ free_res:
+ 	if (IS_ROOT_INTERFACE(priv))
+ #endif
+ 	{
++#ifdef RTD129X_IGPIO_LED
++		if (priv->is_request_gpio) {
++			gpio_free(RTD129X_GPIO_PIN);
++			priv->is_request_gpio = 0;
++			printk("Free GPIO(%d)\n", RTD129X_GPIO_PIN);
++		}
++#endif
+ #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
+ 		rtw_dev_unload(priv);
+ #endif
+@@ -9984,6 +10004,14 @@ int rtl8192cd_close(struct net_device *d
+ 	if (IS_ROOT_INTERFACE(priv))
+ #endif
+ 	{
++#ifdef RTD129X_IGPIO_LED
++		if (priv->is_request_gpio) {
++			gpio_free(RTD129X_GPIO_PIN);
++			priv->is_request_gpio = 0;
++			printk("Free GPIO(%d)\n", RTD129X_GPIO_PIN);
++		}
++#endif
++
+ #if !(defined(__ECOS) && defined(CONFIG_SDIO_HCI))
+ #ifdef RTK_QUE
+ 		free_rtk_queue(priv, &priv->pshare->skb_queue);
+--- a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -327,6 +327,10 @@ struct Dot11OperationEntry {
+ 	unsigned int	expiretime;
+ 	unsigned int	ledtype;
+ 	unsigned int	ledroute;
++#ifdef RTD129X_IGPIO_LED
++	int		led_igpio_num ;
++	unsigned char 	igpio_high_active;
++#endif
+ 	unsigned int	iapp_enable;
+ 	unsigned int	block_relay;
+ 	unsigned int	deny_any;

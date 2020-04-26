@@ -1,0 +1,7 @@
+###
+###	  part = (name mount_point filesystem file size)
+part = system /system ubifs omv/ubi_system.img 734003200
+part = data /data ubifs omv/ubi_data.img 6448742400
+part = cache /cache ubifs omv/ubi_cache.img 471859200
+part = rootfs / squashfs omv/squashfs1.img 0
+part = etc etc ubifs omv/ubifs_etc.img 83886080

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -e
+
+# args: PKG_NAME IDIR_$(1) $(TOPDIR)/packages FILE_PATH(opt)
+# IDIR_$(1):=$(PKG_BUILD_DIR)/ipkg-$(PKGARCH)/$(1)
+
+if [ "$#" -lt 3 ] || [ ! -d "$2" ]; then
+    echo "[SDK]install: Wrong argument!"
+    exit 1
+fi
+
+PKG_NAME=$1
+PKG_INS_DIR="$2"
+SDK_IPK_DIR="$3"
+FILE_PATH="$4"
+
+IPK_PATH="`find \"${SDK_IPK_DIR}\" -name \"${PKG_NAME}*.ipk\"`"
+
+if [ ! -d "$3" ] || [ -z "$IPK_PATH" ]; then
+	echo "No prebuilt IPK"
+	exit 0
+fi
+
+# For InstallDev
+if [[ "$PKG_INS_DIR" == *"/stage-${PKG_NAME}"* ]]; then
+    # TODO: Add ./usr/include
+    tar -xzOf "$IPK_PATH" ./data.tar.gz | tar -C "$PKG_INS_DIR" -xzf - ./usr/lib
+else
+        tar -xzOf "$IPK_PATH" ./data.tar.gz | tar -C "$PKG_INS_DIR" -xz "$FILE_PATH"
+    if [ -z "$FILE_PATH" ]; then
+        mkdir -p "$PKG_INS_DIR/CONTROL"
+        tar -xzOf "$IPK_PATH" ./control.tar.gz | tar -C "$PKG_INS_DIR/CONTROL" -xz
+    fi
+fi
+
+exit 0

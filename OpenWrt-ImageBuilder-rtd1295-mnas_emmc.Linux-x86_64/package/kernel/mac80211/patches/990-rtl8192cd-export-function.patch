@@ -1,0 +1,10 @@
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -179,6 +179,7 @@ enum nl80211_dfs_regions reg_get_dfs_reg
+ out:
+ 	return regd->dfs_region;
+ }
++EXPORT_SYMBOL(reg_get_dfs_region);
+ 
+ static void rcu_free_regdom(const struct ieee80211_regdomain *r)
+ {

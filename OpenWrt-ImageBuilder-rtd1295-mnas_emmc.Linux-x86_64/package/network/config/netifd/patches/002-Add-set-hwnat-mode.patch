@@ -1,0 +1,116 @@
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -58,6 +58,7 @@
+ #include <glob.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <dirent.h>
+ 
+ #include <netlink/msg.h>
+ #include <netlink/attr.h>
+@@ -595,6 +596,86 @@ static int system_rtnl_call(struct nl_ms
+ 	return nl_wait_for_ack(sock_rtnl);
+ }
+ 
++static int system_set_hwnat()
++{
++	struct dirent* dent;
++	DIR* srcdir;
++	struct stat st;
++	const char *hwnatp = "/proc/hw_nat";
++	char buf[64], brname[IFNAMSIZ];
++#ifndef MAX_PORTS
++#define MAX_PORTS 32
++#endif
++	int bridx[MAX_PORTS];
++	int i, num = -1;
++	unsigned long args[3] = {BRCTL_GET_BRIDGES, (unsigned long) bridx, MAX_PORTS};
++	int eth0if, otherifs, has_eth0 = false;
++
++	if (stat(hwnatp, &st) < 0)
++		return -1;
++
++	if ((num = ioctl(sock_ioctl, SIOCGIFBR, args)) < 0) {
++		netifd_log_message(L_NOTICE, "//////system_set_hwnat ioctl error/////\n");
++		return -1;
++	}
++
++	netifd_log_message(L_NOTICE, "//////system_set_hwnat num (%d)/////\n", num);
++	for (i = 0; i < num; i++) {
++		eth0if = false, otherifs = false;
++
++		if (!if_indextoname(bridx[i], brname)) {
++			netifd_log_message(L_NOTICE, "//////system_set_hwnat if_indextoname error/////\n");
++			continue;
++		}
++
++		netifd_log_message(L_NOTICE, "//////system_set_hwnat bridge (%s)/////\n", brname);
++		snprintf(buf, sizeof(buf), "/sys/devices/virtual/net/%s/brif", brname);
++
++		if ((srcdir = opendir(buf)) == NULL) {
++			netifd_log_message(L_NOTICE, "//////system_set_hwnat open (%s) error/////\n", buf);
++			return -1;
++		}
++
++		while((dent = readdir(srcdir)) != NULL) {
++			struct stat st;
++
++			if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
++				continue;
++
++			if (fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0)
++				continue;
++
++			if (S_ISDIR(st.st_mode)) {
++				netifd_log_message(L_NOTICE, "//////system_set_hwnat bridge (%s): %s/////\n", brname, dent->d_name);
++				if (!strcmp("eth0", dent->d_name))
++					eth0if = true;
++				else if (!strcmp("eth1", dent->d_name) || !strcmp("eth2", dent->d_name) || !strcmp("eth3", dent->d_name))
++					otherifs = true;
++			}
++		}
++
++		if (eth0if) {
++			has_eth0 = true;
++			if (otherifs) {
++				system_set_sysctl(hwnatp, "2 ");
++				netifd_log_message(L_NOTICE, "//////system_set_hwnat 2/////\n");
++			} else {
++				system_set_sysctl(hwnatp, "1 ");
++				netifd_log_message(L_NOTICE, "//////system_set_hwnat 1/////\n");
++			}
++		}
++
++		closedir(srcdir);
++	}
++
++	if (!has_eth0) {
++		system_set_sysctl(hwnatp, "1 ");
++		netifd_log_message(L_NOTICE, "//////system_set_hwnat 1/////\n");
++	}
++
++	return 0;
++}
++
+ int system_bridge_delbr(struct device *bridge)
+ {
+ 	return ioctl(sock_ioctl, SIOCBRDELBR, bridge->ifname);
+@@ -697,12 +778,17 @@ int system_bridge_addif(struct device *b
+ 	    !dev->settings.unicast_flood)
+ 		system_bridge_set_unicast_flood(dev, "0");
+ 
++	system_set_hwnat();
++
+ 	return ret;
+ }
+ 
+ int system_bridge_delif(struct device *bridge, struct device *dev)
+ {
+-	return system_bridge_if(bridge->ifname, dev, SIOCBRDELIF, NULL);
++	int ret = system_bridge_if(bridge->ifname, dev, SIOCBRDELIF, NULL);
++	system_set_hwnat();
++
++	return ret;
+ }
+ 
+ int system_if_resolve(struct device *dev)

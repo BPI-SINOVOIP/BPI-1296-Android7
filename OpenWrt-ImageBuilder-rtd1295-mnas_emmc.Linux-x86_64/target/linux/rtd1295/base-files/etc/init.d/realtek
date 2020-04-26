@@ -1,0 +1,29 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=09
+
+DESC="Handling Realtek Specific tasks"
+NAME=realtek
+
+start() {
+
+	[ -d /etc/network ] || mkdir -p /etc/network 
+
+	ln -s /etc/config/network /etc/network/interfaces
+
+	[ -d /www/realtek ] && [ ! -d /var/www ] && ln -s /www /var
+
+	if [ -f /etc/ldreconfig ]; then
+	    /sbin/ldconfig
+	    /usr/bin/rm /etc/ldreconfig
+	fi
+	
+	[ -d /usr/local/bin/chariot ] && /usr/local/bin/chariot/endpoint &
+
+	[ ! -d /home/admin ] && /usr/bin/install -d -o admin -g users -m 755 /home/admin 
+
+	[ -z "`ls -A /mnt`" ] || rmdir --ignore-fail-on-non-empty /mnt/*
+
+}
+

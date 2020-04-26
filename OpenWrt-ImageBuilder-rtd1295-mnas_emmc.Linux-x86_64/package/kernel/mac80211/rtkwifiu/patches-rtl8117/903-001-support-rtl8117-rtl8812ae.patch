@@ -1,0 +1,1818 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/Makefile
+@@ -123,6 +123,7 @@ CONFIG_PLATFORM_ARM_SPREADTRUM_8810 = n
+ CONFIG_PLATFORM_ARM_WMT = n
+ CONFIG_PLATFORM_TI_DM365 = n
+ CONFIG_PLATFORM_MOZART = n
++CONFIG_PLATFORM_RTL8117= n
+ CONFIG_PLATFORM_RTK119X = n
+ CONFIG_PLATFORM_RTK129X = y
+ CONFIG_PLATFORM_RTK139X = n
+@@ -163,9 +164,22 @@ _OS_INTFS_FILES :=	os_dep/osdep_service.
+ 			os_dep/linux/ioctl_cfg80211.o \
+ 			os_dep/linux/rtw_cfgvendor.o \
+ 			os_dep/linux/wifi_regd.o \
+-			os_dep/linux/rtw_android.o \
+ 			os_dep/linux/rtw_proc.o
+ 
++ifneq ($(CONFIG_PLATFORM_RTL8117), y)
++EXTRA_CFLAGS += -DCONFIG_RTKWIFIU_ANDROID
++_OS_INTFS_FILES += os_dep/linux/rtw_android.o
++else
++CONFIG_MP_INCLUDED = n
++CONFIG_POWER_SAVING = n
++CONFIG_BT_COEXIST = n
++CONFIG_LOAD_PHY_PARA_FROM_FILE = n
++CONFIG_BR_EXT = n
++CONFIG_P2P = n
++CONFIG_SRESET = n
++CONFIG_IBSS = n
++endif
++
+ ifeq ($(CONFIG_MP_INCLUDED), y)
+ _OS_INTFS_FILES += os_dep/linux/ioctl_mp.o
+ endif
+@@ -884,9 +898,24 @@ EXTRA_CFLAGS += -DCONFIG_ANTENNA_DIVERSI
+ endif
+ 
+ ifeq ($(CONFIG_TDLS), y)
++$(MODULE_NAME)-$(CONFIG_TDLS) += core/rtw_tdls.o
+ EXTRA_CFLAGS += -DCONFIG_TDLS
+ endif
+ 
++ifeq ($(CONFIG_P2P), y)
++$(MODULE_NAME)-$(CONFIG_P2P) += core/rtw_p2p.o
++EXTRA_CFLAGS += -DCONFIG_P2P
++endif
++
++ifeq ($(CONFIG_SRESET), y)
++$(MODULE_NAME)-$(CONFIG_SRESET) += core/rtw_sreset.o
++EXTRA_CFLAGS += -DDBG_CONFIG_ERROR_DETECT
++endif
++
++ifeq ($(CONFIG_IBSS), y)
++EXTRA_CFLAGS += -DCONFIG_IBSS
++endif
++
+ ifeq ($(CONFIG_WIFI_MONITOR), y)
+ EXTRA_CFLAGS += -DCONFIG_WIFI_MONITOR
+ endif
+@@ -1620,6 +1649,36 @@ KSRC := $(LINUX_KERNEL_PATH)
+ MODULE_NAME := 8812ae
+ endif
+ 
++ifeq ($(CONFIG_PLATFORM_RTL8117), y)
++EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
++EXTRA_CFLAGS += -DCONFIG_TRAFFIC_PROTECT
++# default setting for Android 4.1, 4.2
++EXTRA_CFLAGS += -DCONFIG_CONCURRENT_MODE
++EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
++EXTRA_CFLAGS += -DCONFIG_QOS_OPTIMIZATION
++EXTRA_CFLAGS += -Wno-error=date-time
++ifneq ($(CONFIG_MP_INCLUDED), y)
++EXTRA_CFLAGS += -DCONFIG_NO_PRIVATE_IOCTL
++endif
++
++ifeq ($(CONFIG_USB_HCI), y)
++EXTRA_CFLAGS += -DCONFIG_USE_USB_BUFFER_ALLOC_TX
++#_PLATFORM_FILES += platform/platform_ARM_SUNxI_usb.o
++endif
++ifeq ($(CONFIG_SDIO_HCI), y)
++_PLATFORM_FILES += platform/platform_ARM_SUNnI_sdio.o
++endif
++
++ARCH := mips
++
++# ==== Cross compile setting for Android 4.4 SDK =====
++#CROSS_COMPILE := arm-linux-gnueabihf-
++KVER  := 4.4.18
++CROSS_COMPILE := $(CROSS)
++KSRC := $(LINUX_KERNEL_PATH)
++MODULE_NAME := 8812ae
++endif
++
+ ifeq ($(CONFIG_PLATFORM_NOVATEK_NT72668), y)
+ EXTRA_CFLAGS += -DCONFIG_PLATFORM_NOVATEK_NT72668
+ EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
+@@ -1676,11 +1735,8 @@ rtk_core :=	core/rtw_cmd.o \
+ 		core/rtw_sta_mgt.o \
+ 		core/rtw_ap.o \
+ 		core/rtw_xmit.o	\
+-		core/rtw_p2p.o \
+-		core/rtw_tdls.o \
+ 		core/rtw_br_ext.o \
+ 		core/rtw_iol.o \
+-		core/rtw_sreset.o \
+ 		core/rtw_btcoex.o \
+ 		core/rtw_beamforming.o \
+ 		core/rtw_odm.o \
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/efuse/rtw_efuse.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/efuse/rtw_efuse.c
+@@ -680,6 +680,7 @@ static u8 efuse_write8(PADAPTER padapter
+ /*
+  * read/wirte raw efuse data
+  */
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ u8 rtw_efuse_access(PADAPTER padapter, u8 bWrite, u16 start_addr, u16 cnts, u8 *data)
+ {
+ 	int i = 0;
+@@ -735,6 +736,7 @@ u8 efuse_GetCurrentSize(PADAPTER padapte
+ 
+ 	return _SUCCESS;
+ }
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ //------------------------------------------------------------------------------
+ u8 rtw_efuse_map_read(PADAPTER padapter, u16 addr, u16 cnts, u8 *data)
+ {
+@@ -754,6 +756,7 @@ u8 rtw_efuse_map_read(PADAPTER padapter,
+ 	return _SUCCESS;
+ }
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ u8 rtw_BT_efuse_map_read(PADAPTER padapter, u16 addr, u16 cnts, u8 *data)
+ {
+ 	u16	mapLen=0;
+@@ -1150,6 +1153,7 @@ exit:
+ 
+ 	return ret;
+ }
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 
+ /*-----------------------------------------------------------------------------
+  * Function:	Efuse_ReadAllMap
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_cmd.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_cmd.c
+@@ -2492,8 +2492,8 @@ u8 traffic_status_watchdog(_adapter *pad
+ 		}
+ 
+ 		// Higher Tx/Rx data.
+-		if( pmlmepriv->LinkDetectInfo.NumRxOkInPeriod > 4000 ||
+-			pmlmepriv->LinkDetectInfo.NumTxOkInPeriod > 4000 )
++		if( pmlmepriv->LinkDetectInfo.NumRxOkInPeriod > 1000 ||
++			pmlmepriv->LinkDetectInfo.NumTxOkInPeriod > 1000 )
+ 		{
+ 			bHigherBusyTraffic = _TRUE;
+ 
+@@ -4112,6 +4112,7 @@ _func_enter_;
+ _func_exit_;	
+ }
+ 
++#ifdef CONFIG_IBSS
+ void rtw_create_ibss_post_hdl(_adapter *padapter, int status)
+ {	
+ 	_irqL irqL;
+@@ -4169,7 +4170,7 @@ createbss_cmd_fail:
+ exit:
+ 	return;
+ }
+-
++#endif
+ 
+ 
+ void rtw_setstaKey_cmdrsp_callback(_adapter*	padapter ,  struct cmd_obj *pcmd)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_debug.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_debug.c
+@@ -1072,7 +1072,9 @@ int proc_get_survey_info(struct seq_file
+ 		ie_wpa2 = rtw_get_wpa2_ie(&pnetwork->network.IEs[12], &ielen, pnetwork->network.IELength-12);
+ 		ie_cap = rtw_get_capability(&pnetwork->network);
+ 		ie_wps = rtw_get_wps_ie(&pnetwork->network.IEs[12], pnetwork->network.IELength-12, NULL, &wpsielen);
++		#ifdef CONFIG_P2P
+ 		ie_p2p = rtw_get_p2p_ie(&pnetwork->network.IEs[12], pnetwork->network.IELength-12, NULL, &ielen);
++		#endif
+ 		ssid = pnetwork->network.Ssid.Ssid;
+ 		sprintf(flag_str, "%s%s%s%s%s%s%s",
+ 					(ie_wpa) ? "[WPA]":"",
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_ioctl_set.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_ioctl_set.c
+@@ -142,6 +142,7 @@ _func_enter_;
+ 		}
+ 		else	
+ 		{
++			#ifdef CONFIG_IBSS
+ 			if(check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)==_TRUE)
+ 			{
+ 				// submit createbss_cmd to change to a ADHOC_MASTER
+@@ -172,6 +173,7 @@ _func_enter_;
+ 
+ 			}			
+ 			else
++			#endif //CONFIG_IBSS
+ 			{ 
+ 				// can't associate ; reset under-linking			
+ 				_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING);
+@@ -431,6 +433,7 @@ _func_enter_;
+ 		goto release_mlme_lock;
+ 	}
+ 
++	#ifdef CONFIG_IBSS
+ 	if (check_fwstate(pmlmepriv, _FW_LINKED|WIFI_ADHOC_MASTER_STATE) == _TRUE)
+ 	{
+ 		RT_TRACE(_module_rtl871x_ioctl_set_c_, _drv_info_,
+@@ -490,6 +493,7 @@ _func_enter_;
+ 			}
+ 		}		
+ 	}
++	#endif //CONFIG_IBSS
+ 
+ handle_tkip_countermeasure:
+ 	if (rtw_handle_tkip_countermeasure(padapter, __func__) == _FAIL) {
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_mlme.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_mlme.c
+@@ -443,7 +443,7 @@ _func_exit_;
+ 	return res;
+ }
+ 
+-
++#ifdef CONFIG_IBSS
+ void rtw_generate_random_ibss(u8* pibss)
+ {
+ 	u32	curtime = rtw_get_current_time();
+@@ -458,6 +458,7 @@ _func_enter_;
+ _func_exit_;
+ 	return;
+ }
++#endif
+ 
+ u8 *rtw_get_capability_from_ie(u8 *ie)
+ {
+@@ -576,6 +577,7 @@ struct	wlan_network *rtw_find_network(_q
+ 	return pnetwork;
+ }
+ 
++#ifdef CONFIG_IBSS
+ int rtw_is_same_ibss(_adapter *adapter, struct wlan_network *pnetwork)
+ {
+ 	int ret=_TRUE;
+@@ -599,6 +601,7 @@ int rtw_is_same_ibss(_adapter *adapter,
+ 	return ret;
+ 	
+ }
++#endif
+ 
+ inline int is_same_ess(WLAN_BSSID_EX *a, WLAN_BSSID_EX *b)
+ {
+@@ -1243,6 +1246,7 @@ _func_enter_;
+ 
+ 	if(pmlmepriv->to_join == _TRUE)
+ 	{
++		#ifdef CONFIG_IBSS
+ 		if((check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)==_TRUE) )
+ 		{
+ 			if(check_fwstate(pmlmepriv, _FW_LINKED)==_FALSE)
+@@ -1280,6 +1284,7 @@ _func_enter_;
+ 		 	}
+ 		}
+ 		else
++		#endif //CONFIG_IBSS
+ 		{
+ 			int s_ret;
+ 			set_fwstate(pmlmepriv, _FW_UNDER_LINKING);
+@@ -2570,6 +2575,7 @@ _func_enter_;
+ 		_rtw_roaming(adapter, roam_target);
+ 	}
+ 
++	#ifdef CONFIG_IBSS
+ 	if ( check_fwstate(pmlmepriv,WIFI_ADHOC_MASTER_STATE) || 
+ 	      check_fwstate(pmlmepriv,WIFI_ADHOC_STATE))
+ 	{
+@@ -2616,6 +2622,7 @@ _func_enter_;
+ 		}
+ 		
+ 	}
++	#endif //CONFIG_IBSS
+ 	
+ 	_exit_critical_bh(&pmlmepriv->lock, &irqL2);
+ 	
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_mlme_ext.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_mlme_ext.c
+@@ -1781,6 +1781,7 @@ unsigned int OnBeacon(_adapter *padapter
+ 				#endif
+ 			}
+ 		}
++		#ifdef CONFIG_IBSS
+ 		else if((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 		{
+ 			if ((psta = rtw_get_stainfo(pstapriv, GetAddr2Ptr(pframe))) != NULL)
+@@ -1819,6 +1820,7 @@ unsigned int OnBeacon(_adapter *padapter
+ 				report_add_sta_event(padapter, GetAddr2Ptr(pframe), cam_idx);
+ 			}
+ 		}
++		#endif //CONFIG_IBSS
+ 	}
+ 
+ _END_ONBEACON_:
+@@ -7997,6 +7999,7 @@ void issue_probersp(_adapter *padapter,
+ 		// DS parameter set
+ 		pframe =rtw_set_ie(pframe, _DSSET_IE_, 1, (unsigned char *)&(cur_network->Configuration.DSConfig), &pattrib->pktlen);
+ 
++		#ifdef CONFIG_IBSS
+ 		if( (pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 		{
+ 			u8 erpinfo=0;
+@@ -8009,6 +8012,7 @@ void issue_probersp(_adapter *padapter,
+ 			//ERP IE
+ 			pframe = rtw_set_ie(pframe, _ERPINFO_IE_, 1, &erpinfo, &pattrib->pktlen);
+ 		}
++		#endif
+ 
+ 		
+ 		// EXTERNDED SUPPORTED RATE
+@@ -10830,6 +10834,7 @@ u8 collect_bss_info(_adapter *padapter,
+ 	return _SUCCESS;
+ }
+ 
++#ifdef CONFIG_IBSS
+ void start_create_ibss(_adapter* padapter)
+ {
+ 	unsigned short	caps;
+@@ -10894,6 +10899,7 @@ void start_create_ibss(_adapter* padapte
+ 	update_bmc_sta(padapter);
+ 
+ }
++#endif
+ 
+ void start_clnt_join(_adapter* padapter)
+ {
+@@ -10984,6 +10990,7 @@ void start_clnt_join(_adapter* padapter)
+ 		
+ 		pmlmeinfo->state = WIFI_FW_AUTH_NULL | WIFI_FW_STATION_STATE;
+ 	}
++	#ifdef CONFIG_IBSS
+ 	else if (caps&cap_IBSS) //adhoc client
+ 	{
+ 		Set_MSR(padapter, WIFI_FW_ADHOC_STATE);
+@@ -10997,6 +11004,7 @@ void start_clnt_join(_adapter* padapter)
+ 
+ 		report_join_res(padapter, 1);
+ 	}
++	#endif
+ 	else
+ 	{
+ 		//DBG_871X("marc: invalid cap:%x\n", caps);
+@@ -11752,6 +11760,7 @@ bool rtw_port_switch_chk(_adapter *adapt
+ 		goto exit;
+ 	}
+ 
++#ifdef CONFIG_P2P
+ 	/* GC should use port0 for p2p ps */	
+ 	if (((if_port1_mlmeinfo->state & 0x03) == WIFI_FW_STATION_STATE)
+ 		&& (if_port1_mlmeinfo->state & WIFI_FW_ASSOC_SUCCESS)
+@@ -11762,6 +11771,7 @@ bool rtw_port_switch_chk(_adapter *adapt
+ 		switch_needed = _TRUE;
+ 		goto exit;
+ 	}
++#endif
+ 
+ 	/* port1 linked, but port0 not linked */
+ 	if ((if_port1_mlmeinfo->state & WIFI_FW_ASSOC_SUCCESS)
+@@ -11984,11 +11994,13 @@ void mlmeext_joinbss_event_callback(_ada
+ 	pmlmepriv->bGetGateway = 1;
+ #endif
+ 
++	#ifdef CONFIG_IBSS
+ 	if((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 	{
+ 		//update bc/mc sta_info
+ 		update_bmc_sta(padapter);
+ 	}
++	#endif
+ 
+ 
+ 	//turn on dynamic functions
+@@ -12075,6 +12087,7 @@ void mlmeext_sta_add_event_callback(_ada
+ 
+ 	DBG_871X("%s\n", __FUNCTION__);
+ 
++	#ifdef CONFIG_IBSS
+ 	if((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 	{
+ 		if(pmlmeinfo->state & WIFI_FW_ASSOC_SUCCESS)//adhoc master or sta_count>1
+@@ -12106,6 +12119,7 @@ void mlmeext_sta_add_event_callback(_ada
+ 		join_type = 2;
+ 		rtw_hal_set_hwreg(padapter, HW_VAR_MLME_JOIN, (u8 *)(&join_type));
+ 	}
++	#endif
+ 
+ 	pmlmeinfo->FW_sta_info[psta->mac_id].psta = psta;
+ 
+@@ -12130,7 +12144,11 @@ void mlmeext_sta_del_event_callback(_ada
+ 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
+ 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
+ 
+-	if (is_client_associated_to_ap(padapter) || is_IBSS_empty(padapter))
++	if (is_client_associated_to_ap(padapter)
++		#ifdef CONFIG_IBSS
++		|| is_IBSS_empty(padapter)
++		#endif
++	)
+ 	{
+ 		rtw_mlmeext_disconnect(padapter);
+ 	}
+@@ -12542,6 +12560,7 @@ void linked_status_chk(_adapter *padapte
+ 		} //end of if ((psta = rtw_get_stainfo(pstapriv, passoc_res->network.MacAddress)) != NULL)
+ 
+ 	}
++	#ifdef CONFIG_IBSS
+ 	else if (is_client_associated_to_ibss(padapter))
+ 	{
+ 		//linked IBSS mode
+@@ -12579,6 +12598,7 @@ void linked_status_chk(_adapter *padapte
+ 		//set_link_timer(pmlmeext, DISCONNECT_TO);
+ 
+ 	}
++	#endif
+ 
+ }
+ 
+@@ -13040,6 +13060,7 @@ u8 createbss_hdl(_adapter *padapter, u8
+ #endif
+ 
+ 	/* below is for ad-hoc master */
++#ifdef CONFIG_IBSS
+ 	if (parm->adhoc) {
+ 		rtw_warn_on(pdev_network->InfrastructureMode != Ndis802_11IBSS);
+ 		rtw_joinbss_reset(padapter);
+@@ -13079,13 +13100,17 @@ u8 createbss_hdl(_adapter *padapter, u8
+ 
+ 		_rtw_memcpy(pnetwork->IEs, pdev_network->IEs, pnetwork->IELength);
+ 		start_create_ibss(padapter);
+-	} else {
++	} else
++#endif
++	{
+ 		rtw_warn_on(1);
+ 		ret = H2C_PARAMETERS_ERROR;
+ 	}
+ 
++#ifdef CONFIG_IBSS
+ ibss_post_hdl:
+ 	rtw_create_ibss_post_hdl(padapter, ret);
++#endif
+ 
+ exit:
+ 	return ret;
+@@ -13650,10 +13675,11 @@ static u8 sitesurvey_pick_ch_behavior(_a
+ 			}
+ 		}
+ 		#endif /* CONFIG_SCAN_BACKOP */
++	#ifdef CONFIG_P2P
+ 	} else if (rtw_p2p_findphase_ex_is_needed(pwdinfo)) {
+ 		/* go p2p listen */
+ 		next_state = SCAN_TO_P2P_LISTEN;
+-
++	#endif
+ 	#ifdef CONFIG_ANTENNA_DIVERSITY
+ 	} else if (rtw_hal_antdiv_before_linked(padapter)) {
+ 		/* go sw antdiv before link */
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_recv.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_recv.c
+@@ -1477,6 +1477,7 @@ _func_enter_;
+ 		}
+ 
+ 	}
++#ifdef CONFIG_MP_INCLUDED
+ 	else if ((check_fwstate(pmlmepriv, WIFI_MP_STATE) == _TRUE) &&
+ 		     (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE) )
+ 	{
+@@ -1503,6 +1504,7 @@ _func_enter_;
+ 
+ 
+ 	}
++#endif
+ 	else if (check_fwstate(pmlmepriv, WIFI_AP_STATE) == _TRUE)
+ 	{
+ 		/* Special case */
+@@ -1599,6 +1601,7 @@ _func_enter_;
+ 			goto exit;
+ 		}
+ 	}
++#ifdef CONFIG_MP_INCLUDED
+ 	else if ((check_fwstate(pmlmepriv, WIFI_MP_STATE) == _TRUE) &&
+ 		     (check_fwstate(pmlmepriv, _FW_LINKED) == _TRUE) )
+ 	{
+@@ -1623,6 +1626,7 @@ _func_enter_;
+ 		}
+ 
+ 	}
++#endif
+ 	else {
+ 		u8 *myhwaddr = adapter_mac_addr(adapter);
+ 		if (!_rtw_memcmp(pattrib->ra, myhwaddr, ETH_ALEN)) {
+@@ -3691,7 +3695,6 @@ int validate_mp_recv_frame(_adapter *ada
+ 
+ 	return ret;
+ }
+-#endif
+ 
+ static sint MPwlanhdr_to_ethhdr ( union recv_frame *precvframe)
+ {
+@@ -3922,6 +3925,7 @@ exit:
+ 		return ret;
+ 
+ }
++#endif //CONFIG_MP_INCLUDED
+ 
+ static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, u8 *buf)
+ {
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_wlan_util.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/core/rtw_wlan_util.c
+@@ -926,6 +926,7 @@ int is_client_associated_to_ap(_adapter
+ 	}
+ }
+ 
++#ifdef CONFIG_IBSS
+ int is_client_associated_to_ibss(_adapter *padapter)
+ {
+ 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
+@@ -958,6 +959,7 @@ int is_IBSS_empty(_adapter *padapter)
+ 	return _TRUE;
+ 	
+ }
++#endif
+ 
+ unsigned int decide_wait_for_beacon_timeout(unsigned int bcn_interval)
+ {
+@@ -3401,7 +3403,10 @@ void update_wireless_mode(_adapter *pada
+ 	rtw_hal_set_hwreg( padapter, HW_VAR_WIRELESS_MODE,  (u8 *)&(pmlmeext->cur_wireless_mode));
+ 
+ 	if ((pmlmeext->cur_wireless_mode & WIRELESS_11B)
+-		&& rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
++		#ifdef CONFIG_P2P
++		&& rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)
++		#endif
++		)
+ 		update_mgnt_tx_rate(padapter, IEEE80211_CCK_RATE_1MB);
+ 	else
+ 		update_mgnt_tx_rate(padapter, IEEE80211_OFDM_RATE_6MB);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/hal_com.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/hal_com.c
+@@ -4000,6 +4000,7 @@ static void rtw_hal_construct_beacon(_ad
+ 	// DS parameter set
+ 	pframe = rtw_set_ie(pframe, _DSSET_IE_, 1, (unsigned char *)&(cur_network->Configuration.DSConfig), &pktlen);
+ 
++	#ifdef CONFIG_IBSS
+ 	if( (pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 	{
+ 		u32 ATIMWindow;
+@@ -4008,7 +4009,7 @@ static void rtw_hal_construct_beacon(_ad
+ 		ATIMWindow = 0;
+ 		pframe = rtw_set_ie(pframe, _IBSS_PARA_IE_, 2, (unsigned char *)(&ATIMWindow), &pktlen);
+ 	}
+-
++	#endif
+ 
+ 	//todo: ERP IE
+ 
+@@ -7351,6 +7352,7 @@ int rtw_hal_disable_gpio_interrupt(_adap
+ }
+ #endif
+ 
++#ifdef CONFIG_MP_INCLUDED
+ void rtw_dump_mac_rx_counters(_adapter* padapter,struct dbg_rx_counter *rx_counter)
+ {
+ 	u32	mac_cck_ok=0, mac_ofdm_ok=0, mac_ht_ok=0, mac_vht_ok=0;
+@@ -7490,6 +7492,8 @@ void rtw_reset_phy_rx_counters(_adapter*
+ 		PHY_SetBBReg(padapter, 0xA2C, BIT15, 0x1);
+ 	}
+ }
++#endif
++
+ #ifdef DBG_RX_COUNTER_DUMP
+ void rtw_dump_drv_rx_counters(_adapter* padapter,struct dbg_rx_counter *rx_counter)
+ {
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/phydm_hwconfig.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/phydm_hwconfig.c
+@@ -2246,12 +2246,14 @@ ODM_ConfigRFWithTxPwrTrackHeaderFile(
+ 	{
+ 		if (pDM_Odm->SupportInterface == ODM_ITRF_PCIE)
+ 			READ_AND_CONFIG_MP(8812A,_TxPowerTrack_PCIE);
++		#ifdef CONFIG_USB_HCI
+ 		else if (pDM_Odm->SupportInterface == ODM_ITRF_USB) {
+ 			if (pDM_Odm->RFEType == 3 && pDM_Odm->bIsMPChip) 
+ 				READ_AND_CONFIG_MP(8812A,_TxPowerTrack_RFE3);	
+ 			else
+ 				READ_AND_CONFIG_MP(8812A,_TxPowerTrack_USB);	
+ 		}
++		#endif
+ 		
+ 	}
+ #endif	
+@@ -2700,10 +2702,14 @@ ODM_ConfigFWWithHeaderFile(
+ 	{
+ 		if (ConfigType == CONFIG_FW_NIC)
+ 			READ_FIRMWARE_MP(8812A,_FW_NIC);
++		#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+ 		else if (ConfigType == CONFIG_FW_WoWLAN)
+ 			READ_FIRMWARE_MP(8812A,_FW_WoWLAN);
++		#endif
++		#ifdef CONFIG_BT_COEXIST
+ 		else if (ConfigType == CONFIG_FW_BT)
+ 			READ_FIRMWARE_MP(8812A,_FW_NIC_BT);
++		#endif
+ 		#ifdef CONFIG_AP_WOWLAN
+ 		else if (ConfigType == CONFIG_FW_AP_WoWLAN)
+ 			READ_FIRMWARE(8812A,_FW_AP);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halhwimg8812a_fw.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halhwimg8812a_fw.c
+@@ -3202,7 +3202,7 @@ ODM_ReadFirmware_MP_8812A_FW_NIC(
+ 	*pFirmwareSize = ArrayLength_MP_8812A_FW_NIC;
+ }
+ 
+-
++#ifdef CONFIG_BT_COEXIST
+ u1Byte Array_MP_8812A_FW_NIC_BT[] = {
+ 0x01, 0x95, 0x13, 0x00, 0x29, 0x00, 0x00, 0x00, 0x06, 0x17, 0x19, 0x26, 0x8C, 0x76, 0x00, 0x00, 
+ 0x65, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+@@ -5121,8 +5121,9 @@ ODM_ReadFirmware_MP_8812A_FW_NIC_BT(
+ #endif
+ 	*pFirmwareSize = ArrayLength_MP_8812A_FW_NIC_BT;
+ }
++#endif //CONFIG_BT_COEXIST
+ 
+-
++#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+ u1Byte Array_MP_8812A_FW_WoWLAN[] = {
+ 0x01, 0x95, 0x30, 0x00, 0x29, 0x00, 0x00, 0x00, 0x06, 0x17, 0x19, 0x26, 0xC8, 0x57, 0x00, 0x00, 
+ 0x65, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+@@ -6549,7 +6550,7 @@ ODM_ReadFirmware_MP_8812A_FW_WoWLAN(
+ #endif
+ 	*pFirmwareSize = ArrayLength_MP_8812A_FW_WoWLAN;
+ }
+-
++#endif //#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+ 
+ 
+ #endif /* end of (defined(CONFIG_AP_WOWLAN) || (DM_ODM_SUPPORT_TYPE & (ODM_AP)))*/
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halhwimg8812a_rf.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halhwimg8812a_rf.c
+@@ -1195,7 +1195,7 @@ ODM_ReadAndConfig_MP_8812A_TxPowerTrack_
+ /******************************************************************************
+ *                           TxPowerTrack_RFE3.TXT
+ ******************************************************************************/
+-
++#ifdef CONFIG_USB_HCI
+ u1Byte gDeltaSwingTableIdx_MP_5GB_N_TxPowerTrack_RFE3_8812A[][DELTA_SWINGIDX_SIZE] = {
+ 	{0, 1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 12, 13, 13, 14, 15, 16, 16, 17, 17, 18, 18},
+ 	{0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 6, 7, 8, 8, 9, 9, 10, 10, 11, 11, 11, 12, 14, 13, 13, 14, 14, 14, 15, 15},
+@@ -1373,6 +1373,7 @@ ODM_ReadAndConfig_MP_8812A_TxPowerTrack_
+ #endif
+ }
+ 
++#endif //#ifdef CONFIG_USB_HCI
+ /******************************************************************************
+ *                           TXPWR_LMT.TXT
+ ******************************************************************************/
+@@ -1984,7 +1985,7 @@ ODM_ReadAndConfig_MP_8812A_TXPWR_LMT(
+ /******************************************************************************
+ *                           TXPWR_LMT_HM812A03.TXT
+ ******************************************************************************/
+-
++#if (DM_ODM_SUPPORT_TYPE & ODM_WIN) && (DEV_BUS_TYPE == RT_PCI_INTERFACE)
+ const char *Array_MP_8812A_TXPWR_LMT_HM812A03[] = { 
+ 	"FCC", "2.4G", "20M", "CCK", "1T", "01", "36", 
+ 	"ETSI", "2.4G", "20M", "CCK", "1T", "01", "30", 
+@@ -3196,6 +3197,7 @@ ODM_ReadAndConfig_MP_8812A_TXPWR_LMT_NFA
+ 	}
+ 
+ }
++#endif //#if (DM_ODM_SUPPORT_TYPE & ODM_WIN) && (DEV_BUS_TYPE == RT_PCI_INTERFACE)
+ 
+ #endif /* end of HWIMG_SUPPORT*/
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halphyrf_8812a_ce.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/phydm/rtl8812a/halphyrf_8812a_ce.c
+@@ -91,6 +91,7 @@ ODM_TxPwrTrackSetPwr8812A(
+ 	u1Byte			i = 0;
+ 	PODM_RF_CAL_T	pRFCalibrateInfo = &(pDM_Odm->RFCalibrateInfo);
+ 
++#ifdef CONFIG_MP_INCLUDED
+ 	if (pDM_Odm->mp_mode == TRUE) {
+ 	#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
+ 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+@@ -105,7 +106,9 @@ ODM_TxPwrTrackSetPwr8812A(
+ 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
+ 		#endif	
+ 	#endif
+-	} else {
++	} else 
++#endif
++	{
+ 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
+ 		
+ 		if (!rate) { /*auto rate*/
+@@ -328,6 +331,7 @@ GetDeltaSwingTable_8812A(
+ 	u1Byte		TxRate			= 0xFF;
+ 	u1Byte         	channel   		 = pHalData->CurrentChannel;
+ 
++#ifdef CONFIG_MP_INCLUDED
+ 	if (pDM_Odm->mp_mode == TRUE) {
+ 	#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
+ 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+@@ -342,7 +346,9 @@ GetDeltaSwingTable_8812A(
+ 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
+ 		#endif	
+ 	#endif
+-	} else {
++	} else
++#endif
++	{
+ 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
+ 		
+ 		if (!rate) { /*auto rate*/
+@@ -1534,6 +1540,7 @@ VOID PHY_SetRFPathSwitch_8812A(
+ #endif		
+ }
+ 
++#if 0
+ 
+ VOID
+ _DPK_ThermalCompensation(
+@@ -2191,7 +2198,7 @@ PHY_DPCalibrate_8812A(
+ 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("<=== PHY_DPCalibrate_8812A\n"));
+ }                                               
+                                    
+-                                                          
++#endif //#if 0                                              
+                                                           
+                                                           
+                                                           
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_cmd.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_cmd.c
+@@ -548,6 +548,7 @@ void ConstructBeacon(_adapter *padapter,
+ 	// DS parameter set
+ 	pframe = rtw_set_ie(pframe, _DSSET_IE_, 1, (unsigned char *)&(cur_network->Configuration.DSConfig), &pktlen);
+ 
++	#ifdef CONFIG_IBSS
+ 	if( (pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE)
+ 	{
+ 		u32 ATIMWindow;
+@@ -556,7 +557,7 @@ void ConstructBeacon(_adapter *padapter,
+ 		ATIMWindow = 0;
+ 		pframe = rtw_set_ie(pframe, _IBSS_PARA_IE_, 2, (unsigned char *)(&ATIMWindow), &pktlen);
+ 	}
+-
++	#endif
+ 
+ 	//todo: ERP IE
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_dm.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_dm.c
+@@ -205,7 +205,8 @@ dm_InterruptMigration(
+ 			// timer 25ns*0xfa0=100us for 0xf packets.
+ 			// 2010.03.05.
+ 			//
+-			rtw_write32(Adapter, REG_INT_MIG, 0xff000fa0);// 0x306:Rx, 0x307:Tx
++			//rtw_write32(Adapter, REG_INT_MIG, 0xff000fa0);// 0x306:Rx, 0x307:Tx
++			rtw_write32(Adapter, REG_INT_MIG, 0x555500F0);// 0x306:Rx, 0x307:Tx
+ 			pHalData->bInterruptMigration = IntMtToSet;
+ 		}
+ 		else
+@@ -420,7 +421,7 @@ rtl8812_HalDmWatchDog(
+ #ifdef CONFIG_PCI_HCI
+ 		// 20100630 Joseph: Disable Interrupt Migration mechanism temporarily because it degrades Rx throughput.
+ 		// Tx Migration settings.
+-		//dm_InterruptMigration(Adapter);
++		dm_InterruptMigration(Adapter);
+ 
+ 		//if(Adapter->HalFunc.TxCheckStuckHandler(Adapter))
+ 		//	PlatformScheduleWorkItem(&(GET_HAL_DATA(Adapter)->HalResetWorkItem));
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_hal_init.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/hal/rtl8812a/rtl8812a_hal_init.c
+@@ -1020,7 +1020,7 @@ exit:
+ 	return rtStatus;
+ }
+ 
+-
++#if 0
+ int ReservedPage_Compare(PADAPTER Adapter,PRT_MP_FIRMWARE pFirmware,u32 BTPatchSize)
+ {
+ 	u8 temp,ret,lastBTsz;
+@@ -1115,7 +1115,7 @@ int ReservedPage_Compare(PADAPTER Adapte
+ 	
+ 	return _TRUE;
+ }
+-
++#endif
+ 
+ #if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
+ //===========================================
+@@ -1751,6 +1751,7 @@ Hal_ReadThermalMeter_8812A(
+ 	DBG_871X("ThermalMeter = 0x%x\n", pHalData->EEPROMThermalMeter);
+ }
+ 
++#ifndef CONFIG_SOC_RTL8117
+ void Hal_ReadRemoteWakeup_8812A(
+ 	PADAPTER		padapter,
+ 	IN	u8*			hwinfo,
+@@ -1779,6 +1780,7 @@ void Hal_ReadRemoteWakeup_8812A(
+ 		DBG_871X("%s...bSupportRemoteWakeup(%x)\n",__FUNCTION__, pwrctl->bSupportRemoteWakeup);
+ 	}
+ }
++#endif
+ 
+ VOID
+ Hal_ReadChannelPlan8812A(
+@@ -5230,7 +5232,8 @@ static void hw_var_set_mlme_join(PADAPTE
+ 		}	
+ 		else
+ 		{
+-			rtw_write32(Adapter, REG_RCR, rtw_read32(Adapter, REG_RCR)|RCR_CBSSID_DATA|RCR_CBSSID_BCN);
++			//rtw_write32(Adapter, REG_RCR, rtw_read32(Adapter, REG_RCR)|RCR_CBSSID_DATA|RCR_CBSSID_BCN);
++			rtw_write32(Adapter, REG_RCR, rtw_read32(Adapter, REG_RCR)|RCR_CBSSID_BCN);
+ 		}	
+ 
+ 		if(check_fwstate(pmlmepriv, WIFI_STATION_STATE) == _TRUE)
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/autoconf.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/autoconf.h
+@@ -90,14 +90,14 @@
+ #define CONFIG_DFS	1
+ 
+ //#ifndef CONFIG_MP_INCLUDED
+-	#define CONFIG_IPS	1
++	#define CONFIG_IPS	0
+ 	#ifdef CONFIG_IPS
+ 	//#define CONFIG_IPS_LEVEL_2	1 //enable this to set default IPS mode to IPS_LEVEL_2
+ 	//#define CONFIG_IPS_CHECK_IN_WD // Do IPS Check in WatchDog.	
+ 	#endif
+ 	//#define SUPPORT_HW_RFOFF_DETECTED	1
+ 
+-	#define CONFIG_LPS	1
++	#define CONFIG_LPS	0
+ 	#if defined(CONFIG_LPS)
+ 	//#define CONFIG_LPS_LCLK	1
+ 	#endif
+@@ -141,7 +141,7 @@
+ 	//#define CONFIG_AUTO_AP_MODE
+ #endif
+ 
+-#define CONFIG_P2P	1
++//#define CONFIG_P2P	1
+ #ifdef CONFIG_P2P
+ 	//The CONFIG_WFD is for supporting the Wi-Fi display
+ 	#define CONFIG_WFD
+@@ -274,14 +274,14 @@
+ /*
+  * Debug Related Config
+  */
+-#define DBG	1
++#define DBG	0
+ 
+ #define CONFIG_DEBUG /* DBG_871X, etc... */
+ //#define CONFIG_DEBUG_RTL871X /* RT_TRACE, RT_PRINT_DATA, _func_enter_, _func_exit_ */
+ 
+ #define CONFIG_PROC_DEBUG
+ 
+-#define DBG_CONFIG_ERROR_DETECT
++//#define DBG_CONFIG_ERROR_DETECT
+ //#define DBG_CONFIG_ERROR_DETECT_INT
+ //#define DBG_CONFIG_ERROR_RESET
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtl8812a_hal.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtl8812a_hal.h
+@@ -323,7 +323,9 @@ void	Hal_ReadPAType_8821A(PADAPTER Adapt
+ void	Hal_ReadRFEType_8812A(PADAPTER Adapter,u8* PROMContent, BOOLEAN AutoloadFail);
+ void	Hal_EfuseParseBTCoexistInfo8812A(PADAPTER Adapter, u8* hwinfo, BOOLEAN AutoLoadFail);
+ void	hal_ReadUsbType_8812AU(PADAPTER Adapter, u8 *PROMContent, BOOLEAN AutoloadFail);
++#ifdef CONFIG_MP_INCLUDED
+ int 	FirmwareDownloadBT(PADAPTER Adapter, PRT_MP_FIRMWARE pFirmware);
++#endif
+ void	Hal_ReadRemoteWakeup_8812A(PADAPTER padapter, u8* hwinfo, BOOLEAN AutoLoadFail);
+ 
+ BOOLEAN HalDetectPwrDownMode8812(PADAPTER Adapter);
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_cmd.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_cmd.h
+@@ -1121,7 +1121,9 @@ u8 rtw_drvextra_cmd_hdl(_adapter *padapt
+ extern void rtw_survey_cmd_callback(_adapter  *padapter, struct cmd_obj *pcmd);
+ extern void rtw_disassoc_cmd_callback(_adapter  *padapter, struct cmd_obj *pcmd);
+ extern void rtw_joinbss_cmd_callback(_adapter  *padapter, struct cmd_obj *pcmd);
++#ifdef CONFIG_IBSS
+ void rtw_create_ibss_post_hdl(_adapter *padapter, int status);
++#endif
+ extern void rtw_getbbrfreg_cmdrsp_callback(_adapter  *padapter, struct cmd_obj *pcmd);
+ extern void rtw_readtssi_cmdrsp_callback(_adapter*	padapter,  struct cmd_obj *pcmd);
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_efuse.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_efuse.h
+@@ -204,5 +204,38 @@ u32 rtw_read_macaddr_from_file(const cha
+ #endif /* CONFIG_EFUSE_CONFIG_FILE */
+ #endif /* PLATFORM_LINUX */
+ 
++
++/* E-Fuse */
++#ifdef CONFIG_RTL8188E
++#define EFUSE_MAP_SIZE		512
++#endif
++#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8814A)
++#define EFUSE_MAP_SIZE		512
++#endif
++#ifdef CONFIG_RTL8192E
++#define EFUSE_MAP_SIZE		512
++#endif
++#ifdef CONFIG_RTL8723B
++#define EFUSE_MAP_SIZE		512
++#endif
++#ifdef CONFIG_RTL8814A
++#define EFUSE_MAP_SIZE		512
++#endif
++#ifdef CONFIG_RTL8703B
++#define EFUSE_MAP_SIZE		512
++#endif
++#ifdef CONFIG_RTL8188F
++#define EFUSE_MAP_SIZE		512
++#endif
++
++#if defined(CONFIG_RTL8814A)
++#define EFUSE_MAX_SIZE		1024
++#elif defined(CONFIG_RTL8188E) || defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8703B)
++#define EFUSE_MAX_SIZE		256
++#else
++#define EFUSE_MAX_SIZE		512
++#endif
++/* end of E-Fuse */
++
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mlme.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mlme.h
+@@ -21,7 +21,7 @@
+ #define __RTW_MLME_H_
+ 
+ 
+-#define	MAX_BSS_CNT	128
++#define	MAX_BSS_CNT	64
+ //#define   MAX_JOIN_TIMEOUT	2000
+ //#define   MAX_JOIN_TIMEOUT	2500
+ #define   MAX_JOIN_TIMEOUT	6500
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mlme_ext.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mlme_ext.h
+@@ -762,8 +762,10 @@ u8* get_my_bssid(WLAN_BSSID_EX *pnetwork
+ u16 get_beacon_interval(WLAN_BSSID_EX *bss);
+ 
+ int is_client_associated_to_ap(_adapter *padapter);
++#ifdef CONFIG_IBSS
+ int is_client_associated_to_ibss(_adapter *padapter);
+ int is_IBSS_empty(_adapter *padapter);
++#endif
+ 
+ unsigned char check_assoc_AP(u8 *pframe, uint len);
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mp.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_mp.h
+@@ -248,37 +248,6 @@ typedef struct _MPT_CONTEXT
+ }MPT_CONTEXT, *PMPT_CONTEXT;
+ //#endif
+ 
+-/* E-Fuse */
+-#ifdef CONFIG_RTL8188E
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8814A)
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#ifdef CONFIG_RTL8192E
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#ifdef CONFIG_RTL8723B
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#ifdef CONFIG_RTL8814A
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#ifdef CONFIG_RTL8703B
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-#ifdef CONFIG_RTL8188F
+-#define EFUSE_MAP_SIZE		512
+-#endif
+-
+-#if defined(CONFIG_RTL8814A)
+-#define EFUSE_MAX_SIZE		1024
+-#elif defined(CONFIG_RTL8188E) || defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8703B)
+-#define EFUSE_MAX_SIZE		256
+-#else
+-#define EFUSE_MAX_SIZE		512
+-#endif
+-/* end of E-Fuse */
+ 
+ //#define RTPRIV_IOCTL_MP 					( SIOCIWFIRSTPRIV + 0x17)
+ enum {	  
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_recv.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_recv.h
+@@ -52,11 +52,11 @@
+ 	#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
+ 
+ #ifdef CONFIG_NAPI
+-	#define RTL_NAPI_WEIGHT (64)
++	#define RTL_NAPI_WEIGHT (32)
+ #endif
+ #endif
+ 
+-#define NR_RECVFRAME 256
++#define NR_RECVFRAME 128
+ 
+ #define RXFRAME_ALIGN	8
+ #define RXFRAME_ALIGN_SZ	(1<<RXFRAME_ALIGN)
+@@ -337,7 +337,7 @@ struct recv_stat
+ 
+ #ifdef CONFIG_PCI_HCI
+ #define PCI_MAX_RX_QUEUE		1// MSDU packet queue, Rx Command Queue
+-#define PCI_MAX_RX_COUNT		128
++#define PCI_MAX_RX_COUNT		16
+ 
+ struct rtw_rx_ring {
+ 	struct recv_stat	*desc;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_xmit.h
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/include/rtw_xmit.h
+@@ -58,7 +58,7 @@
+ #endif //CONFIG_SINGLE_XMIT_BUF
+ #elif defined (CONFIG_PCI_HCI)
+ #define MAX_XMITBUF_SZ	(1664)
+-#define NR_XMITBUFF	(128)
++#define NR_XMITBUFF	(32)
+ #endif
+ 
+ #ifdef PLATFORM_OS_CE
+@@ -109,8 +109,7 @@
+ #define HW_QUEUE_ENTRY	8
+ 
+ #ifdef CONFIG_PCI_HCI
+-//#define TXDESC_NUM						64
+-#define TXDESC_NUM						128
++#define TXDESC_NUM				16
+ #define TXDESC_NUM_BE_QUEUE			128
+ #endif
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
+@@ -647,6 +647,7 @@ int rtw_cfg80211_check_bss(_adapter *pad
+ 	return 	(bss!=NULL);
+ }
+ 
++#ifdef CONFIG_IBSS
+ void rtw_cfg80211_ibss_indicate_connect(_adapter *padapter)
+ {
+ 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
+@@ -724,6 +725,7 @@ void rtw_cfg80211_ibss_indicate_connect(
+ 	cfg80211_ibss_joined(padapter->pnetdev, cur_network->network.MacAddress, GFP_ATOMIC);
+ #endif
+ }
++#endif
+ 
+ void rtw_cfg80211_indicate_connect(_adapter *padapter)
+ {
+@@ -1948,9 +1950,11 @@ static int cfg80211_rtw_change_iface(str
+ 	ndev->type = ARPHRD_ETHER;
+ 
+ 	switch (type) {
++	#ifdef CONFIG_IBSS
+ 	case NL80211_IFTYPE_ADHOC:
+ 		networkType = Ndis802_11IBSS;
+ 		break;
++	#endif
+ #if defined(CONFIG_P2P) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE))
+ 	case NL80211_IFTYPE_P2P_CLIENT:
+ #endif
+@@ -3028,6 +3032,7 @@ exit:
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_IBSS
+ static int cfg80211_rtw_join_ibss(struct wiphy *wiphy, struct net_device *ndev,
+ 				  struct cfg80211_ibss_params *params)
+ {
+@@ -3152,6 +3157,7 @@ leave_ibss:
+ 
+ 	return 0;
+ }
++#endif
+ 
+ static int cfg80211_rtw_connect(struct wiphy *wiphy, struct net_device *ndev,
+ 				 struct cfg80211_connect_params *sme)
+@@ -5292,6 +5298,7 @@ static int _cfg80211_rtw_mgmt_tx(_adapte
+ 
+ 		co_channel = rtw_get_oper_ch(padapter);
+ 
++#ifdef CONFIG_P2P
+ 		if (tx_ch != pbuddy_mlmeext->cur_channel) {
+ 
+ 			u16 ext_listen_period;
+@@ -5321,6 +5328,7 @@ static int _cfg80211_rtw_mgmt_tx(_adapte
+ 			_set_timer(&pwdinfo->ap_p2p_switch_timer, ext_listen_period);	
+ 			
+ 		}
++#endif
+ 
+ 		if (!check_fwstate(&padapter->mlmepriv, _FW_LINKED ))
+ 			pmlmeext->cur_channel = tx_ch;
+@@ -6574,7 +6582,9 @@ static void rtw_cfg80211_preinit_wiphy(_
+ #endif
+ 	
+ 	wiphy->interface_modes =	BIT(NL80211_IFTYPE_STATION)
++#ifdef CONFIG_IBSS
+ 								| BIT(NL80211_IFTYPE_ADHOC)
++#endif
+ #ifdef CONFIG_AP_MODE
+ 								| BIT(NL80211_IFTYPE_AP)
+ 								#ifdef CONFIG_WIFI_MONITOR
+@@ -6675,8 +6685,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.set_wiphy_params = cfg80211_rtw_set_wiphy_params,
+ 	.connect = cfg80211_rtw_connect,
+ 	.disconnect = cfg80211_rtw_disconnect,
++#ifdef CONFIG_IBSS
+ 	.join_ibss = cfg80211_rtw_join_ibss,
+ 	.leave_ibss = cfg80211_rtw_leave_ibss,
++#endif
+ 	.set_tx_power = cfg80211_rtw_set_txpower,
+ 	.get_tx_power = cfg80211_rtw_get_txpower,
+ 	.set_power_mgmt = cfg80211_rtw_set_power_mgmt,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_linux.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_linux.c
+@@ -1865,6 +1865,7 @@ exit:
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_WIRELESS_EXT
+ static int rtw_wx_get_name(struct net_device *dev, 
+ 			     struct iw_request_info *info, 
+ 			     union iwreq_data *wrqu, char *extra)
+@@ -4092,7 +4093,10 @@ static int rtw_wx_get_nick(struct net_de
+ 	return 0;
+ 
+ }
++#endif //#ifdef CONFIG_WIRELESS_EXT
++
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ static int rtw_wx_read32(struct net_device *dev,
+                             struct iw_request_info *info,
+                             union iwreq_data *wrqu, char *extra)
+@@ -6871,7 +6875,6 @@ static int rtw_p2p_got_wpsinfo(struct ne
+ 		
+ }
+ 
+-#endif //CONFIG_P2P
+ 
+ static int rtw_p2p_set(struct net_device *dev,
+                                struct iw_request_info *info,
+@@ -6879,7 +6882,6 @@ static int rtw_p2p_set(struct net_device
+ {
+ 	
+ 	int ret = 0;
+-#ifdef CONFIG_P2P
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);	
+@@ -6993,7 +6995,6 @@ static int rtw_p2p_set(struct net_device
+ 	}
+ #endif //CONFIG_WFD
+ 
+-#endif //CONFIG_P2P
+ 
+ 	return ret;
+ 		
+@@ -7006,7 +7007,6 @@ static int rtw_p2p_get(struct net_device
+ 	
+ 	int ret = 0;	
+ 	
+-#ifdef CONFIG_P2P
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);	
+@@ -7068,7 +7068,6 @@ static int rtw_p2p_get(struct net_device
+ 	}
+ #endif // CONFIG_WFD	
+ 	
+-#endif //CONFIG_P2P
+ 
+ 	return ret;
+ 		
+@@ -7081,7 +7080,6 @@ static int rtw_p2p_get2(struct net_devic
+ 
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_P2P
+ 
+ 	int length = wrqu->data.length;
+ 	char *buffer = (u8 *)rtw_malloc(length);
+@@ -7127,11 +7125,11 @@ bad:
+ 		rtw_mfree(buffer, length);
+ 	}
+ 
+-#endif //CONFIG_P2P
+ 
+ 	return ret;
+ 
+ }
++#endif //CONFIG_P2P
+ 
+ static int rtw_cta_test_start(struct net_device *dev,
+ 							   struct iw_request_info *info,
+@@ -8073,6 +8071,7 @@ static int rtw_dbg_port(struct net_devic
+ 	return ret;
+ 
+ }
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 
+ static int wpa_set_param(struct net_device *dev, u8 name, u32 value)
+ {
+@@ -9352,8 +9351,9 @@ out:
+ 	return ret;
+ 	
+ }
+-#endif
++#endif //#ifdef CONFIG_AP_MODE
+ 
++#ifdef CONFIG_WIRELESS_EXT
+ static int rtw_wx_set_priv(struct net_device *dev,
+ 				struct iw_request_info *info,
+ 				union iwreq_data *awrq,
+@@ -9533,6 +9533,8 @@ FREE_EXT:
+ 	return ret;
+ 	
+ }
++#endif //#ifdef CONFIG_WIRELESS_EXT
++
+ #ifdef CONFIG_WOWLAN
+ static int rtw_wowlan_ctrl(struct net_device *dev,
+ 						struct iw_request_info *info,
+@@ -9807,6 +9809,7 @@ _rtw_ap_wowlan_ctrl_exit:
+ }
+ #endif //CONFIG_AP_WOWLAN
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ static int rtw_pm_set(struct net_device *dev,
+                                struct iw_request_info *info,
+                                union iwreq_data *wrqu, char *extra)
+@@ -11518,13 +11521,13 @@ return 0;
+ 
+ #endif /*#if defined(CONFIG_MP_INCLUDED)*/
+ 
++#ifdef CONFIG_TDLS
+ static int rtw_wfd_tdls_enable(struct net_device *dev,
+ 				struct iw_request_info *info,
+ 				union iwreq_data *wrqu, char *extra)
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_WFD
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -11537,7 +11540,6 @@ static int rtw_wfd_tdls_enable(struct ne
+ 		padapter->wdinfo.wfd_tdls_enable = 1;
+ 
+ #endif /* CONFIG_WFD */
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -11548,7 +11550,6 @@ static int rtw_tdls_weaksec(struct net_d
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	u8 i, j;
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -11560,7 +11561,6 @@ static int rtw_tdls_weaksec(struct net_d
+ 	else
+ 		padapter->wdinfo.wfd_tdls_weaksec = 1;
+ 
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -11572,7 +11572,6 @@ static int rtw_tdls_enable(struct net_de
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_info	*ptdlsinfo = &padapter->tdlsinfo;
+@@ -11626,7 +11625,6 @@ static int rtw_tdls_enable(struct net_de
+ 	}	else if (extra[0] == '1') {
+ 		ptdlsinfo->tdls_enable = 1;
+ 	}
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -11636,7 +11634,6 @@ static int rtw_tdls_setup(struct net_dev
+ 				union iwreq_data *wrqu, char *extra)
+ {
+ 	int ret = 0;
+-#ifdef CONFIG_TDLS
+ 	u8 i, j;
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_txmgmt txmgmt;
+@@ -11671,7 +11668,6 @@ static int rtw_tdls_setup(struct net_dev
+ 	{
+ 		issue_tdls_setup_req(padapter, &txmgmt, _TRUE);
+ 	}
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -11682,7 +11678,6 @@ static int rtw_tdls_teardown(struct net_
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	u8 i,j;
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -11712,7 +11707,6 @@ static int rtw_tdls_teardown(struct net_
+ 	} else {
+ 		DBG_871X( "TDLS peer not found\n");
+ 	}
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -11723,7 +11717,6 @@ static int rtw_tdls_discovery(struct net
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_txmgmt	txmgmt;
+@@ -11738,7 +11731,6 @@ static int rtw_tdls_discovery(struct net
+ 
+ 	issue_tdls_dis_req(padapter, &txmgmt);
+ 
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11749,7 +11741,6 @@ static int rtw_tdls_ch_switch(struct net
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_TDLS_CH_SW	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_ch_switch *pchsw_info = &padapter->tdlsinfo.chsw_info;
+@@ -11786,7 +11777,6 @@ static int rtw_tdls_ch_switch(struct net
+ 	/* DBG_871X("issue tdls ch switch req\n"); */
+ 
+ #endif /* CONFIG_TDLS_CH_SW */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11797,7 +11787,6 @@ static int rtw_tdls_ch_switch_off(struct
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_TDLS_CH_SW	
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -11840,7 +11829,6 @@ static int rtw_tdls_ch_switch_off(struct
+ 	}
+ 
+ #endif /* CONFIG_TDLS_CH_SW */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11851,7 +11839,6 @@ static int rtw_tdls_dump_ch(struct net_d
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_TDLS_CH_SW	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
+@@ -11864,7 +11851,6 @@ static int rtw_tdls_dump_ch(struct net_d
+ 	return ret;
+ 
+ #endif
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11875,7 +11861,6 @@ static int rtw_tdls_off_ch_num(struct ne
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_TDLS_CH_SW	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
+@@ -11888,7 +11873,6 @@ static int rtw_tdls_off_ch_num(struct ne
+ 	return ret;
+ 	
+ #endif
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11899,7 +11883,6 @@ static int rtw_tdls_ch_offset(struct net
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_TDLS_CH_SW	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
+@@ -11912,7 +11895,6 @@ static int rtw_tdls_ch_offset(struct net
+ 	return ret;
+ 
+ #endif
+-#endif /* CONFIG_TDLS */
+ 
+ 		return ret;
+ }
+@@ -11923,7 +11905,6 @@ static int rtw_tdls_pson(struct net_devi
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	u8 i, j, mac_addr[ETH_ALEN];
+@@ -11938,7 +11919,6 @@ static int rtw_tdls_pson(struct net_devi
+ 
+ 	issue_nulldata_to_TDLS_peer_STA(padapter, ptdls_sta->hwaddr, 1, 3, 500);
+ 
+-#endif /* CONFIG_TDLS */
+ 
+ 		return ret;
+ }
+@@ -11949,7 +11929,6 @@ static int rtw_tdls_psoff(struct net_dev
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	u8 i, j, mac_addr[ETH_ALEN];
+@@ -11965,7 +11944,6 @@ static int rtw_tdls_psoff(struct net_dev
+ 	if(ptdls_sta)
+ 		issue_nulldata_to_TDLS_peer_STA(padapter, ptdls_sta->hwaddr, 0, 3, 500);
+ 
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -11976,7 +11954,6 @@ static int rtw_tdls_setip(struct net_dev
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_WFD
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -12010,7 +11987,6 @@ static int rtw_tdls_setip(struct net_dev
+ 		ptdlsinfo->wfd_info->ip_address[3]);
+ 
+ #endif /* CONFIG_WFD */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -12021,7 +11997,6 @@ static int rtw_tdls_getip(struct net_dev
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_WFD
+ 	
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -12041,7 +12016,6 @@ static int rtw_tdls_getip(struct net_dev
+ 	wrqu->data.length = strlen( extra );
+ 
+ #endif /* CONFIG_WFD */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
+@@ -12053,7 +12027,6 @@ static int rtw_tdls_getport(struct net_d
+ 	
+ 	int ret = 0;	
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_WFD
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -12069,7 +12042,6 @@ static int rtw_tdls_getport(struct net_d
+ 	wrqu->data.length = strlen( extra );
+ 
+ #endif /* CONFIG_WFD */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ 		
+@@ -12083,7 +12055,6 @@ static int rtw_tdls_dis_result(struct ne
+ 	
+ 	int ret = 0;	
+ 
+-#ifdef CONFIG_TDLS
+ #ifdef CONFIG_WFD
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+@@ -12099,7 +12070,6 @@ static int rtw_tdls_dis_result(struct ne
+ 	wrqu->data.length = strlen( extra );
+ 
+ #endif /* CONFIG_WFD */
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ 		
+@@ -12113,7 +12083,6 @@ static int rtw_wfd_tdls_status(struct ne
+ 	
+ 	int ret = 0;	
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	struct tdls_info *ptdlsinfo = &padapter->tdlsinfo;
+@@ -12150,19 +12119,17 @@ static int rtw_wfd_tdls_status(struct ne
+ 
+ 	wrqu->data.length = strlen( extra );
+ 
+-#endif /* CONFIG_TDLS */
+-
+ 	return ret;
+ 		
+ 	}
+ 
++
+ static int rtw_tdls_getsta(struct net_device *dev,
+                                struct iw_request_info *info,
+                                union iwreq_data *wrqu, char *extra)
+ 	{
+ 	
+ 	int ret = 0;
+-#ifdef CONFIG_TDLS
+ 	u8 i, j;
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 	u8 addr[ETH_ALEN] = {0};
+@@ -12193,7 +12160,6 @@ static int rtw_tdls_getsta(struct net_de
+ 	}
+ 	wrqu->data.length = strlen( extra );
+ 
+-#endif /* CONFIG_TDLS */
+ exit:
+ 	return ret;
+ 		
+@@ -12273,7 +12239,6 @@ static int rtw_tdls(struct net_device *d
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
+ 
+@@ -12338,7 +12303,6 @@ static int rtw_tdls(struct net_device *d
+ 	}
+ #endif /* CONFIG_WFD */
+ 
+-#endif /* CONFIG_TDLS */
+ 	
+ 	return ret;
+ }
+@@ -12350,7 +12314,6 @@ static int rtw_tdls_get(struct net_devic
+ {
+ 	int ret = 0;
+ 
+-#ifdef CONFIG_TDLS
+ 
+ 	DBG_871X( "[%s] extra = %s\n", __FUNCTION__, (char*) wrqu->data.pointer );
+ 
+@@ -12367,10 +12330,10 @@ static int rtw_tdls_get(struct net_devic
+ 		rtw_tdls_getsta( dev, info, wrqu, extra );
+ 	else if (_rtw_memcmp(wrqu->data.pointer, "best_ch", 7))
+ 		rtw_tdls_get_best_ch(dev, info, wrqu, extra);
+-#endif /* CONFIG_TDLS */
+ 
+ 	return ret;
+ }
++#endif /* CONFIG_TDLS */
+ 
+ 
+ 
+@@ -13088,7 +13051,10 @@ static int rtw_test(
+ 	rtw_mfree(pbuf, len);
+ 	return 0;
+ }
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
++#ifdef CONFIG_WIRELESS_EXT
+ static iw_handler rtw_handlers[] =
+ {
+ 	NULL,					/* SIOCSIWCOMMIT */
+@@ -13148,8 +13114,10 @@ static iw_handler rtw_handlers[] =
+ 	rtw_wx_set_pmkid,		/* SIOCSIWPMKSA */
+ 	NULL,					/*---hole---*/
+ }; 
++#endif //#ifdef CONFIG_WIRELESS_EXT
++#endif
+ 
+-
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ static const struct iw_priv_args rtw_private_args[] = {
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x0,
+@@ -13217,26 +13185,46 @@ static const struct iw_priv_args rtw_pri
+ #endif
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x10,
++#ifdef CONFIG_P2P
+ 		IW_PRIV_TYPE_CHAR | 1024, 0, "p2p_set"
++#else
++		IW_PRIV_TYPE_CHAR | 1024, 0, "NULL"
++#endif
+ 	},
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x11,
++#ifdef CONFIG_P2P
+ 		IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK , "p2p_get"
++#else
++		IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK , "NULL"
++#endif
+ 	},
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x12, 0, 0, "NULL"
+ 	},
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x13,
++#ifdef CONFIG_P2P
+ 		IW_PRIV_TYPE_CHAR | 64, IW_PRIV_TYPE_CHAR | 64 , "p2p_get2"
++#else
++		IW_PRIV_TYPE_CHAR | 64, IW_PRIV_TYPE_CHAR | 64 , "NULL"
++#endif
+ 	},	
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x14,
++#ifdef CONFIG_TDLS
+ 		IW_PRIV_TYPE_CHAR  | 64, 0, "tdls"
++#else
++		IW_PRIV_TYPE_CHAR  | 64, 0, "NULL"
++#endif
+ 	},
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x15,
++#ifdef CONFIG_TDLS
+ 		IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | 1024 , "tdls_get"
++#else
++		IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | 1024 , "NULL"
++#endif
+ 	},	
+ 	{
+ 		SIOCIWFIRSTPRIV + 0x16,
+@@ -13357,13 +13345,24 @@ static iw_handler rtw_private_handler[]
+ 	rtw_wx_priv_null,				//0x0E
+ 	rtw_wx_priv_null,				//0x0F
+ #endif
++#ifdef CONFIG_P2P
+ 	rtw_p2p_set,					//0x10
+ 	rtw_p2p_get,					//0x11
+ 	NULL,							//0x12
+ 	rtw_p2p_get2,					//0x13
+-
++#else
++	NULL,					//0x10
++	NULL,					//0x11
++	NULL,							//0x12
++	NULL,					//0x13
++#endif
++#ifdef CONFIG_TDLS
+ 	rtw_tdls,						//0x14
+ 	rtw_tdls_get,					//0x15
++#else
++	NULL,						//0x14
++	NULL,					//0x15
++#endif
+ 
+ 	rtw_pm_set,						//0x16
+ 	rtw_wx_priv_null,				//0x17
+@@ -13383,8 +13382,11 @@ static iw_handler rtw_private_handler[]
+ 	rtw_widi_set_probe_request,		//0x1F
+ #endif // CONFIG_INTEL_WIDI
+ };
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
++#ifdef CONFIG_WIRELESS_EXT
+ #if WIRELESS_EXT >= 17	
+ static struct iw_statistics *rtw_get_wireless_stats(struct net_device *dev)
+ {
+@@ -13447,7 +13449,6 @@ static struct iw_statistics *rtw_get_wir
+ }
+ #endif
+ 
+-#ifdef CONFIG_WIRELESS_EXT
+ struct iw_handler_def rtw_handlers_def =
+ {
+ 	.standard = rtw_handlers,
+@@ -13462,7 +13463,8 @@ struct iw_handler_def rtw_handlers_def =
+ 	.get_wireless_stats = rtw_get_wireless_stats,
+ #endif
+ };
+-#endif
++#endif //#ifdef CONFIG_WIRELESS_EXT
++#endif //CONFIG_NO_PRIVATE_IOCTL
+ 
+ // copy from net/wireless/wext.c start
+ /* ---------------------------------------------------------------- */
+@@ -13490,6 +13492,7 @@ static int get_priv_size(__u16 args)
+ // copy from net/wireless/wext.c end
+ 
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq_data)
+ {
+ 	int err = 0;
+@@ -13882,6 +13885,7 @@ static int rtw_ioctl_wext_private(struct
+ #endif // CONFIG_COMPAT
+ 		return rtw_ioctl_standard_wext_private( dev, rq );
+ }
++#endif //#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 
+ int rtw_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+ {
+@@ -13903,12 +13907,16 @@ int rtw_ioctl(struct net_device *dev, st
+ 			break;
+ #endif
+ #endif // CONFIG_AP_MODE
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ 		case SIOCDEVPRIVATE:				
+ 			 ret = rtw_ioctl_wext_private(dev, rq);
+ 			break;
++#endif
++#ifdef CONFIG_RTKWIFIU_ANDROID
+ 		case (SIOCDEVPRIVATE+1):
+ 			ret = rtw_android_priv_cmd(dev, rq, cmd);
+ 			break;
++#endif
+ 		default:
+ 			ret = -EOPNOTSUPP;
+ 			break;
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/mlme_linux.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/mlme_linux.c
+@@ -154,12 +154,14 @@ void rtw_os_indicate_connect(_adapter *a
+ _func_enter_;	
+ 
+ #ifdef CONFIG_IOCTL_CFG80211
++#ifdef CONFIG_IBSS
+ 	if ( (check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE)==_TRUE ) || 
+ 		(check_fwstate(pmlmepriv, WIFI_ADHOC_STATE)==_TRUE ) )
+ 	{
+ 		rtw_cfg80211_ibss_indicate_connect(adapter);
+ 	}
+ 	else
++#endif
+ 		rtw_cfg80211_indicate_connect(adapter);
+ #endif //CONFIG_IOCTL_CFG80211
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/os_intfs.c
+@@ -154,7 +154,7 @@ int rtw_wifi_spec = 0;
+ 
+ int rtw_special_rf_path = 0; //0: 2T2R ,1: only turn on path A 1T1R
+ 
+-int rtw_channel_plan = RTW_CHPLAN_MAX;
++int rtw_channel_plan = RTW_CHPLAN_FCC1_FCC7;
+ 
+ #ifdef CONFIG_BT_COEXIST
+ int rtw_btcoex_enable = 1;
+@@ -1008,9 +1008,11 @@ struct net_device *rtw_init_netdev(_adap
+ 	//pnetdev->tx_timeout = NULL;
+ 	pnetdev->watchdog_timeo = HZ*3; /* 3 second timeout */
+ 
++#ifndef CONFIG_NO_PRIVATE_IOCTL
+ #ifdef CONFIG_WIRELESS_EXT
+ 	pnetdev->wireless_handlers = (struct iw_handler_def *)&rtw_handlers_def;
+ #endif
++#endif
+ 
+ #ifdef WIRELESS_SPY
+ 	//priv->wireless_data.spy_data = &priv->spy_data;
+@@ -2349,7 +2351,9 @@ _adapter *rtw_drv_if2_init(_adapter *pri
+ 	mac[0] |= BIT(1);
+ 
+ 	_rtw_memcpy(adapter_mac_addr(padapter), mac, ETH_ALEN);
++#ifdef CONFIG_P2P
+ 	rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
++#endif
+ 
+ 	primary_padapter->pbuddy_adapter = padapter;
+ 
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/pci_intf.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/pci_intf.c
+@@ -1548,7 +1548,9 @@ _adapter *rtw_pci_if1_init(struct dvobj_
+ 		goto free_hal_data;
+ 	}
+ 	rtw_macaddr_cfg(adapter_mac_addr(padapter),  get_hal_mac_addr(padapter));
++	#ifdef CONFIG_WFD
+ 	rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
++	#endif
+ 
+ 	rtw_hal_disable_interrupt(padapter);
+ 

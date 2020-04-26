@@ -1,0 +1,516 @@
+From 8ac4714b66ab3035f22964defc43f092f8957809 Mon Sep 17 00:00:00 2001
+From: ywchen <ywchen@realtek.com>
+Date: Tue, 11 Jul 2017 17:33:54 +0800
+Subject: [PATCH] 11k for smart roaming driver
+
+---
+ 8192cd.h                    |  7 ++--
+ 8192cd_cfg.h                |  8 +++++
+ 8192cd_headers.h            |  6 ++--
+ 8192cd_hw.c                 | 85 ++++++++++++++++++---------------------------
+ 8192cd_osdep.c              | 16 ++++++---
+ 8192cd_security.c           |  2 +-
+ 8192cd_sme.c                | 72 +++++++++++++++++++-------------------
+ 8192cd_util.c               |  2 +-
+ ieee802_mib.h               |  1 +
+ phydm/phydm_ccx.c           | 24 ++++++++++++-
+ phydm/phydm_ccx.h           |  8 ++++-
+ phydm/phydm_regdefine11ac.h |  1 +
+ phydm/phydm_regdefine11n.h  |  1 +
+ 13 files changed, 130 insertions(+), 103 deletions(-)
+
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+index 8bfd07f..0acc03a 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -5022,6 +5022,10 @@ struct priv_shared_info {
+ #ifdef CONFIG_POWER_SAVE
+ 	struct ap_pwrctrl_priv ap_ps_handle;
+ #endif
++
++#if defined(HS2_SUPPORT) || defined(DOT11K) || defined(CH_LOAD_CAL) || defined (RTK_SMART_ROAMING)
++	    unsigned char           cu_enable; /*channel utilization calculated enable/disable*/
++#endif
+ };
+ 
+ 
+@@ -6033,9 +6037,6 @@ typedef struct rtl8192cd_priv {
+ 	unsigned int			proxy_arp;
+ //#endif
+ 
+-#if defined(HS2_SUPPORT) || defined(DOT11K) || defined(CH_LOAD_CAL)
+-    unsigned char           cu_enable; /*channel utilization calculated enable/disable*/
+-#endif
+ 
+ #ifdef CONFIG_IEEE80211W_CLI	// all ap's cap
+ 	unsigned char 			support_sha256;		
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+index 7f60b41..4d6f7e2 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -820,6 +820,14 @@
+ //-------------------------------------------------------------
+ #define CH_LOAD_CAL
+ #define CLM_SAMPLE_NUM2 65535  /*  CLM sample num , 65535*4us = 256 ms*/
++
++/* 45ms[CLM sample time] switch to [CLM sample num , it's unit is 4us]*/
++#define RTK80211_TIME_TO_SAMPLE_NUM   ( (45 * 1000) / 4 ) 
++
++/* [CLM sample num , it's unit is 4us] switch to busy time [ how many busy ms of one second]*/
++#define RTK80211_SAMPLE_NUM_TO_TIME(VAL)  (  (VAL*1000) /RTK80211_TIME_TO_SAMPLE_NUM )
++
++
+ //-------------------------------------------------------------
+ // Hotspot 2.0 -R2(20141216 SYS logo pass)
+ //-------------------------------------------------------------
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+index 7966098..5a5a1b0 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_headers.h
+@@ -1512,12 +1512,10 @@ void one_path_cca_power_save(struct rtl8192cd_priv *priv, int enable);
+ 
+ #if defined(HS2_SUPPORT) || defined(RTK_NL80211)/*survey_dump*/ || defined(DOT11K) || defined(CH_LOAD_CAL)
+ EXTERN void start_bbp_ch_load(struct rtl8192cd_priv *priv, unsigned int units);
+-EXTERN int read_bbp_ch_load(struct rtl8192cd_priv *priv);
++EXTERN unsigned int read_bbp_ch_load(struct rtl8192cd_priv *priv);
++EXTERN void channle_loading_measurement(struct rtl8192cd_priv *priv);
+ #endif
+ 
+-EXTERN void phydm_CLMInit2(	struct rtl8192cd_priv *priv,	u2Byte	clm_sample_num);
+-EXTERN unsigned short phydm_getCLMresult2(struct rtl8192cd_priv *priv);
+-
+ 
+ #undef EXTERN
+ 
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+index 703c339..3e7ecc9 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -27011,72 +27011,55 @@ void start_bbp_ch_load(struct rtl8192cd_priv *priv, unsigned int units)
+     }
+ }
+ 
+-int read_bbp_ch_load(struct rtl8192cd_priv *priv)
++
++/*/return busy count ,its units = 4us*/
++unsigned int read_bbp_ch_load(struct rtl8192cd_priv *priv)
+ {
+     unsigned short chip_ver = GET_CHIP_VER(priv);
+ 	unsigned char retry = 0;
+     if(chip_ver == VERSION_8188C || chip_ver == VERSION_8192C || chip_ver ==VERSION_8192D || 
+         chip_ver == VERSION_8188E || chip_ver == VERSION_8192E || chip_ver == VERSION_8197F) /*all N-series ic*/
+     {
+-		do {
+-			if (RTL_R32(0x8b4) & BIT16)
+-            	return (RTL_R32(0x8d0) & 0xffff)*4;
+-			delay_ms(1);
+-		} while(++retry < 20);
+-    }
+-    else /* 8812, 8881A, 8813, all AC-series ic*/
+-    {
+-		do {
+-			if (RTL_R32(0xfa4) & BIT16)
+-            	return (RTL_R32(0xfa4) & 0xffff)*4;
+-			delay_ms(1);
+-		} while(++retry < 20);
++	if (RTL_R32(0x8b4) & BIT16)
++	            	return (RTL_R32(0x8d0) & 0xffff) ;
++
++    }else{ /* 8812, 8881A, 8813, all AC-series ic*/
++
++	if (RTL_R32(0xfa4) & BIT16)
++	            	return (RTL_R32(0xfa4) & 0xffff);
+     }
+ 	
+-	return -1;
++	return 0;
+ }
+-#endif
+-
+-/*new version phydm hasn't phydm_CLMInit  replace here*/
+-void
+-phydm_CLMInit2(
+-	struct rtl8192cd_priv *priv,
+-	u2Byte	clm_sample_num
+-)
+-{
+ 
+-#define 	ODM_REG_CLM_TIME_PERIOD_11AC		0x990
+-#define	ODM_REG_CLM_TIME_PERIOD_11N		0x894
+ 
+-	if (ODMPTR->support_ic_type & ODM_IC_11AC_SERIES) {
++/*CLM [channle loading measurement]*/
++void channle_loading_measurement(struct rtl8192cd_priv *priv){
+ 
+-		RTL_W16(ODM_REG_CLM_TIME_PERIOD_11AC, clm_sample_num); //set ch load period time units*4 usec		
+-		RTL_W16(ODM_REG_CLM_11AC, 0x100); /*Enable CCX for CLM*/
++	unsigned int clm_count=0;
+ 
+-		
+-	} else if (ODMPTR->support_ic_type & ODM_IC_11N_SERIES) {
+-	
+-		RTL_W16(ODM_REG_CLM_TIME_PERIOD_11N, clm_sample_num); //set ch load period time units*4 usec		
+-		RTL_W16(ODM_REG_CLM_11N, 0x100); /*Enable CCX for CLM*/
+-	
+-	}
+-
+-}
+-
+-unsigned short
+-phydm_getCLMresult2(struct rtl8192cd_priv *priv)
+-{
+-
+-	u4Byte			value32 = 0;
+-	u2Byte			results = 0;
+-	
+-	if (ODMPTR->support_ic_type & ODM_IC_11AC_SERIES)
+-		value32 = RTL_R32(ODM_REG_CLM_RESULT_11AC);				/*read CLM calc result*/	
+-	else if (ODMPTR->support_ic_type & ODM_IC_11N_SERIES)
+-		value32 = RTL_R32(ODM_REG_CLM_RESULT_11N);				/*read CLM calc result*/		
++#ifdef USE_OUT_SRC
++	if (phydm_checkCLMready(ODMPTR) ){ 		/* --Getting CLM info previous time--*/	
++		clm_count = phydm_getCLMresult(ODMPTR);	
++	}
++	 if(clm_count >0 ){
++		/*IEEE,Std 802.11-2012,page567,use 0~255 to representing 0~100%*/
++		//priv->ext_stats.ch_utilization = (clm_count * 255) /CLM_SAMPLE_NUM2;
++		priv->ext_stats.ch_utilization = (clm_count * 255) /CLM_SAMPLE_NUM2;
++		//GDEBUG("busy time[%d]ms\n",RTK80211_SAMPLE_NUM_TO_TIME(clm_count));
++	}	   
++	phydm_CLMtrigger(ODMPTR);/* trigger next time CLM */
++#else
++	clm_count=read_bbp_ch_load(priv);	/* --Getting CLM info previous time--*/
++	 if(clm_count >0 ){
++		/*IEEE,Std 802.11-2012,page567,use 0~255 to representing 0~100%*/
++		priv->ext_stats.ch_utilization = (clm_count * 255) /CLM_SAMPLE_NUM2;
++	}	   	
++	start_bbp_ch_load(priv,CLM_SAMPLE_NUM2);/* trigger next time CLM */	
++#endif	
+ 
+-	return (u2Byte)(value32 & bMaskLWord);
+ }
++#endif	
+ 
+ 
+ #ifdef CONFIG_1RCCA_RF_POWER_SAVING
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+index 07a78f3..73742ac 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -8771,11 +8771,19 @@ priv->drv_state |= DRV_STATE_OPEN;      // set driver as has been opened, david
+ 	}
+ #endif
+ 
+-#ifdef CH_LOAD_CAL
+-#ifdef USE_OUT_SRC
+-	//            rtl8192cd_cu_start(priv);
+-	phydm_CLMInit2(priv, CLM_SAMPLE_NUM2);					
++#if defined(CH_LOAD_CAL) || defined(HS2_SUPPORT) || defined(DOT11K)
++#if  defined(HS2_SUPPORT) || defined(DOT11K)
++	priv->pmib->dot11StationConfigEntry.cu_enable=1;
+ #endif
++	if(IS_ROOT_INTERFACE(priv)){
++		#ifdef USE_OUT_SRC
++		
++
++		phydm_CLMInit(ODMPTR, CLM_SAMPLE_NUM2);	    
++		#else
++		start_bbp_ch_load(priv,CLM_SAMPLE_NUM2);
++		#endif	    
++	}
+ #endif
+ 
+ #ifdef CONFIG_PCI_HCI
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_security.c b/drivers/net/wireless/realtek/rtl8192cd/8192cd_security.c
+index 64ad963..8a8cb40 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_security.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_security.c
+@@ -1780,7 +1780,7 @@ static int DOT11_HS2_set_ie(struct net_device *dev, struct iw_point *data)
+     		priv->OSU_Present = 0;
+     	}
+         //channel utilization
+-        rtl8192cd_cu_start(priv);
++        //rtl8192cd_cu_start(priv);
+     }
+     else if (Set_RSNIE->Flag == SET_IE_FLAG_TIMEADVT)
+     {
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+index 8b5b629..90c3908 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_sme.c
+@@ -87,7 +87,11 @@ unsigned char WMM_PARA_IE[6] = {0x00, 0x50, 0xf2, 0x02, 0x01, 0x01};/*cfg p2p cf
+ #include "./sha256.h"
+ #endif
+ 
+-#define INTEL_OUI_NUM	202
++#ifdef CONFIG_IEEE80211V
++#include "./8192cd_11v.h"
++#endif
++
++#define INTEL_OUI_NUM	145
+ unsigned char INTEL_OUI[INTEL_OUI_NUM][3] =
+ {{0x00, 0x02, 0xb3}, {0x00, 0x03, 0x47},
+ {0x00, 0x04, 0x23}, {0x00, 0x07, 0xe9},
+@@ -5358,22 +5362,27 @@ void per_sta_cal(struct rtl8192cd_priv *priv)
+ 		else
+ #endif
+ 		if (is_MCS_rate(pstat->current_tx_rate)) 
+-		{
+-			tx_rate = MCS_DATA_RATEFloat[(pstat->ht_current_tx_info&BIT(0))?1:0][(pstat->ht_current_tx_info&BIT(1))?1:0][pstat->current_tx_rate&0xf];
+-			rx_rate = MCS_DATA_RATEFloat[pstat->rx_bw&0x01][pstat->rx_splcp&0x01][pstat->rx_rate&0xf];
+-		}
++			tx_rate = MCS_DATA_RATEFloat[(pstat->ht_current_tx_info&BIT(0))?1:0][(pstat->ht_current_tx_info&BIT(1))?1:0][pstat->current_tx_rate&0xf];			
+ 		else
+-		{
+ 			tx_rate = pstat->current_tx_rate/2;
++
++		//rx rate
++#ifdef RTK_AC_SUPPORT  //vht rate , todo, dump vht rates in Mbps
++		if(pstat->rx_rate >= 0x90)
++			rx_rate = query_vht_rate(pstat);
++		else
++#endif		
++		if (is_MCS_rate(pstat->rx_rate)) 			
++			rx_rate = MCS_DATA_RATEFloat[pstat->rx_bw&0x01][pstat->rx_splcp&0x01][pstat->rx_rate&0xf];
++		else		
+ 			rx_rate = pstat->rx_rate/2;
+-		}
+ 		
+ 		//last tx/rx time
+ 		if(tx_rate != 0)
+-			pstat->total_tx_time+= (((pstat->tx_bytes - pstat->prev_tx_byte)*8*1000)/(tx_rate*1024*1024));
++			pstat->total_tx_time+= ((((pstat->tx_bytes - pstat->prev_tx_byte)*8)/(tx_rate*1024))*1000)/1024;
+ 		if(rx_rate != 0)
+-			pstat->total_rx_time+= (((pstat->rx_bytes - pstat->prev_rx_byte)*8*1000)/(rx_rate*1024*1024));
+-
++			pstat->total_rx_time+= ((((pstat->rx_bytes - pstat->prev_rx_byte)*8)/(rx_rate*1024))*1000)/1024;
++		
+ 		//tx/rx byte last
+ 		pstat->prev_tx_byte = pstat->tx_bytes;
+ 		pstat->prev_rx_byte = pstat->rx_bytes;
+@@ -5652,10 +5661,7 @@ void rtl8192cd_expire_timer(unsigned long task_priv)
+ #if defined(MBSSID) || defined(DOT11K)
+ 	int i;
+ #endif
+-#ifdef CH_LOAD_CAL
+-	unsigned int clm_count=0;
+-	unsigned int channel_utilization=0;
+-#endif	
++
+ 	if (!(priv->drv_state & DRV_STATE_OPEN))
+ 		return;
+ 
+@@ -5915,24 +5921,8 @@ void rtl8192cd_expire_timer(unsigned long task_priv)
+ 	priv->ext_stats.rx_avarage = (priv->ext_stats.rx_avarage/10)*7 + (priv->ext_stats.rx_byte_cnt/10)*3;
+ 	priv->ext_stats.rx_byte_cnt = 0;
+ 
+-#ifdef CH_LOAD_CAL
+-#ifdef USE_OUT_SRC
+-	/* -----------Getting CLM info previous time---------------*/
+-	if (phydm_checkCLMready(ODMPTR) ) {			
+-		clm_count = phydm_getCLMresult2(priv);	
+-	}
+ 
+-	if(clm_count >0 ) {
+-		/*IEEE,Std 802.11-2012,page567,use 0~255 to representing 0~100%*/
+-		channel_utilization= (clm_count * 255) /CLM_SAMPLE_NUM2  ;	       
+-		priv->ext_stats.ch_utilization=channel_utilization	;					
+-	}	   
+-	/* -----------Getting CLM info previous time---------------*/
+ 
+-	/* trigger next time CLM */	
+-	phydm_clm_trigger(ODMPTR);
+-#endif	
+-#endif
+ #if defined(TXRETRY_CNT) || defined(CH_LOAD_CAL)
+ 	per_sta_cal(priv);
+ #endif
+@@ -7193,6 +7183,13 @@ hs_break:
+ 	}
+ #endif
+ 
++#if defined(CH_LOAD_CAL) || defined(HS2_SUPPORT) || defined(DOT11K)
++	if(IS_ROOT_INTERFACE(priv) 
++		&& priv->pmib->dot11StationConfigEntry.cu_enable){
++		channle_loading_measurement(priv);
++	}
++#endif
++
+ 	RESTORE_INT(flags);
+ 	SMP_UNLOCK(flags);
+ }
+@@ -10428,7 +10425,7 @@ void update_beacon(struct rtl8192cd_priv *priv)
+         pbuf = set_ie(pbuf, _EXT_SUPPORTEDRATES_IE_, bssrate_len, pbssrate, &frlen);
+ 
+     #if defined(HS2_SUPPORT) || defined(DOT11K)    
+-    if(	priv->cu_enable ){ 
++    if(	priv->pmib->dot11StationConfigEntry.cu_enable ){ 
+         pbuf = construct_BSS_load_ie(priv, pbuf, &frlen);
+     }
+     #endif
+@@ -13697,7 +13694,7 @@ int fill_probe_rsp_content(struct rtl8192cd_priv *priv,
+         pbuf = set_ie(pbuf, _EXT_SUPPORTEDRATES_IE_ , bssrate_len , pbssrate, (unsigned int *)&fr_len);
+ 
+     #if defined(HS2_SUPPORT) || defined(DOT11K)    
+-    if(priv->cu_enable){ 
++    if(priv->pmib->dot11StationConfigEntry.cu_enable){ 
+         pbuf = construct_BSS_load_ie(priv, pbuf, &fr_len);
+     }
+     #endif
+@@ -16831,7 +16828,7 @@ void start_clnt_ss(struct rtl8192cd_priv *priv)
+ 
+ #if defined(RTK_NL80211)
+     //by brian, trigger channel load evaluation after channel switched
+-    start_bbp_ch_load(priv, (45*1000)/4);
++    start_bbp_ch_load(priv, RTK80211_TIME_TO_SAMPLE_NUM);
+ #endif
+ 
+ #ifdef UNIVERSAL_REPEATER
+@@ -17474,9 +17471,10 @@ void rtl8192cd_ss_timer(unsigned long task_priv)
+ 	//by brian, collect channel statistic here, move from 8192cd_expire_timer
+ 	{
+ 		priv->rtk->survey_info[idx].channel = priv->site_survey->ss_channel;
+-		int val = read_bbp_ch_load(priv);
+-		if(val != -1) {
+-			priv->rtk->survey_info[idx].chbusytime = (val/1000)*5;
++		unsigned int val = 0;
++		val=read_bbp_ch_load(priv);
++		if(val) {
++			priv->rtk->survey_info[idx].chbusytime = RTK80211_SAMPLE_NUM_TO_TIME(val);
+ 		} else {
+ 			priv->rtk->survey_info[idx].chbusytime = 0;
+ 			NDEBUG("Invalid channel load!\n");
+@@ -18529,7 +18527,7 @@ abort_scan:
+ 	/*switch channel-end*/
+ #if defined(RTK_NL80211)
+ 	//by brian, trigger channel load evaluation after channel switched
+-	start_bbp_ch_load(priv, (45*1000)/4);
++	start_bbp_ch_load(priv, RTK80211_TIME_TO_SAMPLE_NUM);
+ #endif
+     /*TX probe_request -- start*/
+ 
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+index 1bb1c02..75a2415 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+@@ -8684,7 +8684,7 @@ void rtl8192cd_cu_start(struct rtl8192cd_priv *priv) {
+         priv->pshare->cu_info.cu_cntdwn_timer.function = rtl8192cd_cu_cntdwn_timer;
+         priv->pshare->cu_info.cu_cntdwn = priv->pshare->cu_info.cu_initialcnt = (priv->pmib->dot11StationConfigEntry.channel_utili_beaconIntval * priv->pmib->dot11StationConfigEntry.dot11BeaconPeriod)/CU_Intval;
+         start_bbp_ch_load(priv, 50000);
+-        priv->pshare->cu_info.cu_cntdwn_timer.expires = jiffies + CU_TO;
++        //priv->pshare->cu_info.cu_cntdwn_timer.expires = jiffies + CU_TO;
+         mod_timer(&priv->pshare->cu_info.cu_cntdwn_timer, jiffies + CU_TO);
+         priv->pshare->cu_info.cu_enable = 1;
+     }
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+index f573f4e..e8bbeea 100755
+--- a/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/ieee802_mib.h
+@@ -174,6 +174,7 @@ struct Dot11StationConfigEntry {
+     unsigned char   dot11RMAPChannelReportActivated;
+     unsigned int    dot11RMNeighborReportExpireTime;
+     
++	unsigned char           cu_enable; /*[CLM, channel loading measurement] channel utilization calculated enable/disable*/
+ 
+ };
+ 
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.c b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.c
+index 7d81f22..9e525ca
+--- a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.c
+@@ -312,6 +312,27 @@ phydm_storeNHMsetting(
+ }
+ 
+ VOID
++phydm_CLMInit(
++	IN		PVOID			pDM_VOID,
++	u2Byte	clm_sample_num
++)
++{
++	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;		
++	prtl8192cd_priv		priv = pDM_Odm->priv;
++
++	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
++		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_TIME_PERIOD_11AC, bMaskLWord, clm_sample_num);	/*4us sample 1 time*/
++		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11AC, BIT8, 0x1);							/*Enable CCX for CLM*/
++	} else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
++		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_TIME_PERIOD_11N, bMaskLWord, clm_sample_num);	/*4us sample 1 time*/
++		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11N, BIT8, 0x1);								/*Enable CCX for CLM*/	
++	}
++
++	ODM_RT_TRACE(pDM_Odm, ODM_COMP_NOISY_DETECT, ODM_DBG_LOUD, ("CLM sampleNum = %d\n", clm_sample_num));
++}
++
++
++VOID
+ phydm_CLMsetting(
+ 	IN		PVOID			pDM_VOID
+ )
+@@ -377,7 +398,7 @@ phydm_checkCLMready(
+ 	return ret;
+ }
+ 
+-void
++u2Byte
+ phydm_getCLMresult(
+ 	IN		PVOID			pDM_VOID
+ )
+@@ -397,4 +418,5 @@ phydm_getCLMresult(
+ 
+ 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CCX, ODM_DBG_LOUD, ("[%s] : CLM result = %dus\n", __func__, CCX_INFO->CLM_result*4));
+ 	
++	return CCX_INFO->CLM_result;	
+ }
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.h b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.h
+index 18b0dd2..ed93632
+--- a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_ccx.h
+@@ -79,6 +79,12 @@ phydm_checkNHMready(
+ /*CLM*/
+ 
+ VOID
++phydm_CLMInit(
++	IN		PVOID			pDM_VOID,
++	u2Byte	clm_sample_num
++);
++
++VOID
+ phydm_CLMsetting(
+ 	IN		PVOID			pDM_VOID
+ );
+@@ -93,7 +99,7 @@ phydm_checkCLMready(
+ 	IN		PVOID			pDM_VOID
+ );
+ 
+-VOID
++u2Byte
+ phydm_getCLMresult(
+ 	IN		PVOID			pDM_VOID
+ );
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11ac.h b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11ac.h
+index 854ec3c..17d6741
+--- a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11ac.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11ac.h
+@@ -40,6 +40,7 @@
+ #define	ODM_REG_OFDM_FA_RST_11AC		0x9A4
+ #define	ODM_REG_CCX_PERIOD_11AC			0x990
+ #define	ODM_REG_NHM_TH9_TH10_11AC		0x994
++#define 	ODM_REG_CLM_TIME_PERIOD_11AC		0x990
+ #define	ODM_REG_CLM_11AC					0x994
+ #define	ODM_REG_NHM_TH3_TO_TH0_11AC	0x998
+ #define	ODM_REG_NHM_TH7_TO_TH4_11AC	0x99c
+diff --git a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11n.h b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11n.h
+index ec8c6fa..7a73346
+--- a/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11n.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/phydm/phydm_regdefine11n.h
+@@ -67,6 +67,7 @@
+ #define	ODM_REG_CLM_READY_11N			0x8b4
+ #define	ODM_REG_CLM_RESULT_11N			0x8d0
+ #define	ODM_REG_NHM_CNT_11N				0x8d8
++#define	ODM_REG_CLM_TIME_PERIOD_11N		0x894
+ 
+ // For ACS, Jeffery, 2014-12-26
+ #define	ODM_REG_NHM_CNT7_TO_CNT4_11N    		0x8dc
+-- 
+2.11.0
+

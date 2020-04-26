@@ -1,0 +1,15 @@
+diff --git a/block.c b/block.c
+index 2cbf3f1..ae7d76e 100644
+--- a/block.c
++++ b/block.c
+@@ -516,6 +516,7 @@ static void cache_load(int mtd)
+ 	}
+ 	_cache_load("/dev/mmcblk*");
+ 	_cache_load("/dev/sd*");
++	_cache_load("/dev/sata*");
+ 	_cache_load("/dev/hd*");
+ 	_cache_load("/dev/md*");
+ 	_cache_load("/dev/vd*");
+-- 
+1.7.10.4
+

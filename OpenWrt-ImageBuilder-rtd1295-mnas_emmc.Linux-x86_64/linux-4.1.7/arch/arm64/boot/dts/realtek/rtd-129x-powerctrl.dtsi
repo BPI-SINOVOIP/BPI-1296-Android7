@@ -1,0 +1,752 @@
+#include <dt-bindings/soc/rtk,pwrctrl.h>
+#include <dt-bindings/clock/rtk,cc-rtd129x.h>
+&pcm_pd_ve {
+	pd_ve12: pctrl_ve1: pctrl_ve1 {
+		#power-domain-cells = <0>;
+		power-domains = <&pd_ve2>;
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000400 0x4>, <0x9800038c 0x4>, <0x98000390 0x4>;
+		reg-names = "iso", "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+			pwr,value-off = <1>;
+		};
+		rstn {
+			pwr,type = <PWRCTRL_TYPE_RESET>;
+			pwr,nerver-off;
+			resets = <&rst1 13>;
+		};
+		iso {
+			pwr,value-inv;
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+	pd_ve2: pctrl_ve2: pctrl_ve2 {
+		#power-domain-cells = <0>;
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000400 0x4>, <0x980003cc 0x4>, <0x980003d0 0x4>;
+		reg-names = "iso", "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+                        pwr,value-off = <1>;
+		};
+		rstn {
+			pwr,type = <PWRCTRL_TYPE_RESET>;
+			pwr,nerver-off;
+			resets = <&rst1 14>;
+		};
+		iso {
+			pwr,value-inv;
+			pwr,shift = <4>;
+			pwr,width = <1>;
+		};
+	};
+	pd_ve3: pctrl_ve3: pctrl_ve3 {
+		#power-domain-cells = <0>;
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000400 0x4>, <0x980003ec 0x4>, <0x980003f0 0x4>;
+		reg-names = "iso", "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+		rstn {
+			pwr,type = <PWRCTRL_TYPE_RESET>;
+			pwr,nerver-off;
+			resets = <&rst1 15>;
+		};
+		iso {
+			pwr,value-inv;
+			pwr,shift = <6>;
+			pwr,width = <1>;
+		};
+	};
+};
+&pcm_ve_timer {
+	pctrl_ve1_wrapper {
+		compatible = "realtek,pwrctrl-timer";
+		pwr,expired-time-sec = <30>;
+		pwr,name = "pctrl_ve1";
+		powerctrls = <&pctrl_ve1>;
+	};
+	pctrl_ve2_wrapper {
+		compatible = "realtek,pwrctrl-timer";
+		pwr,expired-time-sec = <30>;
+		pwr,name = "pctrl_ve2";
+		powerctrls = <&pctrl_ve2>;
+	};
+	pctrl_ve3_wrapper {
+		compatible = "realtek,pwrctrl-timer";
+		pwr,expired-time-sec = <30>;
+		pwr,name = "pctrl_ve3";
+		powerctrls = <&pctrl_ve3>;
+	};
+};
+&pcm_pd_gpu {
+	pd_gpu: pctrl_gpu: pctrl_gpu {
+		#power-domain-cells = <0>;
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x980003a0 0x4>, <0x980003a4 0x4>;
+		reg-names = "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+};
+&pcm_gpu_core {
+	pctrl_gpu_core@1 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98050180 0x4>, <0x980501c0 0x4>;
+		reg-names = "on", "off";
+		pwr,name = "pctrl_gpu_core_1";
+		on {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,never-off;
+			pwr,no-state;
+		};
+		off {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,never-off;
+			pwr,no-state;
+		};
+	};
+	pctrl_gpu_core@2 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98050180 0x4>, <0x980501c0 0x4>;
+		reg-names = "on", "off";
+		pwr,name = "pctrl_gpu_core_2";
+		on {
+			pwr,shift = <1>;
+			pwr,width = <1>;
+			pwr,never-off;
+			pwr,no-state;
+		};
+		off {
+			pwr,shift = <1>;
+			pwr,width = <1>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pctrl_gpu_core@3 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98050180 0x4>, <0x980501c0 0x4>;
+		reg-names = "on", "off";
+		pwr,name = "pctrl_gpu_core_3";
+		on {
+			pwr,shift = <2>;
+			pwr,width = <1>;
+			pwr,never-off;
+			pwr,no-state;
+		};
+		off {
+			pwr,shift = <2>;
+			pwr,width = <1>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+};
+&pcm_vo {
+	pctrl_l4_icg_mipi {
+		compatible = "realtek,pwrctrl";
+		reg = <0x980041dc 0x4>;
+		clocks = <&clk_en_1 27>;
+		resets = <&rst1 30>;
+		pow {
+			pwr,shift = <6>;
+			pwr,width = <3>;
+			pwr,value-on = <7>;
+			pwr,value-off = <1>;
+		};
+	};
+	pctrl_mipi_aphy {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9800420c 0x4>;
+		clocks = <&clk_en_1 27>;
+		resets = <&rst1 30>;
+		ref,name = "hdmirx";
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_cbus: pctrl_cbus {
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98037008 0x4>;
+		clocks = <&iclk_en 4>, <&iclk_en 5>, <&iclk_en 6>;
+		resets = <&iso_rst 5>, <&iso_rst 6>, <&iso_rst 13>;
+		pow@0 {
+			pwr,shift = <20>;
+			pwr,width = <1>;
+		};
+		pow@1 {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+	pd_cecrx: pctrl_cecrx_aphy {
+		compatible = "realtek,pwrctrl";
+		reg = <0x980372d0 0x4>, <0x98037204 0x4>;
+		reg-names = "pow", "pad_en";
+		clocks = <&iclk_en 3>, <&iclk_en 5>, <&iclk_en 6>;
+		resets = <&iso_rst 6>, <&iso_rst 13>;
+		ref,name = "cec0";
+		pow {
+			pwr,shift = <5>;
+			pwr,width = <1>;
+		};
+		pad_en {
+			pwr,shift = <16>;
+			pwr,width = <2>;
+		};
+	};
+	pd_cectx: pctrl_cectx_aphy {
+		compatible = "realtek,pwrctrl";
+		reg = <0x980378d0 0x4>, <0x98037804 0x4>;
+		reg-names = "pow", "pad_en";
+		clocks = <&iclk_en 4>, <&iclk_en 5>, <&iclk_en 6>;
+		resets = <&iso_rst 5>, <&iso_rst 13>;
+		ref,name = "cec1";
+		pow {
+			pwr,shift = <5>;
+			pwr,width = <1>;
+		};
+		pad_en {
+			pwr,shift = <16>;
+			pwr,width = <2>;
+		};
+	};
+};
+&pcm_ddr {
+	pctrl_dc1_pll: dc1_pll {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9800f09c 0x4>;
+		clocks = <&clk_en_2 31>;
+		status = "disabled";
+		pow {
+			pwr,shift = < 0>;
+			pwr,width = <13>;
+		};
+	};
+};
+&pcm_sys {
+	pctrl_l4_icg_gpu {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98055004 0x4>, <0x980540b4 0x4>;
+		reg-names = "l4cg", "cg";
+		clocks = <&cc CC_CLK_GPU>;
+		resets = <&rst1 18>;
+		powerctrls = <&pctrl_gpu>;
+		status = "disabled";
+		l4cg {
+			pwr,shift = <16>;
+			pwr,width = <1>;
+		};
+		cg {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+	pctrl_l4_icg_scpu_wrapper {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801d000 0x4>, <0x9801d100 0x4>;
+		reg-names = "scw_ctrl", "crt_ctrl";
+		scw_ctrl {
+			pwr,shift = <24>;
+			pwr,width = <8>;
+			pwr,value-inv;
+		};
+		crt_ctrl {
+			pwr,shift = <31>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_sb2 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801a308 0x4>, <0x9801a30c 0x4>, <0x9801a310 0x4>;
+		reg-names = "icg1", "icg2", "icg3";
+		icg1 {
+			pwr,value-on = <0x00000000>;
+			pwr,value-off = <0xffffffff>;
+		};
+		icg2 {
+			pwr,value-on = <0x0000>;
+			pwr,value-off = <0xffff>;
+		};
+		icg3 {
+			pwr,value-on = <0x0>;
+			pwr,value-off = <0x7>;
+		};
+	};
+	pctrl_l4_icg_jpeg {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9803ef00 0x4>;
+		clocks = <&clk_en_2 3>;
+		resets = <&rst2 1>;
+		pow {
+			pwr,shift = <1>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_tp {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98014664 0x4>;
+		clocks = <&clk_en_1 21>;
+		resets = <&rst1 27>;
+		pow {
+			pwr,shift = <16>;
+			pwr,width = <4>;
+		};
+	};
+	pctrl_l4_icg_rsa {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9804cf2c 0x4>;
+		clocks = <&clk_en_1 22>;
+		resets = <&rst1 31>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_sata {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9803ff14 0x4>;
+		clocks = <&clk_en_1 2>;
+		resets = <&rst1 5>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <2>;
+			pwr,value-on = <0>;
+			pwr,value-off = <3>;
+		};
+	};
+	pctrl_l4_icg_nand {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98010168 0x4>, <0x98010314 0x4>, 
+			<0x9801f168 0x4>, <0x9801f314 0x4>, 
+			<0x9801013c 0x4>, <0x98010310 0x4>, 
+			<0x9801f13c 0x4>, <0x9801f310 0x4>;
+		reg-names = "nwc0", "nwc1",
+			"swc0", "swc1",
+			"nwc2", "nwc3",
+			"swc2", "swc3";
+		clocks = <&clk_en_1 23>;
+		resets = <&rst1 29>;
+		nwc0 {
+			pwr,shift = <0>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		nwc1 {
+			pwr,shift = <0>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		swc0 {
+			pwr,shift = <0>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		swc1 {
+			pwr,shift = <0>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		nwc2 {
+			pwr,shift = <3>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		nwc3 {
+			pwr,shift = <5>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		swc2 {
+			pwr,shift = <3>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+		swc3 {
+			pwr,shift = <5>;
+			pwr,width = <2>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_mis {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801b0e0 0x4>;
+		clocks = <&clk_en_1 0>;
+		resets = <&rst1 0>;
+		pow {
+			pwr,shift = <2>;
+			pwr,width = <3>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_gspi {
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801bd48 0x4>;
+		clocks = <&clk_en_1 3>;
+		resets = <&rst1 3>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_emmc {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98012420 0x4>;
+		clocks = <&clk_en_1 24>;
+		resets = <&rst2 11>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+	pctrl_l4_icg_nat_wrap {
+		compatible = "realtek,pwrctrl";
+		reg = <0x981c9118 0x4>;
+		clocks = <&clk_en_2 0>;
+		resets = <&rst1 1>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+};
+&pcm_usb {
+	pctrl_usb_p0_mac {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007f7c 0x4>, <0x98007f80 0x4>;
+		reg-names = "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pctrl_usb_p0_phy: pctrl_usb_p0_phy {
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007fb0 0x4>;
+		phy@0 {
+			pwr,shift = <4>;
+			pwr,width = <1>;
+		};
+		phy@1 {
+			pwr,shift = <6>;
+			pwr,width = <1>;
+		};
+	};
+	pctrl_usb_p0_iso {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007fb0 0x4>;
+		iso {
+			pwr,shift = <8>;
+			pwr,width = <1>;
+			/* FIXME */
+			x-pwr,value-on = <0>;
+			x-pwr,value-off = <1>;
+		};
+	};
+	pctrl_l4_icg_usb_p0 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98013364 0x4>;
+		clocks = <&clk_en_1 4>;
+		resets = <&rst1 6>;
+		powerctrls = <&pctrl_usb_p0_phy>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_l4_icg_usb_p1 {
+		compatible = "realtek,pwrctrl";
+		reg =  <0x98013d60 0x4>;
+		clocks = <&clk_en_1 4>;
+		resets = <&rst1 6>;
+		powerctrls = <&pctrl_usb_p0_phy>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pctrl_usb_p3_mac_A00 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007f9c 0x4>, <0x98007fa0 0x4>;
+		reg-names = "pwr3", "pwr4";
+		pwr,name = "pctrl_usb_p3_mac";
+		realtek,chip-rev,inc = <0>;
+		pwr4 {
+			pwr,value-on = <0xf05>;
+			pwr,value-off = <0xf06>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pctrl_usb_p3_mac {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007f9c 0x4>, <0x98007fa0 0x4>;
+		reg-names = "pwr3", "pwr4";
+		pwr,name = "pctrl_usb_p3_mac";
+		realtek,chip-rev,exc = <0>;
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pctrl_usb_p3_phy: pctrl_usb_p3_phy {
+		#powerctrl-cells = <0>;
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007fb0 0x4>;
+		phy {
+			pwr,shift = <5>;
+			pwr,width = <1>;
+		};
+	};
+	pctrl_usb_p3_iso {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98007fb0 0x4>;
+		iso {
+			pwr,shift = <9>;
+			pwr,width = <1>;
+			/* FIXME */
+			x-pwr,value-on = <0>;
+			x-pwr,value-off = <1>;
+		};
+	};
+	pctrl_l4_icg_usb_p3 {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98013f60 0x4>;
+		clocks = <&clk_en_1 4>;
+		resets = <&rst2 2>;
+		powerctrls = <&pctrl_usb_p3_phy>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+};
+&pcm_unmanaged {
+	pctrl_disp_vo {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000368 0x4>, <0x9800036c 0x4>;
+		reg-names = "sd", "mux";
+		sd {
+			pwr,shift = <0>;
+			pwr,width = <5>;
+			pwr,value-on = <0>;
+			pwr,value-off = <0x1ff>;
+		};
+		mux {
+			pwr,shift = <0>;
+			pwr,width = <5>;
+			pwr,value-off = <0x1ff>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pctrl_hdmirx {
+		compatible = "realtek,pwrctrl";
+		reg = <0x98034384 0x4>, <0x98034404 0x4>,
+			<0x98034a00 0x4>, <0x98034a08 0x4>;
+		reg-names = "apllcr1", "vpllcr1", "phy_bg", "phy_ldo";
+		clocks = <&clk_en_2 24>;
+		resets = <&rst4 12>;
+		status = "disabled";
+		apllcr1 {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+		vpllcr1@0 {
+			pwr,shift = <12>;
+			pwr,width = <1>;
+		};
+		vpllcr1@1 {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+		phy_bg {
+			pwr,shift = <1>;
+			pwr,width = <1>;
+		};
+		phy_ldo {
+			pwr,shift = <0>;
+			pwr,width = <1>;
+		};
+	};
+};
+&pcm_pd_sata_nat {
+	pd_sata_p0: pctrl_iso_sata_p0 {
+		#power-domain-cells = <0>;
+		pd,name = "pd-sata-p0";
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801a980 0x4>;
+		pow {
+			pwr,shift = <6>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pd_sata: pctrl_iso_sata_p1 {
+		#power-domain-cells = <0>;
+		power-domains = <&pd_sata_p0>;
+		pd,name = "pd-sata-p1";
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801a980 0x4>;
+		pow {
+			pwr,shift = <7>;
+			pwr,width = <1>;
+			pwr,value-inv;
+		};
+	};
+	pd_nat: pctrl_nat {
+		#power-domain-cells = <0>;
+		power-domains = <&pd_sata_p0>;
+		pd,name = "pd-nat";
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000400 0x4>, <0x9800042c 0x4>, <0x98000430 0x4>;
+		reg-names = "iso", "pwr3", "pwr4";
+		pwr4 {
+			pwr,value-on = <0xf00>;
+			pwr,value-off = <0xf01>;
+		};
+		pwr3 {
+			pwr,never-on;
+			pwr,no-state;
+		};
+		rstn {
+			pwr,type = <PWRCTRL_TYPE_RESET>;
+			pwr,nerver-off;
+			resets = <&rst1 1>;
+		};
+		iso {
+			pwr,value-inv;
+			pwr,shift = <18>;
+			pwr,width = <1>;
+		};
+	};
+};
+&pcm_pd_rtc {
+	pd_rtc: pctrl_rtc {
+		#power-domain-cells = <0>;
+		pd,name = "pd-rtc";
+		compatible = "realtek,pwrctrl";
+		reg = <0x9801b62c 0x4>;
+		pow {
+			pwr,shift = <0>;
+			pwr,width = <8>;
+			pwr,value-on = <0x5a>;
+			pwr,value-off = <0>;
+		};
+	};
+};
+&pcm_pd_vo {
+	pd_se: pctrl_disp_se {
+		#power-domain-cells = <0>;
+		pd,name = "pd-se";
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000368 0x4>, <0x9800036c 0x4>;
+		reg-names = "sd", "mux";
+		sd {
+			pwr,shift = <5>;
+			pwr,width = <3>;
+			pwr,value-on = <0>;
+			pwr,value-off = <0x7>;
+		};
+		mux {
+			pwr,shift = <5>;
+			pwr,width = <3>;
+			pwr,value-off = <0x7>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pd_mipi: pctrl_disp_mipi {
+		#power-domain-cells = <0>;
+		pd,name = "pd-mipi";
+		compatible = "realtek,pwrctrl";
+		reg = <0x98000368 0x4>, <0x9800036c 0x4>;
+		reg-names = "sd", "mux";
+		sd {
+			pwr,shift = <8>;
+			pwr,width = <1>;
+			pwr,value-on = <0>;
+			pwr,value-off = <0x1>;
+		};
+		mux {
+			pwr,shift = <8>;
+			pwr,width = <1>;
+			pwr,value-off = <0x1>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+	pd_hdmirx: pctrl_disp_hdmi_rx {
+		compatible = "realtek,pwrctrl";
+		#power-domain-cells = <0>;
+		pd,name = "pd-hdmi-rx";
+		power-domains = <&pd_mipi>;
+		reg = <0x98000368 0x4>, <0x9800036c 0x4>;
+		reg-names = "sd", "mux";
+		sd {
+			pwr,shift = <11>;
+			pwr,width = <4>;
+			pwr,value-on = <0>;
+			pwr,value-off = <0xf>;
+		};
+		mux {
+			pwr,shift = <11>;
+			pwr,width = <4>;
+			pwr,value-off = <0xf>;
+			pwr,never-on;
+			pwr,no-state;
+		};
+	};
+};

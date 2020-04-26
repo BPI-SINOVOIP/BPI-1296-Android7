@@ -1,0 +1,38 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -12181,11 +12181,15 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 
+ 		{
+ 			struct pci_dev *pdev = priv->pshare->pdev;
+-			u16 vendor_id,device_id;
++			u16 vendor_id,device_id, sub_vendor_id, sub_device_id;
+ 			pci_read_config_word( pdev , PCI_VENDOR_ID  , &vendor_id);
+ 			pci_read_config_word( pdev , PCI_DEVICE_ID  , &device_id);
++			pci_read_config_word( pdev , PCI_SUBSYSTEM_VENDOR_ID	, &sub_vendor_id);
++			pci_read_config_word( pdev , PCI_SUBSYSTEM_ID	, &sub_device_id);
++
++			printk("vendor_id=0x%04X, device_id=0x%04X, sub_vendor_id=0x%04X, sub_device_id=0x%04X\n", 
++				vendor_id, device_id, sub_vendor_id, sub_device_id);
+ 			
+-			DEBUG_INFO("vendor_id=0x%04X, device_id=0x%04X\n", vendor_id, device_id);
+ #ifdef CONFIG_RTL_92D_SUPPORT
+ 			if( (vendor_id==0x10ec) && (device_id==0x8193) ) 
+ 			{
+@@ -12271,7 +12275,7 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 			} else
+ #endif
+ #ifdef CONFIG_WLAN_HAL_8822BE
+-			if ((vendor_id == 0x10ec) && (device_id == 0xb822))
++			if ((vendor_id == 0x10ec || sub_vendor_id == 0x10ec) && (device_id == 0xb822 || sub_device_id == 0xb822))
+ 			{
+ 				DEBUG_INFO("version_id=VERSION_8822B\n");
+ 				priv->pshare->version_id = VERSION_8822B;
+@@ -14647,6 +14651,8 @@ static struct pci_device_id MDL_DEVINITD
+   PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
+ { PCI_VENDOR_ID_REALTEK, 0xB822,
+   PCI_ANY_ID, PCI_ANY_ID, 0, 0, 0 },
++{ PCI_ANY_ID, PCI_ANY_ID,
++  PCI_VENDOR_ID_REALTEK, 0xB822, 0, 0, 0 },
+ #endif
+ #ifdef CONFIG_RTL_8812_SUPPORT /*eric_8812 ??*/
+ 	{ PCI_VENDOR_ID_REALTEK, 0x8812,

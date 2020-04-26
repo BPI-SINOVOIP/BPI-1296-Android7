@@ -1,0 +1,21 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -13708,11 +13708,16 @@ int rtl8192cd_init_hw_PCI(struct rtl8192
+ 	}
+ #endif
+ 
+-#if defined(CONFIG_WLAN_HAL_8197F)
+-	if (GET_CHIP_VER(priv) == VERSION_8197F) {
++#if defined(CONFIG_WLAN_HAL_8197F) || defined(CONFIG_WLAN_HAL_8822BE)
++	if (GET_CHIP_VER(priv) == VERSION_8197F || GET_CHIP_VER(priv) == VERSION_8822B) {
+ 		if (priv->pmib->dot11RFEntry.xcap > 0 && priv->pmib->dot11RFEntry.xcap < 0x3F) {
+ 			int org_val, tmp_val;
+ 			org_val = (RTL_R32(0x24) >> 25) & 0x3F;
++
++			if(GET_CHIP_VER(priv) == VERSION_8822B) {
++				PHY_SetBBReg(priv, 0x10, 0x00000040, 0x01); //control by WiFi
++			}
++
+ 			if (org_val > priv->pmib->dot11RFEntry.xcap) {
+ 				for (tmp_val=org_val; tmp_val>=priv->pmib->dot11RFEntry.xcap; tmp_val--) {
+ 					PHY_SetBBReg(priv, 0x24, BIT(30) | BIT(29) | BIT(28) | BIT(27) | BIT(26) | BIT(25), tmp_val & 0x3F);

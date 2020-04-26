@@ -1,0 +1,30 @@
+diff --git a/inittab.c b/inittab.c
+index 6dde11a..ae2c431 100644
+--- a/inittab.c
++++ b/inittab.c
+@@ -31,6 +31,10 @@
+ #include "procd.h"
+ #include "rcS.h"
+ 
++#ifndef O_PATH
++#define O_PATH		010000000
++#endif
++
+ #define TAG_ID		0
+ #define TAG_RUNLVL	1
+ #define TAG_ACTION	2
+diff --git a/utils/utils.c b/utils/utils.c
+index 8f14aad..e239eda 100644
+--- a/utils/utils.c
++++ b/utils/utils.c
+@@ -26,6 +26,10 @@
+ 
+ #include "../log.h"
+ 
++#ifndef O_PATH
++#define O_PATH		010000000
++#endif
++
+ void
+ __blobmsg_list_init(struct blobmsg_list *list, int offset, int len, blobmsg_list_cmp cmp)
+ {

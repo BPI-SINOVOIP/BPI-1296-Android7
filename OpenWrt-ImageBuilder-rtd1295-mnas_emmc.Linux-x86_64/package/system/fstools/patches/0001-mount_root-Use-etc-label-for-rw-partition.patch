@@ -1,0 +1,175 @@
+From bfc7557c22b72f458e0c334ddbc53817e39b1893 Mon Sep 17 00:00:00 2001
+
+Date: Thu, 5 Nov 2015 16:55:51 +0800
+Subject: [PATCH 1/2] mount_root: Use DATA_LABEL for rw partition
+
+- Replace jffs2reset, snapshot, block and ubi as well
+---
+ block.c              |  4 ++--
+ CMakeLists.txt       |  6 ++++++
+ jffs2reset.c         |  4 ++--
+ libfstools/overlay.c |  4 ++--
+ mount_root.c         |  4 ++--
+ snapshot.c           | 14 +++++++-------
+ ubi.c                |  2 +-
+ 6 files changed, 16 insertions(+), 16 deletions(-)
+
+--- a/block.c
++++ b/block.c
+@@ -1149,7 +1149,7 @@ static int main_extroot(int argc, char *
+ 	 */
+ 
+ 	/* Start with looking for MTD partition */
+-	find_block_mtd("\"rootfs_data\"", blkdev_path, sizeof(blkdev_path));
++	find_block_mtd(DATA_STR, blkdev_path, sizeof(blkdev_path));
+ 	if (blkdev_path[0]) {
+ 		pr = find_block_info(NULL, NULL, blkdev_path);
+ 		if (pr && !strcmp(pr->id->name, "jffs2")) {
+@@ -1175,7 +1175,7 @@ static int main_extroot(int argc, char *
+ 	/* ... but it also could be an UBI volume */
+ 	memset(blkdev_path, 0, sizeof(blkdev_path));
+ 	libubi = libubi_open();
+-	find_block_ubi(libubi, "rootfs_data", blkdev_path, sizeof(blkdev_path));
++	find_block_ubi(libubi, DATA_LABEL, blkdev_path, sizeof(blkdev_path));
+ 	libubi_close(libubi);
+ 	if (blkdev_path[0]) {
+ 		char cfg[] = "/tmp/ubifs_cfg";
+--- a/jffs2reset.c
++++ b/jffs2reset.c
+@@ -119,9 +119,9 @@ int main(int argc, char **argv)
+ 		return -1;
+ 	}
+ 
+-	v = volume_find("rootfs_data");
++	v = volume_find(DATA_LABEL);
+ 	if (!v) {
+-		ULOG_ERR("MTD partition 'rootfs_data' not found\n");
++		ULOG_ERR("MTD partition '%s' not found\n", DATA_LABEL);
+ 		return -1;
+ 	}
+ 
+--- a/mount_root.c
++++ b/mount_root.c
+@@ -28,7 +28,7 @@ static int
+ start(int argc, char *argv[1])
+ {
+ 	struct volume *root;
+-	struct volume *data = volume_find("rootfs_data");
++	struct volume *data = volume_find(DATA_LABEL);
+ 
+ 	if (!getenv("PREINIT"))
+ 		return -1;
+@@ -94,7 +94,7 @@ stop(int argc, char *argv[1])
+ static int
+ done(int argc, char *argv[1])
+ {
+-	struct volume *v = volume_find("rootfs_data");
++	struct volume *v = volume_find(DATA_LABEL);
+ 
+ 	if (!v)
+ 		return -1;
+--- a/snapshot.c
++++ b/snapshot.c
+@@ -39,7 +39,7 @@
+ static int
+ config_write(int argc, char **argv)
+ {
+-	struct volume *v = volume_find("rootfs_data");
++	struct volume *v = volume_find(DATA_LABEL);
+ 	int ret;
+ 
+ 	if (!v)
+@@ -55,7 +55,7 @@ config_write(int argc, char **argv)
+ static int
+ config_read(int argc, char **argv)
+ {
+-	struct volume *v = volume_find("rootfs_data");
++	struct volume *v = volume_find(DATA_LABEL);
+ 	struct file_header conf, sentinel;
+ 	int next, block, ret = 0;
+ 	uint32_t seq;
+@@ -82,7 +82,7 @@ config_read(int argc, char **argv)
+ static int
+ snapshot_write(int argc, char **argv)
+ {
+-	struct volume *v = volume_find("rootfs_data");
++	struct volume *v = volume_find(DATA_LABEL);
+ 	int block, ret;
+ 	uint32_t seq;
+ 
+@@ -114,9 +114,9 @@ snapshot_mark(int argc, char **argv)
+ 	if (getchar() != 'y')
+ 		return -1;
+ 
+-	v = volume_find("rootfs_data");
++	v = volume_find(DATA_LABEL);
+ 	if (!v) {
+-		ULOG_ERR("MTD partition 'rootfs_data' not found\n");
++		ULOG_ERR("MTD partition '%s' not found\n", DATA_LABEL);
+ 		return -1;
+ 	}
+ 
+@@ -141,7 +141,7 @@ snapshot_mark(int argc, char **argv)
+ static int
+ snapshot_read(int argc, char **argv)
+ {
+-	struct volume *v = volume_find("rootfs_data");;
++	struct volume *v = volume_find(DATA_LABEL);;
+ 	int block = 0, ret = 0;
+ 	char file[64];
+ 
+@@ -173,7 +173,7 @@ out:
+ static int
+ snapshot_info(void)
+ {
+-	struct volume *v = volume_find("rootfs_data");
++	struct volume *v = volume_find(DATA_LABEL);
+ 	struct file_header hdr = { 0 }, conf;
+ 	int block = 0;
+ 
+--- a/ubi.c
++++ b/ubi.c
+@@ -314,7 +314,7 @@ int main(int argc, char **argv)
+ 		return main_image("rootfs", argv[2], NULL);
+ 
+ 	} else if (!strcmp(argv[1], "overlay")) {
+-		return main_image("rootfs", argv[2], "rootfs_data");
++		return main_image("rootfs", argv[2], DATA_LABEL);
+ 
+ 	} else if (!strcmp(argv[1], "detach")) {
+ 		return main_detach(argv[2]);
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 2.6)
+ PROJECT(fs-tools C)
+ ADD_DEFINITIONS(-Os -ggdb -Wall -Werror --std=gnu99 -Wmissing-declarations)
+ 
++IF(DEFINED CMAKE_DATA)
++	ADD_DEFINITIONS(-DDATA_LABEL="${CMAKE_DATA}" -DDATA_STR="\\\"${CMAKE_DATA}\\\"")
++ELSE(DEFINED CMAKE_DATA)
++	ADD_DEFINITIONS(-DDATA_LABEL="rootfs_data" -DDATA_STR="\\\"rootfs_data\\\"")
++ENDIF(DEFINED CMAKE_DATA)
++
+ SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+ 
+ ADD_LIBRARY(fstools SHARED
+--- a/libfstools/overlay.c
++++ b/libfstools/overlay.c
+@@ -208,7 +208,7 @@ jffs2_switch(struct volume *v)
+ 
+ 	mp = find_mount_point(v->blk, 0);
+ 	if (mp) {
+-		ULOG_ERR("rootfs_data:%s is already mounted as %s\n", v->blk, mp);
++		ULOG_ERR("%s:%s is already mounted as %s\n", DATA_LABEL, v->blk, mp);
+ 		return -1;
+ 	}
+ 
+@@ -332,7 +332,7 @@ int mount_overlay(struct volume *v)
+ 
+ 	mp = find_mount_point(v->blk, 0);
+ 	if (mp) {
+-		ULOG_ERR("rootfs_data:%s is already mounted as %s\n", v->blk, mp);
++		ULOG_ERR("%s:%s is already mounted as %s\n", DATA_LABEL, v->blk, mp);
+ 		return -1;
+ 	}
+ 

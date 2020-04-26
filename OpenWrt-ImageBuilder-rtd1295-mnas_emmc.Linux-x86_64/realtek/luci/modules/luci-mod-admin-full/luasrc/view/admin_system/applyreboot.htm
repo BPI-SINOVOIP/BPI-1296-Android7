@@ -1,0 +1,81 @@
+<%#
+ Copyright 2008 Steven Barth <steven@midlink.org>
+ Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<html>
+	<head>
+		<title><%=luci.sys.hostname()%> - <% if title then %><%=title%><% else %><%:Rebooting...%><% end %></title>
+		<link rel="stylesheet" type="text/css" media="screen" href="<%=media%>/cascade.css" />
+		<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+		<script type="text/javascript">//<![CDATA[
+			<% if polling then %>
+			setTimeout(function() {
+				var reboot = false;
+				XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "system", "flashops", "upcomplete")%>', null,
+					function(x, rv) {
+						if (!rv)	return;
+						console.log(rv);
+						if (typeof(rv.status) == "string") {
+							XHR.halt();
+							//console.log(document.getElementById("returntologin").style);
+							document.getElementById("result").innerHTML = rv.status.toUpperCase();
+							document.getElementById("returnbtn").addEventListener("click", function() {
+								location.href = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=addr or luci.http.getenv("SERVER_NAME")%>/';
+							});
+							if (rv.status == "fail") {
+								document.getElementById("install_log_section").style.display = "";
+							}
+							document.getElementById("resultcontent").style.display = "";
+							document.getElementById("returntologin").style.display = "";
+							document.getElementById("maincontent").style.display = "none";
+						}
+						if (typeof(rv.install_log) == "string") {
+							document.getElementById("install_log").innerHTML = rv.install_log;
+						}
+					}
+				);
+			}, 5000);
+			<% else %>
+			var interval = window.setInterval(function() {
+				var img = new Image();
+
+				img.onload = function() {
+					window.clearInterval(interval);
+					location.href = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=addr or luci.http.getenv("SERVER_NAME")%>/';
+				};
+
+				img.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=addr or luci.http.getenv("SERVER_NAME")%><%=resource%>/icons/loading.gif?' + Math.random();
+			}, 5000);
+			<% end %>
+		//]]></script>
+	</head>
+	<body>
+		<div id="maincontainer">
+			<div id="maincontent">
+				<h2><a id="content" name="content"><%:System%> - <% if title then %><%=title%><% else %><%:Rebooting...%><% end %></a></h2>
+				<fieldset class="cbi-section">
+					<p>
+						<% if msg then %><%=msg%><% else %><%:Changes applied.%><% end %>
+					</p>
+					<p>
+						<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" />
+						<%:Waiting for changes to be applied...%>
+					</p>
+				</fieldset>
+			</div>
+			<div id="resultcontent" style="display:none">
+				<h2><a id="result"></a></h2>
+				<fieldset id="install_log_section" class="cbi-section" style="display:none">
+					<textarea id="install_log" readonly="readonly" wrap="off" rows="30" style="width: 100%;"></textarea>
+				</fieldset>
+			</div>
+			<div id="returntologin" class="cbi-page-actions right" style="display:none">
+				<form style="display:inline">
+					<input id="returnbtn" class="cbi-button cbi-button-apply" type="button" value="<%:Return to Login Page%>" />
+				</form>
+			</div>
+		</div>
+	</body>
+</html>

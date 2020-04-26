@@ -1,0 +1,9 @@
+
+      nic: gmac@98016000 {
+              status = "disabled";
+       };
+
+      hwnat: gmac@0x98060000 {
+              mac0_enable = <0>; /* 0:disable, 1:enable */
+              status = "okay";
+      };

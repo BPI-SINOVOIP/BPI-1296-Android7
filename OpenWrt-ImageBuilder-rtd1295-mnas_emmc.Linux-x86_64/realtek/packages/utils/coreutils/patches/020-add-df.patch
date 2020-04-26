@@ -1,0 +1,7 @@
+Index: coreutils-8.16/config.cache
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ coreutils-8.16/config.cache	2015-09-10 20:26:53.328570860 +0800
+@@ -0,0 +1,2 @@
++fu_cv_sys_stat_statfs2_bsize=yes
++gl_cv_func_working_mkstemp=yes

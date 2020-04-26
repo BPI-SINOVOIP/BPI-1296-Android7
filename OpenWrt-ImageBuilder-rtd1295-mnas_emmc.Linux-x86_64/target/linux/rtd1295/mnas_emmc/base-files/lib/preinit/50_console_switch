@@ -1,0 +1,29 @@
+#!/bin/sh
+# Copyright (C) 2016 Realtek
+
+do_inittab_patch() {
+
+	#only valid if overlay fs is mounted
+	OVERLAYFS=`cat /proc/mounts | grep overlayfs`
+	if [ -n "$OVERLAYFS" ]; then
+		set -- $(cat /proc/cmdline)
+		for x in "$@"; do
+			case "$x" in
+				console.switch=*)
+				consolemode=`echo $x | awk -F'=' '{print $2}'`
+        		;;
+		esac
+		done
+
+		TTY=`grep ttyS0 /etc/inittab`
+
+		if [ "$consolemode" = "openwrt" ]; then
+			[ -z "$TTY" ] && cp /rom/etc/inittab /etc/inittab
+		else
+			[ -n "$TTY" ] && sed -i "/ttyS0/d" /etc/inittab
+		fi
+	fi
+}
+
+boot_hook_add preinit_mount_root do_inittab_patch
+

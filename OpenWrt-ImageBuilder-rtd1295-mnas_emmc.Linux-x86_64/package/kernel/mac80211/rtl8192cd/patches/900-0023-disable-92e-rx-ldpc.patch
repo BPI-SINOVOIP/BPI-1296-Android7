@@ -1,0 +1,11 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_ioctl.c
+@@ -2322,7 +2322,7 @@ static struct iwpriv_arg mib_table[] = {
+ 	{"thrd_8b4", RFFT_T, _OFFSET_RFFT(thrd_8b4), _SIZE_RFFT(thrd_8b4), 0x16},
+ 	{"loop_8b4", RFFT_T, _OFFSET_RFFT(loop_8b4), _SIZE_RFFT(loop_8b4), 50},	
+ 	{"disable_ACPR", RFFT_T, _OFFSET_RFFT(disable_ACPR), _SIZE_RFFT(disable_ACPR), 1},	
+-	{"ldpc_92e", RFFT_T, _OFFSET_RFFT(ldpc_92e), _SIZE_RFFT(ldpc_92e), 3},	
++	{"ldpc_92e", RFFT_T, _OFFSET_RFFT(ldpc_92e), _SIZE_RFFT(ldpc_92e), 2},	
+ #endif
+ #ifdef RTK_NL80211
+         //mark_priv , for some parameter that not support in nl80211 

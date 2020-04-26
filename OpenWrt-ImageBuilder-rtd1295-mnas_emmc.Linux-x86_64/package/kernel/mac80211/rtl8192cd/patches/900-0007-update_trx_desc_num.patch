@@ -1,0 +1,32 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -2700,7 +2700,7 @@
+ #if defined(CONFIG_WLAN_HAL_8814AE)|| defined(CONFIG_WLAN_HAL_8822BE)
+ #define NUM_TX_DESC		2176 //512		// kmalloc max size issue
+ #else
+-#define NUM_TX_DESC		1024//512
++#define NUM_TX_DESC		1024//1024//512
+ #endif
+ #else
+ #define NUM_TX_DESC		256		// kmalloc max size issue
+@@ -2804,9 +2804,9 @@
+ 	#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
+ 		#define NUM_RX_DESC		2048
+ 	#elif defined(CONFIG_RTL_8812_SUPPORT)
+-		#define NUM_RX_DESC		2048
++		#define NUM_RX_DESC		2048//2048
+ 	#else
+-		#define NUM_RX_DESC		512//128
++		#define NUM_RX_DESC		512//512//128
+ 	#endif
+ #else
+ 	#ifdef RX_BUFFER_GATHER
+@@ -3166,7 +3166,7 @@
+ #if defined(CONFIG_WLAN_HAL_8197F) && defined(CONFIG_WLAN_HAL_8822BE)
+ 	#define MAX_RX_BUF_LEN_1 2600  //wlan1 97F
+ 	#define MIN_RX_BUF_LEN_1 2600  //wlan1 97F
+-#elif defined(CONFIG_WLAN_HAL_8192EE) && defined(CONFIG_WLAN_HAL_8822BE)
++#elif defined(CONFIG_WLAN_HAL_8192EE) && (defined(CONFIG_WLAN_HAL_8822BE) || defined(CONFIG_RTL_8812_SUPPORT))
+ 	#define MAX_RX_BUF_LEN_1 2600  //wlan1 92E
+ 	#define MIN_RX_BUF_LEN_1 2600  //wlan1 92E
+     #undef MAX_RX_BUF_LEN

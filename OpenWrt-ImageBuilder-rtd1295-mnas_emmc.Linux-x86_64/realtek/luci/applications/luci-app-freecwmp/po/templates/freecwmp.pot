@@ -1,0 +1,62 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "ACS"
+msgstr ""
+
+msgid "ACS connection settings"
+msgstr ""
+
+msgid "Device"
+msgstr ""
+
+msgid "Hardware version"
+msgstr ""
+
+msgid "Hostname"
+msgstr ""
+
+msgid "Interface"
+msgstr ""
+
+msgid "Local"
+msgstr ""
+
+msgid "Manufacturer"
+msgstr ""
+
+msgid "OUI"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Path"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Product class"
+msgstr ""
+
+msgid "Serial number"
+msgstr ""
+
+msgid "Software version"
+msgstr ""
+
+msgid "TR-069 device options"
+msgstr ""
+
+msgid "Transport scheme"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "freecwmp"
+msgstr ""
+
+msgid "freecwmpd daemon options"
+msgstr ""

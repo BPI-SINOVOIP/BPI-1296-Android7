@@ -1,0 +1,75 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/Makefile
+@@ -803,7 +803,7 @@ endif
+ 
+ ########### HAL_RTL8822B #################################
+ ifeq ($(CONFIG_RTL8822B), y)
+-include $(TopDIR)/rtl8822b.mk
++include $(TopDIR)/rtl8822bu/rtl8822b.mk
+ endif
+ 
+ ########### HAL_RTL8821C #################################
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/Makefile
+@@ -239,7 +239,7 @@ _BTC_FILES += hal/btc/halbtc8192e1ant.o
+ 				hal/btc/halbtc8821c2ant.o
+ endif
+ 
+-include $(TopDIR)/hal/phydm/phydm.mk
++include $(TopDIR)/rtl8822be/hal/phydm/phydm.mk
+ ########### HAL_RTL8188E #################################
+ ifeq ($(CONFIG_RTL8188E), y)
+ 
+@@ -720,7 +720,7 @@ endif
+ 
+ ########### HAL_RTL8822B #################################
+ ifeq ($(CONFIG_RTL8822B), y)
+-include $(TopDIR)/rtl8822b.mk
++include $(TopDIR)/rtl8822be/rtl8822b.mk
+ endif
+ 
+ ########### HAL_RTL8821C #################################
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/Makefile
+@@ -806,7 +806,7 @@ endif
+ 
+ ########### HAL_RTL8822B #################################
+ ifeq ($(CONFIG_RTL8822B), y)
+-include $(TopDIR)/rtl8822b.mk
++include $(TopDIR)/rtl8822bs/rtl8822b.mk
+ endif
+ 
+ ########### HAL_RTL8821C #################################
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/Makefile
+@@ -821,7 +821,7 @@ endif
+ 
+ ########### HAL_RTL8821C #################################
+ ifeq ($(CONFIG_RTL8821C), y)
+-include $(TopDIR)/rtl8821c.mk
++include $(TopDIR)/rtl8821cu/rtl8821c.mk
+ endif
+ 
+ ########### AUTO_CFG  #################################
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/Makefile
+@@ -821,7 +821,7 @@ endif
+ 
+ ########### HAL_RTL8821C #################################
+ ifeq ($(CONFIG_RTL8821C), y)
+-include $(TopDIR)/rtl8821c.mk
++include $(TopDIR)/rtl8821cs/rtl8821c.mk
+ endif
+ 
+ ########### AUTO_CFG  #################################
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821ce/Makefile
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821ce/Makefile
+@@ -822,7 +822,7 @@ endif
+ 
+ ########### HAL_RTL8821C #################################
+ ifeq ($(CONFIG_RTL8821C), y)
+-include $(TopDIR)/rtl8821c.mk
++include $(TopDIR)/rtl8821ce/rtl8821c.mk
+ endif
+ 
+ ########### AUTO_CFG  #################################

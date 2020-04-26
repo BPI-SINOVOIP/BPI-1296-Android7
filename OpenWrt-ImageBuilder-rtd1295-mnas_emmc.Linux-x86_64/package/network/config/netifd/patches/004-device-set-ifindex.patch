@@ -1,0 +1,21 @@
+--- a/device.c
++++ b/device.c
+@@ -693,6 +693,7 @@ static void
+ __device_add_user(struct device_user *dep, struct device *dev)
+ {
+ 	struct safe_list *head;
++	int ifindex = system_if_resolve(dev);
+ 
+ 	dep->dev = dev;
+ 
+@@ -702,7 +703,9 @@ __device_add_user(struct device_user *de
+ 		head = &dev->users;
+ 
+ 	safe_list_add(&dep->list, head);
+-	D(DEVICE, "Add user for device '%s', refcount=%d\n", dev->ifname, device_refcount(dev));
++	D(DEVICE, "Add user for device '%s', refcount=%d, old_ifindex=%d, new_ifindex=%d\n",
++		dev->ifname, device_refcount(dev), dev->ifindex, ifindex);
++	device_set_ifindex(dev, ifindex);
+ 
+ 	if (dep->cb && dev->present) {
+ 		dep->cb(dep, DEV_EVENT_ADD);

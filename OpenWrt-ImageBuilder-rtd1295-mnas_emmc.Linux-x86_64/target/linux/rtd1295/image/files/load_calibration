@@ -1,0 +1,144 @@
+#!/bin/sh
+
+#
+#Initial variable
+#
+timeout=200
+netif_wlan0=
+netif_wlan1=
+
+#
+#Environment setting
+#
+if [ -f "/etc/openwrt_release" ]; then #OpenWRT
+	FACTORY_BIN="/usr/local/bin/factory"
+	SED_BIN="sed"
+	AWK_BIN="awk"
+else #Android
+	FACTORY_BIN="/system/bin/factory"
+	SED_BIN="busybox sed"
+	AWK_BIN="busybox awk"
+fi
+
+#
+#Get chip version and band
+#
+[ -d /proc/wlan0 ] && {
+	chip_id=$(echo $(cat /proc/wlan0/mib_rf | grep chipVersion) | $AWK_BIN -F' ' '{print $2}' | cut -c 1-8)
+
+	[ "$chip_id" = "RTL8812c" -o "$chip_id" = "RTL8812t" ] && {
+		chip_id=RTL8812A
+	}
+
+	netif_wlan0=wlan_$chip_id
+}
+
+[ -d /proc/wlan1 ] && {
+	chip_id=$(echo $(cat /proc/wlan1/mib_rf | grep chipVersion) | $AWK_BIN -F' ' '{print $2}' | cut -c 1-8)
+
+	[ "$chip_id" = "RTL8812c" -o "$chip_id" = "RTL8812t" ] && {
+		chip_id=RTL8812A
+	}
+
+	netif_wlan1=wlan_$chip_id
+}
+
+#Load calibration parameter to driver.
+#
+[ -x $FACTORY_BIN ] && [ -n "$netif_wlan0" -o -n "$netif_wlan1" ] && {
+
+	cnt=0
+	#wait for wlan0 & wlan1 down
+	while [ "$cnt" -lt "$timeout" -a -n "$(ifconfig | grep -v "wlan0-\|wlan1-" | grep "wlan0\|wlan1")" ]
+	do
+		cnt=$(($cnt+1))
+		sleep 0.1
+	done
+
+	#check the setting is old or new
+	#Udpate calibration parameter from wlan0/wlan1 to wlan_RTL8192E/wlan_RTL8812A
+	[ -n "$(echo $($FACTORY_BIN list | grep "wlan0\|wlan1"))" ] && {
+		original_wlan2g=$(echo $($FACTORY_BIN list | grep pwrlevelHT40_1S_A) | awk -F' ' '{print $1}')
+		original_wlan5g=$(echo $($FACTORY_BIN list | grep pwrlevel5GHT40_1S_A) | awk -F' ' '{print $1}')
+
+		[ -x $FACTORY_BIN ] && {
+			for netif in wlan2g wlan5g
+			do
+				if [ "$netif" = "wlan2g" ]; then
+					original_netif=$original_wlan2g
+					current_netif="wlan_RTL8192E"
+				elif [ "$netif" = "wlan5g" ]; then
+					original_netif=$original_wlan5g
+					current_netif="wlan_RTL8812A"
+				fi
+
+				[ -n "$original_netif" ] && {
+					mp_file=/tmp/wifi_mp.txt
+					$FACTORY_BIN list | grep "$original_netif" > $mp_file
+					$SED_BIN -i "s/=/\ /g" $mp_file
+					#Delete old setting
+					cat $mp_file | $AWK_BIN -F' ' '{ system(factory " set \"" $1 " " $2"\"") }' factory=$FACTORY_BIN
+
+					$SED_BIN -i "s/$original_netif/$current_netif/g" $mp_file
+					#Add new setting
+					cat $mp_file | $AWK_BIN -F' ' '{ system(factory " set \"" $1 " " $2 "\" "$3) }' factory=$FACTORY_BIN
+
+					$FACTORY_BIN save
+					rm $mp_file
+				}
+			done
+		}
+	}
+
+	#load mac addr
+	mp_hwaddr_file=/tmp/mp_hwaddr.txt
+	$FACTORY_BIN list | grep hwaddr > $mp_hwaddr_file
+	[ -n "$netif_wlan0" ] && {
+		$SED_BIN -i "s/$netif_wlan0/ifconfig wlan0/g" $mp_hwaddr_file
+	}
+	[ -n "$netif_wlan1" ] && {
+		$SED_BIN -i "s/$netif_wlan1/ifconfig wlan1/g" $mp_hwaddr_file
+	}
+	$SED_BIN -i "s/hwaddr=/hw ether /g" $mp_hwaddr_file
+	while read line; do
+		#echo $line
+		netif=$(echo $line | $AWK_BIN -F' ' '{print $2}')
+		[ -n "$(ifconfig -a | grep $netif)" ] && {
+			$line
+		}
+	done < $mp_hwaddr_file
+
+	rm $mp_hwaddr_file
+
+	#load wifi calibration
+	for netif in wlan0 wlan1
+	do
+		if [ $netif == "wlan0" ]; then
+			netif_wlan=$netif_wlan0
+		elif [ $netif == "wlan1" ]; then
+			netif_wlan=$netif_wlan1
+		fi
+
+		[ -d /proc/$netif ] && {
+
+			#echo $netif
+			mp_file=/tmp/$netif_mp.txt
+
+			$FACTORY_BIN list | grep -E $netif_wlan > $mp_file
+
+			$SED_BIN -i "/hwaddr/d" $mp_file
+
+			$SED_BIN -i "s/$netif_wlan/iwpriv $netif set_mib/g" $mp_file
+
+			$SED_BIN -i -e "/regdomain=/d" $mp_file
+
+			while read line; do
+				#echo $line
+				$line
+			done < $mp_file
+
+			rm $mp_file
+
+		}
+	done
+}

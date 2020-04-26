@@ -1,0 +1,144 @@
+#!/bin/sh /etc/rc.common
+
+START=05
+STOP=00
+
+DESC="Realtek XEN inital sequence"
+NAME=realtek
+
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+IRDA=/usr/local/sbin/xenirda
+GPIO=/usr/local/sbin/xengpio
+CEC=/usr/local/sbin/xencec
+BRIDGE_LIST=
+
+log() {
+	local level="$1"
+	shift
+	logger -p "daemon.$level" -- "$0:" "$@" || echo "$0 $@" >&2
+}
+
+detect_bridge_interface() {
+	TMP_BR_INTERFACE=
+
+	while read line
+	do
+		echo $line | grep "config[[:blank:]]interface" > /dev/null
+		if [ "$?" == "0" ]; then
+			INTERFACE=`echo $line | grep "config[[:blank:]]"interface | awk '{print $3}' | sed "s/'//g"`
+			TMP_BR_INTERFACE=br-$INTERFACE
+		fi
+
+		echo $line | grep "option[[:blank:]]type[[:blank:]]'bridge'" > /dev/null
+		if [ "$?" == "0" ]; then
+			BRIDGE_LIST=`echo $BRIDGE_LIST $TMP_BR_INTERFACE`
+		fi
+	done < /etc/config/network
+
+	log debug "Bridged detected : $BRIDGE_LIST"
+}
+
+check_openwrt_bridge() {
+	detect_bridge_interface
+	COUNTER=0
+	QUIT=0
+	while true
+	do
+		COUNTER=$(($COUNTER + 1))
+		CHECK_FAIL=0
+		for br_interface in $BRIDGE_LIST
+		do
+			[ -e /sys/class/net/$br_interface/brif ] && [ "$(ls -A /sys/class/net/$br_interface/brif)" ]
+			if [ "$?" != "0" ]; then
+				if [ "$COUNTER" -gt "10" ]; then
+					log debug "Timeout waiting for bridge interfaces!!!"
+					QUIT=1
+					break
+				fi
+
+				log debug "fail checking /sys/class/net/$br_interface/brif"
+				CHECK_FAIL=1
+				break
+			fi
+		done
+
+		if [ "$QUIT" == "1" ]; then
+			break
+		elif [ "$CHECK_FAIL" == "1" ]; then
+			log debug "sleep 1 sec"
+			sleep 1
+			continue
+		fi
+
+		log debug "all bridge interface detected"
+		break #break loop if all interface detected
+
+	done
+
+	sleep 2
+}
+
+mount_domu_part()
+{
+	COUNTER=0
+
+	while true
+	do
+		mount -t ext4 -r -L xen /domu
+
+		cat /proc/mounts | grep domu > /dev/null
+		if [ "$?" == "0" ]; then
+			log debug "domu partition mounted"
+			break
+		fi
+
+		if [ "$COUNTER" == "10" ]; then
+			log debug "FAIL to mount domu partition!!!"
+			break
+		fi
+
+		log debug "domu partition mount fail, retry..."
+		sleep 1
+		COUNTER=$((COUNTER + 1))
+	done
+}
+
+start() {
+	if [ -f /etc/init.d/xencommons ]; then
+		/etc/init.d/xencommons start
+		mount_domu_part
+	else
+		log debug "xencommons not detected"
+		# exit without error if xen environment not detected
+		exit 0
+	fi
+
+	# Bridge binding is now using OTT_net Daemon from XEN
+	#check_openwrt_bridge
+
+	if [ -f $IRDA ]; then
+		$IRDA &
+	else
+		log debug "xen irda not detected"
+	fi
+
+	if [ -f $GPIO ]; then
+		$GPIO &
+	else
+		log debug "xen gpio not detected"
+	fi
+
+	if [ -f $CEC ]; then
+		$CEC &
+	else
+		log debug "xen cec not detected"
+	fi
+	OTT_start &
+}
+
+stop() {
+	# Shutdown all VM when system down
+	xl shutdown -a
+}

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@rtkshaper[-1]
+	set ucitrack.rtkshaper="rtkshaper"
+	set ucitrack.rtkshaper.exec='/etc/init.d/rtkshaper start'
+	commit ucitrack
+EOF
+
+rm -f /tmp/luci-indexcache
+exit 0

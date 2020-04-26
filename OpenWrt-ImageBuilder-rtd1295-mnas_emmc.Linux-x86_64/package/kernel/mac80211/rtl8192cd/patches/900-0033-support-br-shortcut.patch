@@ -1,0 +1,112 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -204,6 +204,10 @@ extern int (*Fn_rtl8651_romeperfExitPoin
+ extern int (*wirelessnet_hook_is_priv_buf)(void);
+ extern void (*wirelessnet_hook_free_priv_buf)(unsigned char *head);
+ #endif
++#elif defined(RTK_129X_PLATFORM)
++#ifdef BR_SHORTCUT
++extern struct net_device* (*wirelessnet_hook_shortcut)(unsigned char *da);
++#endif
+ #endif // CONFIG_WIRELESS_LAN_MODULE
+ 
+ #if defined(WIFI_HAPD) || defined (RTK_NL80211)
+@@ -14748,6 +14752,10 @@ int MDL_INIT __rtl8192cd_init(unsigned l
+ 	wirelessnet_hook_is_priv_buf = is_rtl8190_priv_buf;
+ 	wirelessnet_hook_free_priv_buf = free_rtl8190_priv_buf;
+ #endif
++#elif defined(RTK_129X_PLATFORM)
++#ifdef BR_SHORTCUT
++	wirelessnet_hook_shortcut = get_shortcut_dev;
++#endif
+ #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
+ #endif // __KERNEL__
+ 
+@@ -15031,6 +15039,10 @@ void MDL_EXIT rtl8192cd_exit (void)
+ 	wirelessnet_hook_is_priv_buf = NULL;
+ 	wirelessnet_hook_free_priv_buf = NULL;
+ #endif
++#elif defined(RTK_129X_PLATFORM)
++#ifdef BR_SHORTCUT
++	wirelessnet_hook_shortcut = NULL;
++#endif
+ #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
+ 
+ #if defined(EAP_BY_QUEUE) && defined(USE_CHAR_DEV)
+@@ -15669,7 +15681,7 @@ void clear_shortcut_cache(void)
+      memset(brsc_cache_arr,0,sizeof(struct brsc_cache_t)*MAX_BRSC_NUM);	
+ #endif
+ 
+-#if defined(CONFIG_RTL_819X) && (defined(__LINUX_2_6__) || defined(__ECOS))
++#if (defined(CONFIG_RTL_819X) || defined(RTK_129X_PLATFORM)) && (defined(__LINUX_2_6__) || defined(__ECOS))
+ 	{
+ 		extern 	 unsigned char cached_eth_addr[MACADDRLEN];
+ 		extern struct net_device *cached_dev;
+@@ -15678,7 +15690,7 @@ void clear_shortcut_cache(void)
+ 	}
+ #endif
+ 
+-#if !defined(NOT_RTK_BSP) && !defined(__ECOS)
++#if (!defined(NOT_RTK_BSP) && !defined(__ECOS)) || defined(RTK_129X_PLATFORM)
+ #if defined(BR_SHORTCUT_C2)
+ 	{
+ 		extern 	 unsigned char cached_eth_addr2[MACADDRLEN];
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_rx.c
+@@ -1124,13 +1124,13 @@ static __inline__ unsigned int check_icv
+ #ifdef CONFIG_RTL8672
+ extern struct net_device *get_eth_cached_dev(unsigned char *da);
+ #else
+-#ifdef CONFIG_RTL_819X
++#if defined(CONFIG_RTL_819X) || defined(RTK_129X_PLATFORM)
+ __inline__ struct net_device *get_eth_cached_dev(unsigned char *da)
+ {
+ 	extern unsigned char cached_eth_addr[MACADDRLEN];
+ 	extern struct net_device *cached_dev;
+ 	
+-#if !defined(NOT_RTK_BSP) && !defined(__ECOS)
++#if (!defined(NOT_RTK_BSP) && !defined(__ECOS)) || defined(RTK_129X_PLATFORM)
+ 	extern unsigned char cached_eth_addr2[MACADDRLEN];
+ 	extern struct net_device *cached_dev2;
+ 	
+@@ -1143,7 +1143,7 @@ __inline__ struct net_device *get_eth_ca
+ 	
+ 	if (cached_dev && isEqualMACAddr(da, cached_eth_addr))
+ 		return cached_dev;
+-#if !defined(NOT_RTK_BSP) && !defined(__ECOS)
++#if (!defined(NOT_RTK_BSP) && !defined(__ECOS)) || defined(RTK_129X_PLATFORM)
+ 	else if (cached_dev2 && isEqualMACAddr(da, cached_eth_addr2))
+ 		return cached_dev2;
+ 	else if (cached_dev3 && isEqualMACAddr(da, cached_eth_addr3))
+@@ -1766,7 +1766,7 @@ static int gothrough_brsrc(struct rtl819
+ 			&& (g_sc_enable_brsc)
+ #endif
+ #endif
+-#ifdef CONFIG_RTL_819X
++#if defined(CONFIG_RTL_819X) || defined(RTK_129X_PLATFORM)
+ #if defined(CONFIG_RTL_ULINKER_BRSC)
+ 			&& (((cached_dev = brsc_get_cached_dev(0, pskb->data)) != NULL) || ((cached_dev = get_eth_cached_dev(pskb->data)) != NULL))
+ #else
+@@ -2281,7 +2281,7 @@ void rtl_netif_rx(struct rtl8192cd_priv
+ 		(pskb->dev) &&
+ 		(rtl_IsMcastIP(pskb) == 0) &&
+ 		!(pskb->data[0] & 0x01)
+-#if defined(__KERNEL__) || defined(__OSK__)
++#if (defined(__KERNEL__) || defined(__OSK__))
+ 		&& (br_port)
+ #endif
+ 		) {
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -1936,6 +1936,11 @@
+ 
+ #if defined(NOT_RTK_BSP) && defined(BR_SHORTCUT_SUPPORT)
+ #define BR_SHORTCUT
++#ifdef RTK_129X_PLATFORM
++#define BR_SHORTCUT_C2
++#define BR_SHORTCUT_C3
++#define BR_SHORTCUT_C4
++#endif
+ #endif // NOT_RTK_BSP && BR_SHORTCUT_SUPPORT
+ 
+ //#ifdef RTK_BR_EXT

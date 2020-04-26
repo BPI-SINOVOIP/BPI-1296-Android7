@@ -1,0 +1,59 @@
+Realtek RTD-129X Clock Controller
+=================================
+
+--------------
+Clock Provider
+--------------
+
+Required properties :
+- compatible : shall contain only one of the following:
+
+	"realtek,clock-controller" for Clock Controller 
+	"realtek,clock-gate-controller" for Clock Gate Controller
+
+- #clock-cells : shall contain 1
+
+Must contain one of the following properties:
+
+- reg : iomem address required
+
+- realtek,mmio : referring to a regmap for iomem
+
+
+Properties for Clock Gate Controller :
+
+- realtek,cgc,id : only required by realtek,clock-gate-controller
+	The IDs are defined in 'dt-bindings/clock/rtk,cc-rtd129x.h'
+	with a prefix 'CGC_'.
+
+
+Example:
+
+	cc: clock-controlller@98000000 {
+		compatible   = "realtek,clock-controller";
+		reg = <0x98000000 0x600>;
+		#clock-cells = <1>;
+		realtek,mmio = <&crt_mmio 0x0>;
+	};
+
+	ce1: clk-en@9800000c {
+		compatible   = "realtek,clock-gate-controller";
+		reg = <0x9800000c 0x4>;
+		#clock-cells = <1>;
+		realtek,cgc,id = <0>;
+		realtek,mmio = <&crt_mmio 0xc>;
+	};
+
+--------------
+Clock consumer
+--------------
+The clock id for clock-controller is defined in 
+'dt-bindings/clock/rtk,cc-rtd129x.h' with a prefix 'CC_'. The clock id 
+for clock-gate-controller is the bit index of register.
+
+Example:
+
+	device {
+		clocks = <&cc CC_PLL_SCPU>, <&ce1 23>;
+	};
+

@@ -1,0 +1,36 @@
+Silergy Sy8089A DT-bindings
+===========================
+
+Required properties:
+- compatible : shall contain the following
+	"silergy,sy8089a".
+
+- pwm : shall contain a phandle to pwm
+
+* Subnode :
+
+Required properties:
+- regulator-compatible : shall contain the following
+	"pwm-reg-0".
+
+The rest of peropeties in subnode using of-regulator to configure, see 
+also 'Documentation/devicetree/bindings/regulator/regulator.txt' for more
+information.
+
+Example :
+	pwm_regulator {
+		compatible = "silergy,sy8089a";
+                pwms = <&pwm 2 75>;
+                status = "okay";
+
+                cpu_supp: pwm_reg {
+                        regulator-compatible = "pwm-reg-0";
+                        regulator-name = "pwm-reg-0";
+                        regulator-min-microvolt = <800000>;
+                        regulator-max-microvolt = <1100000>;
+
+                        regulator-boot-on;
+                        regulator-always-on;
+                };
+        };
+

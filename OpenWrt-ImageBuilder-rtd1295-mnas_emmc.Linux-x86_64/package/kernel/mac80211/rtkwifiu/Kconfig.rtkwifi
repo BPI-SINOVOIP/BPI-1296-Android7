@@ -1,0 +1,31 @@
+
+config RTKWIFIU
+	tristate "Realtek USB Wireless Cards"
+	depends on m
+	depends on CFG80211
+
+if RTKWIFIU
+
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8189es/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8189fs/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8192eu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8723bu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8723du/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8811au/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8812au/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8814au/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8821as/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8821au/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8822be/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/Kconfig"
+source "drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/Kconfig"
+
+endif

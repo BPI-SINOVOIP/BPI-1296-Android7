@@ -1,0 +1,412 @@
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_osdep.c
+@@ -575,6 +575,25 @@ struct rtl8192cd_priv *rtl8192cd_chr_reg
+ void rtl8192cd_chr_unreg(unsigned int minor);
+ int rtl8192cd_fileopen(const char *filename, int flags, int mode);
+ 
++#ifdef USE_DMA_ALLOCATE
++#include <linux/device.h>
++#include <linux/miscdevice.h>
++#include <linux/module.h>
++#include <linux/dma-mapping.h>
++#include <linux/slab.h>
++static struct device * cma_dev;
++static const struct file_operations cma_dev_fops = {
++	.owner =    THIS_MODULE,
++	.read  =    NULL,
++	.write =    NULL,
++};
++static struct miscdevice cma_dev_misc = {
++	.minor = MISC_DYNAMIC_MINOR,
++	.name = "cma_dev",
++	.fops = &cma_dev_fops,
++};
++#endif
++
+ #ifdef RTK_WLAN_EVENT_INDICATE
+ extern struct sock *get_nl_eventd_sk(void);
+ extern struct sock* rtk_eventd_netlink_init(void);
+@@ -11013,7 +11032,7 @@ static struct ss_res* alloc_site_survey_
+ {
+ 	struct ss_res *res;
+ 	
+-	res = (struct ss_res *)rtw_vmalloc(sizeof(struct ss_res));
++	res = (struct ss_res *)rtw_vmalloc_flag(sizeof(struct ss_res), flags);
+ 	if (NULL == res) return NULL;
+ 	
+ 	memset(res, 0, sizeof(struct ss_res));
+@@ -11240,6 +11259,12 @@ void *rtl8192cd_init_one(struct sdio_fun
+     BOOLEAN     bVal;
+ 	unsigned int errorFlag;
+ #endif  //CONFIG_WLAN_HAL
++
++#ifdef USE_DMA_ALLOCATE
++	dma_addr_t	dma_phys = NULL;
++	void		*dma_virt = NULL;
++#endif
++
+     int rc=0;
+     priv = NULL;
+     regs = NULL;
+@@ -11422,12 +11447,25 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 		phw = &hw_info;
+ #endif
+ #else
++#ifndef USE_DMA_ALLOCATE
+ 		phw = (struct rtl8192cd_hw *)kmalloc((sizeof(struct rtl8192cd_hw)), GFP_ATOMIC);
+ 		if (!phw) {
+ 			rc = -ENOMEM;
+ 			printk(KERN_ERR "Can't kmalloc for rtl8192cd_hw (size %d)\n", sizeof(struct rtl8192cd_hw));
+ 			goto err_out_free;
+ 		}
++#else
++		dma_virt = dma_alloc_coherent(cma_dev, sizeof(struct rtl8192cd_hw), &dma_phys, GFP_KERNEL);
++		phw = (struct rtl8192cd_hw *)dma_virt;
++		if (!dma_virt) {
++			rc = -ENOMEM;
++			printk(KERN_ERR "Can't dma_alloc_coherent for rtl8192cd_hw (size %d)\n", sizeof(struct rtl8192cd_hw));
++			goto err_out_free;
++		}
++		else {
++			printk("****** %s %d, allocated addr %p\n", __FUNCTION__, __LINE__, &dma_virt);
++		}
++#endif
+ #endif
+ 		memset((void *)phw, 0, sizeof(struct rtl8192cd_hw));
+ #ifdef CONFIG_PCI_HCI
+@@ -11586,7 +11624,7 @@ void *rtl8192cd_init_one(struct sdio_fun
+         /*for multiple repeater usage,  need to allocate site_survey memory for vap_idx=1,2*/
+ #endif
+ 	{
+-		site_survey = alloc_site_survey_res(GFP_ATOMIC);
++		site_survey = alloc_site_survey_res(GFP_KERNEL /*GFP_ATOMIC*/);
+ 		if (!site_survey) {
+ 			rc = -ENOMEM;
+ 			printk(KERN_ERR "Can't kmalloc for site_survey (size %d)\n", sizeof(struct ss_res));
+@@ -11782,6 +11820,10 @@ void *rtl8192cd_init_one(struct sdio_fun
+ 	{
+ 		priv->pshare = pshare;	// david
+ 		priv->pshare->phw = phw;
++#ifdef USE_DMA_ALLOCATE
++		priv->pshare->hw_dma_phys = dma_phys;
++#endif
++
+ #ifdef CONCURRENT_MODE
+ 		priv->pshare->wlandev_idx = wlan_index;
+ #endif
+@@ -11836,6 +11878,10 @@ void *rtl8192cd_init_one(struct sdio_fun
+ #endif
+ #endif // CONFIG_PCI_HCI
+ 
++#ifdef USE_DMA_ALLOCATE
++		priv->pshare->cma_dev = cma_dev;
++#endif
++
+ 		priv->pshare->type = wdev->type;
+ #ifdef USE_RTL8186_SDK
+ #if defined(CONFIG_RTL8196B) || defined(CONFIG_RTL_819X)
+@@ -13278,7 +13324,11 @@ register_driver:
+ 				// Avoid the combination of (64-bit dma_addr_t + big endian) to get invalid phw->ring_dma_addr
+ 
+ #ifdef WLAN_HAL_TX_AMSDU
++#ifndef USE_DMA_ALLOCATE
+ 				page_ptr_amsdu = pci_alloc_consistent(priv->pshare->pdev, DESC_DMA_PAGE_SIZE_HAL_FOR_AMSDU, &addr);
++#else
++				page_ptr_amsdu = dma_alloc_coherent(cma_dev, DESC_DMA_PAGE_SIZE_HAL_FOR_AMSDU, &addr, GFP_KERNEL);
++#endif
+ 				_GET_HAL_DATA(priv)->desc_dma_buf_amsdu = (unsigned long)page_ptr_amsdu;
+ 				_GET_HAL_DATA(priv)->desc_dma_buf_addr_amsdu[0] = addr;
+ 				if (page_ptr_amsdu == NULL) {
+@@ -13352,7 +13402,11 @@ register_driver:
+ 		if (IS_PCIBIOS_TYPE) {
+ 			dma_addr_t addr;
+ 			// Avoid the combination of (64-bit dma_addr_t + big endian) to get invalid phw->ring_dma_addr
++#ifndef USE_DMA_ALLOCATE
+ 			page_ptr = pci_alloc_consistent(priv->pshare->pdev, DESC_DMA_PAGE_SIZE_IF(priv), &addr);
++#else
++			page_ptr = dma_alloc_coherent(cma_dev, DESC_DMA_PAGE_SIZE, &addr, GFP_KERNEL);
++#endif
+ 			phw->ring_dma_addr = addr;
+ 		} else
+ #endif
+@@ -13623,8 +13677,17 @@ err_out_free:
+ 		kfree(rssim_queue);
+ #endif
+ #ifndef PRIV_STA_BUF
++#ifndef USE_DMA_ALLOCATE
+ 	if (phw)
+ 		kfree(phw);
++#else
++	if (phw) {
++		printk("****** %s %d, free allocated addr %pa\n", __FUNCTION__, __LINE__, &phw);
++		dma_free_coherent(cma_dev, sizeof(struct rtl8192cd_hw), phw, dma_phys);
++		phw = NULL;
++		dma_phys = NULL;
++	}
++#endif
+ 	if (pshare)	// david
+ 		kfree(pshare);
+ 	if (pwlan_hdr_poll)
+@@ -13928,8 +13991,13 @@ void rtl8192cd_deinit_one(struct rtl8192
+ #ifdef CONFIG_NET_PCI
+ 		if (IS_PCIBIOS_TYPE) {
+ 			unsigned long page_align_phy = (PAGE_SIZE - (((unsigned long)priv->pshare->phw->alloc_dma_buf) & (PAGE_SIZE-1)));
++#ifndef USE_DMA_ALLOCATE
+ 			pci_free_consistent(priv->pshare->pdev, DESC_DMA_PAGE_SIZE_IF(priv), (void*)priv->pshare->phw->alloc_dma_buf,
+ 				(dma_addr_t)(priv->pshare->phw->ring_dma_addr-page_align_phy));
++#else
++			dma_free_coherent(cma_dev, DESC_DMA_PAGE_SIZE, (void*)priv->pshare->phw->alloc_dma_buf,
++				(dma_addr_t)(priv->pshare->phw->ring_dma_addr-page_align_phy));
++#endif
+ 		} else
+ #endif
+ 			kfree((void *)priv->pshare->phw->alloc_dma_buf);
+@@ -14013,7 +14081,15 @@ void rtl8192cd_deinit_one(struct rtl8192
+ 	kfree(priv->pshare->pwlanbuf_poll);
+ 	kfree(priv->pshare->pwlanicv_poll);
+ 	kfree(priv->pshare->pwlanmic_poll);
++#ifndef USE_DMA_ALLOCATE
+ 	kfree(priv->pshare->phw);
++#else
++	if (priv->pshare->phw) {
++		dma_free_coherent(cma_dev, sizeof(struct rtl8192cd_hw), priv->pshare->phw, priv->pshare->hw_dma_phys);
++		priv->pshare->phw = NULL;
++		priv->pshare->hw_dma_phys = NULL;
++	}
++#endif
+ 	kfree(priv->pshare);	// david
+ #endif
+ 
+@@ -14788,6 +14864,21 @@ int rtl8192cd_init(unsigned long base_ad
+ #elif !defined(__ECOS)
+ int MDL_INIT rtl8192cd_init(void)
+ {
++#ifdef USE_DMA_ALLOCATE
++	int ret;
++	printk("****** %s %d\n", __FUNCTION__, __LINE__);
++	ret = misc_register(&cma_dev_misc);
++	if (unlikely(ret)) {
++		printk("****** %s %d, failed(%d) to register cma_dev_fops misc device!\n", __FUNCTION__, __LINE__, ret);
++		cma_dev = NULL;
++	}
++	else {
++		cma_dev = cma_dev_misc.this_device;
++		cma_dev->coherent_dma_mask = ~0;
++		printk("****** %s %d, cma_dev %pa\n", __FUNCTION__, __LINE__, &cma_dev);
++	}
++#endif
++
+ #if defined(CONFIG_RTL_ULINKER_WLAN_DELAY_INIT)
+ 	static char initated = 0;
+ 	if (initated == 0)
+@@ -14820,6 +14911,9 @@ void MDL_EXIT rtl8192cd_exit (void)
+ #if defined(CONFIG_PCI_HCI) && !defined(CONFIG_NET_PCI)
+ 	int idx;
+ #endif
++#ifdef USE_DMA_ALLOCATE
++	misc_deregister(&cma_dev_misc);
++#endif
+ 
+ #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
+ 	wirelessnet_hook = NULL;
+@@ -14969,7 +15063,15 @@ void MDL_EXIT rtl8192cd_exit(void *data)
+ #ifndef PRIV_STA_BUF
+ 	kfree((void *)priv->pshare->phw->alloc_dma_buf);
+ 
++#ifndef USE_DMA_ALLOCATE
+ 	kfree(priv->pshare->phw);
++#else
++	if (priv->pshare->phw) {
++		dma_free_coherent(cma_dev, sizeof(struct rtl8192cd_hw), priv->pshare->phw, priv->pshare->hw_dma_phys);
++		priv->pshare->phw = NULL;
++		priv->pshare->hw_dma_phys = NULL;
++	}
++#endif
+ 	kfree(priv->pshare->pwlan_hdr_poll);
+ 	kfree(priv->pshare->pwlanllc_hdr_poll);
+ 	kfree(priv->pshare->pwlanbuf_poll);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.c
+@@ -195,6 +195,26 @@ inline void _rtw_vmfree(const void *pbuf
+ 	}
+ }
+ #endif // __KERNEL__
++
++#if defined(__ECOS)
++u8* _rtw_malloc_flag(u32 sz, int gfp)
++#else
++u8* _rtw_malloc_flag(u32 sz, gfp_t gfp)
++#endif
++{
++	u8 *pbuf = NULL;
++
++	pbuf = kmalloc(sz, gfp);
++
++#ifdef DBG_MEMORY_LEAK
++	if (pbuf != NULL) {
++		atomic_inc(&_malloc_cnt);
++		atomic_add(sz, &_malloc_size);
++#endif /* DBG_MEMORY_LEAK */
++
++	return pbuf;
++}
++
+ 
+ u8* _rtw_malloc(u32 sz)
+ {
+@@ -6987,6 +7007,9 @@ __IRAM_IN_865X
+ struct sk_buff *alloc_skb_from_queue(struct rtl8192cd_priv *priv)
+ {
+ 	struct sk_buff *skb=NULL;
++	#ifdef RTK_129X_PLATFORM
++	struct net_device *netdev = priv->dev;
++	#endif
+ 
+ #ifdef NOT_RTK_BSP
+ 	if (skb_queue_len(&priv->pshare->skb_queue) < 2)
+@@ -7002,7 +7025,11 @@ struct sk_buff *alloc_skb_from_queue(str
+ 		skb = dev_alloc_skb_priv(priv, RX_BUF_LEN);
+ #endif
+ #else
++		#ifdef RTK_129X_PLATFORM
++		skb = __netdev_alloc_skb(netdev, RX_BUF_LEN, (in_interrupt() ? GFP_ATOMIC : GFP_KERNEL));
++		#else
+ 		skb = dev_alloc_skb(RX_BUF_LEN);
++		#endif
+ #endif
+ 		if (skb == NULL) {
+ //			DEBUG_ERR("[%s] dev_alloc_skb() failed!\n", __func__);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_util.h
+@@ -1288,6 +1288,9 @@ static __inline__ struct sk_buff *rtl_de
+ 				unsigned int length, int flag, int could_alloc_from_kerenl)
+ {
+ 	struct sk_buff *skb = NULL;
++	#ifdef RTK_129X_PLATFORM
++	struct net_device *netdev = priv->dev;
++	#endif
+ 
+ #if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
+ 	skb = dev_alloc_skb(length);
+@@ -1295,7 +1298,11 @@ static __inline__ struct sk_buff *rtl_de
+ 	skb = alloc_skb_from_queue(priv);
+ 
+ 	if (skb == NULL && could_alloc_from_kerenl)
++		#ifdef RTK_129X_PLATFORM
++		skb = __netdev_alloc_skb(netdev, length, (in_interrupt() ? GFP_ATOMIC : GFP_KERNEL));
++		#else
+ 		skb = dev_alloc_skb(length);
++		#endif
+ #endif
+ 
+ #ifdef ENABLE_RTL_SKB_STATS
+@@ -1956,9 +1963,11 @@ void wapi_event_indicate(struct rtl8192c
+ #ifdef CONFIG_USE_VMALLOC
+ #define rtw_vmalloc(sz)			_rtw_vmalloc((sz))
+ #define rtw_zvmalloc(sz)			_rtw_zvmalloc((sz))
++#define rtw_vmalloc_flag(sz,gfp)	_rtw_vmalloc((sz))
+ #define rtw_vmfree(pbuf, sz)		_rtw_vmfree((pbuf), (sz))
+ #else // !CONFIG_USE_VMALLOC
+ #define rtw_vmalloc(sz)			_rtw_malloc((sz))
++#define rtw_vmalloc_flag(sz,gfp)	_rtw_malloc_flag((sz), (gfp))
+ #define rtw_zvmalloc(sz)			_rtw_zmalloc((sz))
+ #define rtw_vmfree(pbuf, sz)		_rtw_mfree((pbuf), (sz))
+ #endif // CONFIG_USE_VMALLOC
+@@ -1970,6 +1979,11 @@ u8* _rtw_vmalloc(u32 sz);
+ u8* _rtw_zvmalloc(u32 sz);
+ void _rtw_vmfree(const void *pbuf, u32 sz);
+ u8* _rtw_zmalloc(u32 sz);
++#if defined(__ECOS)
++u8* _rtw_malloc_flag(u32 sz, int gfp);
++#else
++u8* _rtw_malloc_flag(u32 sz, gfp_t gfp);
++#endif
+ u8* _rtw_malloc(u32 sz);
+ void _rtw_mfree(const void *pbuf, u32 sz);
+ 
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd.h
+@@ -3768,6 +3768,10 @@ struct priv_shared_info {
+ #endif
+ #endif // CONFIG_PCI_HCI
+ 
++#ifdef USE_DMA_ALLOCATE
++	struct device 			*cma_dev;
++#endif
++
+ #ifdef CONFIG_USB_HCI
+ 	//For 92D, DMDP have 2 interface.
+ 	u8	InterfaceNumber;
+@@ -4044,6 +4048,7 @@ struct priv_shared_info {
+ 	struct list_head		wlanmic_list;
+ 
+ 	struct rtl8192cd_hw		*phw;
++	dma_addr_t                      hw_dma_phys;
+ #ifdef CONFIG_PCI_HCI
+ 	struct rtl8192cd_tx_desc_info 	*pdesc_info;
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/WlanHAL/RTL88XX/Hal88XXGen.c
+@@ -5387,7 +5387,11 @@ InitHCIDMAMem88XX(
+ 	unsigned int dma_len = DESC_DMA_PAGE_SIZE_MAX_HAL_IF(Adapter);
+ 
+ 	if (HAL_IS_PCIBIOS_TYPE(Adapter)) {
++#ifndef USE_DMA_ALLOCATE
+ 		page_ptr = pci_alloc_consistent(Adapter->pshare->pdev, dma_len, &ring_dma_addr);
++#else
++		page_ptr = dma_alloc_coherent(Adapter->pshare->cma_dev, dma_len, &ring_dma_addr, GFP_KERNEL);
++#endif
+ 		if (NULL == page_ptr) {
+ 			RT_TRACE_F( COMP_INIT, DBG_SERIOUS, ("Allocate HAL Memory-TX Failed\n") );
+ 			return RT_STATUS_FAILURE;
+@@ -5630,13 +5634,23 @@ StopHCIDMASW88XX(
+ 
+ 		u4Byte page_align_phy = (HAL_PAGE_SIZE - (((u4Byte)_GET_HAL_DATA(Adapter)->alloc_dma_buf) & (HAL_PAGE_SIZE - 1)));
+ 
++#ifndef USE_DMA_ALLOCATE
+ 		pci_free_consistent(Adapter->pshare->pdev, dma_len, (void*)_GET_HAL_DATA(Adapter)->alloc_dma_buf,
+ 							(dma_addr_t)((_GET_HAL_DATA(Adapter)->ring_dma_addr) - page_align_phy));
++#else
++		dma_free_coherent(Adapter->pshare->cma_dev, dma_len, (void*)_GET_HAL_DATA(Adapter)->alloc_dma_buf,
++							(dma_addr_t)((_GET_HAL_DATA(Adapter)->ring_dma_addr) - page_align_phy));
++#endif
+ 
+ #ifdef WLAN_HAL_TX_AMSDU
+ 				page_align_phy = (HAL_PAGE_SIZE - (((u4Byte)_GET_HAL_DATA(Adapter)->desc_dma_buf_amsdu) & (HAL_PAGE_SIZE-1)));
++#ifndef USE_DMA_ALLOCATE
+ 				pci_free_consistent(Adapter->pshare->pdev, DESC_DMA_PAGE_SIZE_HAL_FOR_AMSDU, (void*)_GET_HAL_DATA(Adapter)->desc_dma_buf_amsdu,
+ 					(dma_addr_t)((_GET_HAL_DATA(Adapter)->desc_dma_buf_addr_amsdu[0])-page_align_phy));
++#else
++				dma_free_coherent(Adapter->pshare->cma_dev, DESC_DMA_PAGE_SIZE_HAL_FOR_AMSDU, (void*)_GET_HAL_DATA(Adapter)->desc_dma_buf_amsdu,
++					(dma_addr_t)((_GET_HAL_DATA(Adapter)->desc_dma_buf_addr_amsdu[0])-page_align_phy));
++#endif
+ #endif
+ 	}
+ #endif
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_hw.c
+@@ -100,7 +100,11 @@
+ #define EXPORT_SYMBOL(x) 
+ #endif
+ 
++#if defined(CONFIG_WLAN_HAL_8814AE)
+ #define MAX_CONFIG_FILE_SIZE (64*1024) // for 8814, added to 64k
++#else
++#define MAX_CONFIG_FILE_SIZE (20*1024)
++#endif
+ 
+ int rtl8192cd_fileopen(const char *filename, int flags, int mode);
+ void selectMinPowerIdex(struct rtl8192cd_priv *priv);
+--- a/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
++++ b/drivers/net/wireless/realtek/rtl8192cd/8192cd_cfg.h
+@@ -157,6 +157,10 @@
+ 
+ #ifdef RTK_129X_PLATFORM
+ 
++#ifdef CONFIG_CMA
++#define USE_DMA_ALLOCATE
++#endif
++
+ #ifdef CONFIG_RTL_819X
+ #undef CONFIG_RTL_819X
+ #endif

@@ -1,0 +1,260 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188eu/os_dep/linux/ioctl_cfg80211.c
+@@ -6604,8 +6604,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8189es/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8189es/os_dep/linux/ioctl_cfg80211.c
+@@ -6583,8 +6583,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8189fs/os_dep/linux/ioctl_cfg80211.c
+@@ -6591,8 +6591,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192cu/os_dep/linux/ioctl_cfg80211.c
+@@ -5395,8 +5395,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192ee/os_dep/linux/ioctl_cfg80211.c
+@@ -6347,8 +6347,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
+-	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+-	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	//.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
++	//.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8192eu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8192eu/os_dep/linux/ioctl_cfg80211.c
+@@ -6597,8 +6597,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bs/os_dep/linux/ioctl_cfg80211.c
+@@ -6828,8 +6828,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723bu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723bu/os_dep/linux/ioctl_cfg80211.c
+@@ -6401,8 +6401,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723du/os_dep/linux/ioctl_cfg80211.c
+@@ -6311,8 +6311,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812ae/os_dep/linux/ioctl_cfg80211.c
+@@ -6504,8 +6504,8 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
+-	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+-	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	//.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
++	//.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8812au/os_dep/linux/ioctl_cfg80211.c
+@@ -6258,8 +6258,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8814au/os_dep/linux/ioctl_cfg80211.c
+@@ -6523,8 +6523,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821as/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821as/os_dep/linux/ioctl_cfg80211.c
+@@ -6506,8 +6506,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 	
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cs/os_dep/linux/ioctl_cfg80211.c
+@@ -6805,8 +6805,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8821cu/os_dep/linux/ioctl_cfg80211.c
+@@ -6816,8 +6816,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bu/os_dep/linux/ioctl_cfg80211.c
+@@ -6351,8 +6351,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8188fu/os_dep/linux/ioctl_cfg80211.c
+@@ -6824,8 +6824,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/os_dep/linux/ioctl_cfg80211.c
+@@ -6826,8 +6826,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822bs/os_dep/linux/ioctl_cfg80211.c
+@@ -6381,8 +6381,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8723ds/os_dep/linux/ioctl_cfg80211.c
+@@ -6816,8 +6816,10 @@ static struct cfg80211_ops rtw_cfg80211_
+ 	.flush_pmksa = cfg80211_rtw_flush_pmksa,
+ 
+ #ifdef CONFIG_AP_MODE
++	#if !defined(BUILD_OPENWRT)
+ 	.add_virtual_intf = cfg80211_rtw_add_virtual_intf,
+ 	.del_virtual_intf = cfg80211_rtw_del_virtual_intf,
++	#endif
+ 
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)) && !defined(COMPAT_KERNEL_RELEASE)
+ 	.add_beacon = cfg80211_rtw_add_beacon,

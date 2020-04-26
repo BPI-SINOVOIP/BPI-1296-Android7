@@ -1,0 +1,34 @@
+choice
+	prompt "gator version"
+	default GATOR_V522
+	help
+	  gator version selection.
+
+config GATOR_V522
+	bool "gator version v5.22"
+	help
+	  gator version v5.22.
+
+config GATOR_V524
+	bool "gator version v5.24"
+	help
+	  gator version v5.24.
+
+config GATOR_V525
+	bool "gator version v5.25"
+	help
+	  gator version v5.25.
+
+endchoice
+
+if GATOR_V522
+source "drivers/gator/gator-v5.22/Kconfig"
+endif
+
+if GATOR_V524
+source "drivers/gator/gator-v5.24/Kconfig"
+endif
+
+if GATOR_V525
+source "drivers/gator/gator-v5.25/Kconfig"
+endif

@@ -1,0 +1,12 @@
+--- a/net/wireless/wext-compat.c
++++ b/net/wireless/wext-compat.c
+@@ -85,6 +85,9 @@ int cfg80211_wext_siwmode(struct net_dev
+ 	case IW_MODE_REPEAT:
+ 		type = NL80211_IFTYPE_WDS;
+ 		break;
++	case IW_MODE_MASTER:
++		type = NL80211_IFTYPE_AP;
++		break;
+ 	case IW_MODE_MONITOR:
+ 		type = NL80211_IFTYPE_MONITOR;
+ 		break;
