@@ -1,0 +1,116 @@
+ANDROID_SRC_PATH=../../../../../..
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS=-DHAVE_SYS_UIO_H
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libOMX.realtek.video.dec.so
+
+TOP=$(ANDROID_SRC_PATH)
+
+RTK_TOP := $(TOP)/hardware/realtek/realtek_omx
+RTK_INC := $(RTK_TOP)/include
+RTK_RPC := $(TOP)/device/realtek/proprietary/libs/rtk_libs/common
+RTK_VE1:= $(TOP)/hardware/realtek/VideoEngine/VE1
+RTK_VE3:= $(TOP)/hardware/realtek/VideoEngine/VE3
+RTK_JPG:= $(TOP)/hardware/realtek/VideoEngine/JPEG
+
+OMX_DECODER_TUNNELING_SUPPORT = false
+
+LOCAL_SRC_FILES := \
+	decoder.c \
+	codec.c \
+	codec_vdec.c \
+	codec_jdec.c
+
+LOCAL_CFLAGS = -DOMX_DECODER_VIDEO_DOMAIN -DUSE_OUTPUT_CROP -D__GENERIC_LINUX__
+LOCAL_CFLAGS += -DUSE_RT_ION
+
+# For HEVC 10bit and compression mode
+LOCAL_CFLAGS += -DOMX_HEVC_10BIT_HDR_SUPPORT
+LOCAL_SRC_FILES += codec_HEVCHdrParameterParser.c
+LOCAL_SRC_FILES += vo_writeback/codec_VORPC.c
+ifeq ($(OMX_DECODER_TUNNELING_SUPPORT), true)
+LOCAL_SRC_FILES += sidebandOutput.c Sideband_C.cpp
+LOCAL_CFLAGS += -DOMX_DECODER_TUNNELING_SUPPORT
+endif
+
+LOCAL_C_INCLUDES := \
+	. \
+	$(RTK_INC)/khronos \
+	$(RTK_INC)/imagination \
+	$(TOP)/system/core/include \
+	$(TOP)/system/core/include/cutils \
+	$(TOP)/bionic/libc/kernel/common \
+	$(TOP)/hardware/libhardware/include \
+	$(RTK_TOP)/osal_rtk \
+	$(RTK_TOP)/core \
+	$(RTK_VE1)/vpuapi \
+	$(RTK_VE1)/sample/helper \
+	$(RTK_JPG)/include \
+	$(RTK_JPG)/jpuapi \
+	$(RTK_JPG) \
+	$(TOP)/hardware/realtek/StreamingEngine2 \
+        $(TOP)/device/realtek/proprietary_trunk-6.0.0_r1/libs/libRTKAllocator/include \
+	$(GENERIC_LINUX_PATH)/include
+
+
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/common/IPC/generate/include/system
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/rtk_libs/OSAL/include
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/libRTKAllocator/include
+
+
+LOCAL_C_INCLUDES += $(TOP)/device/realtek/proprietary/libs/Include
+
+ifeq ($(ENABLE_TEE_DRM_FLOW),true)
+LOCAL_CFLAGS += -DENABLE_TEE_DRM_FLOW
+LOCAL_C_INCLUDES += \
+	$(TOP)/device/realtek/proprietary/libs/Include/TEEapi
+endif
+
+
+#LIBS += -lpthread
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES))
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS) -fPIC
+
+LOCAL_SHARED_LIBRARIES = \
+	-Wl,--whole-archive \
+	$(GENERIC_LINUX_PATH)/src/libMisc/generic_misc.o \
+	$(GENERIC_LINUX_PATH)/lib/libhwse_$(TARGET_BOARD_PLATFORM).a \
+	$(GENERIC_LINUX_PATH)/lib/libRtkIpc.a \
+	$(GENERIC_LINUX_PATH)/lib/libRTKAllocator.a \
+	-Wl,--no-whole-archive
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(CC) -shared $(LOCAL_SHARED_LIBRARIES) -o $@ $(OBJ_FILES)
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) $(LIBS) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) $(LIBS) -c $*.c -o $@

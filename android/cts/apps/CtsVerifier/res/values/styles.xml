@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="InstructionsFont" parent="@android:style/TextAppearance.Large">
+        <item name="android:padding">10dp</item>
+    </style>
+    <style name="InstructionsSmallFont" parent="@android:style/TextAppearance.Medium">
+    </style>
+    <style name="MessageRow">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">5dp</item>
+    </style>
+    <style name="RootLayoutPadding">
+      <item name="android:paddingEnd">?android:attr/listPreferredItemPaddingEnd</item>
+      <item name="android:paddingBottom">?android:attr/dialogPreferredPadding</item>
+      <item name="android:paddingLeft">?android:attr/listPreferredItemPaddingLeft</item>
+      <item name="android:paddingRight">?android:attr/listPreferredItemPaddingRight</item>
+      <item name="android:paddingStart">?android:attr/listPreferredItemPaddingStart</item>
+      <item name="android:paddingTop">?android:attr/dialogPreferredPadding</item>
+    </style>
+</resources>

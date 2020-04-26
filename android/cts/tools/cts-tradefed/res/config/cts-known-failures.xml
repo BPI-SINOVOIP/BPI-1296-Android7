@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2016 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<configuration description="Configuration with CTS known failures" >
+    <!-- <option name="compatibility:exclude-filter" value="MODULE_NAME" /> Excludes whole module -->
+    <!-- <option name="compatibility:exclude-filter" value="MODULE_NAME PACKAGE_NAME" /> Excludes whole package -->
+    <!-- <option name="compatibility:exclude-filter" value="MODULE_NAME PACKAGE_NAME.CLASS_NAME" /> Excludes whole class -->
+    <!-- <option name="compatibility:exclude-filter" value="MODULE_NAME PACKAGE_NAME.CLASS_NAME#TEST_NAME" /> Excludes individual test -->
+
+    <!-- b/35314835 -->
+    <option name="compatibility:exclude-filter" value="CtsServicesHostTestCases android.server.cts.ActivityManagerPinnedStackTests#testAlwaysFocusablePipActivity" />
+    <option name="compatibility:exclude-filter" value="CtsServicesHostTestCases android.server.cts.ActivityManagerPinnedStackTests#testLaunchIntoPinnedStack" />
+
+    <!-- b/17595050 -->
+    <option name="compatibility:exclude-filter" value="CtsAccessibilityServiceTestCases android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverText" />
+    <option name="compatibility:exclude-filter" value="CtsAccessibilityServiceTestCases android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverTextExtend" />
+
+    <!-- b/23776083 -->
+    <option name="compatibility:exclude-filter" value="CtsAlarmClockTestCases" />
+
+    <!-- b/31156007 will need framework fix https://android.googlesource.com/platform/frameworks/base/+/20488d97cdc9aa7e98f6fd75c2890ba18781654a -->
+    <option name="compatibility:exclude-filter" value="CtsAppSecurityHostTestCases android.appsecurity.cts.ScopedDirectoryAccessTest#testDeniesOnceForAllClearedWhenPackageRemoved" />
+
+    <!-- b/17993121 -->
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testAppWidgetProviderCallbacks" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testBindAppWidget" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testCollectionWidgets" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testDeleteHost" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testDeleteHosts" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testGetAppWidgetIds" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testGetAppWidgetInfo" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testGetAppWidgetOptions" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testPartiallyUpdateAppWidgetViaWidgetId" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testPartiallyUpdateAppWidgetViaWidgetIds" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testTwoAppWidgetProviderCallbacks" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaComponentName" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaWidgetId" />
+    <option name="compatibility:exclude-filter" value="CtsAppWidgetTestCases android.appwidget.cts.AppWidgetTest#testUpdateAppWidgetViaWidgetIds" />
+
+    <!-- b/21668302 -->
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.AssistantContentViewTest#testAssistantContentViewDimens" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.ExtraAssistDataTest#testAssistContentAndAssistData" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.FocusChangeTest#testLayerCausesUnderlyingActivityToLoseFocus" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.LargeViewHierarchyTest#testTextView" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.ScreenshotTest#testBlueScreenshot" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.ScreenshotTest#testGreenScreenshot" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.ScreenshotTest#testRedScreenshot" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.TextViewTest#testTextView" />
+    <option name="compatibility:exclude-filter" value="CtsAssistTestCases android.assist.cts.WebViewTest#testWebView" />
+
+    <!-- b/23776099 -->
+    <option name="compatibility:exclude-filter" value="CtsCallLogTestCases" />
+
+    <!-- b/17530117 -->
+    <option name="compatibility:exclude-filter" value="CtsCameraTestCases android.hardware.camera2.cts.AllocationTest#testBlackWhite" />
+    <option name="compatibility:exclude-filter" value="CtsCameraTestCases android.hardware.camera2.cts.AllocationTest#testParamSensitivity" />
+    <!-- b/17989532 -->
+    <option name="compatibility:exclude-filter" value="CtsCameraTestCases android.hardware.camera2.cts.SurfaceViewPreviewTest#testPreparePerformance" />
+    <!-- b/23008511 -->
+    <option name="compatibility:exclude-filter" value="CtsCameraTestCases android.hardware.cts.CameraTest#testPreviewFpsRange" />
+
+    <option name="compatibility:exclude-filter" value="CtsCarTestCases" />
+
+    <!-- b/23776893 -->
+    <option name="compatibility:exclude-filter" value="CtsDumpsysHostTestCases android.dumpsys.cts.DumpsysHostTest#testBatterystatsOutput" />
+    <option name="compatibility:exclude-filter" value="CtsDumpsysHostTestCases android.dumpsys.cts.DumpsysHostTest#testGfxinfoFramestats" />
+
+    <!-- b/31199016 will need platform fix https://android.googlesource.com/platform/frameworks/base/+/11a84b8429c2cf395b99c852d232a490ba1c9975 to pass -->
+    <option name="compatibility:exclude-filter" value="CtsGraphicsTestCases android.graphics.drawable.cts.ThemedDrawableTest#testLayerDrawable" />
+
+    <!-- b/31306911 will need platform fixes
+         https://android.googlesource.com/platform/frameworks/base/+/0a815bb94fa2aad016a10fe23633efc5682d2a7c and
+         https://android.googlesource.com/platform/frameworks/base/+/0c03664fa6acbe5c3fd11d54ab9a6792f43dda07 to pass -->
+    <option name="compatibility:exclude-filter" value="CtsGraphicsTestCases android.graphics.drawable.cts.CustomAnimationScaleListDrawableTest#testNonZeroDurationScale" />
+    <option name="compatibility:exclude-filter" value="CtsGraphicsTestCases android.graphics.drawable.cts.CustomAnimationScaleListDrawableTest#testZeroDurationScale" />
+
+    <!-- b/22922206 b/27534791 -->
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testAccelerometer_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testAccelerometer_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testGravity_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testGravity_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testGyroscope_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testGyroscope_50hz_flush" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testGyroscope_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testLinearAcceleration_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testLinearAcceleration_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testMagneticField_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testMagneticField_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testMagneticFieldUncalibrated_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testMagneticFieldUncalibrated_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testPressure_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testPressure_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testRotationVector_50hz_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testRotationVector_50hz_flush" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorBatchingTests#testRotationVector_fastest_batching" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorTest#testBatchAndFlush" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SensorTest#testSensorTimeStamps" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testGyroscope_15hz" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testGyroscope_1hz" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testMagneticField_1hz" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testMagneticField_50hz" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testMagneticFieldUncalibrated_200hz" />
+    <option name="compatibility:exclude-filter" value="CtsHardwareTestCases android.hardware.cts.SingleSensorTests#testOrientation_5hz" />
+
+    <!-- b/31153233 will need platform fix https://android.googlesource.com/platform/external/apache-harmony/+/5617ae1cb798e58748946c0fa4299f5d982c7b8b to pass -->
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayArgConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayCharsetConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayIntIntCharsetConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayIntIntConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayIntIntStringConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_ByteArrayStringConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_CharArrayConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_CharArrayIntIntConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_IntArrayIntIntConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_StringBufferConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_StringBuilderConstructor" />
+    <option name="compatibility:exclude-filter" value="CtsJdwpTestCases org.apache.harmony.jpda.tests.jdwp.ClassType.NewInstanceStringTest#testNewInstanceString_StringConstructor" />
+
+    <!-- b/18117279 b/21262226 b/23144425 -->
+    <option name="compatibility:exclude-filter" value="CtsJobSchedulerTestCases android.jobscheduler.cts.ConnectivityConstraintTest#testConnectivityConstraintExecutes_withMobile" />
+    <option name="compatibility:exclude-filter" value="CtsJobSchedulerTestCases android.jobscheduler.cts.ConnectivityConstraintTest#testConnectivityConstraintExecutes_withWifi" />
+    <option name="compatibility:exclude-filter" value="CtsJobSchedulerTestCases android.jobscheduler.cts.ConnectivityConstraintTest#testUnmeteredConstraintExecutes_withWifi" />
+    <option name="compatibility:exclude-filter" value="CtsJobSchedulerTestCases android.jobscheduler.cts.ConnectivityConstraintTest#testUnmeteredConstraintFails_withMobile" />
+    <option name="compatibility:exclude-filter" value="CtsJobSchedulerTestCases android.jobscheduler.cts.TimingConstraintsTest#testJobParameters_unexpiredDeadline" />
+
+    <!-- b/31157079 will need platform fix https://android.googlesource.com/platform/libcore/+/4149edc81ea22ef954aa443e0c70e5d3cb55341b to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLibcoreTestCases libcore.java.util.TimeZoneTest#testDisplayNamesWithScript" />
+
+    <!-- b/31157557 will need platform fix https://android.googlesource.com/platform/libcore/+/7b7ce9368f104eef4cf337a8a2067e5cf345ccc0 to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLibcoreTestCases libcore.java.net.SocketTest#testSocketTestAllAddresses" />
+
+    <!-- b/31305368 will need platform fix https://android.googlesource.com/platform/external/conscrypt/+/f24631e45c6bef8135cd9e82bfb30cf56fd8acb6 to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLibcoreTestCases libcore.javax.crypto.MacTest#testMac_correctAlias" />
+
+    <!-- b/31151341 will need platform fix https://android.googlesource.com/platform/libcore/+/4a2b94a98213fcf628f6d4de034a109695d908cc to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLibcoreTestCases libcore.net.MimeUtilsTest#test_30793548" />
+
+    <!-- b/31155940 will need platform fix https://android.googlesource.com/platform/libcore/+/08e9e364940586cb242839c8f0e303b82438f58b to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLibcoreTestCases org.apache.harmony.tests.java.util.VectorTest#test_listIterator_addAndPrevious" />
+
+    <!-- b/31535558 will need platform fix https://android.googlesource.com/platform/frameworks/base/+/4e82fe51207bbd8ceaec356b4215e338ec63a31e to pass -->
+    <option name="compatibility:exclude-filter" value="CtsLocationTestCases android.location.cts.GnssStatusTest#testGnssStatusChanges" />
+
+    <!-- b/25850508 -->
+    <option name="compatibility:exclude-filter" value="CtsMediaStressTestCases android.mediastress.cts.preconditions.MediaPreparerTest#testCopyMediaFiles" />
+    <option name="compatibility:exclude-filter" value="CtsMediaStressTestCases android.mediastress.cts.preconditions.MediaPreparerTest#testMediaFilesExistOnDeviceFalse" />
+    <option name="compatibility:exclude-filter" value="CtsMediaStressTestCases android.mediastress.cts.preconditions.MediaPreparerTest#testMediaFilesExistOnDeviceTrue" />
+    <option name="compatibility:exclude-filter" value="CtsMediaStressTestCases android.mediastress.cts.preconditions.MediaPreparerTest#testSetMountPoint" />
+    <option name="compatibility:exclude-filter" value="CtsMediaStressTestCases android.mediastress.cts.preconditions.MediaPreparerTest#testSkipMediaDownload" />
+
+    <!-- b/17144778 -->
+    <option name="compatibility:exclude-filter" value="CtsMediaTestCases android.media.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv" />
+    <!-- b/23827982 -->
+    <option name="compatibility:exclude-filter" value="CtsMediaTestCases android.media.cts.VideoEncoderTest#testGoogH264FlexArbitraryW" />
+    <option name="compatibility:exclude-filter" value="CtsMediaTestCases android.media.cts.VideoEncoderTest#testGoogH264SurfArbitraryW" />
+
+    <!-- b/25651805 -->
+    <option name="compatibility:exclude-filter" value="CtsNetTestCases android.net.cts.ConnectivityManagerTest#testRestrictedNetworks" />
+    <!-- b/18682315 -->
+    <option name="compatibility:exclude-filter" value="CtsNetTestCases android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket" />
+    <option name="compatibility:exclude-filter" value="CtsNetTestCases android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind" />
+    <option name="compatibility:exclude-filter" value="CtsNetTestCases android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple" />
+    <option name="compatibility:exclude-filter" value="CtsNetTestCases android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping" />
+
+    <!-- b/17394321 -->
+    <option name="compatibility:exclude-filter" value="CtsOpenGlPerfTestCases android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingFast" />
+    <option name="compatibility:exclude-filter" value="CtsOpenGlPerfTestCases android.openglperf.cts.GlAppSwitchTest#testGlActivitySwitchingSlow" />
+
+    <!-- b/18091590 -->
+    <option name="compatibility:exclude-filter" value="CtsOpenGlPerfTestCases android.openglperf.cts.GlVboPerfTest#testVboWithVaryingIndexBufferNumbers" />
+
+    <!-- b/31306874 will need platform fix https://android.googlesource.com/platform/frameworks/base/+/5eb91a437c551ed0c66b38299f988f8159ada207 to pass -->
+    <option name="compatibility:exclude-filter" value="CtsOsTestCases android.os.cts.AsyncTaskTest#testCancellationWithException" />
+
+    <!-- b/23192492 -->
+    <option name="compatibility:exclude-filter" value="CtsPermission2TestCases android.permission2.cts.ProtectedBroadcastsTest#testSendProtectedBroadcasts" />
+
+    <option name="compatibility:exclude-filter" value="CtsSampleDeviceTestCases" />
+    <option name="compatibility:exclude-filter" value="CtsSampleHostTestCases" />
+
+    <!-- b/18461670 -->
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_getStreamVolumeLeak" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_isStreamActive" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_isStreamActiveRemotely" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_startAudioSource" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_startOutput" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.AudioPolicyBinderTest#test_stopOutput" />
+    <!-- b/27218502 -->
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.MediaCryptoTest#testMediaCryptoClearKey" />
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.MediaCryptoTest#testMediaCryptoWidevine" />
+
+    <!-- b/26150806 -->
+    <option name="compatibility:exclude-filter" value="CtsSignatureTestCases android.signature.cts.tests" />
+
+    <!-- b/23427621 -->
+    <option name="compatibility:exclude-filter" value="CtsSystemUiTestCases" />
+
+    <!-- b/27873815 -->
+    <option name="compatibility:exclude-filter" value="arm64-v8a CtsRenderscriptLegacyTestCases" />
+    <option name="compatibility:exclude-filter" value="x86_64 CtsRenderscriptLegacyTestCases" />
+    <option name="compatibility:exclude-filter" value="mips64 CtsRenderscriptLegacyTestCases" />
+
+    <!-- b/23604254 -->
+    <option name="compatibility:exclude-filter" value="CtsTelecomTestCases android.telecom.cts.ExtendedInCallServiceTest#testAddNewOutgoingCallAndThenDisconnect" />
+    <option name="compatibility:exclude-filter" value="CtsTelecomTestCases android.telecom.cts.RemoteConferenceTest#testRemoteConferenceCallbacks_ConferenceableConnections" />
+
+    <!-- b/23979591 -->
+    <option name="compatibility:exclude-filter" value="CtsTelephonyTestCases android.telephony.cts.CellInfoTest#testCellInfo" />
+
+    <!-- b/23779020 -->
+    <option name="compatibility:exclude-filter" value="CtsTransitionTestCases android.transition.cts.ChangeScrollTest#testChangeScroll" />
+
+    <!-- b/17536113 -->
+    <option name="compatibility:exclude-filter" value="CtsUsageStatsTestCases android.app.usage.cts.UsageStatsTest#testNoAccessSilentlyFails" />
+    <option name="compatibility:exclude-filter" value="CtsUsageStatsTestCases android.app.usage.cts.UsageStatsTest#testOrderedActivityLaunchSequenceInEventLog" />
+    <option name="compatibility:exclude-filter" value="CtsUsageStatsTestCases android.app.usage.cts.UsageStatsTest#testPackageUsageStatsIntervals" />
+    <option name="compatibility:exclude-filter" value="CtsUsageStatsTestCases android.app.usage.cts.UsageStatsTest#testUsageEventsParceling" />
+
+    <!-- b/31469490 -->
+    <option name="compatibility:exclude-filter" value="CtsViewTestCases android.view.cts.DragDropTest" />
+
+    <!-- b/23238984 -->
+    <option name="compatibility:exclude-filter" value="CtsVoiceSettingsTestCases android.voicesettings.cts.ZenModeTest#testAll" />
+
+    <!-- b/26235244 -->
+    <option name="compatibility:exclude-filter" value="android.util.cts.EventLogTest#testWriteEventWithOversizeValue" />
+
+    <!-- b/31803630 -->
+    <option name="compatibility:exclude-filter" value="CtsSecurityTestCases android.security.cts.ListeningPortsTest" />
+</configuration>
