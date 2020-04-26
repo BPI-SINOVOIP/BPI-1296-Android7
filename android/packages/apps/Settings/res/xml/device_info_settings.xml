@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:settings="http://schemas.android.com/apk/res-auto"
+        android:title="@string/about_settings">
+
+        <!-- System update settings - launches activity -->
+        <PreferenceScreen android:key="system_update_settings"
+                android:title="@string/system_update_settings_list_item_title"
+                android:summary="@string/system_update_settings_list_item_summary">
+            <intent android:action="android.settings.SYSTEM_UPDATE_SETTINGS" />
+        </PreferenceScreen>
+
+
+        <PreferenceScreen android:key="additional_system_update_settings"
+                          android:title="@string/additional_system_update_settings_list_item_title">
+            <intent android:action="android.intent.action.MAIN"
+                    android:targetPackage="@string/additional_system_update"
+                    android:targetClass="@string/additional_system_update_menu" />
+        </PreferenceScreen>
+
+        <!-- Device status - launches activity -->
+        <PreferenceScreen android:key="status_info"
+                android:title="@string/device_status"
+                android:summary="@string/device_status_summary"
+                android:fragment="com.android.settings.deviceinfo.Status">
+        </PreferenceScreen>
+
+        <!-- Manual -->
+        <PreferenceScreen
+                android:key="manual"
+                android:title="@string/manual">
+            <intent android:action="android.settings.SHOW_MANUAL" />
+        </PreferenceScreen>
+
+        <!-- Legal Information -->
+        <PreferenceScreen
+                android:key="container"
+                android:title="@string/legal_information"
+                android:fragment="com.android.settings.LegalSettings" />
+
+        <PreferenceScreen
+                android:key="regulatory_info"
+                android:title="@string/regulatory_labels">
+            <intent android:action="android.settings.SHOW_REGULATORY_INFO" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+                android:key="safety_info"
+                android:title="@string/safety_and_regulatory_info">
+                <intent android:action="android.settings.SHOW_SAFETY_AND_REGULATORY_INFO" />
+        </PreferenceScreen>
+
+        <!-- Feedback on the device -->
+        <PreferenceScreen android:key="device_feedback"
+                android:title="@string/device_feedback">
+        </PreferenceScreen>
+
+        <!-- Device hardware model -->
+        <com.android.settings.DividerPreference
+                android:key="device_model"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:selectable="false"
+                android:title="@string/model_info"
+                android:summary="@string/device_info_default"
+                settings:allowDividerAbove="true"
+                settings:allowDividerBelow="true"/>
+
+        <!-- Device firmware version -->
+        <Preference android:key="firmware_version"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:title="@string/firmware_version"
+                android:summary="@string/device_info_default"/>
+
+        <!-- Security patch level -->
+        <PreferenceScreen android:key="security_patch"
+                android:title="@string/security_patch"
+                android:summary="@string/device_info_default">
+                <intent android:action="android.intent.action.VIEW"
+                        android:data="https://source.android.com/security/bulletin/" />
+        </PreferenceScreen>
+
+        <!-- Device FCC equipment id -->
+        <com.android.settings.DividerPreference
+                android:key="fcc_equipment_id"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:selectable="false"
+                android:title="@string/fcc_equipment_id"
+                android:summary="@string/device_info_default"
+                settings:allowDividerAbove="true"
+                settings:allowDividerBelow="true"/>
+
+        <!-- Device Baseband version -->
+        <com.android.settings.DividerPreference
+                android:key="baseband_version"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:selectable="false"
+                android:title="@string/baseband_version"
+                android:summary="@string/device_info_default"
+                settings:allowDividerAbove="true"
+                settings:allowDividerBelow="true"/>
+
+        <!-- Device Kernel version -->
+        <com.android.settings.DividerPreference
+                android:key="kernel_version"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:selectable="false"
+                android:title="@string/kernel_version"
+                android:summary="@string/device_info_default"
+                settings:allowDividerAbove="true"
+                settings:allowDividerBelow="true"/>
+
+        <!-- Detailed build version -->
+        <Preference android:key="build_number"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:title="@string/build_number"
+                android:summary="@string/device_info_default"/>
+
+        <!-- SELinux status information -->
+        <com.android.settings.DividerPreference
+                android:key="selinux_status"
+                android:enabled="false"
+                android:shouldDisableView="false"
+                android:selectable="false"
+                android:title="@string/selinux_status"
+                android:summary="@string/selinux_status_enforcing"
+                settings:allowDividerAbove="true"
+                settings:allowDividerBelow="true"/>
+
+</PreferenceScreen>
