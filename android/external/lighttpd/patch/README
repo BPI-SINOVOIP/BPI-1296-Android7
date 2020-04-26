@@ -1,0 +1,21 @@
+* lighttpd 1.4.33 source downloaded from http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.33.tar.bz2
+
+* The patch "lighttpd-1.4.33_configure.patch" had been applied so you don't need to do it.
+Otherwise, you will try to upgrade lighttpd version to higher one.
+
+* If you want to upgrade lighttpd version, you need to apply the patch and re-execute configure
+to generate some necessary files, for instance config.h
+command for ./configure:
+./configure --host=mipsel-linux CC=mipsel-linux-android-gcc CPP=mipsel-linux-android-cpp CFLAGS="-nostdlib" \
+            CPPFLAGS="-I${ANDROID_DIR}/bionic/libc/include/ -I${ANDROID_DIR}/bionic/libc/arch-mips/include/ \
+            -I${ANDROID_DIR}/bionic/libc/kernel/common/  -I${ANDROID_DIR}/bionic/libc/kernel/common/linux \
+            -I${ANDROID_DIR}/bionic/libc/kernel/common/linux/ -I${ANDROID_DIR}/bionic/libc/kernel/arch-mips \
+            -I${ANDROID_DIR}/development/ndk/platforms/android-9/include \
+            -I${ANDROID_DIR}/prebuilts/ndk/8/platforms/android-14/arch-mips/usr/include" \
+            LDFLAGS="-Wl,-rpath-link=${ANDROID_DIR}/out/target/product/saturn/system/lib \
+            -L${ANDROID_DIR}/out/target/product/saturn/system/lib -L${ANDROID_DIR}/out/target/products/system/lib" \
+            --without-bzip2 --without-pcre
+
+
+Date: 2013-10-11 (update: 2013-10-15)
+Writer: Hamer Sun (hamer.sun@realtek.com)

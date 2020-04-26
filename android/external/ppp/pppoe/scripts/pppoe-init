@@ -1,0 +1,68 @@
+#!/system/bin/sh
+#
+# pppoe                     This script starts or stops a PPPoE connection
+#
+# chkconfig: 2345 99 01
+# description: Connects to PPPoE provider
+#
+# LIC: GPL
+#
+# Copyright (C) 2000 Roaring Penguin Software Inc.  This software may
+# be distributed under the terms of the GNU General Public License, version
+# 2 or any later version.
+
+# Source function library if it exists
+test -r /etc/rc.d/init.d/functions && . /etc/rc.d/init.d/functions
+
+# From AUTOCONF
+prefix=/system/bin
+exec_prefix=${prefix}
+CONFIG_DIR=/data/misc/ppp
+
+
+# Paths to programs
+START=${exec_prefix}/pppoe-start
+STOP=${exec_prefix}/pppoe-stop
+STATUS=${exec_prefix}/pppoe-status
+case "$1" in
+    start)
+        echo -n "Bringing up PPPoE link"
+
+	$START
+	if [ $? = 0 ] ; then
+		touch ${CONFIG_DIR}/pppoe.up
+	        echo_success
+	else
+		echo_failure
+	fi
+        echo ""
+        ;;
+
+    stop)
+        echo -n "Shutting down PPPoE link"
+
+	$STOP > /dev/null 2>&1
+	if [ $? = 0 ] ; then
+		rm -f ${CONFIG_DIR}/pppoe.up
+	        echo_success
+	else
+		echo_failure
+	fi
+        echo ""
+        ;;
+
+    restart)
+	$0 stop
+	$0 start
+	;;
+
+    status)
+	$STATUS
+	;;
+
+    *)
+        echo "Usage: pppoe {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0

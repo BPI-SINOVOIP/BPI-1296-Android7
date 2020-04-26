@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+-->
+
+<link rel="import" href="/tracing/base/iteration_helpers.html">
+<link rel="import" href="/tracing/value/histogram.html">
+
+<script>
+'use strict';
+
+tr.exportTo('tr.v', function() {
+  class ValueSet {
+    constructor(opt_values) {
+      this.values_ = new Map();
+
+      if (opt_values !== undefined)
+        for (var value of opt_values)
+          this.addHistogram(value);
+    }
+
+    get valueDicts() {
+      return this.map(v => v.asDict());
+    }
+
+    lookup(guid) {
+      return this.values_.get(guid);
+    }
+
+    get length() {
+      return this.values_.size;
+    }
+
+    toArray() {
+      return [...this];
+    }
+
+    *[Symbol.iterator]() {
+      for (var [guid, value] of this.values_)
+        yield value;
+    }
+
+    /**
+     * @param {!function(!tr.v.Histogram):*} callback
+     * @param {*=} opt_this
+     */
+    map(callback, opt_this) {
+      return this.toArray().map(callback, opt_this || this);
+    }
+
+    /**
+     * Convert Values from dicts and add them.
+     * Resolve RelatedValueSet references.
+     *
+     * @param {Array.<Object>} dicts
+     */
+    addValuesFromDicts(dicts) {
+      for (var dict of dicts)
+        this.addHistogram(tr.v.Histogram.fromDict(dict));
+
+      // Now resolve the RelatedValueSet references between values.
+      // This resolution process must wait until all new values are added in
+      // case a value refers to another that comes after it in dicts.
+      // Iterate over all values, old and new, in case an old value contained a
+      // reference to a new value. Don't worry, resolve() is idempotent.
+      // The expected running time is this: for each value (hundreds to
+      // thousands?), for each diagnostic that is a RelatedValueSet (0-5?), for
+      // each ValueRef (0-10?), do a hash lookup (constant time?).
+      for (var value of this) {
+        for (var [name, diagnostic] of value.diagnostics) {
+          if ((diagnostic instanceof tr.v.d.RelatedValueSet) ||
+              (diagnostic instanceof tr.v.d.RelatedValueMap)) {
+            diagnostic.resolve(this);
+          }
+        }
+
+        // In addition to Values, we must also look inside of Histogram samples.
+        for (var bin of value.allBins) {
+          for (var dm of bin.diagnosticMaps) {
+            for (var [name, diagnostic] of dm) {
+              if ((diagnostic instanceof tr.v.d.RelatedValueSet) ||
+                  (diagnostic instanceof tr.v.d.RelatedValueMap)) {
+                diagnostic.resolve(this);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Find the Values that are not contained in any other Values'
+     * RelatedValueSet or RelatedValueMap diagnostics.
+     *
+     * @return {!Array.<!tr.v.Histogram>}
+     */
+    get sourceValues() {
+      var sourceValues = new Map(this.values_);
+      // If a Histogram is in a RelatedValueSet or RelatedValueMap, which can be
+      // owned either by Values or by numeric samples, then it is not a
+      // source Histogram.
+      function deleteSourceValues(diagnosticMap) {
+        for (var [name, diagnostic] of diagnosticMap) {
+          if (diagnostic instanceof tr.v.d.RelatedValueSet)
+            for (var relatedValue of diagnostic)
+              sourceValues.delete(relatedValue.guid);
+          else if (diagnostic instanceof tr.v.d.RelatedValueMap)
+            for (var [name, relatedValue] of diagnostic)
+              sourceValues.delete(relatedValue.guid);
+        }
+      }
+
+      for (var hist of this) {
+        deleteSourceValues(hist.diagnostics);
+        for (var b of hist.allBins) {
+          for (var dm of b.diagnosticMaps) {
+            deleteSourceValues(dm);
+          }
+        }
+      }
+      return [...sourceValues.values()];
+    }
+
+    getValuesNamed(name) {
+      return this.toArray().filter(h => h.name === name);
+    }
+
+    /**
+     * @param {!tr.v.Histogram} h
+     */
+    addHistogram(h) {
+      if (this.values_.get(h.guid))
+        throw new Error('Cannot add same Histogram twice');
+
+      this.values_.set(h.guid, h);
+    }
+  }
+
+  // This does not contain storyGroupingKeys!
+  ValueSet.GROUPINGS = {
+    HISTOGRAM_NAME: {
+      key: 'histogramName',
+      label: 'name',
+      dataFn: v => v.name
+    },
+
+    BENCHMARK_NAME: {
+      key: 'benchmarkName',
+      label: 'benchmark',
+      dataFn: v => tr.v.d.IterationInfo.getField(v, 'benchmarkName', '')
+    },
+
+    BENCHMARK_START: {
+      key: 'benchmarkStart',
+      label: 'time',
+      dataFn: v => tr.v.d.IterationInfo.getField(v, 'benchmarkStartString', '')
+    },
+
+    STORYSET_REPEAT: {
+      key: 'storysetRepeat',
+      label: 'storyset repeat',
+      dataFn: v => tr.v.d.IterationInfo.getField(
+          v, 'storysetRepeatCounterLabel', 0)
+    },
+
+    STORY_REPEAT: {
+      key: 'storyRepeat',
+      label: 'story repeat',
+      dataFn: v => tr.v.d.IterationInfo.getField(
+          v, 'storyRepeatCounterLabel', 0)
+    },
+
+    STORY_NAME: {
+      key: 'storyName',
+      label: 'story',
+      dataFn: v => tr.v.d.IterationInfo.getField(v, 'storyDisplayName', '')
+    },
+
+    DISPLAY_LABEL: {
+      key: 'displayLabel',
+      label: 'label',
+      dataFn: v => tr.v.d.IterationInfo.getField(v, 'displayLabel', 'Value')
+    }
+  };
+
+  return {
+    ValueSet: ValueSet
+  };
+});
+</script>

@@ -1,0 +1,78 @@
+ifndef CC
+CC=gcc
+endif
+
+ifndef AR
+AR=ar
+endif
+
+include ../hostapd/.config
+
+CFLAGS += -I$(abspath ./)
+CFLAGS += -I$(abspath ../src)
+CFLAGS += -I$(abspath ../src/drivers)
+CFLAGS += -I$(abspath ../src/common)
+CFLAGS += -I$(abspath ../src/l2_packet)
+CFLAGS += -I$(abspath ../src/utils)
+CFLAGS += -I$(abspath ../src/wps)
+CFLAGS += -I$(abspath ../hostapd)
+CFLAGS += -I$(abspath ../wpa_supplicant)
+
+CFLAGS += -DREALTEK_WIFI_VENDOR
+CFLAGS += -DANDROID -DANDROID_P2P
+CFLAGS += -DHOSTAPD
+CFLAGS += -DPURE_LINUX
+
+LIB_HOSTAPD = lib_driver_cmd_rtw_hostapd.a
+ifdef CONFIG_DRIVER_NL80211
+   OBJ_HOSTAPD += driver_cmd_nl80211.o
+   SRC_HOSTAPD += driver_cmd_nl80211.c
+endif
+
+#ifdef CONFIG_DRIVER_WEXT
+#   OBJ_HOSTAPD += driver_cmd_wext.o
+#   SRC_HOSTAPD += driver_cmd_wext.c
+#endif
+
+ifdef CONFIG_LIBNL32
+  DRV_LIBS += -lnl-3
+  DRV_LIBS += -lnl-genl-3
+  DRV_CFLAGS += -DCONFIG_LIBNL20
+  ifdef LIBNL_INC
+    DRV_CFLAGS += -I$(LIBNL_INC)
+  else
+    PKG_CONFIG ?= pkg-config
+    DRV_CFLAGS += $(shell $(PKG_CONFIG) --cflags libnl-3.0)
+  endif
+ifdef CONFIG_LIBNL3_ROUTE
+  DRV_LIBS += -lnl-route-3
+  DRV_CFLAGS += -DCONFIG_LIBNL3_ROUTE
+endif
+else
+  ifdef CONFIG_LIBNL_TINY
+    DRV_LIBS += -lnl-tiny
+  else
+    ifndef CONFIG_OSX
+      DRV_LIBS += -lnl
+    endif
+  endif
+
+  ifdef CONFIG_LIBNL20
+    ifndef CONFIG_LIBNL_TINY
+      DRV_LIBS += -lnl-genl
+    endif
+    DRV_CFLAGS += -DCONFIG_LIBNL20
+  endif
+endif
+
+CFLAGS += $(DRV_CFLAGS)
+LIBS += $(DRV_LIBS)
+
+all: $(OBJ_HOSTAPD)
+	$(AR) rcs $(LIB_HOSTAPD) $(OBJ_HOSTAPD)
+
+OBJ_HOSTAPD: $(SRC_HOSTAPD)
+	$(CC) $(CFLAGS) -c $(SRC_HOSTAPD) $(LIBS)
+
+clean:
+	rm -f *.o $(LIB_HOSTAPD)

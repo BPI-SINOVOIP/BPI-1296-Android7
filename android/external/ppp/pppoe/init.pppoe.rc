@@ -1,0 +1,20 @@
+on post-fs-data
+    mkdir /data/misc/wifi/pppoe.test 0766 shell system
+
+service start-pppoe /system/bin/pppoe 
+    class main
+    disabled
+    user root
+    group system
+#    oneshot
+  
+on property:rtk.pppoe.start=1
+    start pppoe
+    setprop rtk.lighttpd.start 2
+    setprop rtk.lighttpd.stop 0
+    
+on property:rtk.lighttpd.stop=1
+    stop lighttpd
+    setprop rtk.lighttpd.stop 2
+    setprop rtk.lighttpd.start 0
+    rm /data/www/run/lighttpd.pid

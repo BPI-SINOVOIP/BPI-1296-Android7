@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+-->
+
+<link rel="import" href="/tracing/base/statistics.html">
+<link rel="import" href="/tracing/metrics/metric_registry.html">
+<link rel="import" href="/tracing/metrics/system_health/clock_sync_latency_metric.html">
+<link rel="import" href="/tracing/value/histogram.html">
+
+<script>
+'use strict';
+
+tr.exportTo('tr.metrics.sh', function() {
+
+  var IDEAL_FRAME_RATE_FPS = 60;
+  var IDEAL_FRAME_DURATION_MS = tr.b.convertUnit(1.0 / IDEAL_FRAME_RATE_FPS,
+      tr.b.UnitScale.Metric.NONE, tr.b.UnitScale.Metric.MILLI);
+
+  function energyConsumedPerFrame(valueList, model) {
+    var frameEnergyConsumedInJ = new tr.v.Histogram('energy_consumed_per_frame',
+        tr.b.Unit.byName.energyInJoules_smallerIsBetter,
+        tr.v.HistogramBinBoundaries.createLinear(0, 0.5, 20));
+    frameEnergyConsumedInJ.description =
+      'Energy consumption per frame in joules';
+
+    var frameStartTs = parseFloat(model.device.powerSeries.samples[0].start);
+    while (model.device.powerSeries.getSamplesWithinRange(
+        frameStartTs, frameStartTs + IDEAL_FRAME_DURATION_MS).length) {
+      var currentFrameEnergy = model.device.powerSeries.getEnergyConsumedInJ(
+          frameStartTs, frameStartTs + IDEAL_FRAME_DURATION_MS);
+      frameStartTs += IDEAL_FRAME_DURATION_MS;
+      frameEnergyConsumedInJ.addSample(currentFrameEnergy);
+    }
+
+    valueList.addHistogram(frameEnergyConsumedInJ);
+  }
+
+  function powerMetric(valueList, model) {
+    if (!model.device.powerSeries)
+      return;
+
+    energyConsumedPerFrame(valueList, model);
+  }
+
+  tr.metrics.MetricRegistry.register(powerMetric);
+
+  return {
+    powerMetric: powerMetric
+  };
+});
+</script>

@@ -1,0 +1,124 @@
+#CAL_PATH:= $(call my-dir)
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:=\
+src/pppoe.c \
+src/if.c \
+src/debug.c \
+src/common.c \
+src/ppp.c \
+src/discovery.c
+plugin.c
+
+
+#LOCAL_MODULE_PATH := $(LOCAL_PATH)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/src
+LOCAL_CFLAGS + = '-DVERSION = "3.11"' \ 
+'-DPPPD_PATH = "/ system / bin / pppd"' 
+
+#include $(BUILD_EXECUTABLE)
+include $(BUILD_SHARED_LIBRARY)
+
+#include $(call all-makefiles-under,$(LOCAL_PATH))
+
+###################### pppoe-start  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-start
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-start
+include $(BUILD_PREBUILT)
+
+###################### pppoe-stop  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-stop
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-stop
+include $(BUILD_PREBUILT)
+
+
+###################### pppoe-status  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-status
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-status
+include $(BUILD_PREBUILT)
+
+###################### pppoe-init  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-init
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-init
+include $(BUILD_PREBUILT)
+
+###################### pppoe-setup  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-setup
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-setup
+include $(BUILD_PREBUILT)
+
+
+###################### pppoe-connect  ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe-connect
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := scripts/pppoe-connect
+include $(BUILD_PREBUILT)
+
+###################### firewall-standalone ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := firewall-standalone
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := configs/firewall-standalone
+include $(BUILD_PREBUILT)
+
+###################### pppoe.conf ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pppoe.conf
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/ppp/
+LOCAL_SRC_FILES := configs/pppoe.conf
+include $(BUILD_PREBUILT)
+
+###################### pap-secrets ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := pap-secrets
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/ppp/
+LOCAL_SRC_FILES := configs/pap-secrets
+include $(BUILD_PREBUILT)
+
+
+###################### chap-secrets ######################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE := chap-secrets
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT_ETC)/ppp/
+LOCAL_SRC_FILES := configs/chap-secrets
+include $(BUILD_PREBUILT)
+
+
+
