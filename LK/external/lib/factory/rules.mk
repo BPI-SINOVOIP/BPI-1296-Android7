@@ -1,0 +1,23 @@
+LOCAL_DIR := $(GET_LOCAL_DIR)
+
+MODULE := $(LOCAL_DIR)
+
+MODULE_DEPS := \
+	lib/bio \
+	lib/sysparam \
+	external/lib/tar
+
+MODULE_SRCS += \
+	$(LOCAL_DIR)/factorylib.c
+
+GLOBAL_DEFINES += \
+	FACTORY_START=$(FACTORY_START) \
+	FACTORY_SIZE=$(FACTORY_SIZE)
+
+ifdef FACTORY_BLOCKS
+GLOBAL_DEFINES += FACTORY_BLOCKS=$(FACTORY_BLOCKS)
+else
+GLOBAL_DEFINES += FACTORY_BLOCKS=0
+endif
+
+include make/module.mk

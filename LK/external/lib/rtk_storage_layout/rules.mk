@@ -1,0 +1,21 @@
+LOCAL_DIR := $(GET_LOCAL_DIR)
+
+MODULE := $(LOCAL_DIR)
+
+MODULE_DEPS := \
+	lib/bio
+
+MODULE_SRCS += \
+	$(LOCAL_DIR)/layout.c \
+	$(LOCAL_DIR)/part.c \
+	$(LOCAL_DIR)/mbr.c \
+	$(LOCAL_DIR)/gpt.c \
+	$(LOCAL_DIR)/fw.c
+
+ifeq ($(USB_FASTBOOT_SETTING),1)
+GLOBAL_DEFINES += \
+	FASTBOOT_FW_IMG_UPDATE_ADDR=$(FASTBOOT_FW_IMG_UPDATE_ADDR) \
+	FASTBOOT_FW_IMG_UPDATE_MAX_SIZE=$(FASTBOOT_FW_IMG_UPDATE_MAX_SIZE)
+endif
+
+include make/module.mk
