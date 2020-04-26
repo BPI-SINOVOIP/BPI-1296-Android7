@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <permissions>
+            <library name="com.android.server.pppoe"
+            file="/system/framework/com.android.server.pppoe.jar"
+            />
+    </permissions>

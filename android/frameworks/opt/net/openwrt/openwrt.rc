@@ -1,0 +1,38 @@
+service update_hosts /system/bin/update_hosts.sh
+    class core
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0
+
+service sh_ubus /system/bin/ubus.sh
+    class core
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0
+
+service xen_data_channel /system/bin/init_xen_data_channel.sh
+    class core
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0
+
+service xen_tcp_server /system/bin/Dom0tcpService server
+    class core
+    user root
+    group root
+    disabled
+    seclabel u:r:realtek:s0
+
+service eth0_down_up /system/bin/iface_du.sh eth0
+    class core
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:realtek:s0

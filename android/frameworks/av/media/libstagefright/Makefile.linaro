@@ -1,0 +1,71 @@
+ANDROID_SRC_PATH=../../../../
+GENERIC_LINUX_PATH=$(ANDROID_SRC_PATH)/genericLinux
+include $(GENERIC_LINUX_PATH)/MakeConfig
+
+MYDEFS= -DHAVE_PTHREADS -DHAVE_SYS_UIO_H -DUSE_RTK_VOUT_UTIL
+rm=/bin/rm -f
+cp=/bin/cp -f
+CC= $(MYCC)
+CXX = $(MYCXX)
+AR= $(MYAR) cq
+RANLIB= $(MYRANLIB)
+LIBNAME= $(GENERIC_LINUX_PATH)/lib/libstagefright.a
+
+TOP=$(ANDROID_SRC_PATH)
+LOCAL_PATH=.
+
+LOCAL_SRC_FILES:= \
+	MediaBuffer.cpp \
+	MediaBufferGroup.cpp \
+	MediaSource.cpp \
+	MetaData.cpp \
+	MediaDefs.cpp \
+	MPEG2TSWriter.cpp \
+	ESDS.cpp \
+	Utils.cpp \
+	MPEG4Writer.cpp \
+	FFmpegMP4Writer.cpp \
+	avc_utils.cpp
+
+LOCAL_C_INCLUDES = \
+	$(GENERIC_LINUX_PATH)/include \
+	../../include \
+	$(TOP)/system/core/include \
+	$(TOP)/frameworks/native/include \
+	$(TOP)/hardware/libhardware/include \
+	$(TOP)/system/core/include \
+	$(TOP)/device/realtek/proprietary/libs/Include \
+	$(TOP)/device/realtek/video/rvsd/$(TARGET_BOARD_PLATFORM)/foundation/include \
+	$(TOP)/external/ffmpeg
+
+OBJ_FILES = $(addsuffix .o, $(basename $(LOCAL_SRC_FILES)))
+
+INCLUDES = $(addprefix -I, $(LOCAL_C_INCLUDES) )
+
+ifeq ($(USE_RT_ION),true)
+LOCAL_CFLAGS += -DUSE_RT_ION
+endif
+
+CFLAGS = $(INCLUDES) $(DEFINES) $(LOCAL_CFLAGS) -DSYS_UNIX=1 $(MYDEFS)
+
+all: $(LIBNAME)
+
+$(LIBNAME) : $(OBJ_FILES) 
+	$(SHOW_COMMAND)$(rm) $@
+	$(SHOW_COMMAND)$(AR) $@ $(OBJ_FILES)
+	$(SHOW_COMMAND)$(RANLIB) $@
+
+clean:
+	$(SHOW_COMMAND)$(rm) $(OBJ_FILES) $(LIBNAME) core *~
+
+miniclean: clean
+
+.cpp.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo -=--=--=- [$*.cpp] -=--=--=--=--=--=--=--=--=-
+	$(SHOW_COMMAND)$(CXX) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.cpp -o $@
+
+.c.o:
+	$(rm) -f $@
+	$(SHOW_COMMAND)echo --------- [$*.c] ---------------------------
+	$(SHOW_COMMAND)$(CC) $(CFLAGS) $(WARNING) $(DEBUGFLAG) -c $*.c -o $@

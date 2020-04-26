@@ -1,0 +1,6 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+	<library name="com.rtk.net.ubusrpc"
+		file="/system/framework/com.rtk.net.ubusrpc.jar"/>
+</permissions>
