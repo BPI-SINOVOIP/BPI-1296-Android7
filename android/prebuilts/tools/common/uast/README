@@ -1,0 +1,7 @@
+This library is a subset of IntelliJ IDEA's PSI API, extracted
+via the psi extration tool in tools/base/misc/psi-extractor/.
+
+This jar is extracted into the tools/base/lint/libs/uast
+library, which is a Java library packaged along with the
+rest of the tools libraries such that they can be published
+and signed using Gradle's machinery.

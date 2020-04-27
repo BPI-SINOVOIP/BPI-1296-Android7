@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.ow2.asm</groupId>
+  <artifactId>asm-analysis</artifactId>
+  <version>6.0_ALPHA</version>
+  <versioning>
+    <latest>6.0_ALPHA</latest>
+    <release>6.0_ALPHA</release>
+    <versions>
+      <version>4.0</version>
+      <version>4.1</version>
+      <version>4.2</version>
+      <version>5.0</version>
+      <version>5.0_ALPHA</version>
+      <version>5.0_BETA</version>
+      <version>5.0.1</version>
+      <version>5.0.2</version>
+      <version>5.0.3</version>
+      <version>5.0.4</version>
+      <version>5.1</version>
+      <version>6.0_ALPHA</version>
+    </versions>
+    <lastUpdated>20160627081415</lastUpdated>
+  </versioning>
+</metadata>
