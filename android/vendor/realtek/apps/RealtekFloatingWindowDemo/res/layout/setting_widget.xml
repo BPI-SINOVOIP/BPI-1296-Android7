@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.realtek.floatingwindow.SettingWidgets xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|left">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top|left">
+
+    <!-- source type HDMIRx USB camera MediaPlayer -->
+    <!-- set label of the CheckBox programmly -->
+    <CheckBox
+        android:id="@+id/source_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"/>
+
+    <!-- view type SurfaceView TextureView, no preview -->
+    <TextView
+        android:id="@+id/view_type_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/view_type"
+        android:layout_marginTop="5dp"/>
+
+    <Spinner
+        android:id="@+id/view_type_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"/>
+
+    <!-- record enabled on/off -->
+    <CheckBox
+        android:id="@+id/record_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"/>
+
+    <!-- window size -->
+    <TextView
+        android:id="@+id/window_size_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/window_size"
+        android:layout_marginTop="5dp"/>
+
+    <Spinner
+        android:id="@+id/window_size_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+    <!-- Info text -->
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top|left"
+        android:layout_margin="5dp">
+
+        <TextView android:id="@+id/info_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</com.realtek.floatingwindow.SettingWidgets>

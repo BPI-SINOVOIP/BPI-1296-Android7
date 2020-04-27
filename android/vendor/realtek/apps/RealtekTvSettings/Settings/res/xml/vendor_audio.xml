@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/vendor_audio">
+    <ListPreference
+        android:key="hdmi_output"
+        android:persistent="false"
+        android:title="@string/hdmi_output_title"
+        android:summary="%s"
+        android:entries="@array/hdmi_output_entries"
+        android:entryValues="@array/hdmi_output_values" />
+
+    <ListPreference
+        android:key="spdif_output"
+        android:persistent="false"
+        android:title="@string/spdif_output_title"
+        android:summary="%s"
+        android:entries="@array/spdif_output_entries"
+        android:entryValues="@array/spdif_output_values" />
+
+    <ListPreference
+        android:key="sound_playback_effect"
+        android:persistent="false"
+        android:title="@string/sound_playback_effect_title"
+        android:summary="%s"
+        android:entries="@array/sound_playback_effect_titles"
+        android:entryValues="@array/sound_playback_effect_values" />
+
+    <ListPreference
+        android:key="hdmirx_audio"
+        android:persistent="false"
+        android:title="@string/hdmirx_audio_title"
+        android:summary="%s"
+        android:entries="@array/hdmirx_audio_entries"
+        android:entryValues="@array/hdmirx_audio_values" />
+
+    <SwitchPreference
+        android:key="force_sd_audio_mode"
+        android:persistent="false"
+        android:title="@string/force_sd_audio_onoff_title"
+        android:summary="@string/force_sd_audio_onoff_summary"/>
+
+    <!--SwitchPreference
+        android:key="audio_i2s_in_mode"
+        android:persistent="false"
+        android:title="@string/audio_i2s_in_mode_title"
+        android:summary="@string/audio_i2s_in_mode_summary"/-->
+    <ListPreference
+        android:key="audio_in_mode"
+        android:title="@string/audio_in_mode_title"
+        android:dialogTitle="@string/audio_in_mode_title"
+        android:entries="@array/audio_in_mode_entries"
+        android:entryValues="@array/audio_in_mode_values" />
+
+</PreferenceScreen>

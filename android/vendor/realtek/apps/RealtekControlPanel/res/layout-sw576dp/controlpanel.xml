@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/transparent" />
+
+    <RelativeLayout
+        android:id="@+id/controlpanel_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_vertical"
+        >
+
+        <ImageView
+            android:layout_width="137dp"
+            android:layout_height="486dp"
+            android:id="@+id/panel_outside"
+            android:src="@drawable/panel_left_bg"
+            />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:gravity="left"
+            android:orientation="vertical"
+            >
+
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_return"
+                android:src="@drawable/panel_left_return"
+                />
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_home"
+                android:src="@drawable/panel_left_home"
+                />
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_option"
+                android:src="@drawable/panel_left_option"
+                />
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_pip"
+                android:src="@drawable/panel_left_pip"
+                />
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_source"
+                android:src="@drawable/panel_left_source"
+                />
+            <ImageView
+                android:layout_width="137dp"
+                android:layout_height="73dp"
+                android:id="@+id/panel_left_search"
+                android:src="@drawable/panel_left_search"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

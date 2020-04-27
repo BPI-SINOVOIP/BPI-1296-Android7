@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:key="@string/pref_cat_appearance_key" android:title="@string/pref_cat_appearance">
+
+        <Preference android:key="@string/pref_save_path"
+                        android:title="@string/pref_save_path_title"/>
+        <Preference android:key="@string/pref_start_all"
+                    android:title="@string/pref_pref_start_all_title"
+                    android:defaultValue="false"/>
+        <Preference android:key="@string/pref_stop_all"
+                            android:title="@string/pref_pref_stop_all_title"
+                            android:defaultValue="false"/>
+        <Preference android:key="@string/pref_unmount_device"
+                    android:title="@string/pref_unmount_device_title"
+                    android:defaultValue="false"/>
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:title="@string/pref_auto_boot_log_title" android:key="@string/pref_auto_boot_log_key"/>
+        <CheckBoxPreference android:key="@string/pref_dump_log"
+                            android:title="@string/pref_dump_log_title"
+                            android:defaultValue="false"/>
+        <CheckBoxPreference android:key="@string/pref_dump_kernel_log"
+                            android:title="@string/pref_dump_kernel_log_title"
+                            android:defaultValue="false"/>
+
+        <CheckBoxPreference android:key="@string/pref_dump_network_info"
+                            android:title="@string/pref_dump_network_info_title"
+                            android:defaultValue="false"/>
+
+        <CheckBoxPreference android:key="@string/pref_dumpsys_meminfo"
+                            android:title="@string/pref_dumpsys_meminfo_title"
+                            android:defaultValue="false"/>
+        <CheckBoxPreference android:key="@string/pref_dump_dmesg_log"
+                            android:title="@string/pref_dump_dmesg_log_title"
+                            android:defaultValue="true"
+                            android:enabled="false"
+        />
+        <!--<Preference android:key="@string/pref_dump_audio_log"-->
+                            <!--android:title="@string/pref_dump_audio_log_title"-->
+                            <!--android:defaultValue="false"/>-->
+    </PreferenceCategory>
+    <PreferenceCategory android:key="@string/pref_cat_appearance_key" android:title="@string/pref_cat_dvdplayer">
+        <CheckBoxPreference android:key="@string/pref_dump_stream"
+                            android:title="@string/pref_dump_stream_title"
+                            android:defaultValue="false"/>
+        <CheckBoxPreference android:key="@string/pref_dump_buffer_info"
+                            android:title="@string/pref_dump_buffer_info_title"
+                            android:defaultValue="false"/>
+        <CheckBoxPreference android:key="@string/pref_dump_video_info"
+                            android:title="@string/pref_dump_video_info_title"
+                            android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

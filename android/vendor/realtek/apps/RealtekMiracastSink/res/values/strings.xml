@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Miracast</string>
+    <string name="title_activity_video_view">VideoViewActivity</string>
+    
+    <string name="STRING_WIFI_INIT">Waiting for connection, PBC/PIN</string>
+    <string name="STRING_WIFI_NEGO">Wi-Fi Direct connecting....</string>
+    <string name="STRING_WIFI_PROVE">Wi-Fi Direct connecting....</string>
+    <string name="STRING_WIFI_NEGO_FAIL">Wi-Fi Direct failed, restart Wi-Fi....</string>
+    <string name="STRING_WIFI_NEGO_SUCCESS">Wi-Fi Direct Succeed, wait IP....</string>
+    <string name="STRING_WIFI_P2P_IPOK">IP OK, wait RTSP....</string>
+    <string name="STRING_WIFI_RTSP_CONNECT">Source connecting....</string>
+    <string name="STRING_WIFI_RTSP_STANDBY">Device is now in standby mode</string>
+    <string name="STRING_WIFI_ON_RESETING">Restart Wi-Fi, Waiting.......</string>    
+
+</resources>

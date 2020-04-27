@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   	android:id="@+id/background" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    >
+ 
+    <com.android.gallery3d.ui.MarqueeTextView
+        android:id="@+id/selection_text"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:gravity="center"
+        android:singleLine="false"
+        android:ellipsize="marquee"
+        android:textSize="17sp" />
+</LinearLayout>
+

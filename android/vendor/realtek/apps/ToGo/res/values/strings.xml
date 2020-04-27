@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ToGo</string>
+    <string name="action_settings">Settings</string>
+    <string name="bind_service">Bind Service</string>
+    <string name="unbind_service">Unbind Service</string>
+    <string name="queryall">queryall</string>
+    <string name="init_camera">Init Camera</string>
+    <string name="init_file">Init File</string>
+    <string name="init_dtv">Init DTV</string>
+    <string name="start_client_0">Start Client 0</string>
+    <string name="start_client_1">Start Client 1</string>
+    <string name="stop_client_0">Stop Client 0</string>
+    <string name="stop_client_1">Stop Client 1</string>
+    <string name="config_out_to_file">Config Out to File</string>
+
+</resources>

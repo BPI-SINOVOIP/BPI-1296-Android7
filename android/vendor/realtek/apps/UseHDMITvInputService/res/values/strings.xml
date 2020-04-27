@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Passthrough TvInput demo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="ok">Register to Tv provider</string>
+    <string name="cancel">Close</string>
+    <string name="db1">Debug button 1</string>
+    <string name="db2">Debug button 2</string>
+    <string name="example_input_label">Passthrough TvInput demo</string>
+    <string name="hw_id_title">System supported passthrough TvInput:</string>
+</resources>

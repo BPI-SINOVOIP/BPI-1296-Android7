@@ -1,0 +1,19 @@
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg_vscroll_focus"
+    android:alpha="0.9"
+ >
+    
+    <ImageView
+	android:id="@+id/sub_upkey"
+	android:src="@drawable/sub_upkey"
+	android:layout_height="36dp"
+	android:layout_width="92dp"
+	android:layout_gravity="center"
+	android:layout_marginTop="0dp"
+	android:focusable="false"
+	android:focusableInTouchMode="false" />
+   
+</FrameLayout>

@@ -1,0 +1,10 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <item android:drawable="@drawable/icon_connecting_ap_01" android:duration="200" />
+    <item android:drawable="@drawable/icon_connecting_ap_02" android:duration="200" />
+    <item android:drawable="@drawable/icon_connecting_ap_03" android:duration="200" />
+    <item android:drawable="@drawable/icon_connecting_ap_04" android:duration="200" />
+    <item android:drawable="@drawable/icon_connecting_ap_05" android:duration="200" />
+
+</animation-list>

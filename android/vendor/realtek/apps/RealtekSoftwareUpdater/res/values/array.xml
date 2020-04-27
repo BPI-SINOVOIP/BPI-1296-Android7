@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="string_array_support_software_list">
+        <item>USB: update.zip</item>
+        <item>OTA: update2.zip</item>
+    </string-array>
+
+</resources>

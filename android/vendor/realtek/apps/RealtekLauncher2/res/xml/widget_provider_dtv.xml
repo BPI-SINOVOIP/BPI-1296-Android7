@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:minHeight="@dimen/rtk_widget_egde_span_5" 
+    android:minWidth="@dimen/rtk_widget_egde_span_6"
+    android:updatePeriodMillis="1000" 
+    android:initialLayout="@layout/wl_favorite_app" 
+    android:resizeMode="none">
+</appwidget-provider>

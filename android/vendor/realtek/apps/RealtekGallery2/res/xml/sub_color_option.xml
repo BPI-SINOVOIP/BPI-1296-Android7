@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+	<Item Name = "White" />
+	<Item Name = "Black" />
+	<Item Name = "Red" />
+	<Item Name = "Green" />
+	<Item Name = "Blue" />
+	<Item Name = "Yellow" />
+</Option>

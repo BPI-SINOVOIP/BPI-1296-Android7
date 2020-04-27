@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/* //device/apps/common/assets/res/any/colors.xml
+**
+** Copyright 2008, The Android Open Source Project
+**
+** Licensed under the Apache License, Version 2.0 (the "License"); 
+** you may not use this file except in compliance with the License. 
+** You may obtain a copy of the License at 
+**
+**     http://www.apache.org/licenses/LICENSE-2.0 
+**
+** Unless required by applicable law or agreed to in writing, software 
+** distributed under the License is distributed on an "AS IS" BASIS, 
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+** See the License for the specific language governing permissions and 
+** limitations under the License.
+*/
+-->
+<resources>
+    <!-- The color tints to apply to the text and drag view when hovering
+         over the delete target or the info target -->
+    <color name="delete_target_hover_tint">#DAFF0000</color>
+    <color name="info_target_hover_tint">#DA0099CC</color>
+
+    <color name="bubble_dark_background">#20000000</color>
+
+    <color name="appwidget_error_color">#FCCC</color>
+
+    <color name="workspace_all_apps_and_delete_zone_text_color">#CCFFFFFF</color>
+    <color name="workspace_all_apps_and_delete_zone_text_shadow_color">#A0000000</color>
+    <color name="workspace_icon_text_color">#FFF</color>
+    
+    
+    <!-- Realtek launcher widget background color -->
+    <color name="w_filebrowser_color">#CFAE01</color>
+    <color name="w_google_music_color">#FB8521</color>
+    <color name="w_video_color">#A026AC</color>
+    <color name="w_favorite_color">#C54041</color>
+    <color name="w_app_color">#281AC7</color>
+    <color name="w_setting_color">#1ABCC7</color>
+    <color name="w_miracast_color">#00C140</color>
+    <color name="w_wifi_status_color">#63A027</color>
+    <color name="w_storage_status_color">#FB8528</color>    
+
+    <color name="option_label_color_unfocus">#4C5254</color>
+    <color name="option_label_color_focus">#0084B6</color>
+    <color name="option_label_color_disabled">#999999</color>
+    <color name="rtk_dtv_widget_label_background">#6620AD</color>
+    <color name="rtk_net_traffic_widget_text_color">#FFA7B0FD</color>
+    <color name="rtk_wifi_status_widget_text_color">#FFFFFFFF</color>
+    
+</resources>

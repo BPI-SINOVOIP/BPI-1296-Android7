@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/popup_bg" >
+
+    <!-- Dialog Title -->
+    <TextView
+        android:id="@+id/dialog_security_title"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp"
+		android:textStyle="bold"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="40px"
+        android:layout_width="288px"
+        android:layout_height="60px" />
+
+    <!-- Signal Strength Icon -->
+    <ImageButton
+        android:id="@+id/dialog_security_signal_strength_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="860px"
+        android:layout_marginTop="20px"
+        android:background="@color/transparent" />
+
+    <!-- Security Type Text -->
+    <TextView
+        android:id="@+id/dialog_security_type"
+        android:textColor="#808080"
+        android:textSize="30sp"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="130px"
+        android:layout_width="288px"
+        android:layout_height="60px" />
+
+    <!-- Password Text -->
+    <TextView
+        android:id="@+id/dialog_security_password"
+		android:text="@string/dialog_security_password_text"
+        android:textColor="#003333"
+        android:textSize="40sp"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="210px"
+        android:layout_width="288px"
+        android:layout_height="60px" />
+
+    <!-- Lock Icon -->
+    <ImageButton
+        android:id="@+id/dialog_lock_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="300px"
+        android:background="@color/transparent" 
+		android:src="@drawable/account_password_focus"
+		android:paddingLeft="0px" />
+
+	<!-- Password input -->
+	<EditText
+        android:id="@+id/dialog_password_input"
+        android:textColor="#009999"
+        android:textSize="30sp"
+		android:password="true"
+        android:layout_width="743px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="160px"
+        android:layout_marginTop="360px">
+
+		<requestFocus />
+	</EditText>
+
+</RelativeLayout>

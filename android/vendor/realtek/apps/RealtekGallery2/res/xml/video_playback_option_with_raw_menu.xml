@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+	<Item Name = "Subtitle" />
+	<Item Name = "Audio" />
+	<Item Name = "Video RAW" />
+	<Item Name = "Aspect Ratio" />
+	<Item Name = "Title Menu" />
+	<Item Name = "Root Menu" />
+	<Item Name = "Property" />
+</Option>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:gravity="center_horizontal"
+              android:background="#000000">    
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <Button android:id="@+id/btnRecGrid1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/encoder_single"
+                android:textColor="#FFFFFF"
+                />
+
+        <Button android:id="@+id/btnRecGrid2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/encoder_double"
+                android:textColor="#FFFFFF"
+                />
+
+        <Button android:id="@+id/btnRecGrid3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/encoder_triple"
+                android:textColor="#FFFFFF"
+                />
+
+        <Button android:id="@+id/btnRecGrid4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/encoder_quadra"
+                android:textColor="#FFFFFF"
+                />
+        
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@layout/background"
+            android:orientation="horizontal">
+            
+			<CheckBox android:id="@+id/chbSearchI"
+			  	android:layout_width="wrap_content"
+			  	android:layout_height="fill_parent"
+			  	android:text="@string/searchI"
+			  	android:gravity="center"
+			  	android:textSize="15sp"
+			  	android:textColor="#FFFFFF" />
+    </LinearLayout>
+    
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView android:id="@+id/sourceView1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:text="@string/source_title1"
+            android:textSize="15sp"
+            />
+        <EditText android:id="@+id/sourceText1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="5"
+            android:inputType="text"
+            android:textColor="#FFFF00"
+            android:text="@string/source_path1"
+            android:gravity="center_horizontal"
+            android:textSize="15sp"
+            android:textCursorDrawable="@drawable/cursor"
+            />
+    </LinearLayout>
+    
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView android:id="@+id/sourceView2"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:text="@string/source_title2"
+            android:textSize="15sp"
+            />
+        <EditText android:id="@+id/sourceText2"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="5"
+            android:inputType="text"
+            android:textColor="#FFFF00"
+            android:text="@string/source_path2"
+            android:gravity="center_horizontal"
+            android:textSize="15sp"
+            android:textCursorDrawable="@drawable/cursor"
+            />
+    </LinearLayout>
+    
+    
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView android:id="@+id/sourceView3"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:text="@string/source_title3"
+            android:textSize="15sp"
+            />
+        <EditText android:id="@+id/sourceText3"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="5"
+            android:inputType="text"
+            android:textColor="#FFFF00"
+            android:text="@string/source_path3"
+            android:gravity="center_horizontal"
+            android:textSize="15sp"
+            android:textCursorDrawable="@drawable/cursor"
+            />
+    </LinearLayout>    
+    
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView android:id="@+id/sourceView4"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:text="@string/source_title4"
+            android:textSize="15sp"
+            />
+        <EditText android:id="@+id/sourceText4"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="5"
+            android:inputType="text"
+            android:textColor="#FFFF00"
+            android:text="@string/source_path4"
+            android:gravity="center_horizontal"
+            android:textSize="15sp"
+            android:textCursorDrawable="@drawable/cursor"
+            />
+    </LinearLayout>
+    
+
+
+              
+</LinearLayout>

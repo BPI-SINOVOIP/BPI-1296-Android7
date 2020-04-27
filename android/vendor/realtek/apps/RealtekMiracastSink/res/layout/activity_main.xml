@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/wfd_waiting_bg"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity" >
+
+    <TextView
+        android:id="@+id/STATE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="170dp"
+        android:textColor="@color/WHITE"
+        android:textSize="25sp"
+        android:text="@string/STRING_WIFI_INIT" />
+    
+    <TextView
+        android:id="@+id/DEVICE_NAME"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="122dp"
+        android:textColor="@color/WHITE"
+        android:textSize="25sp" />
+    
+    <TextView
+        android:id="@+id/PIN_CODE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="74dp"
+        android:textColor="@color/WHITE"
+        android:textSize="25sp"
+        android:text="@string/STRING_WIFI_P2P_IPOK"  />
+
+</RelativeLayout>

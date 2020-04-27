@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:focusable="false"	
+	android:focusableInTouchMode="false"	
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >    
+    <!--Pre view screen-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/VideoArea"
+	android:layout_width="604dp"
+	android:layout_height="420dp"
+    android:background="@color/black">
+	<RtkVideoView
+		android:id="@+id/vv"
+		android:layout_width="604dp"
+		android:layout_height="420dp"
+		android:layout_marginTop="0dp"
+		android:layout_marginLeft="0dp"
+		android:focusable="false"	
+		android:focusableInTouchMode="false"	
+		android:layout_gravity = "center"
+		/>
+	<ImageView
+		android:id="@+id/video_image"
+	    android:layout_width="604dp"
+	    android:layout_height="420dp"
+		android:layout_gravity = "center"
+		android:focusable="false"	
+		android:focusableInTouchMode="false"	
+		/>
+</FrameLayout>
+    <!--Progress bar-->
+    <ProgressBar
+        android:id="@+id/video_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="6dp"
+		android:layout_marginTop="0dp"
+		android:layout_marginLeft="0dp" 
+		android:focusable="false"	
+		android:focusableInTouchMode="false"	
+		/>
+	<!--Media information-->
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_marginTop="30dp"
+		android:layout_marginLeft="62dp" 
+		android:focusable="false"	
+		android:focusableInTouchMode="false"	
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent" >    
+
+		<TextView
+			android:id="@+id/media_elapsed_time"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+			android:focusable="false"	
+			android:focusableInTouchMode="false"	
+		/>
+
+		<TextView
+			android:id="@+id/media_time"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+			android:focusable="false"	
+			android:focusableInTouchMode="false"	
+		/>
+
+		<TextView
+			android:id="@+id/media_type"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+			android:focusable="false"	
+			android:focusableInTouchMode="false"	
+		/>
+
+		<TextView
+			android:id="@+id/media_size"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+			android:focusable="false"	
+			android:focusableInTouchMode="false"	
+		/>
+		<TextView
+			android:id="@+id/media_dimension"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+			android:focusable="false"	
+			android:focusableInTouchMode="false"	
+		/>
+
+	</LinearLayout>
+</LinearLayout>

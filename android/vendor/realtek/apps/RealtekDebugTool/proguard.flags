@@ -1,0 +1,4 @@
+# Keep all Fragments in this package, which are used by reflection.
+-dontobfuscate
+-dontwarn android.support.v4.**
+-dontwarn org.jaudiotagger.**

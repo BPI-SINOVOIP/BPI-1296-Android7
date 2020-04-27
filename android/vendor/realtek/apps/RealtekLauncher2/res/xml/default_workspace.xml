@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<favorites xmlns:launcher="http://schemas.android.com/apk/res/com.realtek.launcher">
+    <!-- Far-left screen [0] -->
+
+    <!-- Left screen [1] -->
+    <!-- disabled!! 
+    <appwidget
+        launcher:packageName="com.android.settings"
+        launcher:className="com.android.settings.widget.SettingsAppWidgetProvider"
+        launcher:screen="1"
+        launcher:x="0"
+        launcher:y="3"
+        launcher:spanX="4"
+        launcher:spanY="1" />
+    -->
+
+    <!-- RTKCOMMENT: all realtek default widget are placed here [this is for 1080p mode, and we only specify default layout in this mode] -->
+    <!-- Middle screen [2] -->
+    
+    <!-- Google search -->
+    <!--
+    <favorite
+        launcher:packageName="com.google.android.googlequicksearchbox"
+        launcher:className="com.google.android.googlequicksearchbox.SearchActivity"
+        launcher:screen="2"
+        launcher:x="5"
+        launcher:y="0" />
+    -->
+    
+    <!-- Google play -->
+    <!--
+    <favorite
+        launcher:packageName="com.android.vending"
+        launcher:className="com.android.vending.AssetBrowserActivity"
+        launcher:screen="2"
+        launcher:x="6"
+        launcher:y="0" />
+    -->
+    
+    <!-- only one screen in workspace -->
+    <!-- dummy widget -->
+    <!--
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.EmptyWidgetProvider"
+        launcher:screen="0"
+        launcher:x="7"
+        launcher:y="0"
+        launcher:spanX="3"
+        launcher:spanY="1" />
+    -->
+    
+    <!-- dummy widget -->
+    <!--
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.EmptyWidgetProvider"
+        launcher:screen="0"
+        launcher:x="5"
+        launcher:y="1"
+        launcher:spanX="2"
+        launcher:spanY="1" />
+    -->
+    
+    <!-- app widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.AppDrawerWidgetProvider"
+        launcher:screen="0"
+        launcher:x="6"
+        launcher:y="3"
+        launcher:spanX="2"
+        launcher:spanY="2" />
+    
+    <!-- video app widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.VideoAppWidgetProvider"
+        launcher:screen="0"
+        launcher:x="6"
+        launcher:y="2"
+        launcher:spanX="1"
+        launcher:spanY="1" />
+    
+    <!-- favorite app widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.FavoriteAppWidgetProvider"
+        launcher:screen="0"
+        launcher:x="7"
+        launcher:y="2"
+        launcher:spanX="1"
+        launcher:spanY="1" />
+    
+    <!-- file browser widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.FilebrowserWidgetProvider"
+        launcher:screen="0"
+        launcher:x="7"
+        launcher:y="1"
+        launcher:spanX="1"
+        launcher:spanY="1" />
+    
+    <!-- setting widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.SettingWidgetProvider"
+        launcher:screen="0"
+        launcher:x="10"
+        launcher:y="0"
+        launcher:spanX="1"
+        launcher:spanY="1" />
+    
+    <!-- wifi status widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.WifiStatusWidgetProvider"
+        launcher:screen="0"
+        launcher:x="8"
+        launcher:y="2"
+        launcher:spanX="3"
+        launcher:spanY="1" />
+    
+    <!-- network traffic widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.NetworkTrafficWidgetProvider"
+        launcher:screen="0"
+        launcher:x="8"
+        launcher:y="1"
+        launcher:spanX="3"
+        launcher:spanY="1" />
+    
+    <!-- WiDi widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.WidiWidgetProvider"
+        launcher:screen="0"
+        launcher:x="9"
+        launcher:y="3"
+        launcher:spanX="2"
+        launcher:spanY="1" />
+    
+    <!-- storage widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.StorageWidgetProvider"
+        launcher:screen="0"
+        launcher:x="9"
+        launcher:y="4"
+        launcher:spanX="2"
+        launcher:spanY="1" />
+    
+    <!-- google music widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.GoogleMusicWidgetProvider"
+        launcher:screen="0"
+        launcher:x="6"
+        launcher:y="1"
+        launcher:spanX="1"
+        launcher:spanY="1" />
+    
+    <!-- dtv widget -->
+    <appwidget
+        launcher:packageName="com.realtek.launcher"
+        launcher:className="com.realtek.addon.widget.DtvWidgetProvider"
+        launcher:screen="0"
+        launcher:x="0"
+        launcher:y="0"
+        launcher:spanX="6"
+        launcher:spanY="5" />
+    
+    <!-- Gmail -->
+    <!--
+    <favorite
+        launcher:packageName="com.google.android.gm"
+        launcher:className="com.google.android.gm.ConversationListActivityGmail"
+        launcher:screen="2"
+        launcher:x="9"
+        launcher:y="3" />
+    -->
+    
+    <!-- Chrome -->
+    <!--
+    <favorite
+        launcher:packageName="com.android.chrome"
+        launcher:className="com.google.android.apps.chrome.Main"
+        launcher:screen="2"
+        launcher:x="7"
+        launcher:y="4" />
+    -->
+    
+
+    <!-- Right screen [3] -->
+    <!-- disabled 
+    <favorite
+        launcher:packageName="com.android.gallery3d"
+        launcher:className="com.android.gallery3d.app.Gallery"
+        launcher:screen="3"
+        launcher:x="1"
+        launcher:y="3" />
+    <favorite
+        launcher:packageName="com.android.settings"
+        launcher:className="com.android.settings.Settings"
+        launcher:screen="3"
+        launcher:x="2"
+        launcher:y="3" />
+    -->
+    <!-- Far-right screen [4] -->
+</favorites>

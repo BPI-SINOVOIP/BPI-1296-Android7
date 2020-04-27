@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/slideshowpage_progress"
+    >
+
+    <RelativeLayout
+        android:id="@+id/slideshow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="26dp"
+        android:layout_marginLeft="50dp"
+	android:visibility="gone" >
+
+        <TextView android:id="@+id/slideshow_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text="@string/slideshow"
+            android:textColor="#86ACBF" />
+        <TextView android:id="@+id/slideshow_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/slideshow_tag"
+            android:layout_alignBottom="@+id/slideshow_tag"
+            android:layout_marginLeft="6dp"
+            android:textSize="22sp"
+            android:text="@string/setting_on_value"
+            android:textColor="#FFFFFF" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/floatHoverArea"
+        android:layout_width="fill_parent"
+        android:layout_height="32dp"
+        android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="@android:color/transparent" />
+
+</RelativeLayout>

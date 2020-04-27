@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DTV</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="region">電視收視地區</string>
+    <string name="auto_scan">自動掃台</string>
+    <string name="manual_scan">手動掃台</string>
+    
+    <string name="ARGENTINA">阿根廷</string>
+    <string name="AUSTRALIA">澳大利亞</string>
+    <string name="AUSTRIA">奧地利</string>
+    <string name="BELGIUM">比利時</string>
+    <string name="BRAZIL">巴西</string>
+    <string name="CHINA">中國大陸</string>
+    <string name="CZECH_REPUBLIC">捷克</string>
+    <string name="DENMARK">丹麥</string>
+    <string name="FINLAND">芬蘭</string>
+    <string name="FRANCE">法國</string>
+    <string name="GERMANY">德國</string>
+    <string name="GREECE">希臘</string>
+    <string name="HUNGARY">匈牙利</string>
+    <string name="IRELAND">愛爾蘭</string>
+    <string name="ITALY">義大利</string>
+    <string name="JAPAN">日本</string>
+    <string name="KOREA">韓國</string>
+    <string name="LUXEMBOURG">盧森堡</string>
+    <string name="NETHERLANDS">荷蘭</string>
+    <string name="NORWAY">挪威</string>
+    <string name="POLAND">波蘭</string>
+    <string name="PORTUGAL">葡萄牙</string>
+    <string name="RUSSIA">俄羅斯</string>
+    <string name="SLOVAKIA">斯洛伐克</string>
+    <string name="SLOVENIA">斯洛維尼亞</string>
+    <string name="SPAIN_PENINSULA_Y_BALEARES">Spain (Peninsula y Baleares)</string>
+    <string name="SPAIN_CANARIAS">Spain (Canarias)</string>
+    <string name="SWEDEN">瑞典</string>
+    <string name="SWITZERLAND">瑞士</string>
+    <string name="TAIWAN">臺灣</string>
+    <string name="TURKEY">土耳其</string>
+    <string name="UNITED_KINGDOM">英國</string>
+    <string name="USA">美國</string>
+    <string-array name="regionArray">
+        <item>@string/ARGENTINA</item>
+        <item>@string/AUSTRALIA</item>
+        <item>@string/AUSTRIA</item>
+        <item>@string/BELGIUM</item>
+        <item>@string/BRAZIL</item>
+        <item>@string/CHINA</item>
+        <item>@string/CZECH_REPUBLIC</item>
+        <item>@string/DENMARK</item>
+        <item>@string/FINLAND</item>
+        <item>@string/FRANCE</item>
+        <item>@string/GERMANY</item>
+        <item>@string/GREECE</item>
+        <item>@string/HUNGARY</item>
+        <item>@string/IRELAND</item>
+        <item>@string/ITALY</item>
+        <item>@string/JAPAN</item>
+        <item>@string/KOREA</item>
+        <item>@string/LUXEMBOURG</item>
+        <item>@string/NETHERLANDS</item>
+        <item>@string/NORWAY</item>
+        <item>@string/POLAND</item>
+        <item>@string/PORTUGAL</item>
+        <item>@string/RUSSIA</item>
+        <item>@string/SLOVAKIA</item>
+        <item>@string/SLOVENIA</item>
+        <item>@string/SPAIN_PENINSULA_Y_BALEARES</item>
+        <item>@string/SPAIN_CANARIAS</item>
+        <item>@string/SWEDEN</item>
+        <item>@string/SWITZERLAND</item>
+        <item>@string/TAIWAN</item>
+        <item>@string/TURKEY</item>
+        <item>@string/UNITED_KINGDOM</item>
+        <item>@string/USA</item>
+    </string-array>
+</resources>

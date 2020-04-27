@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dialog_security_result_bg_color" >
+
+    <!-- Dialog Text -->
+    <TextView
+        android:id="@+id/dialog_security_result_text"
+        android:textColor="#626264"
+        android:textSize="40sp"
+		android:textStyle="bold"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="40px"
+        android:layout_width="688px"
+        android:layout_height="200px" />
+
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/dialog_security_result_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="720px"
+        android:layout_marginTop="160px"
+        android:background="@color/transparent" />
+
+	<!-- Invisible EditText -->
+	<!-- We do a trick solution here to let the dialog stay on the screen until the user do input -->
+	<EditText
+		android:visibility="invisible"
+		android:layout_width="1px"
+		android:layout_height="1px" >
+
+		<requestFocus />
+	</EditText>
+
+
+</RelativeLayout>

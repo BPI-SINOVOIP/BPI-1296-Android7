@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+	<Item Name = "Slideshow" />
+	<Item Name = "Slideshow timing" />
+	<Item Name = "Slideshow repeat mode" />
+	<Item Name = "Transition effect" />
+	<Item Name = "Background music" />
+	<Item Name = "EXIF info" />
+</Option>

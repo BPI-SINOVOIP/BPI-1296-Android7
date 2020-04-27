@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_selected="false">
+		<layer-list>
+			<item>
+				<bitmap android:gravity="center" android:src="@drawable/list_bg_none" />
+			</item>
+			<item>
+				<shape xmlns:android="http://schemas.android.com/apk/res/android">
+					<size android:width="623px" android:height="63px" />
+				</shape>
+			</item>
+		</layer-list>
+	</item>
+
+    <item android:state_selected="true">
+		<layer-list>
+			<item>
+				<bitmap android:gravity="center" android:src="@drawable/list_bg_focus" />
+			</item>
+			<item>
+				<shape xmlns:android="http://schemas.android.com/apk/res/android">
+					<size android:width="724px" android:height="63px" />
+				</shape>
+			</item>
+		</layer-list>
+	</item>
+
+
+</selector> 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Floating Window</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="view_type">View type:</string>
+    <string name="demo_type">Demo type:</string>
+    <string name="camera_type">Preview source:</string>
+    <string name="record_on">Enable MediaRecorder</string>
+    <string name="floating_window_demo_text">FloatingWindowDemo:</string>
+    <string name="background_record_demo_text">BackgroundRecordDemo:</string>
+    <string name="show_view">Show preview window (runtime option)</string>
+    <string name="window_size">Window size:</string>
+    <string name="no_preview">No Preview!!</string>
+    <string name="browse">-></string>
+    <string name="file_select">Select file:</string>
+
+</resources>

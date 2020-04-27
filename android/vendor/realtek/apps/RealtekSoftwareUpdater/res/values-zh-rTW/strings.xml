@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">瑞昱軟體升級</string>
+    <string name="select_software">可用的軟體</string>
+    <string name="software_downloading">軟體下載中</string>
+</resources>

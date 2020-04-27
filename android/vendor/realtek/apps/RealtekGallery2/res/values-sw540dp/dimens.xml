@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <dimen name="option_menu_width">205dp</dimen>
+  <dimen name="option_menu_height">483dp</dimen>
+
+  <dimen name="photo_progress_center_width">78dp</dimen>
+  <dimen name="photo_progress_center_height">59dp</dimen>
+  <dimen name="photo_progress_center_padding">21dp</dimen>
+  
+  <dimen name="photo_progress_other_width">48dp</dimen>
+  <dimen name="photo_progress_other_height">36dp</dimen>
+  <dimen name="photo_progress_other_spacing">16dp</dimen>
+
+  <dimen name="photo_scroll_menu_margin_right">20dp</dimen>
+  <dimen name="photo_scroll_menu_margin_top">37dp</dimen>
+  <dimen name="photo_scroll_menu_width">135dp</dimen>
+  <dimen name="photo_scroll_menu_height">311dp</dimen>
+
+  <dimen name="photo_exif_menu_width">400dp</dimen>
+  <dimen name="photo_exif_menu_height">350dp</dimen>
+
+  <dimen name="property_menu_width">400dp</dimen>
+  <dimen name="property_menu_height">350dp</dimen>
+
+  <dimen name="video_timebar_text_size">15sp</dimen>
+  <dimen name="video_timebar_scrubber_padding">5dp</dimen>
+  <dimen name="video_timebar_v_padding">15dp</dimen>
+
+  <dimen name="video_subtitle_menu_margin_right">38dp</dimen>
+  <dimen name="video_subtitle_menu_margin_top">54dp</dimen>
+  <dimen name="video_subtitle_menu_height">275dp</dimen>
+  <dimen name="video_subtitle_menu_width_1">135dp</dimen>
+  <dimen name="video_subtitle_menu_width_2">77dp</dimen>
+  <dimen name="video_subtitle_updown_key_height">18dp</dimen>
+
+  <dimen name="video_audio_menu_margin_right">20dp</dimen>
+  <dimen name="video_audio_menu_margin_top">37dp</dimen>
+  <dimen name="video_audio_menu_width">235dp</dimen>
+  <dimen name="video_audio_menu_height">311dp</dimen>
+
+  <dimen name="video_ar_menu_width">347dp</dimen>
+  <dimen name="video_ar_menu_height">157dp</dimen>
+
+</resources>

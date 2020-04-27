@@ -1,0 +1,74 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg_vscroll_normal"
+    android:orientation="horizontal"
+    >
+    
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_vscroll_normal"
+        android:alpha="0.9"
+        >
+
+        <ImageView
+            android:id="@+id/sbs"
+            android:src="@drawable/sub_sbs_side_none"
+            android:layout_height="172dp"
+            android:layout_width="195dp"
+            android:layout_gravity="left" 
+            android:layout_marginLeft="9dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="9dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            />   
+
+        <TextView
+            android:id="@+id/msg"
+            android:textColor="@color/video_option_text"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:text="@string/sbs_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="134dp"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_vscroll_normal"
+        android:alpha="0.9"
+        >
+
+        <ImageView
+            android:id="@+id/tb"
+            android:src="@drawable/sub_tb_top_none"
+            android:layout_height="172dp"
+            android:layout_width="195dp"
+            android:layout_gravity="left" 
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="9dp"
+            android:layout_marginTop="9dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            />   
+
+        <TextView
+            android:id="@+id/msg"
+            android:textColor="@color/video_option_text"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:text="@string/tb_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="134dp"/>
+
+    </FrameLayout>
+
+</LinearLayout>

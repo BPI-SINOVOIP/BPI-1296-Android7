@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg03"
+    tools:context=".InitialWirelessSettingsActivity" >
+
+	<!-- Title text for listview -->
+	<TextView
+		android:layout_width="934px"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="120px"
+   		android:layout_marginLeft="493px"
+		android:gravity="center"
+		android:text="@string/select_wireless_ap"
+		android:textColor="#57CAD9"
+		android:textSize="40sp"
+		android:textStyle="bold" />
+      
+	<!-- Header for listview --> 
+	<include layout="@layout/menu_list_header" />
+
+	<!-- Main listview body --> 
+   	<ListView
+   		android:id="@+id/wireless_ap_menu"
+		android:layout_width="1086px"
+		android:layout_height="720px"
+   		android:layout_marginTop="210px"
+   		android:layout_marginLeft="417px"
+		android:scrollbars="none"
+   		android:listSelector="@color/transparent"
+   		android:divider="@android:color/transparent" />
+
+	<!-- Footer for listview --> 
+	<include layout="@layout/menu_list_footer" />
+    
+    
+	<!-- Skip Icon --> 
+	<ImageButton 
+		android:id="@+id/skip_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginLeft="1681px"	
+   		android:layout_marginTop="652px"		
+   		android:background="@color/transparent"
+		android:src="@drawable/skip_icon_focus_selector" />
+    
+	<!-- Skip Icon Text --> 
+   	<TextView
+		android:id="@+id/hint_skip_icon"
+  		android:text="@string/hint_skip_icon_text"
+   		android:textColor="#A5AAC5"
+       	android:textSize="40sp"
+		android:gravity="center"
+   		android:layout_marginLeft="1596px"	
+   		android:layout_marginTop="778px"		
+   		android:layout_width="288px"
+   		android:layout_height="60px" />
+
+	<!-- Refresh Icon --> 
+	<ImageButton 
+		android:id="@+id/refresh_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginLeft="1681px"	
+   		android:layout_marginTop="870px"		
+   		android:background="@color/transparent"
+		android:src="@drawable/refresh_icon_focus_selector" />
+    
+	<!-- Refresh Icon Text --> 
+   	<TextView
+		android:id="@+id/hint_refresh_icon"
+  		android:text="@string/hint_refresh_icon_text"
+   		android:textColor="#A5AAC5"
+       	android:textSize="40sp"
+		android:gravity="center"
+   		android:layout_marginLeft="1596px"	
+   		android:layout_marginTop="996px"		
+   		android:layout_width="288px"
+   		android:layout_height="60px" />
+    
+</RelativeLayout>

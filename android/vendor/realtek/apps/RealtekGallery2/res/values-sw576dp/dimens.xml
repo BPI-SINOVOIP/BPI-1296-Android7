@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <dimen name="option_menu_width">218dp</dimen>
+  <dimen name="option_menu_height">515dp</dimen>
+
+  <dimen name="photo_progress_center_width">83dp</dimen>
+  <dimen name="photo_progress_center_height">62dp</dimen>
+  <dimen name="photo_progress_center_padding">22dp</dimen>
+  
+  <dimen name="photo_progress_other_width">51dp</dimen>
+  <dimen name="photo_progress_other_height">38dp</dimen>
+  <dimen name="photo_progress_other_spacing">17dp</dimen>
+
+  <dimen name="photo_scroll_menu_x">858dp</dimen>
+  <dimen name="photo_scroll_menu_y">39dp</dimen>
+  <dimen name="photo_scroll_menu_width">144dp</dimen>
+  <dimen name="photo_scroll_menu_height">332dp</dimen>
+
+  <dimen name="photo_exif_menu_x">298dp</dimen>
+  <dimen name="photo_exif_menu_y">102dp</dimen>
+  <dimen name="photo_exif_menu_width">426dp</dimen>
+  <dimen name="photo_exif_menu_height">373dp</dimen>
+
+  <dimen name="property_menu_width">426dp</dimen>
+  <dimen name="property_menu_height">373dp</dimen>
+
+  <dimen name="video_timebar_text_size">16sp</dimen>
+  <dimen name="video_timebar_scrubber_padding">6dp</dimen>
+  <dimen name="video_timebar_v_padding">16dp</dimen>
+
+  <dimen name="video_subtitle_menu_margin_right">40dp</dimen>
+  <dimen name="video_subtitle_menu_margin_top">58dp</dimen>
+  <dimen name="video_subtitle_menu_height">293dp</dimen>
+  <dimen name="video_subtitle_menu_width_1">144dp</dimen>
+  <dimen name="video_subtitle_menu_width_2">82dp</dimen>
+  <dimen name="video_subtitle_updown_key_height">19dp</dimen>
+
+  <dimen name="video_audio_menu_margin_right">21dp</dimen>
+  <dimen name="video_audio_menu_margin_top">39dp</dimen>
+  <dimen name="video_audio_menu_width">250dp</dimen>
+  <dimen name="video_audio_menu_height">332dp</dimen>
+
+  <dimen name="video_ar_menu_width">416dp</dimen>
+  <dimen name="video_ar_menu_height">189dp</dimen>
+
+</resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2011 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/hdmi_cec_sources_heading">
+
+    <SwitchPreference
+        android:key="hdmi_cec_toggle"
+        android:title="@string/hdmi_cec_mode_title"
+        android:summary="@string/hdmi_cec_mode_summary"/>
+
+    <PreferenceCategory
+        android:key="hdmi_cec_category"
+        android:title="@string/hdmi_cec_sources_heading"/>
+
+    <CheckBoxPreference
+        android:key="hdmi_cec_one_touch_play"
+        android:dependency="hdmi_cec_toggle"
+        android:title="@string/hdmi_cec_one_touch_play"/>
+
+    <CheckBoxPreference
+        android:key="hdmi_cec_one_touch_standby"
+        android:dependency="hdmi_cec_toggle"
+        android:title="@string/hdmi_cec_one_touch_standby"/>
+
+    <CheckBoxPreference
+        android:key="hdmi_cec_auto_power_on_from_tv"
+        android:dependency="hdmi_cec_toggle"
+        android:title="@string/hdmi_cec_auto_power_on_from_tv"/>
+
+    <CheckBoxPreference
+        android:key="hdmi_cec_auto_osd_language"
+        android:dependency="hdmi_cec_toggle"
+        android:title="@string/hdmi_cec_auto_osd_language"/>
+
+    <PreferenceCategory
+        android:key="irda_cec_switch"
+        android:title="@string/irda_cec_switch_heading"/>
+
+    <ListPreference
+        android:key="irda_cec_switch_list"
+        android:title="@string/irda_cec_switch_list_title"
+        android:dialogTitle="@string/irda_cec_switch_list_dialog_title"
+        android:entries="@array/irda_cec_switch_titles"
+        android:entryValues="@array/irda_cec_switch_values" />
+
+</PreferenceScreen>

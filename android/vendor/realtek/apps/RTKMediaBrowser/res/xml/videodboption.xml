@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+    <Group
+            GroupName="ViewSelect"
+            >
+        <Item
+                Name="mb_thumbnailview"
+                Focus="false"/>
+        <Item
+                Name="mb_preview"
+                Focus="false"/>
+        <Item
+                Name="mb_use_rt_player"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+
+    <Group
+            GroupName="Category"
+            >
+        <Item
+                Name="mb_all_video"
+                Focus="false"/>
+        <Item
+                Name="mb_dvd_bd"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+
+    <Group
+            GroupName="Sort"
+            >
+        <Item
+                Name="mb_sort_by_name_a_z"
+                Focus="false"/>
+        <Item
+                Name="mb_sort_by_name_z_a"
+                Focus="false"/>
+        <Item
+                Name="mb_recently_play"
+                Focus="false"/>
+        <Item
+                Name="mb_recently_add_new_old"
+                Focus="false"/>
+        <Item
+                Name="mb_recently_add_old_new"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+</Option>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+	<Item Name = "Auto" />
+	<Item Name = "UTF8" />
+	<Item Name = "GBK" />
+	<Item Name = "BIG5" />
+	<Item Name = "WESTERN" />
+	<Item Name = "TURKISH" />
+	<Item Name = "CENTRAL EUROPEAN" />
+	<Item Name = "GREEK" />
+	<Item Name = "CYRILLIC" />
+	<Item Name = "HEBREW" />
+	<Item Name = "SOUTH EASTERN EUROPEAN" />
+	<Item Name = "JAPANESE" />
+	<Item Name = "KOREAN" />
+	<Item Name = "THAI" />
+	<Item Name = "ARABIC" />
+</Option>

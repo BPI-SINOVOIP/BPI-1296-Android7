@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/vendor_others">
+    <SwitchPreference
+        android:key="ignore_hdmi_plugout"
+        android:persistent="false"
+        android:title="@string/ignore_hdmi_plugout_title"
+        android:summary="@string/ignore_hdmi_plugout_summary"/>
+
+    <SwitchPreference
+        android:key="num_video_buffer"
+        android:persistent="false"
+        android:title="@string/cts_mode_enable_title"
+        android:summary="@string/cts_mode_summary"/>
+
+    <SwitchPreference
+        android:key="check_volume_mode"
+        android:persistent="false"
+        android:title="@string/check_volume_onoff_title"
+        android:summary="@string/check_volume_onoff_summary"/>
+
+    <SwitchPreference
+        android:key="disable_try_mount_mode"
+        android:persistent="false"
+        android:title="@string/disable_try_mount_onoff_title"
+        android:summary="@string/disable_try_mount_onoff_summary"/>
+
+    <SwitchPreference
+        android:key="format_on_error_mode"
+        android:persistent="false"
+        android:title="@string/format_on_error_onoff_title"
+        android:summary="@string/format_on_error_onoff_summary"/>
+
+    <SwitchPreference
+        android:key="deep_sleep_mode"
+        android:persistent="false"
+        android:title="@string/deep_sleep_mode_title"
+        android:summary="@string/deep_sleep_mode_summary"/>
+
+    <SwitchPreference
+        android:key="performance_mode"
+        android:persistent="false"
+        android:title="@string/performance_mode_title"
+        android:summary="@string/performance_mode_summary"/>
+    <SwitchPreference
+        android:key="search_key_frame_mode"
+        android:persistent="false"
+        android:title="@string/search_key_frame_mode_title"
+        android:summary="@string/search_key_frame_mode_summary"/>
+
+</PreferenceScreen>

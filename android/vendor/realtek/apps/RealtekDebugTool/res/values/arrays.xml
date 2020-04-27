@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="text_sizes">
+        <item>text_sizes</item>
+    </string-array>
+    <string-array name="text_size_values">
+        <item>text_size_values</item>
+    </string-array>
+    <string-array name="log_levels_values">
+        <item>@string/log_level_value_verbose</item>
+        <item>@string/log_level_value_debug</item>
+        <item>@string/log_level_value_info</item>
+        <item>@string/log_level_value_warn</item>
+        <item>@string/log_level_value_error</item>
+        <item>@string/log_level_value_wtf</item>
+    </string-array>
+</resources>

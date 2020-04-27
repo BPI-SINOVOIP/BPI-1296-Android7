@@ -1,0 +1,13 @@
+# Keep all Fragments in this package, which are used by reflection.
+-dontobfuscate
+-keep class com.android.settings.**
+-keep class android.support.v4.** { *; }
+-dontnote android.support.v4.**
+-dontnote com.realtek.Utils.**
+-dontwarn com.realtek.Utils.**
+-dontwarn org.jaudiotagger.**
+-dontwarn jcifs.**
+-keep class com.realtek.DLNA_DMP_1p5.** {
+    <methods>;
+}
+-keep class com.realtek.rtksmb.**

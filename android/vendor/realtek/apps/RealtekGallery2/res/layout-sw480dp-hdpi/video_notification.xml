@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/selector_notification_bg"
+    android:gravity="center_vertical"
+    >
+
+    <ImageView
+        android:layout_width="71dp"
+        android:layout_height="58dp"
+        android:src="@drawable/selector_notification_icon"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/filepath"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:textSize="16dp"
+            android:singleLine="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:ellipsize="marquee"
+            android:textColor="@drawable/selector_notification_title"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+     
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:text="@string/audio" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textSize="13dp"
+                android:text="@string/title" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textSize="13dp"
+                android:text="@string/chapter" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/chapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+     
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:text="@string/video" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+            <TextView
+                android:id="@+id/size_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textSize="13dp"
+                android:text="@string/size" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:textSize="13dp"
+                android:text="@string/repeat_mode" 
+                android:textColor="@drawable/selector_notification_tag"
+                />
+            <TextView
+                android:id="@+id/repeat_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:textSize="13dp"
+                android:textColor="@drawable/selector_notification_content"
+                />
+
+        </LinearLayout>
+        
+    </LinearLayout>
+</LinearLayout>
+

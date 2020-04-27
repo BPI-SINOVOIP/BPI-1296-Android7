@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2010 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/group_layout"
+    android:layout_width="667dp"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    >
+    
+    <ImageView android:id="@+id/group_icon1"
+        android:layout_width="361dp"
+        android:layout_height="47dp"    
+        android:duplicateParentState="true"
+        android:src="@drawable/group_icon1"
+        />
+        
+    <ImageView android:id="@+id/group_icon2"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_alignBottom="@+id/group_icon1"
+        android:duplicateParentState="true"
+        android:src="@drawable/group_icon2"
+        />
+
+    <ImageView android:id="@+id/group_icon3"
+        android:layout_width="53dp"
+        android:layout_height="47dp"
+        android:duplicateParentState="true"
+        android:src="@drawable/us_title_video_none"
+        />
+        
+    <TextView android:id="@+id/group_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/group_icon3"
+        android:layout_marginTop="7dp"
+        android:duplicateParentState="true"
+        android:textSize="27sp"
+        android:textColor="@color/colorFocusText"
+        android:textStyle="bold"
+        android:text="@string/video" />    
+
+    <TextView android:id="@+id/group_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="3dp"
+        android:duplicateParentState="true"
+        android:textSize="28sp"
+        android:textColor="@drawable/group_count" />  	
+                    
+</RelativeLayout>

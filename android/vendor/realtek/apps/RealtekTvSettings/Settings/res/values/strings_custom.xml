@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Top level headers -->
+    <skip />
+    <!-- Header title for device [CHAR LIMIT=50] -->
+    <string name="header_category_vendor">Vendor</string>
+    <string name="vendor_video">Video</string>
+    <string name="vendor_audio">Audio</string>
+    <string name="vendor_others">Others</string>
+
+    <!-- Video preferences -->
+    <skip />
+    <string name="tv_system">TV System</string>
+    <string name="tvsystem_warning_title">TV System Confirm</string>
+    <string name="tvsystem_warning_message">Are you able to see this dialog? <xliff:g id="countdown">%1$d</xliff:g></string>
+    <string name="select_tvsystem_title">Choose TV System</string>
+    <string name="select_tvsystem_description">The available TV System of this TV is listed below.</string>
+    <string name="tv_system_confirm_title">Confirm</string>
+    <string name="tv_system_confirm_message">Are you able to see this dialog? <xliff:g id="countdown">%1$d</xliff:g></string>
+    <string name="peak_luminance">Peak Luminance</string>
+
+    <string-array name="peak_luminance_titles">
+        <item>Level 0</item>
+        <item>Level 1</item>
+        <item>Level 2</item>
+        <item>Level 3</item>
+        <item>Level 4</item>
+    </string-array>
+    <string-array name="peak_luminance_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string name="video_color_title">Video Color Mode</string>
+    <string name="confirm_force_set_video_color_title">Set video color mode?</string>
+    <string name="confirm_force_set_video_color_text">The color mode you selected is not supported by this TV. Are you sure to proceed?</string>
+
+    <string-array name="video_color_entries" translatable="false">
+        <item>AUTO</item>
+        <item>RGB444 8BIT</item>
+        <item>RGB444 10BIT</item>
+        <item>RGB444 12BIT</item>
+        <item>YCbCr444 8BIT</item>
+        <item>YCbCr444 10BIT</item>
+        <item>YCbCr444 12BIT</item>
+        <item>YCbCr422</item>
+        <item>YCbCr420 8BIT</item>
+        <item>YCbCr420 10BIT</item>
+        <item>YCbCr420 12BIT</item>
+        <item>AUTO DeepColor</item>
+    </string-array>
+    <string-array name="video_color_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+    </string-array>
+
+    <string name="auto_1080p24_onoff_title">Auto 1080p 24Hz Playback</string>
+    <string name="auto_1080p24_onoff_summary">Switch TV system to 1080p 24Hz when playing a video with 24Hz content</string>
+    <string name="cvbs_onoff_title">CVBS Switch</string>
+    <string name="cvbs_onoff_summary">Turn On CVBS output</string>
+    <string name="ignore_hdmi_plugout_summary">Do not pause playback when get HDMI plug-out event</string>
+    <string name="ignore_hdmi_plugout_title">Continue playback on HDMI plug-out</string>
+    <string name="cts_mode_enable_title">Playback with less reserved buffers</string>
+    <string name="cts_mode_summary">reserve less buffer for video playback</string>
+    <string name="ignore_edid_mode_title">Ignoring HDMI EDID</string>
+    <string name="ignore_edid_mode_summary">List all TV systems</string>
+    <string name="auto_2997_onoff_title">Auto 29.97/59.94Hz Playback</string>
+    <string name="auto_2997_onoff_summary">Switch TV system when playing a video with 29.97/59.94Hz content</string>
+    <string name="screen_zoom_in_title">95% Zoom Mode</string>
+    <string name="screen_zoom_in_summary">Zooom in screen to 95%</string>
+
+    <!-- Audio preferences -->
+    <skip />
+    <string name="hdmi_output_title">HDMI output</string>
+    <string name="spdif_output_title">S/PDIF output</string>
+    <string name="sound_playback_effect_title">Playback effect</string>
+    <string name="hdmirx_audio_title">HDMI Rx Audio format</string>
+    <string name="audio_i2s_in_mode_title">Audio I2S In</string>
+    <string name="audio_i2s_in_mode_summary">Audio In from I2S</string>
+    <string name="force_sd_audio_onoff_title">Force SD audio</string>
+    <string name="force_sd_audio_onoff_summary">Force output TrueHD/DDP to DD</string>
+
+    <!-- Titles for HDMI output preference. -->
+    <string-array name="hdmi_output_entries">
+        <item>RAW</item>
+        <item>LPCM 2 Channel</item>
+        <item>LPCM Multi-Channel</item>
+        <item>Auto</item>
+    </string-array>
+
+    <string-array name="hdmi_output_values"  translatable="false">
+        <!-- RAW -->
+        <item>0</item>
+        <!-- LPCM 2Ch -->
+        <item>1</item>
+        <!-- LPCM Multi-Ch -->
+        <item>2</item>
+        <!-- AUTO -->
+        <item>3</item>
+    </string-array>
+
+    <!-- Titles for S/PDIF output preference. -->
+    <string-array name="spdif_output_entries">
+        <item>LPCM 2Ch</item>
+        <item>RAW</item>
+    </string-array>
+
+    <string-array name="spdif_output_values"  translatable="false">
+        <!-- LPCM -->
+        <item>0</item>
+        <!-- RAW -->
+        <item>1</item>
+    </string-array>
+
+    <!-- Titles for Playback Effect preference. -->
+    <string-array name="sound_playback_effect_titles">
+        <item>Off</item>
+        <item>Night Mode</item>
+        <item>Comfort Mode</item>
+    </string-array>
+
+    <!-- Values for Playback Effect preference. -->
+    <string-array name="sound_playback_effect_values"  translatable="false">
+        <item>off</item>
+        <item>night</item>
+        <item>comfort</item>
+    </string-array>
+
+    <!-- Titles for HDMI Rx Audio format preference. -->
+    <string-array name="hdmirx_audio_entries">
+        <item>PCM</item>
+        <item>RAW</item>
+    </string-array>
+
+    <string-array name="hdmirx_audio_values"  translatable="false">
+        <!-- LPCM -->
+        <item>0</item>
+        <!-- RAW -->
+        <item>1</item>
+    </string-array>
+
+    <!-- Others preferences -->
+    <skip />
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="disable_try_mount_onoff_title">Check File System Before Mount Disk</string>
+    <string name="disable_try_mount_onoff_summary">Default is to check file system only when fail to mount disk</string>
+    <string name="check_volume_onoff_title">Check File System</string>
+    <string name="check_volume_onoff_summary">Run file system checking on external storage inserted</string>
+    <string name="format_on_error_onoff_title">Format Disk On Error</string>
+    <string name="format_on_error_onoff_summary">Format disk when fail to check file system</string>
+    <string name="edid_save_confirm_message">The edid will be saved in edidxxxx.bin in the root folder of the USB stick!!!</string>
+    <string name="edid_save_confirm_title">Save EDID on USB stick</string>
+    <string name="usb_not_found_title">USB stick NOT found!</string>
+    <string name="deep_sleep_mode_title">Deep Sleep Mode</string>
+    <string name="deep_sleep_mode_summary">System go to suspend when power off</string>
+    <string name="performance_mode_title">Performance Mode</string>
+    <string name="performance_mode_summary">Maximize CPU performance</string>
+    <string name="search_key_frame_mode_title">Search Key Frame</string>
+    <string name="search_key_frame_mode_summary">Jump to next key frame on video flush to avoid mosaic effect</string>
+    <string name="audio_in_mode_title">Audio In</string>
+</resources>

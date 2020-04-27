@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2011 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+    <dimen name="app_icon_size">96dp</dimen>
+    <dimen name="app_icon_padding_top">4dp</dimen>
+    <dimen name="reveal_radius">72dp</dimen>
+
+<!-- Hotseat -->
+    <dimen name="button_bar_height">82dp</dimen>
+    <dimen name="button_bar_height_top_padding">12dp</dimen>
+    <dimen name="button_bar_height_bottom_padding">12dp</dimen>
+    <dimen name="button_bar_width_left_padding">12dp</dimen>
+    <dimen name="button_bar_width_right_padding">12dp</dimen>
+    <dimen name="button_bar_height_plus_padding">10dp</dimen>
+    <dimen name="hotseat_width_gap">58dp</dimen>
+
+<!-- QSB -->
+    <dimen name="toolbar_button_vertical_padding">8dip</dimen>
+    <dimen name="toolbar_button_horizontal_padding">8dip</dimen>
+
+<!-- Workspace -->
+    <dimen name="qsb_bar_height">60dp</dimen>
+    <dimen name="qsb_bar_height_inset">42dp</dimen>
+    <dimen name="qsb_padding_left">177dp</dimen>
+    <dimen name="qsb_padding_right">177dp</dimen>
+    <!-- We offset the proxy to overlap with the voice icon -->
+    <dimen name="qsb_voice_proxy_padding_right">230dp</dimen>
+    <!-- 44dp high for the optical bounds -->
+    <dimen name="search_bar_height">52dp</dimen>
+
+<!-- AppsCustomize -->
+    <dimen name="apps_customize_cell_width">160dp</dimen>
+    <dimen name="apps_customize_cell_height">160dp</dimen>
+    <integer name="apps_customize_maxCellCountX">-1</integer>
+    <integer name="apps_customize_maxCellCountY">-1</integer>
+    <dimen name="all_apps_button_vertical_padding">4dip</dimen>
+
+    <!-- dimensions for the wallpaper picker wallpaper thumbnail width -->
+    <dimen name="wallpaper_chooser_grid_width">196dp</dimen>
+    <dimen name="wallpaper_chooser_grid_height">140dp</dimen>
+
+    <!-- When dragging items on the workspace, the number of dps by which the position of
+     the drag view should be offset from the position of the original view. -->
+    <dimen name="dragViewOffsetX">0dp</dimen>
+    <dimen name="dragViewOffsetY">0dp</dimen>
+    
+    <!-- copied from sw600dp-land -->
+    <dimen name="apps_customize_pageLayoutPaddingLeft">12dp</dimen>
+    <dimen name="apps_customize_pageLayoutPaddingRight">12dp</dimen>
+    <dimen name="apps_customize_tab_bar_height">100dp</dimen>
+    <dimen name="apps_customize_tab_bar_margin_top">8dp</dimen>
+    <dimen name="apps_customize_widget_cell_width_gap">20dp</dimen>
+    <dimen name="apps_customize_widget_cell_height_gap">24dp</dimen>
+    <dimen name="app_widget_preview_label_margin_top">8dp</dimen>
+    <dimen name="app_widget_preview_label_margin_left">@dimen/app_widget_preview_padding_left</dimen>
+    <dimen name="app_widget_preview_label_margin_right">@dimen/app_widget_preview_padding_right</dimen>
+    
+
+<!-- CellLayout padding land / port-->
+    <dimen name="cell_layout_left_padding_port">4dp</dimen>
+    <dimen name="cell_layout_left_padding_land">4dp</dimen>
+    <dimen name="cell_layout_right_padding_port">4dp</dimen>
+    <dimen name="cell_layout_right_padding_land">4dp</dimen>
+    <dimen name="cell_layout_top_padding_port">0dp</dimen>
+    <dimen name="cell_layout_top_padding_land">0dp</dimen>
+    <dimen name="cell_layout_bottom_padding_port">8dp</dimen>
+    <dimen name="cell_layout_bottom_padding_land">8dp</dimen>
+
+<!-- Folders -->
+    <!-- The size of the image which sits behind the preview of the folder contents -->
+    <dimen name="folder_cell_width">96dp</dimen>
+    <dimen name="folder_cell_height">96dp</dimen>
+    <dimen name="folder_preview_size">70dp</dimen>
+    <dimen name="folder_width_gap">2dp</dimen>
+    <dimen name="folder_height_gap">2dp</dimen>
+    <dimen name="folder_padding">4dp</dimen>
+
+<!-- Workspace padding -->
+    <dimen name="workspace_left_padding_port">0dp</dimen>
+    <dimen name="workspace_left_padding_land">0dp</dimen>
+    <dimen name="workspace_right_padding_port">0dp</dimen>
+    <dimen name="workspace_right_padding_land">0dp</dimen>
+
+    <dimen name="workspace_top_padding_port">@dimen/qsb_bar_height_inset</dimen>
+    <dimen name="workspace_top_padding_land">@dimen/qsb_bar_height_inset</dimen>
+    <dimen name="workspace_bottom_padding_port">@dimen/button_bar_height_plus_padding</dimen>
+    <dimen name="workspace_bottom_padding_land">@dimen/button_bar_height_plus_padding</dimen>
+
+    <!-- Divider width set to match the qsb width -->
+    <dimen name="workspace_divider_width">0dp</dimen>
+    <dimen name="workspace_divider_padding_left">177dp</dimen>
+    <dimen name="workspace_divider_padding_right">177dp</dimen>
+    <dimen name="workspace_divider_padding_top">0dp</dimen>
+    <dimen name="workspace_divider_padding_bottom">0dp</dimen>
+
+<!-- Workspace cell size -->
+    <dimen name="workspace_cell_width_land">150dp</dimen>
+    <dimen name="workspace_cell_width_port">150dp</dimen>
+    <dimen name="workspace_cell_height_land">150dp</dimen>
+    <dimen name="workspace_cell_height_port">150dp</dimen>
+    <dimen name="workspace_width_gap_land">@dimen/rtk_workspace_cell_gap</dimen>
+    <dimen name="workspace_width_gap_port">@dimen/rtk_workspace_cell_gap</dimen>
+    <dimen name="workspace_height_gap_land">@dimen/rtk_workspace_cell_gap</dimen>
+    <dimen name="workspace_height_gap_port">@dimen/rtk_workspace_cell_gap</dimen>
+    
+    <!-- Realtek launcher customized -->
+    <!-- used in LauncherAppWidgetHostView -->
+    <dimen name="rtk_workspace_cell_inner_padding">0dp</dimen>
+    <dimen name="rtk_workspace_cell_gap">12dp</dimen>
+    <dimen name="rtk_workspace_focus_frame_thickness">16dp</dimen>
+    <dimen name="rtk_widget_egde">120dp</dimen>
+    <!-- span = x3 -->
+    <dimen name="rtk_widget_egde_span">360dp</dimen>
+    <dimen name="rtk_widget_egde_span_2">240dp</dimen>
+    <dimen name="rtk_widget_egde_span_5">600dp</dimen>
+    <dimen name="rtk_widget_egde_span_6">720dp</dimen>
+    
+    
+    <dimen name="rtk_widget_icon_edge">120dp</dimen>
+    
+    <!-- Realtek launcher network traffic widget -->
+    <dimen name="rtk_net_traffic_widget_speed_text_label_bottom_padding">20dp</dimen>
+    <dimen name="rtk_net_traffic_widget_unit_text_label_bottom_padding">25dp</dimen>
+    
+    <dimen name="rtk_net_traffic_widget_up_speed_text_label_right_padding">234dp</dimen>
+    <dimen name="rtk_net_traffic_widget_up_speed_unit_text_label_right_padding">177dp</dimen>
+    
+    <dimen name="rtk_net_traffic_widget_down_speed_text_label_right_padding">385dp</dimen>
+    <dimen name="rtk_net_traffic_widget_down_speed_unit_text_label_right_padding">328dp</dimen>
+   
+    <!-- Realtek launcher wifi status widget -->
+    <dimen name="rtk_wifi_status_widget_device_name_text_label_left_padding">153dp</dimen>
+    <dimen name="rtk_wifi_status_widget_pin_code_text_label_left_padding">123dp</dimen>
+    <dimen name="rtk_wifi_status_widget_ssid_text_label_left_padding">322dp</dimen>
+    <dimen name="rtk_wifi_status_widget_miracast_text_label_left_padding">43dp</dimen>
+    <dimen name="rtk_wifi_status_widget_miracast_mode_text_label_left_padding">20dp</dimen>
+
+    <dimen name="rtk_wifi_status_widget_device_name_text_label_top_padding">85dp</dimen>
+    <dimen name="rtk_wifi_status_widget_pin_code_text_label_top_padding">111dp</dimen>
+    <dimen name="rtk_wifi_status_widget_ssid_text_label_top_padding">95dp</dimen>
+    <dimen name="rtk_wifi_status_widget_miracast_text_label_top_padding">44dp</dimen>
+    <dimen name="rtk_wifi_status_widget_miracast_mode_text_label_top_padding">85dp</dimen>
+    
+    <dimen name="rtk_wifi_status_widget_ssid_text_label_length">150dp</dimen>
+    <dimen name="rtk_wifi_status_widget_miracast_mode_text_label_length">130dp</dimen>
+    <dimen name="rtk_wifi_status_widget_device_text_label_length">120dp</dimen>
+    <dimen name="rtk_wifi_status_widget_pin_text_label_length">180dp</dimen>
+    
+    <dimen name="rtk_wifi_status_widget_break_left_padding">290dp</dimen>
+    <dimen name="rtk_wifi_status_widget_break_top_padding">42dp</dimen>
+    
+    <dimen name="rtk_miracast_dialog_global_top_padding">40dp</dimen>
+    <dimen name="rtk_miracast_dialog_global_bottom_padding">40dp</dimen>
+    <dimen name="rtk_miracast_dialog_global_left_padding">40dp</dimen>
+    <dimen name="rtk_miracast_dialog_global_right_padding">90dp</dimen>
+    <dimen name="rtk_miracast_dialog_middle_padding">10dp</dimen>
+    <!-- dtv widget -->
+    <dimen name="rtk_dtv_widget_label_height">120dp</dimen>
+    <dimen name="rtk_dtv_buttom_icon_margin_top">5dp</dimen>
+    <dimen name="rtk_dtv_buttom_icon_margin_left">30dp</dimen>
+    
+    <!-- General resource define -->
+    <dimen name="hotseat_height_gap">-1dp</dimen>
+    <dimen name="cling_text_block_offset_x">0dp</dimen>
+    <dimen name="cling_text_block_offset_y">0dp</dimen>
+    <dimen name="folderClingMarginTop">20dp</dimen>
+    <dimen name="workspace_max_gap">16dp</dimen>
+    <dimen name="folder_name_padding">10dp</dimen>
+    <dimen name="app_widget_preview_padding_left">16dp</dimen>
+    <dimen name="app_widget_preview_padding_right">16dp</dimen>
+    <dimen name="app_widget_preview_padding_top">32dp</dimen>
+    <dimen name="workspace_icon_text_size">12sp</dimen>
+    
+    <dimen name="workspace_overscroll_drawable_padding">0dp</dimen>
+    <dimen name="apps_customize_max_gap">18dp</dimen>
+    <dimen name="clingPunchThroughGraphicCenterRadius">94dp</dimen>
+    
+    <dimen name="dragViewScale">20dp</dimen>
+    <dimen name="drop_target_drag_padding">14dp</dimen>
+    <dimen name="folder_preview_padding">4dp</dimen>
+    <dimen name="scroll_zone">20dp</dimen>
+    
+    <dimen name="shortcut_preview_padding_left">0dp</dimen>
+    <dimen name="shortcut_preview_padding_right">0dp</dimen>
+    <dimen name="shortcut_preview_padding_top">0dp</dimen>
+    
+    <!-- External toolbar icon size (for bounds) -->
+    <dimen name="toolbar_external_icon_width">54dp</dimen>
+    <dimen name="toolbar_external_icon_height">54dp</dimen>
+    
+    <dimen name="workspace_spring_loaded_page_spacing">15dp</dimen>
+    
+    <dimen name="hotseat_cell_width">64dp</dimen>
+    <dimen name="hotseat_cell_height">64dp</dimen>
+    
+    <dimen name="workspace_left_padding">0dp</dimen>
+    <dimen name="workspace_right_padding">0dp</dimen>
+    <dimen name="workspace_top_padding">0dp</dimen>
+    <dimen name="workspace_bottom_padding">0dp</dimen>
+    
+    <dimen name="workspace_page_spacing">50dp</dimen>
+    
+    <dimen name="cell_layout_left_padding">4dp</dimen>
+    <dimen name="cell_layout_right_padding">4dp</dimen>
+    <dimen name="cell_layout_bottom_padding">8dp</dimen>
+    <dimen name="cell_layout_top_padding">0dp</dimen>
+    
+    <dimen name="apps_customize_pageLayoutWidthGap">42dp</dimen>
+    <dimen name="apps_customize_pageLayoutHeightGap">24dp</dimen>
+    <dimen name="apps_customize_pageLayoutPaddingTop">30dp</dimen>
+    <dimen name="apps_customize_pageLayoutPaddingBottom">21dp</dimen>
+    
+    <dimen name="workspace_cell_height">150dp</dimen>
+    <dimen name="workspace_cell_width">150dp</dimen>
+    
+    
+    <integer name="apps_customize_cling_focused_x">4</integer>
+    <integer name="apps_customize_cling_focused_y">2</integer>
+    <integer name="apps_customize_widget_cell_count_x">4</integer>
+    <integer name="apps_customize_widget_cell_count_y">2</integer>
+    
+    <dimen name="workspace_height_gap">@dimen/rtk_workspace_cell_gap</dimen>
+    <dimen name="workspace_width_gap">@dimen/rtk_workspace_cell_gap</dimen>
+    
+    <dimen name="option_menu_height">966dp</dimen>
+    <dimen name="option_menu_r_height">966dp</dimen>
+    <dimen name="option_menu_r_width">376dp</dimen>
+    <dimen name="option_menu_l_width">33dp</dimen>
+    <dimen name="option_menu_focus_width">31dp</dimen>
+    <dimen name="option_menu_focus_height">60dp</dimen>
+    
+    <dimen name="widget_label_text_size">25sp</dimen>
+    
+</resources>

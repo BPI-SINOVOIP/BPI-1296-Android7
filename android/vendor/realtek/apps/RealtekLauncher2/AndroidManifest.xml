@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+**
+** Copyright 2008, The Android Open Source Project
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+*/
+-->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.realtek.launcher"
+    android:sharedUserId="android.uid.system">
+
+    <original-package android:name="com.android.launcher2" />
+
+    <protected-broadcast
+        android:name="com.realtek.launcher.action.INIT_SURFACEVIEW_WIDGET" />
+    <protected-broadcast
+        android:name="com.realtek.launcher.action.UNINIT_SURFACEVIEW_WIDGET" />
+    <protected-broadcast
+        android:name="com.realtek.launcher.action.SWITCH_SURFACEVIEW_WIDGET_SOURCE" />
+
+    <permission
+        android:name="com.android.launcher.permission.PRELOAD_WORKSPACE"
+        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+        android:protectionLevel="system|signature" />
+    <permission
+        android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
+        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+        android:protectionLevel="dangerous"
+        android:label="@string/permlab_install_shortcut"
+        android:description="@string/permdesc_install_shortcut" />
+    <permission
+        android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT"
+        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+        android:protectionLevel="dangerous"
+        android:label="@string/permlab_uninstall_shortcut"
+        android:description="@string/permdesc_uninstall_shortcut"/>
+    <permission
+        android:name="com.android.rtklauncher.permission.READ_SETTINGS"
+        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+        android:protectionLevel="normal"
+        android:label="@string/permlab_read_settings"
+        android:description="@string/permdesc_read_settings"/>
+    <permission
+        android:name="com.android.rtklauncher.permission.WRITE_SETTINGS"
+        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+        android:protectionLevel="normal"
+        android:label="@string/permlab_write_settings"
+        android:description="@string/permdesc_write_settings"/>
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <uses-permission android:name="com.android.launcher.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.android.rtklauncher.permission.READ_SETTINGS" />
+    <uses-permission android:name="com.android.rtklauncher.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+	<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.BIND_APPWIDGET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+    
+	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="23"/>
+	
+    <application
+        android:name="com.android.launcher2.LauncherApplication"
+        android:label="@string/application_name"
+        android:icon="@mipmap/ic_launcher_home"
+        android:hardwareAccelerated="true"
+        android:largeHeap="@bool/config_largeHeap"
+        android:supportsRtl="true">
+	<uses-library android:name="com.realtek" />
+        <activity
+            android:name="com.android.launcher2.Launcher"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:stateNotNeeded="true"
+            android:theme="@style/Theme"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="nosensor"
+            android:configChanges="navigation|keyboard|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.MONKEY"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.launcher2.WallpaperChooser"
+            android:theme="@style/Theme.WallpaperPicker"
+            android:label="@string/pick_wallpaper"
+            android:icon="@mipmap/ic_launcher_wallpaper"
+            android:finishOnCloseSystemDialogs="true"
+            android:process=":wallpaper_chooser">
+            <intent-filter>
+                <action android:name="android.intent.action.SET_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.wallpaper.preview"
+                android:resource="@xml/wallpaper_picker_preview" />
+        </activity>
+
+        <!-- BOOT_COMPLETED receiver -->
+        <receiver android:enabled="true"
+            android:name="com.android.launcher2.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Intent received used to prepopulate the default workspace. -->
+        <receiver
+            android:name="com.android.launcher2.PreloadReceiver"
+            android:permission="com.android.launcher.permission.PRELOAD_WORKSPACE">
+            <intent-filter>
+                <action android:name="com.android.launcher.action.PRELOAD_WORKSPACE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Intent received used to install shortcuts from other applications -->
+        <receiver
+            android:name="com.android.launcher2.InstallShortcutReceiver"
+            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
+            <intent-filter>
+                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Intent received used to uninstall shortcuts from other applications -->
+        <receiver
+            android:name="com.android.launcher2.UninstallShortcutReceiver"
+            android:permission="com.android.launcher.permission.UNINSTALL_SHORTCUT">
+            <intent-filter>
+                <action android:name="com.android.launcher.action.UNINSTALL_SHORTCUT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- New user initialization; set up initial wallpaper -->
+        <receiver
+            android:name="com.android.launcher2.UserInitializeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_INITIALIZE" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- The settings provider contains Home's data, like the workspace favorites -->
+        <provider
+            android:name="com.android.launcher2.LauncherProvider"
+            android:authorities="com.realtek.launcher2.settings"
+            android:exported="true"
+            android:writePermission="com.android.rtklauncher.permission.WRITE_SETTINGS"
+            android:readPermission="com.android.rtklauncher.permission.READ_SETTINGS" />
+
+        <meta-data android:name="android.nfc.disable_beam_default"
+                       android:value="true" />
+        
+        <!-- dtv widget -->
+        <receiver android:name="com.realtek.addon.widget.DtvWidgetProvider" 
+            android:label="@string/w_dtv_label" 
+            android:description="@string/w_dtv_label" 
+            android:icon="@drawable/wi_apps" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+                <action android:name="com.realtek.launcher.action.INIT_SURFACEVIEW_WIDGET"/>
+                <action android:name="com.realtek.launcher.action.UNINIT_SURFACEVIEW_WIDGET"/>
+                <action android:name="com.realtek.launcher.action.SWITCH_SURFACEVIEW_WIDGET_SOURCE"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_dtv"/>
+        </receiver>
+        
+        
+        <!-- app drawer widget -->
+        <receiver android:name="com.realtek.addon.widget.AppDrawerWidgetProvider" 
+            android:label="@string/w_app_drawer_label" 
+            android:description="@string/w_app_drawer_label" 
+            android:icon="@drawable/wi_apps" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_app_drawer"/>
+        </receiver>
+        
+        <!-- settings widget -->
+        <receiver android:name="com.realtek.addon.widget.SettingWidgetProvider" 
+            android:label="@string/w_setting_label" 
+            android:description="@string/w_setting_label" 
+            android:icon="@drawable/wi_setting" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_setting"/>
+        </receiver>
+        
+        <!-- miracast/Widi widget -->
+        <receiver android:name="com.realtek.addon.widget.WidiWidgetProvider" 
+            android:label="@string/w_widi_label" 
+            android:description="@string/w_widi_label" 
+            android:icon="@drawable/wi_widi" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_widi"/>
+        </receiver>
+        
+        <!-- file browser widget -->
+        <receiver android:name="com.realtek.addon.widget.FilebrowserWidgetProvider" 
+            android:label="@string/w_filebrowser_label" 
+            android:description="@string/w_filebrowser_label" 
+            android:icon="@drawable/wi_filebrowser" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_filebrowser"/>
+        </receiver>
+        
+        
+        <!-- favorite app widget -->
+        <receiver android:name="com.realtek.addon.widget.FavoriteAppWidgetProvider" 
+            android:label="@string/w_favorite_app_label" 
+            android:description="@string/w_favorite_app_label" 
+            android:icon="@drawable/wi_favorite" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_favorite_app"/>
+        </receiver>
+        
+        <!-- video app widget -->
+        <receiver android:name="com.realtek.addon.widget.VideoAppWidgetProvider" 
+            android:label="@string/w_video_app_label"
+            android:description="@string/w_video_app_label" 
+            android:icon="@drawable/wi_video" 
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_video_app"/>
+        </receiver>
+        
+        <!-- dummy browser widget -->
+        <!--
+        <receiver android:name="com.realtek.addon.widget.EmptyWidgetProvider" 
+            android:label="@string/w_empty_label" 
+            android:description="@string/w_empty_label" 
+            
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_empty"/>
+        </receiver>
+        -->
+        
+        <!-- wifi status widget -->
+        <receiver android:name="com.realtek.addon.widget.WifiStatusWidgetProvider" 
+            android:label="@string/w_wifi_status_label" 
+            android:description="@string/w_wifi_status_label" 
+            android:icon="@drawable/wi_networkinfo_widgets_0"
+            
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_wifi_status"/>
+        </receiver>
+        
+        <!-- google music widget -->
+        <receiver android:name="com.realtek.addon.widget.GoogleMusicWidgetProvider" 
+            android:label="@string/w_google_music_label" 
+            android:description="@string/w_google_music_label" 
+            android:icon="@drawable/wi_google_music" 
+            
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_google_music"/>
+        </receiver>
+        
+        
+        <!-- network traffic widget -->
+        <receiver android:name="com.realtek.addon.widget.NetworkTrafficWidgetProvider" 
+            android:label="@string/w_network_traffic_label"
+            android:description="@string/w_network_traffic_label" 
+            android:icon="@drawable/wi_download_upload_wifi" 
+            
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_network_traffic"/>
+        </receiver>
+        
+        <!-- storage widget -->
+        <receiver android:name="com.realtek.addon.widget.StorageWidgetProvider" 
+            android:label="@string/w_storage_label"
+            android:description="@string/w_storage_label" 
+            android:icon="@drawable/wi_storage_usb_no" 
+            
+            android:exported="true" 
+            android:enabled="true">
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+            </intent-filter>
+            
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_provider_storage"/>
+        </receiver>
+    </application>
+</manifest>

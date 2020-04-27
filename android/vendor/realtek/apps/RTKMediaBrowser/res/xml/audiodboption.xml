@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+    <Group
+            GroupName="ViewSelect"
+            >
+        <Item
+                Name="ThumbnailView"
+                Focus="false"/>
+        <Item
+                Name="PreView"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+
+    <Group
+            GroupName="GoTo"
+            >
+        <Item
+                Name="GoToFolder"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+
+    <Group
+            GroupName="Sort"
+            >
+        <Item
+                Name="SortByName"
+                Focus="false"/>
+        <Item
+                Name="SortByAddDate"
+                Focus="false"/>
+        <Item
+                Name="SortByRecentlyPlay"
+                Focus="false"/>
+    </Group>
+</Option>

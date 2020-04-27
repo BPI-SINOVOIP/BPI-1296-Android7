@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:focusable="false"	
+	android:focusableInTouchMode="false"	
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >    
+    <!--Pre view screen-->
+    <ImageView
+        android:id="@+id/album_photo"
+        android:layout_width="fill_parent"
+        android:layout_height="280dp"
+		android:layout_marginTop="0dp"
+		android:layout_marginLeft="0dp"
+		/>
+    <!--Progress bar-->
+    <ProgressBar
+        android:id="@+id/audio_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+		android:layout_marginTop="0dp"
+		android:layout_marginLeft="0dp" 
+		/>
+	<!--Media information-->
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_marginTop="20dp"
+		android:layout_marginLeft="41dp" 
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent" >    
+
+		<TextView
+			android:id="@+id/media_elapsed_time"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+		/>
+		<TextView
+			android:id="@+id/media_time"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+		/>
+		<TextView
+			android:id="@+id/audio_title"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+		/>
+
+		<TextView
+			android:id="@+id/audio_artist"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+		/>
+
+		<TextView
+			android:id="@+id/audio_album"
+			android:layout_width="fill_parent"
+        	android:layout_height="wrap_content"
+       		android:shadowColor="@color/BWTitleShadowColor"
+       		android:textColor="@color/BWTitleGreen"
+       		android:singleLine="true"
+       		android:textSize="@dimen/preview_media_info_text_size"
+		/>
+
+	</LinearLayout>
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="1189dp"
+    android:layout_height="876dp" >    
+   
+    
+      <RtkListView
+        android:id="@+id/listview"
+		android:paddingTop="0dp"
+		android:paddingBottom="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="false"
+        android:fadingEdge="none"
+        android:focusable="true"
+        android:stackFromBottom ="false"
+        android:transcriptMode="disabled"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:verticalSpacing="0dp"
+		android:clickable="true"
+        android:listSelector="@color/transparent"
+
+       />
+</LinearLayout>

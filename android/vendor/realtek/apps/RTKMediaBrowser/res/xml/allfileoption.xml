@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+    <Group
+            GroupName="ViewSelect"
+            >
+        <Item
+                text="error"
+                Name="mb_thumbnailview"
+                Focus="false"/>
+        <Item
+                Name="mb_preview"
+                Focus="false"/>
+        <Item
+                Name="mb_use_rt_player"
+                GroupEnd="true"
+                Focus="false"/>
+    </Group>
+</Option>

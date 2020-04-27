@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">IPCamPIP</string>
+    <string name="action_settings">Settings</string>
+    <string name="source_title1">Source1</string>
+    <string name="source_title2">Source2</string>
+    <string name="source_title3">Source3</string>
+    <string name="source_title4">Source4</string>
+
+    <string name="source_path1">rtsp://172.29.32.74:8554/1</string>
+    <string name="source_path2">rtsp://172.29.32.74:8554/1</string>
+    <string name="source_path3">rtsp://172.29.32.74:8554/1</string>
+    <string name="source_path4">rtsp://172.29.32.74:8554/1</string>
+    
+    <string name="encoder_single">PIP Grid 1X1</string>
+    <string name="encoder_double">PIP Grid 1X2</string>
+    <string name="encoder_triple">PIP Grid 1X3</string>
+    <string name="encoder_quadra">PIP Grid 2X2</string>
+    <string name="searchI">Enable SearchI</string>
+</resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.realtek.suspendhandler"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="1"
+    android:versionName="1.0" 
+    >
+    <!-- permission to receive boot completed -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
+    <uses-permission android:name="android.permission.REMOVE_TASKS"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
+    <uses-permission android:name="android.permission.DEVICE_POWER" />
+    <application
+        android:allowBackup="true"
+        android:persistent="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name">
+        <!-- BOOT_COMPLETED receiver -->
+        <receiver android:enabled="true"
+            android:name="com.realtek.suspendhandler.BootCompleteReceiver">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:enabled="true"
+            android:name="com.realtek.suspendhandler.WakeUpBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.WAKE_UP_ADD"/>
+                <action android:name="android.intent.action.WAKE_UP_RM"/>
+            </intent-filter>
+        </receiver>
+
+        <!--
+        <receiver android:enabled="true"
+            android:name="com.realtek.suspendhandler.UnmountTimeoutReceiver">
+            <intent-filter>
+                <action android:name=""/>
+            </intent-filter>
+        </receiver>
+        -->
+
+        <!--
+        <receiver android:enabled="true"
+            android:name="com.realtek.suspendhandler.UnmountReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED"/>
+            </intent-filter>
+        </receiver>
+        -->
+
+        <!--
+        <receiver android:enabled="true"
+            android:name="com.realtek.suspendhandler.SuspendHandler">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_OFF"/>
+                <action android:name="android.intent.action.SCREEN_ON"/>
+            </intent-filter>
+        </receiver>
+        -->
+
+        <service android:enabled="true"
+            android:name="com.realtek.suspendhandler.SuspendService" >
+        </service>
+    </application>
+</manifest>

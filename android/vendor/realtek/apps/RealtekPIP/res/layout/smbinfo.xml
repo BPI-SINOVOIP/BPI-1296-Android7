@@ -1,0 +1,144 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              >
+ 
+ 	<LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/domain" />
+        
+        <EditText
+            android:id="@+id/domain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="text" />
+   	</LinearLayout>    
+    
+    
+ 	<LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/server" />
+        
+        <EditText
+            android:id="@+id/server"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="text" />
+   	</LinearLayout>   
+    
+ 	<LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >    
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/username" />
+        
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="text"
+             />
+    </LinearLayout> 
+    
+    <LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" > 
+        <TextView  
+            android:layout_width="0dp"         
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/password" /> 
+       
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="textPassword" />
+	</LinearLayout> 
+    
+    <LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >    
+    
+        <TextView       
+            android:layout_width="0dp"    
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/share" />
+        <EditText
+            android:id="@+id/share"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:inputType="text"
+             />
+    </LinearLayout>
+
+
+    <LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >  
+        	<TextView       
+            		android:layout_width="0dp"    
+            		android:layout_height="wrap_content"
+            		android:layout_weight="2" />
+    		<CheckBox android:id="@+id/chb_nodomain"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="3"
+			android:text="@string/chb_nodomain"
+			android:gravity="left"
+			/>    
+    		<CheckBox android:id="@+id/chb_rememberme"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="3"
+			android:text="@string/chb_rememberme"
+			android:checked="true"
+			android:gravity="left"
+			/> 
+    </LinearLayout>
+    <LinearLayout
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:orientation="horizontal" >
+    
+    	<Button
+        	android:id="@+id/bt_ok"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:text="@string/bt_ok" />
+    	<Button
+        	android:id="@+id/bt_cancel"
+        	android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:text="@string/bt_cancel" />
+            
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/photopage_info_display" >
+
+    <RelativeLayout
+        android:id="@+id/slideshow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="33dp"
+        android:layout_marginLeft="63dp"
+        android:visibility="gone" >
+
+        <TextView android:id="@+id/slideshow_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:text="@string/slideshow"
+            android:textColor="#86ACBF" />
+        <TextView android:id="@+id/slideshow_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/slideshow_tag"
+            android:layout_alignBottom="@+id/slideshow_tag"
+            android:layout_marginLeft="7dp"
+            android:textSize="28sp"
+            android:text="@string/setting_off_value"
+            android:textColor="#FFFFFF" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/photopage_info"
+        android:layout_width="453dp"
+        android:layout_height="81dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="17dp"
+        android:paddingTop="7dp"
+        android:paddingLeft="17dp"
+        android:paddingRight="17dp"
+        android:background="#B5C2C9"
+        android:alpha="0.8"
+        android:visibility="gone" >
+
+        <TextView android:id="@+id/photopage_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textSize="28sp"
+            android:textColor="#11181A" />
+        <TextView android:id="@+id/photopage_info_dimension"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="37dp"
+            android:singleLine="true"
+            android:textSize="21sp"
+            android:textColor="#435B63" />
+        <TextView android:id="@+id/photopage_info_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="37dp"
+            android:layout_alignParentRight="true"
+            android:singleLine="true"
+            android:textSize="21sp"
+            android:textColor="#435B63" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		      android:layout_width="match_parent"
+		      android:layout_height="match_parent"
+		      android:orientation="vertical"
+		      android:gravity="center_horizontal"
+		      android:background="#000000">
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+
+		<Button android:id="@+id/btnRecGrid1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/pip1x1"
+			android:textColor="#FFFFFF"
+			/>
+
+		<Button android:id="@+id/btnRecGrid2"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/pip1x2"
+			android:textColor="#FFFFFF"
+			/>
+
+		<Button android:id="@+id/btnRecGrid4"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/pip2x2"
+			android:textColor="#FFFFFF"
+			/>
+
+		<Button android:id="@+id/btnRecGrid9"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/pip3x3"
+			android:textColor="#FFFFFF"
+			/>
+
+		<Button android:id="@+id/btnRecGrid16"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/pip4x4"
+			android:textColor="#FFFFFF"
+			/>
+	    </LinearLayout>
+
+
+
+    	<LinearLayout
+            	android:layout_width="fill_parent"
+            	android:layout_height="wrap_content"
+            	android:background="@layout/background"
+            	android:orientation="vertical">
+
+
+
+	    	<LinearLayout
+		    	android:layout_width="fill_parent"
+		    	android:layout_height="wrap_content"
+		    	android:orientation="horizontal">
+
+			<CheckBox android:id="@+id/chbRepeat"
+			  	android:layout_width="0dp"
+			  	android:layout_height="fill_parent"
+			  	android:layout_weight="1"
+			  	android:text="@string/repeat"
+			  	android:gravity="left"
+			  	android:textSize="20sp"
+			  	android:textColor="#FFFFFF"/>
+			<CheckBox android:id="@+id/chbAudioDynamic"
+			  	android:layout_width="0dp"
+			  	android:layout_height="fill_parent"
+			  	android:layout_weight="1"
+			  	android:text="@string/audioclick"
+			  	android:gravity="left"
+			  	android:textSize="20sp"
+			  	android:textColor="#FFFFFF" />
+			<CheckBox android:id="@+id/chbFreeRun"
+			  	android:layout_width="0dp"
+			  	android:layout_height="fill_parent"
+			  	android:layout_weight="1"
+			  	android:text="@string/freerun"
+			  	android:gravity="left"
+			  	android:textSize="20sp"
+			  	android:textColor="#FFFFFF" />
+			<CheckBox android:id="@+id/chbTunnelMode"
+			  	android:layout_width="0dp"
+			  	android:layout_height="fill_parent"
+			  	android:layout_weight="1"
+			  	android:text="@string/tunnelmode"
+			  	android:gravity="left"
+			  	android:textSize="20sp"
+			  	android:textColor="#FFFFFF" />
+			<CheckBox android:id="@+id/chbVideoOnly"
+			  	android:layout_width="0dp"
+			  	android:layout_height="fill_parent"
+			  	android:layout_weight="1"
+			  	android:text="@string/videoonly"
+			  	android:gravity="left"
+			  	android:textSize="20sp"
+			  	android:textColor="#FFFFFF" />
+            <CheckBox android:id="@+id/chbPerformance"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="@string/performance"
+                android:gravity="left"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF" />
+            <CheckBox android:id="@+id/chbRender"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="@string/render"
+                android:gravity="left"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF" />
+	    	</LinearLayout>
+
+	<!-- new -->
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+			<TextView
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				
+				android:textColor="#FFFFFF"
+				android:gravity="center_horizontal"
+				android:text="@string/sourcePath"
+				android:textSize="20sp" />
+			<Spinner 
+				android:id="@+id/spnSource"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.3"
+				android:gravity="center_horizontal"
+				 />
+			<TextView android:id="@+id/txtView"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:textColor="#FFFFFF"
+				android:gravity="center_horizontal"
+				android:text="@string/txtview"
+				android:textSize="20sp" />
+
+			<EditText android:id="@+id/edtText"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:inputType="number"
+				android:textColor="#FF0000"
+				android:hint="@string/range"
+				android:gravity="center_horizontal" />
+
+			<TextView android:id="@+id/txtView2"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:textColor="#FFFFFF"
+				android:gravity="center_horizontal"
+				android:text="@string/txtview2"
+				android:textSize="20sp" />
+
+			<EditText android:id="@+id/edtText2"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:inputType="number"
+				android:textColor="#FF0000"
+				android:hint="@string/range"
+				android:gravity="center_horizontal" />
+
+			<Button android:id="@+id/btnOK"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/ok"
+				android:textColor="#FFFFFF" />
+
+		</LinearLayout>
+	<!-- new -->
+
+	</LinearLayout>
+
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+
+		<TextView android:id="@+id/contView1"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title1"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText1"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content1"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+
+		<TextView android:id="@+id/contView2"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title2"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText2"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content2"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView3"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title3"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText3"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content3"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView4"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title4"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText4"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content4"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView5"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title5"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText5"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content5"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView6"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title6"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText6"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content6"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView7"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title7"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText7"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content7"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView8"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title8"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText8"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content8"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView9"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title9"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText9"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content9"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView10"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title10"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText10"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content10"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView11"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title11"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText11"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content11"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView12"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title12"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText12"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content12"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView13"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title13"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText13"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content13"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView14"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title14"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText14"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content14"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+	    </LinearLayout>
+
+	    <LinearLayout
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+		<TextView android:id="@+id/contView15"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title15"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText15"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="5"
+			  android:inputType="text"
+			  android:textColor="#FFFFFF"
+			  android:text="@string/content15"
+			  android:gravity="center_horizontal"
+			  android:textSize="20sp"
+			/>
+		<TextView android:id="@+id/contView16"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+			  android:layout_weight="2"
+			  android:textColor="#FFFFFF"
+			  android:gravity="center_horizontal"
+			  android:text="@string/title16"
+			  android:textSize="20sp"
+			/>
+		<AutoCompleteTextView android:id="@+id/contText16"
+			  android:layout_width="0dp"
+			  android:layout_height="wrap_content"
+                  android:layout_weight="5"
+                  android:inputType="text"
+                  android:textColor="#FFFFFF"
+                  android:text="@string/content16"
+                  android:gravity="center_horizontal"
+                  android:textSize="20sp"
+                />
+
+    </LinearLayout>
+</LinearLayout>

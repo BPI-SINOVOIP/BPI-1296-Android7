@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?> 
+    <resources>
+        <color name="transparent">#00000000</color>
+        <color name="white">#ffffff</color>
+		<color name="red">#FF0000</color>
+		<color name="green">#00FF00</color>
+		<color name="blue">#0000FF</color>
+        <color name="black">#000000</color>
+        <color name="button_bg">#ff9966</color>
+        <color name="blank">#00000000</color>
+        <color name="musicTitle">#29abe2</color>
+        <color name="musicIdinfos">#171820</color>
+        <color name="timecolor">#cccccc</color>
+		<color name="BWTitleGreen">#01664E</color>
+		<color name="BWTitleVideoBlue">#508FF2</color>
+		<color name="BWTitlePhotoBlue">#2FD2EB</color>
+		<color name="BWTitleShadowColor">#aaaaaa</color>
+		<color name="ItemSelectedTextColor">#FFFFFF</color>
+		<color name="ItemUnselectedTextColor">#7A7A7A</color>
+    </resources>

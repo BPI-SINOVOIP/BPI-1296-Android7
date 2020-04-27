@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<MimeTypes>
+	<!-- Image types -->
+	<type extension=".png" mimetype="image/png" />
+	<type extension=".gif" mimetype="image/gif" />
+	<type extension=".jpg" mimetype="image/jpg" />
+	<type extension=".jpeg" mimetype="image/jpeg" />
+	<type extension=".bmp" mimetype="image/bmp" />
+        <!--
+	<type extension=".tiff" mimetype="image/tiff" />
+	<type extension=".tif" mimetype="image/tiff" />
+        -->
+	<type extension=".webp" mimetype="image/webp" />
+        <type extension=".heic" mimetype="image/heic" />
+        <type extension=".heif" mimetype="image/heif" />
+	    
+	<!-- Audio types -->
+	<type extension=".mp3" mimetype="audio/mpeg" />
+	<type extension=".wma" mimetype="audio/x-ms-wma" />
+	<type extension=".wav" mimetype="audio/wav" />
+	<type extension=".aac" mimetype="audio/aac"/>
+	<type extension=".x-aac" mimetype="audio/x-aac"/>
+	<type extension=".mp4" mimetype="audio/aac"/>
+	<type extension=".m4a" mimetype="audio/mp4"/>
+	<type extension=".flac" mimetype="audio/flac"/>
+    <type extension=".ogg" mimetype="audio/ogg"/>
+    <type extension=".oga" mimetype="audio/ogg"/>
+    <type extension=".amr" mimetype="audio/amr"/>
+    <type extension=".3ga" mimetype="audio/amr"/>
+    <type extension=".ape" mimetype="audio/ape"/>
+    <type extension=".dms_ogm_application" mimetype="application/ogg"/><!-- use for DMS-->
+    <type extension=".dms_asf_video" mimetype="video/x-ms-asf"/><!-- use for DMS-->
+    <type extension=".ra" mimetype="audio/real"/>
+    <type extension=".ram" mimetype="audio/real"/>
+    <type extension=".mid" mimetype="audio/midi"/>
+    <type extension=".xmf" mimetype="audio/midi"/>
+    <type extension=".mxmf" mimetype="audio/midi"/>
+    <type extension=".rtttl" mimetype="audio/midi"/>
+    <type extension=".rtx" mimetype="audio/midi"/>
+    <type extension=".ota" mimetype="audio/midi"/>
+    <type extension=".imy" mimetype="audio/midi"/>
+    <type extension=".aiff" mimetype="audio/aiff"/>
+	<type extension=".dsf" mimetype="audio/dsd-dsf"/>
+    <type extension=".adts" mimetype="audio/vnd.dlna.adts"/>
+
+	<!-- Video types -->
+	<type extension=".asf" mimetype="video/x-ms-asf" />
+	<type extension=".mp4" mimetype="video/mp4" />
+	<type extension=".m4v" mimetype="video/mp4" />
+	<type extension=".mov" mimetype="video/mp4" />
+	<type extension=".xvid" mimetype="video/mp4" />
+	<type extension=".avi" mimetype="video/avi" />
+	<type extension=".iso" mimetype="video/iso" />
+	<type extension=".wmv" mimetype="video/x-ms-wmv" />
+	<type extension=".flv" mimetype="video/flv" />
+	<type extension=".x-flv" mimetype="video/x-flv" />
+	<type extension=".f4v" mimetype="video/f4v" />
+	<type extension=".mkv" mimetype="video/x-matroska" />
+	<type extension=".ts" mimetype="video/ts" />
+	<type extension=".tp" mimetype="video/tp" />
+    <type extension=".trp"  mimetype="video/trp" />
+    <type extension=".m2ts"  mimetype="video/m2ts"/>
+    <type extension=".mts"  mimetype="video/mts" />
+	<type extension=".mpg" mimetype="video/mpg" />
+	<type extension=".mpeg" mimetype="video/mpeg" />
+    <type extension=".m2v"  mimetype="video/m2v" />
+	<type extension=".vob" mimetype="video/vob" />
+	<type extension=".avs" mimetype="video/avs" />
+    <type extension=".asm"  mimetype="video/avs"/>
+    <type extension=".avsts"  mimetype="video/avs"/>
+    <type extension=".ps"  mimetype="video/avs"/>
+	<type extension=".3gp" mimetype="video/3gp" />
+	<type extension=".webm" mimetype="video/webm" />
+	<type extension=".ogm" mimetype="video/ogm" />
+	<type extension=".rm" mimetype="video/rm" />
+	<type extension=".rmvb" mimetype="video/rmvb" />
+    <type extension=".tts" mimetype="video/vnd.dlna.mpeg-tts" />
+
+	<!-- Package types -->
+	<type extension=".jar" mimetype="application/java-archive" />
+	<type extension=".zip" mimetype="application/zip" />
+	<type extension=".rar" mimetype="application/x-rar-compressed" />
+	<type extension=".gz" mimetype="application/gzip" />
+	
+	<!-- Web browser types -->
+	<type extension=".htm" mimetype="text/html" />
+	<type extension=".html" mimetype="text/html" />
+	<type extension=".php" mimetype="text/php " />
+	
+	<!-- Text types -->
+	<type extension=".txt" mimetype="text/plain" />
+	<type extension=".csv" mimetype="text/csv" />
+	<type extension=".xml" mimetype="text/xml" />
+	
+    <type extension=".pls" mimetype="list/pls"/>
+    <type extension=".m3u" mimetype="list/m3u"/>
+	<!-- Android specific -->
+	<type extension=".apk" mimetype="application/vnd.android.package-archive" />
+	
+</MimeTypes>

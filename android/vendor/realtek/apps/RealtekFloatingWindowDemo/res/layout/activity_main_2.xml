@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|left">
+
+    <include android:id="@+id/hdmi_rx_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/setting_widget" />
+
+    <include android:id="@+id/usb_camera_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/setting_widget" />
+
+    <!--
+    <include android:id="@+id/media_player_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/setting_widget" />
+    -->
+
+    <include android:id="@+id/media_player_setting_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/setting_widget_2" />
+
+    <Button android:id="@+id/demo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

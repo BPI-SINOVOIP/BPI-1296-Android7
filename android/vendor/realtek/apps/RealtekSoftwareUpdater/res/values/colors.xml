@@ -1,0 +1,9 @@
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="list_item_focus_color">#00756B</color>
+    <color name="list_item_unfocus_color">#4A6870</color>
+	<color name="dialog_security_result_bg_color">#D4E5EC</color>
+
+</resources>

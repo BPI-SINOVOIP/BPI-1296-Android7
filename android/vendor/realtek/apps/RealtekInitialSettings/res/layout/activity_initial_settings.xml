@@ -1,0 +1,99 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg03"
+    tools:context=".InitialSettingsActivity" >
+
+	<!-- Google Play Icon for Airfun-->
+	<ImageView 
+		android:id="@+id/google_play_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="804px"
+   		android:layout_marginLeft="60px"
+   		android:src="@drawable/qr_google" />
+    
+	<!-- Apple Store Icon for Airfun-->
+   	<ImageView 
+   		android:id="@+id/apple_store_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="804px"
+   		android:layout_marginLeft="229px"
+   		android:src="@drawable/qr_appstore" />
+    
+	<!-- Airfun device name text -->
+	<TextView
+		android:id="@+id/hint_airfun_device_name"
+  		android:text="@string/hint_airfun_device_name_text"
+   		android:textColor="#33CCCC"
+       	android:textSize="20sp"
+   		android:layout_marginTop="964px"
+   		android:layout_marginLeft="60px"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+    
+	<!-- Download Airfun text -->
+   	<TextView
+		android:id="@+id/hint_download_app"
+  		android:text="@string/hint_download_app_text"
+   		android:textColor="#FFFFFF"
+       	android:textSize="20sp"
+   		android:layout_marginTop="1008px"		
+   		android:layout_marginLeft="60px"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+    
+	<!-- Title text for listview -->
+	<TextView
+		android:layout_width="934px"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="120px"
+   		android:layout_marginLeft="493px"
+		android:gravity="center"
+		android:text="@string/select_menu_language"
+		android:textColor="#57CAD9"
+		android:textSize="40sp"
+		android:textStyle="bold" />
+      
+	<!-- Header for listview --> 
+	<include layout="@layout/menu_list_header" />
+
+	<!-- Main listview body --> 
+   	<ListView
+   		android:id="@+id/language_menu"
+		android:layout_width="1086px"
+		android:layout_height="720px"
+   		android:layout_marginTop="210px"
+   		android:layout_marginLeft="417px"
+		android:scrollbars="none"
+   		android:listSelector="@color/transparent"
+   		android:divider="@android:color/transparent" />
+
+	<!-- Footer for listview --> 
+	<include layout="@layout/menu_list_footer" />
+    
+	<!-- Next Icon --> 
+	<ImageButton 
+		android:id="@+id/next_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginLeft="1681px"	
+   		android:layout_marginTop="870px"		
+   		android:background="@color/transparent"
+		android:src="@drawable/next_icon_focus_selector" />
+    
+	<!-- Next Icon Text --> 
+   	<TextView
+		android:id="@+id/hint_next_icon"
+  		android:text="@string/hint_next_icon_text"
+   		android:textColor="#A5AAC5"
+       	android:textSize="40sp"
+		android:gravity="center"
+   		android:layout_marginLeft="1596px"	
+   		android:layout_marginTop="996px"		
+   		android:layout_width="288px"
+   		android:layout_height="60px" />
+    
+</RelativeLayout>

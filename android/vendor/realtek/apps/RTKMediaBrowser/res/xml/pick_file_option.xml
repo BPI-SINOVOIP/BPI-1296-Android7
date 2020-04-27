@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Option>
+    <Group GroupName="ViewSelect">
+        <Item
+                text="Select Dir"
+                Name="mb_select_dir"
+                Focus="false"/>
+        <Item
+                text="Select File"
+                Name="mb_select_file"
+                Focus="false"/>
+    </Group>
+</Option>

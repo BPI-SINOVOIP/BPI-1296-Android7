@@ -1,0 +1,9 @@
+<resources>
+
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+
+    <dimen name="RTK_margin_horizontal">16dp</dimen>
+    <dimen name="RTK_margin_vertical">16dp</dimen>
+</resources>

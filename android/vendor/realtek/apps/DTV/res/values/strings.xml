@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DTV</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="region">Region</string>
+    <string name="auto_scan">Auto Scan</string>
+    <string name="manual_scan">Manual Scan</string>
+    <string name="auto_scan_title">AUTO SCAN</string>
+    <string name="manual_scan_title">MANUAL SCAN</string>
+    
+    <string name="scan">Scan</string>
+    <string name="wrong_frequency">Wrong Input</string>
+    
+    <string name="channel_strength">Strength:</string>
+    <string name="channel_quality">Quality:</string>
+
+    <string name="tv_channel">TV Channel</string>
+    <string name="radio_channel">Radio Channel</string>
+    
+    <!-- DO NOT TRANSLATE radio_channel_background -->
+    <string name="radio_channel_background">Radio Channel</string>
+    <!-- DO NOT TRANSLATE radio_channel_background -->
+    
+    <string name="ARGENTINA">Argentina</string>
+    <string name="AUSTRALIA">Australia</string>
+    <string name="AUSTRIA">Austria</string>
+    <string name="BELGIUM">Belgium</string>
+    <string name="BRAZIL">Brazil</string>
+    <string name="CHINA">China</string>
+    <string name="CZECH_REPUBLIC">Czech</string>
+    <string name="DENMARK">Denmark</string>
+    <string name="FINLAND">Finland</string>
+    <string name="FRANCE">France</string>
+    <string name="GERMANY">Germany</string>
+    <string name="GREECE">Greece</string>
+    <string name="HUNGARY">Hungary</string>
+    <string name="IRELAND">Ireland</string>
+    <string name="ITALY">Italy</string>
+    <string name="JAPAN">Japan</string>
+    <string name="KOREA">Korea</string>
+    <string name="LUXEMBOURG">Luxembourg</string>
+    <string name="NETHERLANDS">Netherlands</string>
+    <string name="NORWAY">Norway</string>
+    <string name="POLAND">Poland</string>
+    <string name="PORTUGAL">Portugal</string>
+    <string name="RUSSIA">Russia</string>
+    <string name="SLOVAKIA">Slovakia</string>
+    <string name="SLOVENIA">Slovenia</string>
+    <string name="SPAIN_PENINSULA_Y_BALEARES">Spain (Peninsula y Baleares)</string>
+    <string name="SPAIN_CANARIAS">Spain (Canarias)</string>
+    <string name="SWEDEN">Sweden</string>
+    <string name="SWITZERLAND">Switzerland</string>
+    <string name="TAIWAN">Taiwan (ROC)</string>
+    <string name="TURKEY">Turkey</string>
+    <string name="UNITED_KINGDOM">United Kingdom</string>
+    <string name="USA">USA</string>
+    <string-array name="regionArray">
+        <item>@string/ARGENTINA</item>
+        <item>@string/AUSTRALIA</item>
+        <item>@string/AUSTRIA</item>
+        <item>@string/BELGIUM</item>
+        <item>@string/BRAZIL</item>
+        <item>@string/CHINA</item>
+        <item>@string/CZECH_REPUBLIC</item>
+        <item>@string/DENMARK</item>
+        <item>@string/FINLAND</item>
+        <item>@string/FRANCE</item>
+        <item>@string/GERMANY</item>
+        <item>@string/GREECE</item>
+        <item>@string/HUNGARY</item>
+        <item>@string/IRELAND</item>
+        <item>@string/ITALY</item>
+        <item>@string/JAPAN</item>
+        <item>@string/KOREA</item>
+        <item>@string/LUXEMBOURG</item>
+        <item>@string/NETHERLANDS</item>
+        <item>@string/NORWAY</item>
+        <item>@string/POLAND</item>
+        <item>@string/PORTUGAL</item>
+        <item>@string/RUSSIA</item>
+        <item>@string/SLOVAKIA</item>
+        <item>@string/SLOVENIA</item>
+        <item>@string/SPAIN_PENINSULA_Y_BALEARES</item>
+        <item>@string/SPAIN_CANARIAS</item>
+        <item>@string/SWEDEN</item>
+        <item>@string/SWITZERLAND</item>
+        <item>@string/TAIWAN</item>
+        <item>@string/TURKEY</item>
+        <item>@string/UNITED_KINGDOM</item>
+        <item>@string/USA</item>
+    </string-array>
+    <string name="_6MHz">6 MHz</string>
+    <string name="_7MHz">7 MHz</string>
+    <string name="_8MHz">8 MHz</string>
+    
+    <string-array name="bandwidthArray">
+        <item>@string/_6MHz</item>
+        <item>@string/_7MHz</item>
+        <item>@string/_8MHz</item>
+    </string-array>
+    <string name="bandwidth">Bandwidth</string>
+    <string name="frequency">Frequency</string>
+    
+    <string name="ch5">CH 5</string>
+    <string name="ch6">CH 6</string>
+    <string name="ch7">CH 7</string>
+    <string-array name="channelArray">
+        <item>@string/ch5</item>
+        <item>@string/ch6</item>
+        <item>@string/ch7</item>
+    </string-array>
+    <string name="channel">Channel</string>
+</resources>

@@ -1,0 +1,59 @@
+<resources>
+
+    
+
+
+
+
+
+ 
+    
+    
+
+
+    <string name="app_name">Media Browser</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_media_browser">MediaBrowser</string>
+    <string name="title_activity_audio_browser">AudioBrowser</string>
+    <string name="mb_video">Video</string>
+    <string name="mb_music">Music</string>
+    <string name="mb_photo">Photo</string>
+    <string name="mb_allfile">All Files</string>
+    <string name="mb_usb">USB</string>
+    <string name="mb_storage">Storage</string>
+    <string name="mb_dlna">DLNA</string>
+    <string name="mb_samba">SAMBA</string>
+    <string name="mb_title">Title</string>
+    <string name="mb_album">Album</string>
+    <string name="mb_artist">Artist</string>
+    <string name="mb_unknown">Unknown</string>
+    <string name="mb_thumbnailview">Thumbnail view</string>
+    <string name="mb_preview">Preview</string>
+    <string name="mb_all_video">All video</string>
+    <string name="mb_dvd_bd">DVD/BD only</string>
+    <string name="mb_date_view">Date view</string>
+    <string name="mb_all_photo">All photos</string>
+    <string name="mb_sort_by_name_a_z">Sort by name A to Z</string>
+    <string name="mb_sort_by_name_z_a">Sort by name Z to A</string>
+    <string name="mb_recently_play">Sort by recently play</string>
+    <string name="mb_recently_add_new_old">Sort by add new to old </string>
+    <string name="mb_recently_add_old_new">Sort by add old to new</string>
+    <string name="mb_image_over_supporting">This image is over supporting</string>
+    <string name="video">video</string>
+    <string name="audio">audio</string>
+    <string name="photo">photo</string>
+    <string name="title_music">Music</string>
+    <string name="title_photo">Photo</string>
+    <string name="title_movie">Videos</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="no_file">No applicable media files.</string>
+    <string name="no_db_file">Could not get any media file form DB.</string>
+    <string name="network_NG">Network is disconnected.</string>
+    <string name="remember_login">Remember login information</string>
+    <string name="press_option_to_select_folder">Please press Option menu on the remote controller to select folder</string>
+    <string name="searchable_label">MediaBrowserLabel</string>
+    <string name="searchable_hint">Search MediaBrowser</string>
+    <string name="searchable_description">MediaBrowserDesc</string>
+</resources>

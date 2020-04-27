@@ -1,0 +1,51 @@
+<resources>
+
+    <style name="AppTheme" parent="android:Theme.Light" />
+	<style name="PopupAnimation" parent="android:Animation" mce_bogus="1">		
+		<item name="android:windowEnterAnimation">@anim/sif</item>
+		<item name="android:windowExitAnimation">@anim/sof</item>
+	</style>
+    <style name="MBWSelectedText">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="MBWUnselectedText">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#404040</item>
+    </style>
+    <style name="PRESelectedText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/ItemSelectedTextColor</item>
+    </style>
+    <style name="PREUnselectedText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/ItemUnselectedTextColor</item>
+    </style>
+    <style name="THUSelectedText">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/ItemSelectedTextColor</item>
+    </style>
+    <style name="THUUnselectedText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/ItemUnselectedTextColor</item>
+    </style>
+    <style name="OPTSelectedText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">18sp</item>
+		<item name="android:textStyle">bold</item>
+        <item name="android:textColor">#0084B6</item>
+    </style>
+    <style name="OPTUnselectedText">
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:textSize">18sp</item>
+		<item name="android:textStyle">normal</item>
+        <item name="android:textColor">#4C5254</item>
+    </style>
+
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:state_selected="false">
+		<layer-list>
+			<item>
+				<bitmap android:gravity="center" android:src="@drawable/list_bg_none" />
+			</item>
+			<item>
+				<shape xmlns:android="http://schemas.android.com/apk/res/android">
+					<size android:width="934px" android:height="96px" />
+					<!-- <size android:width="200px" android:height="96px" /> -->
+				</shape>
+			</item>
+		</layer-list>
+	</item>
+
+    <item android:state_selected="true">
+		<layer-list>
+			<item>
+				<bitmap android:gravity="center" android:src="@drawable/list_bg_focus" />
+			</item>
+			<item>
+				<shape xmlns:android="http://schemas.android.com/apk/res/android">
+					<size android:width="1086px" android:height="96px" />
+					<!-- <size android:width="400px" android:height="96px" /> -->
+					<!-- <stroke android:width="5dp" android:color="#5C3708" /> -->
+				</shape>
+			</item>
+		</layer-list>
+	</item>
+
+
+</selector> 

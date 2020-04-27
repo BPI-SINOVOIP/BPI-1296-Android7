@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/movie_hint_layout"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true"
+    android:layout_marginTop="33dp"
+    android:layout_marginLeft="63dp"
+    android:visibility="invisible" >
+
+    <TextView android:id="@+id/movie_hint_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:textColor="#86ACBF" />
+    <TextView android:id="@+id/movie_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/movie_hint_tag"
+        android:layout_alignBottom="@+id/movie_hint_tag"
+        android:layout_marginLeft="7dp"
+        android:textSize="28sp"
+        android:textColor="#FFFFFF" />
+
+</RelativeLayout>

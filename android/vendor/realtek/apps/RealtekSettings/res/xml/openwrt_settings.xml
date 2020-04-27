@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2011 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/openwrt_settings_title">
+
+    <!--EditTextPreference
+        android:title="@string/openwrt_login"
+        android:dialogTitle="@string/openwrt_login"
+        android:key="openwrt_login_key"
+        android:singleLine="true"
+        android:maxLength="16"
+        android:inputType="text"
+        android:password="true" /-->
+
+    <SwitchPreference
+        android:key="toggle_samba_service"
+        android:title="@string/openwrt_samba_mode"
+		android:summary="@string/openwrt_samba_summary" />
+
+    <SwitchPreference
+        android:key="toggle_dms_service"
+        android:title="@string/openwrt_dms_mode" />
+
+    <SwitchPreference
+        android:key="toggle_ftp_service"
+        android:title="@string/openwrt_ftp_mode" />
+
+    <SwitchPreference
+        android:key="toggle_afp_service"
+        android:title="@string/openwrt_afp_mode" />
+
+    <SwitchPreference
+        android:key="toggle_daap_service"
+        android:title="@string/openwrt_daap_mode" />
+
+    <SwitchPreference
+        android:key="toggle_bt_service"
+        android:title="@string/openwrt_bt_mode" />
+
+    <!--Preference
+        android:key="openwrt_wifi_ap_2g"
+        android:title="@string/wifi_tether_configure_ap_text"
+        android:summary="@string/openwrt_ap_summary_2g"
+        android:persistent="false" />
+
+    <Preference
+        android:key="openwrt_wifi_ap_5g"
+        android:title="@string/wifi_tether_configure_ap_text"
+        android:summary="@string/openwrt_ap_summary_5g"
+        android:persistent="false" /-->
+
+    <Preference
+        android:key="openwrt_advanced_key"
+        android:title="@string/openwrt_advanced"
+        android:summary="@string/openwrt_advanced_summary"
+        android:persistent="false" />
+
+</PreferenceScreen>

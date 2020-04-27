@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg03"
+    tools:context=".InitialSettingsActivity" >
+
+	<!-- Title text for listview -->
+	<TextView
+		android:layout_width="934px"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="120px"
+   		android:layout_marginLeft="493px"
+		android:gravity="center"
+		android:text="@string/select_software"
+		android:textColor="#57CAD9"
+		android:textSize="40sp"
+		android:textStyle="bold" />
+      
+	<!-- Header for listview --> 
+	<include layout="@layout/menu_list_header" />
+
+	<!-- Main listview body --> 
+   	<ListView
+   		android:id="@+id/software_menu"
+		android:layout_width="1086px"
+		android:layout_height="720px"
+   		android:layout_marginTop="210px"
+   		android:layout_marginLeft="417px"
+		android:scrollbars="none"
+   		android:listSelector="@color/transparent"
+   		android:divider="@android:color/transparent" />
+
+	<!-- Footer for listview --> 
+	<include layout="@layout/menu_list_footer" />
+    
+</RelativeLayout>

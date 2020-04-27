@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:background="@drawable/bg"
+    tools:context=".ThumbnailViewActivity" >
+
+	<include layout="@layout/media_info"/>
+
+    <fragment android:name="com.rtk.mediabrowser.GenericContentViewFragment"
+        android:id="@+id/genericview_grid_fragment"
+        android:layout_marginTop="192dp"
+        android:layout_marginLeft="30dp"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+</RelativeLayout>
+<!--WEN ADD END-->	
+
+

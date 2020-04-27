@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+        >
+        <ImageView
+                android:layout_width="338dp"
+                android:layout_height="374dp"
+                android:id="@+id/mbw_menu_grid_img"
+                android:focusable="false"
+                android:layout_centerHorizontal="true"
+                />
+        <com.realtek.Utils.MarqueeTextView
+                android:id="@+id/mbw_menu_grid_text"
+                android:layout_marginTop="206dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:focusable="false"
+                />
+</RelativeLayout>

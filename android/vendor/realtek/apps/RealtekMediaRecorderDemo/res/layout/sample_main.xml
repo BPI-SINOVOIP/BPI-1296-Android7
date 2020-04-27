@@ -1,0 +1,155 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+    <!-- Group control panel -->
+    <LinearLayout android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:gravity="center_vertical" >
+
+        <CheckBox android:id="@+id/render_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:padding="5dp"
+            android:text="@string/text_render">
+        </CheckBox>
+
+        <!-- Output mode select group -->
+        <LinearLayout android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/output_mode_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:padding="10dip"
+                android:text="@string/text_output_mode"
+                android:textSize = "20sp"/>
+
+            <Spinner
+                android:id="@+id/output_mode_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- put all control panel groups under a FrameLayout -->
+        <FrameLayout
+            android:id="@+id/control_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+                <!-- file infomation -->
+                <LinearLayout android:id="@+id/file_control_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:padding="10dip"
+                        android:text="@string/text_file_path"
+                        android:textSize = "16sp"/>
+
+                    <TextView
+                        android:id="@+id/file_info_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:padding="10dip"
+                        android:textSize = "10sp"/>
+
+                </LinearLayout>
+
+                <!-- udp ip/port control panel -->
+                <LinearLayout android:id="@+id/udp_control_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <!-- IP setting -->    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <!-- IP textview -->
+                        <TextView
+                            android:id="@+id/udp_ip_textview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:padding="10dip"
+                            android:text="@string/text_udp_ip"
+                            android:textSize = "20sp"/>
+
+                        <!-- input field -->
+                        <EditText android:id="@+id/udp_ip_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                        </EditText>
+                    </LinearLayout>
+
+                    <!-- Port setting -->    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <!-- Port textview -->
+                        <TextView
+                            android:id="@+id/udp_port_textview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:padding="10dip"
+                            android:text="@string/text_udp_port"
+                            android:textSize = "20sp"/>
+
+                        <!-- input field -->
+                        <EditText android:id="@+id/udp_port_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                        </EditText>
+                    </LinearLayout>
+                </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Grop preview panel -->
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:gravity="center">
+
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_capture"
+                android:layout_gravity="bottom"
+                android:onClick="onCaptureClick"
+                android:text="@string/btnCapture"/>
+
+        <SurfaceView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/surface_view" />
+
+    </LinearLayout>
+
+</LinearLayout>

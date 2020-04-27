@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/photopage_progress"
+    >
+
+    <RelativeLayout
+        android:id="@+id/cursor_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:id="@+id/cursor_progress_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal" >
+
+            <ImageView android:id="@+id/photo_progessbar_fr"
+                android:layout_width="64dp"
+                android:layout_height="54dp"
+                android:src="@drawable/photo_progessbar_fr"
+                />
+            <ImageView android:id="@+id/photo_progessbar_slideshow_play"
+                android:layout_width="64dp"
+                android:layout_height="54dp"
+                android:src="@drawable/photo_progessbar_slideshow_play"
+                />
+            <ImageView android:id="@+id/photo_progessbar_ff"
+                android:layout_width="64dp"
+                android:layout_height="54dp"
+                android:src="@drawable/photo_progessbar_ff"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cursor_progress_rotate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/cursor_progress_play"
+            android:layout_marginLeft="60dp"
+            android:orientation="horizontal" >
+
+            <ImageView android:id="@+id/photo_progessbar_rotation_left"
+                android:layout_width="64dp"
+                android:layout_height="54dp"
+                android:src="@drawable/photo_progessbar_rotation_left"
+                />
+            <ImageView android:id="@+id/photo_progessbar_rotation_right"
+                android:layout_width="64dp"
+                android:layout_height="54dp"
+                android:src="@drawable/photo_progessbar_rotation_right"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/floatHoverArea"
+        android:layout_width="fill_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="@android:color/transparent" />
+
+</RelativeLayout>

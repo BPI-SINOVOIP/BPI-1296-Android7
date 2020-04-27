@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">RunRunScript</string>
+    <string name="btnStart">Start</string>
+    <string name="btnScan">Scan</string>
+    <string name="textInfo">Found ? test cases</string>
+    <string name="textVersion">Version</string>
+    <string name="textStopErr">Stop on Error?</string>
+</resources>

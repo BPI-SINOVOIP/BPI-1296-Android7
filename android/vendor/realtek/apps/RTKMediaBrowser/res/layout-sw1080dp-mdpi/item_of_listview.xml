@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				xmlns:custom="http://schemas.android.com/apk/res/com.rtk.mediabrowser"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left"
+    >
+	<ImageView
+		android:id="@+id/focused_img" 
+		android:layout_width="@dimen/item_of_listview_focused_img_layout_width"
+		android:layout_height="@dimen/item_of_listview_focused_img_layout_height"
+		android:clickable="false"
+	/>
+			
+	<ImageView
+		android:layout_alignParentTop="true"
+		android:id="@+id/list_type_img"
+		android:layout_marginLeft="69dp"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:focusable="false"
+		android:clickable="false"
+		android:paddingRight="25dp"
+	/>
+
+	<ImageView
+		android:id="@+id/folder_img"
+		android:layout_alignParentRight="true"
+		android:layout_centerVertical="true"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:minWidth="30dp"
+		android:gravity="left|center_vertical"
+		android:focusable="false"
+		android:clickable="false"
+	/>
+
+	<com.realtek.Utils.MarqueeTextView
+			android:id="@+id/list_text"
+			android:layout_toRightOf="@id/list_type_img"
+			android:layout_toLeftOf="@id/folder_img"
+			android:layout_centerVertical="true"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="left|center_vertical"
+			android:ellipsize="marquee"
+			android:marqueeRepeatLimit="marquee_forever"
+			android:singleLine="true"
+			android:clickable="false"
+			custom:UpdateViewOnFocusChange="false">
+	</com.realtek.Utils.MarqueeTextView>
+</RelativeLayout>

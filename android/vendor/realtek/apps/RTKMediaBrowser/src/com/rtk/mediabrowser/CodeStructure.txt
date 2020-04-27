@@ -1,0 +1,10 @@
+MediaBrowser.java(Activity)
+		ThumbnailViewActivity.java(Activity) inherit AbstractFBViewActivity.java
+		PreViewActivity.java(Activity) inherit AbstractFBViewActivity.java
+		AbstractFBViewActivity.java will use GenericContentViewFragment.java to display GridView/ListView item. 
+		
+		    AudioPreViewFragment.java
+			PhotoPreViewFragment.java
+			VideoPreViewFragment.java
+
+            RTKOptionMenu.java:Could be used in any Activity.

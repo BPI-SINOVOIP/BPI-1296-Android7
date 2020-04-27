@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Encoder</string>
+    <string name="surface_name">Encoder Preview</string>
+    <string name="encoder_single">Single </string>
+    <string name="encoder_double">Double </string>
+    <string name="encoder_triple">Triple </string>
+    <string name="encoder_quadra">Quadra </string>
+    <string name="encoder_monitor">Monitor </string>
+    <string name="txtview">VideoNum</string>
+    <string name="txtview2">AudioNum</string>
+    <string name="ok">OK</string>
+    <string name="title1">Source1</string>
+    <string name="title2">Source2</string>
+    <string name="title3">Source3</string>
+    <string name="title4">Source4</string>
+    <string name="content1">storage/sda1/video.mp4</string>
+    <string name="content2">storage/sda1/video2.mp4</string>
+    <string name="content3">storage/sda1/video3.mp4</string>
+    <string name="content4">storage/sda1/video4.mp4</string>
+    <string name="general">GeneralSetting </string>
+    <string name="audio">AudioSetting </string>
+    <string name="video">VideoSetting </string>
+    <string name="empty"> </string>
+    <string name="FR">FrameRate</string>
+    <string name="BR">BitRate</string>
+    <string name="FI">I-FrameInterval</string>
+    <string name="Format">OutputFormat</string>
+    <string name="Exit">ExitType</string>
+    <string name="Track">TrackOption</string>
+    <string name="Pass">AudioOutput</string>
+    <string name="Resol">Resolution</string>
+    <string name="x">x</string>
+    <string name="Deinterlace">Deinterlace</string>
+    <string name="BitrateMode">BitrateMode</string>
+    <string name="ProfileLevel">ProfileLevel</string>
+    <string name="Profile">Profile</string>
+    <string name="Level">Level</string>
+    <string name="SampleRate">SampleRate</string>
+    <string name="Channel">ChannelCount</string>
+    <string name="stream">StreamSetting </string>
+    <string name="burnin">Burn-in</string>
+    <string name="streamOption">StreamOption </string>
+    <string name="repeatOption">Repeat(Times) </string>
+    <string name="streamIP">StreamIP </string>
+    <string name="streamPort">StreamPort </string>
+    <string name="target_title1">Target1</string>
+    <string name="target_title2">Target2</string>
+    <string name="target_title3">Target3</string>
+    <string name="target_title4">Target4</string>
+    <string name="target_path1">sdcard/temp0.mp4</string>
+    <string name="target_path2">sdcard/temp1.mp4</string>
+    <string name="target_path3">sdcard/temp2.mp4</string>
+    <string name="target_path4">sdcard/temp3.mp4</string>
+    <string name="ipText">239.0.0.1</string>
+    <string name="portText">7890</string>
+    <string name="repeatText">0</string>
+    <string name="widthText">1280</string>
+    <string name="heightText">720</string>
+    <string-array name="playList">
+        <item>storage/sda1/video3.mp4</item>
+        <item>storage/sda1/video2.mp4</item>
+        <item>storage/sda1/video.mp4</item>
+        <item>storage/sda1/video4.mp4</item>
+    </string-array>
+
+    <string name="spnFRprompt">FrameRate</string>
+    <string name="spnBRprompt">BitRate</string>
+    <string name="spnFIprompt">I-FrameInterval</string>
+    <string name="spnFormat">OutputFormat</string>
+    <string name="spnExit">ExitType</string>
+    <string name="spnTrack">Track</string>
+    <string name="spnPass">Pass</string>
+    <string name="spnResol">Resolution</string>
+    <string name="spnDeinterlace">Deinterlace</string>
+    <string name="spnBitrateMode">BitrateMode</string>
+    <string name="spnProfile">Profile</string>
+    <string name="spnLevel">Level</string>
+    <string name="spnSampleRate">Resolution</string>
+    <string name="spnChannel">Resolution</string>
+    <string name="spnStreamChoise">OFF</string>
+</resources>

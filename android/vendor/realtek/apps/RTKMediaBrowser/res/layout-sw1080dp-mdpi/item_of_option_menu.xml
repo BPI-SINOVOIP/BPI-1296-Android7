@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	>
+<LinearLayout
+   	android:id="@+id/background" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="left"
+    >
+ 
+    <ImageView
+        android:layout_alignParentTop="true"
+        android:id="@+id/selection_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:paddingLeft="20dp"
+		android:src="@drawable/selector_option_list"
+        android:focusable="false"
+	/>
+
+    <com.realtek.Utils.MarqueeTextView
+        android:id="@+id/selection_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:gravity="left|center_vertical"
+		android:paddingLeft="6dp"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:textColor="#10265f"
+        android:textSize="18sp" >
+    </com.realtek.Utils.MarqueeTextView>
+</LinearLayout>
+	<ImageView
+        android:id="@+id/group_end"
+        android:layout_width="310dp"
+		android:layout_height="1dp"
+		android:paddingLeft="66dp"
+		android:src="#7A9099"
+        android:focusable="false"
+        android:layout_alignParentBottom="true"
+	/>
+</RelativeLayout>

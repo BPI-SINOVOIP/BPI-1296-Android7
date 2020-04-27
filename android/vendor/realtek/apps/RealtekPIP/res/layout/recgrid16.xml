@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical" >
+    
+<SurfaceView android:id="@+id/surfaceView1"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"    
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView2"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView3"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView4"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+</LinearLayout>
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical" >
+    
+<SurfaceView android:id="@+id/surfaceView5"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"    
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView6"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView7"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView8"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+</LinearLayout>
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical" >
+    
+<SurfaceView android:id="@+id/surfaceView9"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"    
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView10"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView11"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView12"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+</LinearLayout>
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical" >
+    
+<SurfaceView android:id="@+id/surfaceView13"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"    
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView14"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView15"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+<SurfaceView android:id="@+id/surfaceView16"
+	android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_gravity="center_horizontal"
+    />
+</LinearLayout>
+
+</LinearLayout>

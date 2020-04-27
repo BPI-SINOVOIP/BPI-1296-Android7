@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <!-- source switch -->
+    <Switch android:id="@+id/source_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/rtk_miracast_dialog_global_top_padding"
+        android:paddingBottom="@dimen/rtk_miracast_dialog_middle_padding"
+        android:paddingLeft="@dimen/rtk_miracast_dialog_global_left_padding"
+        android:paddingRight="@dimen/rtk_miracast_dialog_global_right_padding"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:text="@string/rtk_miracast_dialog_source"
+    />
+    
+    <!-- sink switch -->
+    <Switch android:id="@+id/sink_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/rtk_miracast_dialog_middle_padding"
+        android:paddingBottom="@dimen/rtk_miracast_dialog_global_bottom_padding"
+        android:paddingLeft="@dimen/rtk_miracast_dialog_global_left_padding"
+        android:paddingRight="@dimen/rtk_miracast_dialog_global_right_padding"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:text="@string/rtk_miracast_dialog_sink"
+    />
+</LinearLayout>

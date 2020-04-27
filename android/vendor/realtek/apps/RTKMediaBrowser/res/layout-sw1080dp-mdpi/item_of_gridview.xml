@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:layout_width="@dimen/gridview_item_width"
+    android:layout_height="@dimen/gridview_item_height"
+    android:gravity="center"
+    >
+	<ImageView
+        android:id="@+id/focus_img"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_width="@dimen/gridview_item_width"
+        android:layout_height="@dimen/gridview_item_height"
+        android:focusable="false"
+	/>
+	<LinearLayout
+   		android:layout_width="342dp"	
+    	android:layout_height="334dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+	    android:layout_marginTop="13dp"
+	    android:layout_marginLeft="15dp"
+    	android:gravity="center"
+	    android:orientation="vertical">
+
+   		<ImageView
+   		    android:layout_alignParentTop="true"
+   		    android:id="@+id/grid_img"
+   		    android:layout_width="342dp"
+   		    android:layout_height="230dp"
+   		    android:focusable="false"
+   		    android:layout_marginTop="0dp"
+   		    android:layout_marginRight="0dp"
+   		/>
+
+   		<com.realtek.Utils.MarqueeTextView
+   		    android:id="@+id/grid_text"
+   		    android:layout_width="fill_parent"
+   		    android:layout_height="fill_parent"
+   		    android:layout_below="@+id/grid_img"
+   		    android:ellipsize="marquee"
+   		    android:gravity="center"
+   		    android:marqueeRepeatLimit="marquee_forever"
+   		    android:singleLine="true"
+   		    android:textColor="#10265f"
+   		    android:textSize="25sp" >
+   		</com.realtek.Utils.MarqueeTextView>
+	</LinearLayout>
+
+		
+	<ImageView
+        android:id="@+id/grid_type_img"
+        android:layout_marginTop="143dp"
+        android:layout_marginLeft="257dp"
+        android:layout_width="100dp"
+        android:layout_height="84dp"
+        android:focusable="false"
+	/>
+</RelativeLayout>

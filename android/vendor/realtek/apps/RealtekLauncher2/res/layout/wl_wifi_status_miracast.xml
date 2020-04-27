@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="@color/w_wifi_status_color"
+    android:gravity="center"
+    android:id="@+id/widget_root_view_group">
+    
+    <ImageView android:id="@+id/wifi_connect_image" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/w_wifi_status_label"
+        android:src="@drawable/wi_networkinfo_widgets_1"
+        />
+    
+    <ImageView android:id="@+id/connect_break_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/w_wifi_status_label"
+        android:layout_marginLeft="@dimen/rtk_wifi_status_widget_break_left_padding"
+        android:layout_marginTop="@dimen/rtk_wifi_status_widget_break_top_padding"
+        android:src="@drawable/wi_networkinfo_widgets_break"/>
+    
+    <RelativeLayout android:id="@+id/label_view_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|left">
+        
+        <!-- miracast -->
+        <TextView android:id="@+id/miracast_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="@style/rtk_wifi_status_text"
+            android:layout_marginTop="@dimen/rtk_wifi_status_widget_miracast_text_label_top_padding"
+            android:layout_marginLeft="@dimen/rtk_wifi_status_widget_miracast_text_label_left_padding"
+            android:includeFontPadding="false"
+            />
+        
+        <!-- miracast mode (source/sink) -->
+        <TextView android:id="@+id/miracast_mode_text"
+            android:layout_width="@dimen/rtk_wifi_status_widget_miracast_mode_text_label_length"
+            android:layout_height="wrap_content" 
+            android:gravity="center_horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="@style/rtk_wifi_status_text"
+            android:layout_marginTop="@dimen/rtk_wifi_status_widget_miracast_mode_text_label_top_padding"
+            android:layout_marginLeft="@dimen/rtk_wifi_status_widget_miracast_mode_text_label_left_padding"
+            android:includeFontPadding="false"
+            />
+        
+        <!-- device name -->
+        <TextView android:id="@+id/device_name_text"
+            android:layout_width="@dimen/rtk_wifi_status_widget_device_text_label_length"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="@style/rtk_wifi_status_text"
+            android:layout_marginTop="@dimen/rtk_wifi_status_widget_device_name_text_label_top_padding"
+            android:layout_marginLeft="@dimen/rtk_wifi_status_widget_device_name_text_label_left_padding"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:text="@string/rtk_default_device_name"
+            />
+        
+        <!-- pin code -->
+        <TextView android:id="@+id/pin_code_text"
+            android:layout_width="@dimen/rtk_wifi_status_widget_pin_text_label_length"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="@style/rtk_wifi_status_text"
+            android:layout_marginTop="@dimen/rtk_wifi_status_widget_pin_code_text_label_top_padding"
+            android:layout_marginLeft="@dimen/rtk_wifi_status_widget_pin_code_text_label_left_padding"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:text="@string/rtk_default_pin_code"
+            />
+        
+        <!-- SSID -->
+        <TextView android:id="@+id/ssid_text"
+            android:layout_width="@dimen/rtk_wifi_status_widget_ssid_text_label_length"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:textAppearance="@style/rtk_wifi_status_text"
+            android:layout_marginTop="@dimen/rtk_wifi_status_widget_ssid_text_label_top_padding"
+            android:layout_marginLeft="@dimen/rtk_wifi_status_widget_ssid_text_label_left_padding"
+            android:includeFontPadding="false"
+            />
+    </RelativeLayout>
+</FrameLayout>

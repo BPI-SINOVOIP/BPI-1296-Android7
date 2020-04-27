@@ -1,0 +1,102 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.rtk.mediabrowser"
+    android:installLocation="auto"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-feature android:name="android.software.leanback" android:required="false"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"/>
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="24" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+		android:persistent="true"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MediaBrowser"
+            android:configChanges="navigation|keyboard|keyboardHidden"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+
+            <!--declare for tv global search begin-->
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <!-- No category needed, because the Intent will specify this class component -->
+            </intent-filter>
+
+            <!-- Points to searchable meta data. -->
+            <meta-data android:name="android.app.searchable"
+                       android:resource="@xml/searchable" />
+            <!--declare for tv global search end-->
+        </activity>
+        <activity
+            android:name=".ThumbnailViewActivity"
+            android:configChanges="navigation|keyboard|keyboardHidden"
+            android:finishOnTaskLaunch="true"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".PreViewActivity"
+            android:configChanges="navigation|keyboard|keyboardHidden"
+            android:finishOnTaskLaunch="true"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+
+        <provider
+                android:name="android.support.v4.content.FileProvider"
+                android:authorities="com.rtk.mediabrowser.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/provider_paths"/>
+        </provider>
+
+
+        <!-- Provides search suggestions for keywords against video meta data. -->
+        <provider android:name=".VideoContentProvider"
+                  android:authorities="com.rtk.mediabrowser"
+                  android:exported="true" >
+            <path-permission
+                    android:pathPrefix="/search"
+                    android:readPermission="android.permission.GLOBAL_SEARCH" />
+
+        </provider>
+
+        <service
+                android:name="com.realtek.recommendation.UpdateRecommendationsService"
+                android:enabled="true" />
+        <receiver
+                android:name="com.realtek.recommendation.RecommendationReceiver"
+                android:enabled="true"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

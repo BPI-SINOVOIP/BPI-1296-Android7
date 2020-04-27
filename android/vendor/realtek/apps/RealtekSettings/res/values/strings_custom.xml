@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2007 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="smart_brightness_title">Smart backlight</string>
+    <string name="smart_brightness_summary">Auto adjust the backlight.</string>
+    <string name="smart_brightness_preview">Preview mode</string>
+    <string name="hdmi_output_mode">HDMI output mode</string>
+    <string name="hdmi_output_mode_summary">Set the default output mode of HDMI</string>
+
+    <!-- Media scanner -->
+    <string name="media_scan_category">Media scan</string>
+    <string name="media_scan_title">Enable media scanning on %1$s</string>
+    <string name="usb_storage_usage">USB large storage</string>
+
+    <!-- ++++++++++++++++++++++++++++++++++++++++++ -->
+    <!--           new strings for crane            -->
+    <string name="tscalibration_title">Calibrating the touch screen</string>
+
+    <!-- Screen Adaption -->
+    <string name="screen_adaption_title">Enable screen adaption</string>
+    <string name="screen_adaption_summary">Used to adjust size of some games display screen .</string>
+    <string name="screen_adaption_summary_off">The current resolution:</string>
+    <string name="screen_adaption_summary_on">Works after restart</string>
+    <string name="display_mode_selector_title">Display mode</string>
+    <string name="screen_adaption_setting">screen adaption</string>
+
+    <string name="google_market_is_not_found">Application market is not found.</string>
+    <string name="default_tts_speech_is_not_found">Please choose a default tts speech engine and choice a default language.</string>
+
+
+    <!-- system update  -->
+    <string name="system_update_section_title" msgid="7815209034443782061">"System upgrade"</string>
+    <string name="system_recovery_title" msgid="7815209034443782061">"Recovery Mode"</string>
+    <string name="system_recovery_summary" msgid="7815209034443782061">"Reboot into the system in Recovery Mode.Can clear the data or system upgrade"</string>
+    <string name="system_recovery_dialog_massage" msgid="7815209034443782061">"Now reboot into System Recovery Mode, you can partition to remove data or system upgrade?"</string>
+
+    <string name="accelerometer_coordinate_title">Accelerometer coordinate system</string>
+
+
+    <!-- Begin ethernet configure add by shugeLinux@gmail.com @@@@@ -->
+    <string name="eth_settings_title">Ethernet</string>
+    <string name="eth_toggle_title">Ethernet connection</string>
+    <string name="eth_settings">Ethernet Settings</string>
+    <string name="eth_devices">Ethernet Devices</string>
+    <string name="eth_conf">Ethernet Configuration</string>
+    <string name="eth_ip_address">IP Address</string>
+    <string name="eth_ip_string">0.0.0.0</string>
+    <string name="eth_mac_address">MAC Address</string>
+    <string name="eth_mac_string">00:00:00:00:00:00</string>
+    <string name="eth_advanced_configure">Advanced Configuration</string>
+    <string name="eth_mask_address">Mask Address</string>
+    <string name="title_network_prefix_length">Network prefix length</string>
+    <string name="eth_dns1_address">DNS 1 Server</string>
+    <string name="eth_dns2_address">DNS 2 Server</string>
+    <string name="eth_gw_address">Gateway</string>
+    <string name="eth_dhcp_choice">DHCP</string>
+    <string name="eth_dev_more">None Device</string>
+    <string name="eth_dev_summaryoff">DISCONNECTED</string>
+    <string name="eth_dev_summaryon">CONNECTED -- USED DEVICE: </string>
+
+    <string name="eth_link_status">Link Status</string>
+    <string name="eth_link_mode">Link Mode</string>
+    <string name="eth_ip_mode">IP Mode: </string>
+    <string name="eth_dhcp_mode">DHCP</string>
+    <string name="eth_manual_mode">MANUAL</string>
+    <string name="eth_ok">Ok</string>
+    <string name="eth_cancel">Cancel</string>
+    <string name="eth_advand">Advand</string>
+    <string name="eth_message">Are you apply this device?</string>
+    <!-- End ethernet configure add by shugeLinux@gmail.com @@@@@ -->
+
+    <!-- begin system work mode -->
+  <string name="system_work_mode">Power saving mode</string>
+  <string name="system_work_mode_introduction">The system into power saving mode to extend battery usage time.</string>
+
+
+  <string name="cpu_type">SOC Chip</string>
+  <string name="cpu">Super Doulcore A20</string>
+
+  <!-- End system work mode -->
+
+    <string name="eth_pppoe_conf">PPPoE Configuration</string>
+    <string name="miracast_sink_connect_reminder">Connection Reminder</string>
+    <string name="miracast_sink_enable">Enable miracast sink</string>
+    <string name="miracast_sink_settings_title">Miracast Sink</string>
+
+    <!-- HDMI CEC -->
+    <string name="hdmi_cec_sources_heading">HDMI CEC Functions</string>
+    <string name="hdmi_cec_mode_title">HDMI CEC</string>
+    <string name="hdmi_cec_mode_summary">Enable/Disable HDMI CEC</string>
+    <string name="hdmi_cec_auto_osd_language">Auto OSD language</string>
+    <string name="hdmi_cec_auto_power_on_from_tv">Auto Power On From TV</string>
+    <string name="hdmi_cec_one_touch_play">One Touch Play</string>
+    <string name="hdmi_cec_one_touch_standby">One Touch Standby</string>
+    <string name="irda_cec_switch_heading">IRDA/CEC Functions</string>
+    <string name="irda_cec_switch_list_dialog_title">IRDA/CEC Switch</string>
+    <string name="irda_cec_switch_list_title">IRDA/CEC Switch</string>
+
+    <!-- Titles for IRDA CEC Switch preference. -->
+    <string-array name="irda_cec_switch_titles">
+        <item>Off</item>
+        <item>CEC</item>
+        <item>IRDA</item>
+    </string-array>
+
+    <!-- Values for IRDA CEC Switch preference. -->
+    <string-array name="irda_cec_switch_values">
+	<!-- OFF -->
+        <item>off</item>
+	<!-- CEC -->
+        <item>cec</item>
+	<!-- IRDA -->
+        <item>irda</item>
+    </string-array>
+
+    <string name="disable_try_mount_onoff_title">Check File System Before Mount Disk</string>
+    <string name="disable_try_mount_onoff_summary">Default is to check file system only when fail to mount disk</string>
+    <string name="check_volume_onoff_title">Check File System</string>
+    <string name="check_volume_onoff_summary">Run file system checking on external storage inserted</string>
+    <string name="format_on_error_onoff_title">Format Disk On Error</string>
+    <string name="format_on_error_onoff_summary">Format disk when fail to check file system</string>
+    <string name="screen_zoom_in_title">95% Zoom Mode</string>
+    <string name="screen_zoom_in_summary">Zooom in screen to 95%</string>
+    <string name="edid_save_confirm_message">The edid will be saved in edidxxxx.bin in the root folder of the USB stick!!!</string>
+    <string name="edid_save_confirm_title">Save EDID on USB stick</string>
+    <string name="usb_not_found_title">USB stick NOT found!</string>
+
+    <!-- OpenWRT settings -->
+    <string name="openwrt_settings_title">Openwrt Settings</string>
+    <string name="openwrt_afp_mode">AFP Service</string>
+    <string name="openwrt_bt_mode">BT Service</string>
+    <string name="openwrt_daap_mode">DAAP Service</string>
+    <string name="openwrt_dms_mode">DMS Service</string>
+    <string name="openwrt_ftp_mode">FTP Service</string>
+    <string name="openwrt_samba_mode">Samba Server</string>
+    <string name="openwrt_samba_summary">Enable/Disable Samba server</string>
+    <string name="openwrt_ap_summary_2g">OpneWrt portable Wi\u2011Fi hotspot 2.4GHz</string>
+    <string name="openwrt_ap_summary_5g">OpneWrt portable Wi\u2011Fi hotspot 5GHz</string>
+    <string name="openwrt_advanced">Advanced settings</string>
+    <string name="openwrt_advanced_summary">Router and Network configurations</string>
+    <string name="openwrt_login">OpenWrt Login</string>
+
+    <string name="deep_sleep_mode_title">Deep Sleep Mode</string>
+    <string name="deep_sleep_mode_summary">System go to suspend when power off</string>
+
+    <!-- HDMI Rx -->
+    <string name="hdmirx_title">HDMI Rx Functions</string>
+    <string name="hdmirx_version_selector">HDMI Rx Version</string>
+    <string-array name="hdmirx_version_title">
+        <item>1.4</item>
+        <item>2.0</item>
+    </string-array>
+    <string-array name="hdmirx_version_value">
+        <item>1.4</item>
+        <item>2.0</item>
+    </string-array>
+
+    <string name="cvbs_onoff_title">CVBS Switch</string>
+    <string name="cvbs_onoff_summary">Turn On CVBS output</string>
+    <string name="audio_i2s_in_mode_title">Audio I2S In</string>
+    <string name="audio_i2s_in_mode_summary">Audio In from I2S</string>
+    <string name="video_color_title">Video Color Mode</string>
+    <string name="confirm_force_set_video_color_title">Set video color mode?</string>
+    <string name="confirm_force_set_video_color_text">The color mode you selected is not supported by this TV. Are you sure to proceed?</string>
+    <string name="peak_luminance">Peak Luminance</string>
+
+    <!-- realtek -->
+    <string name="tv_system_confirm_message">Are you able to see this dialog? <xliff:g id="countdown">%1$d</xliff:g></string>
+    <string name="tv_system_confirm_title">Confirm</string>
+    <string name="tv_system_list_dialog_title">Set TV System</string>
+    <string name="tv_system_list_title">TV System</string>
+    <string name="auto_1080p24_onoff_title">Auto 1080p 24Hz Playback</string>
+    <string name="auto_1080p24_onoff_summary">Switch TV system to 1080p 24Hz when playing a video with 24Hz content</string>
+    <string name="auto_2997_onoff_title">Auto 29.97/59.94Hz Playback</string>
+    <string name="auto_2997_onoff_summary">Switch TV system when playing a video with 29.97/59.94Hz content</string>
+    <string name="realtek_audio_settings">Realtek Audio Settings</string>
+    <string name="hdmi_output_title">HDMI output</string>
+    <string name="spdif_output_title">S/PDIF output</string>
+    <string name="sound_playback_effect_title">Playback effect</string>
+    <string name="hdmirx_audio_title">HDMI Rx Audio format</string>
+    <string name="dlna_dmr_mode">DLNA DMR</string>
+    <string name="dlna_dmr_mode_summary">Enable/Disable DLNA DMR service</string>
+    <string name="set_dlna_device_name">Set Device Name</string>
+    <string name="dlna_device_name_title">Please Input Device Name</string>
+    <string name="softap_wps_method_dialog_title">Set SoftAP WPS Method</string>
+    <string name="softap_wps_method_title">WPS Method</string>
+    <string name="realtek_debugging_settings">Realtek Debugging Settings</string>
+    <string name="ignore_hdmi_plugout_summary">Do not pause playback when get HDMI plug-out event</string>
+    <string name="ignore_hdmi_plugout_title">Continue playback on HDMI plug-out</string>
+    <string name="cts_mode_enable_title">Playback with less reserved buffers</string>
+    <string name="cts_mode_summary">reserve less buffer for video playback</string>
+    <string name="cts_reboot_warning">Reboot to make settings work</string>
+    <string name="yst_mode_title">Ignoring HDMI EDID</string>
+    <string name="yst_mode_summary">List all TV systems</string>
+    <string name="eth_con_type">Connection Type</string>
+    <string name="eth_con_type_dhcp">DHCP</string>
+    <string name="eth_con_type_manual">Static IP</string>
+    <string name="eth_conf_perf_title">Ethernet configuration</string>
+    <string name="eth_conf_summary">Configure Ethernet devices</string>
+    <string name="eth_config_title">Configure Ethernet device</string>
+    <string name="eth_dev_list">Ethernet Devices:</string>
+    <string name="eth_dns">DNS address</string>
+    <string name="eth_gw">Gateway address</string>
+    <string name="eth_ipaddr">IP address</string>
+    <string name="eth_mask">Netmask</string>
+    <string name="eth_quick_toggle_summary">Turn on Ethernet</string>
+    <string name="eth_quick_toggle_title">Ethernet</string>
+    <string name="eth_radio_ctrl_title">Ethernet configuration</string>
+    <string name="eth_setting">Ethernet setting</string>
+    <string name="eth_toggle_summary_off">Turn off Ethernet</string>
+    <string name="eth_toggle_summary_on">Turn on Ethernet</string>
+    <string name="ethernet_advanced_ip_address_title">Ethernet IP address</string>
+    <string name="ethernet_proxy_settings_title">Ethernet proxy settings</string>
+    <string name="connectivity_ethernet">Ethernet</string>
+    <!-- Wifi Security type indicating no security [CHAR LIMIT=30] -->
+    <string name="wifi_security_type_none">None</string>
+    <!-- Wifi Security type indicating WEP security [CHAR LIMIT=30] -->
+    <string name="wifi_security_type_wep">WEP</string>
+    <!-- Wifi Security type indicating WPA/WPA2 security [CHAR LIMIT=30] -->
+    <string name="wifi_security_type_wpa">WPA/WPA2 PSK</string>
+    <!-- Wifi Security type indicating EAP security [CHAR LIMIT=30] -->
+    <string name="wifi_security_type_eap">802.1x EAP</string>
+    <string name="connected">Connected</string>
+    <string name="not_connected">Not connected</string>
+    <string name="force_sd_audio_onoff_title">Force SD audio</string>
+    <string name="force_sd_audio_onoff_summary">Force output TrueHD/DDP to DD</string>
+    <string name="performance_mode_title">Performance Mode</string>
+    <string name="performance_mode_summary">Maximize CPU performance</string>
+    <string name="device_name">Set Device Name</string>
+    <string name="device_name_dialog">Choose Device Name</string>
+    <!--for search key frame -->
+    <string name="search_key_frame_mode_title">Search Key Frame</string>
+    <string name="search_key_frame_mode_summary">Jump to next key frame on video flush to avoid mosaic effect</string>
+    <string-array name="rooms">
+        <!-- [CHAR LIMIT=40] -->
+        <item>Living Room</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Media Room</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Family Room</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Dining Room</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Den</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Bedroom</item>
+        <!-- [CHAR LIMIT=40] -->
+        <item>Kitchen</item>
+        <item>Default Device Name</item>
+        <item>Enter Custom Name</item>
+    </string-array>
+    <string-array name="rooms_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+    <string name="device_rename_title">Rename this <xliff:g id="devicemodel" example="Nexus Player">%1$s</xliff:g></string>
+    <string name="device_summary_description">This <xliff:g id="devicemodel" example="Nexus Player">%1$s</xliff:g> is currently named \"<xliff:g id="devicename" example="Living Room Player">%2$s</xliff:g>\"</string>
+    <string name="audio_native_sr_title">Audio Native Sampling Rate</string>
+    <string name="audio_native_sr_summary">Audio output native sampling rate</string>
+    <string name="hdmi_range_title">HDMI Range Mode</string>
+    <string name="audio_in_mode_title">Audio In</string>
+    <string name="toggle_bt_sink_service_title">Bluetooth source service and sink service switch</string>
+    <string name="toggle_bt_sink_service_summary">Switch Bluetooth source service to sink service</string>
+    <string name="bt_media_controller_title">Bluetooth Media Controller</string>
+    <string name="cvbs_zoom_in_title">CVBS 95% Zoom Mode</string>
+    <string name="cvbs_zoom_in_summary">Zoom in CVBS to 95%</string>
+    <string name="hdr_output_mode_title">HDR Output Mode</string>
+    <string name="embedded_sub_display_ratio_fixed_title">Embedded Subtitles Display Ratio Fixed Switch</string>
+    <string name="embedded_sub_display_ratio_fixed_summary">Fix Embedded Subtitles Display Ratio</string>
+    <string name="super_resolution_onoff_title">Super Resolution Switch</string>
+    <string name="super_resolution_onoff_summary">Turn On Super Resolution</string>
+    <string name="hdr_to_sdr_gma_title">HDR to SDR gamma</string>
+    <string name="hdr_to_sdr_gma_summary">Set HDR2SDR gamma curve</string>
+    <string name="maxcll_maxfall_onoff_title">MaxCLL and MaxFALL Switch</string>
+    <string name="maxcll_maxfall_onoff_summary">Turn On MaxCLL and MaxFALL</string>
+</resources>

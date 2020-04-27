@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/option_bg_edge"
+        android:layout_width="@dimen/option_menu_l_width"
+        android:layout_height="@dimen/option_menu_height"
+        android:contentDescription="@string/application_name"
+        android:src="@drawable/bg_option_loption" 
+        android:layout_gravity="center_vertical"
+        android:scaleType="fitXY"/>
+
+    <FrameLayout
+        android:id="@+id/option_item_group"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" 
+        android:layout_gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/option_bg"
+            android:layout_width="@dimen/option_menu_r_width"
+            android:layout_height="@dimen/option_menu_height"
+            android:layout_gravity="center_vertical"
+            android:alpha="0.85"
+            android:contentDescription="@string/application_name"
+            android:src="@drawable/bg_option_roption"
+            android:scaleType="fitXY" />
+
+        <!-- content of listview would be set in java code level -->
+
+        <ListView
+            android:id="@+id/option_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:divider="@android:color/transparent"
+            android:listSelector="@android:color/transparent" />
+    </FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/region"
+        android:title="@string/region"/>
+    <item 
+        android:id="@+id/auto_scan"
+        android:title="@string/auto_scan"/>
+    <item 
+        android:id="@+id/manual_scan"
+        android:title="@string/manual_scan"/>
+</menu>

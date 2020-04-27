@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:background="#000000"
+    android:alpha="0.6"
+    android:gravity="center"
+    android:id="@+id/widget_root_view_group"
+    >
+    
+    <!-- background image -->
+    <ImageView android:id="@+id/net_mode_image" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/w_network_traffic_label"
+        android:src="@drawable/wi_download_upload_wifi_0"
+        />
+    
+    <RelativeLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom|right">
+        
+        <!-- text label to display upload speed -->
+	    <TextView android:id="@+id/up_text_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginBottom="@dimen/rtk_net_traffic_widget_speed_text_label_bottom_padding"
+	        android:layout_marginRight="@dimen/rtk_net_traffic_widget_up_speed_text_label_right_padding"
+	        android:textAppearance="@style/rtk_network_traffic_widget_speed_text"
+	        android:includeFontPadding="false"
+	        android:singleLine="true"
+	        android:ellipsize="end"
+	        android:text="@string/rtk_network_traffic_default_value"
+	        />
+		
+	    <!-- speed unit label -->
+	    <TextView android:id="@+id/up_unit_text_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginBottom="@dimen/rtk_net_traffic_widget_unit_text_label_bottom_padding"
+	        android:layout_marginRight="@dimen/rtk_net_traffic_widget_up_speed_unit_text_label_right_padding"
+	        android:textAppearance="@style/rtk_network_traffic_widget_unit_text"
+	        android:text="@string/rtk_network_traffic_unit_text"
+	        android:includeFontPadding="false"
+	        />
+	    
+	    <!-- text label to display download speed -->
+	    <TextView android:id="@+id/down_text_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginBottom="@dimen/rtk_net_traffic_widget_speed_text_label_bottom_padding"
+	        android:layout_marginRight="@dimen/rtk_net_traffic_widget_down_speed_text_label_right_padding"
+	        android:textAppearance="@style/rtk_network_traffic_widget_speed_text"
+	        android:includeFontPadding="false"
+	        android:singleLine="true"
+	        android:ellipsize="end"
+	        android:text="@string/rtk_network_traffic_default_value"
+	        />
+	    
+	    <!-- speed unit label -->
+	    <TextView android:id="@+id/down_unit_text_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginBottom="@dimen/rtk_net_traffic_widget_unit_text_label_bottom_padding"
+	        android:layout_marginRight="@dimen/rtk_net_traffic_widget_down_speed_unit_text_label_right_padding"
+	        android:textAppearance="@style/rtk_network_traffic_widget_unit_text"
+	        android:text="@string/rtk_network_traffic_unit_text"
+	        android:includeFontPadding="false"
+	        />
+    </RelativeLayout>
+</FrameLayout>

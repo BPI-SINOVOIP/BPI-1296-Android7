@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+	
+    <string name="app_name">RealtekSoftwareUpdater</string>
+    <string name="select_software">Select firmware to upgrade</string>
+    <string name="software_downloading">Software downloading...</string>
+    <string name="confirm_message">Are you sure to upgrade system with <xliff:g id="ota_file">%1$s</xliff:g>\n\n(System will reboot to upgrade)</string>
+    <string name="wait_reboot">Please wait for system upgrade.\n\nSystem will reboot in a few seconds.</string>
+</resources>

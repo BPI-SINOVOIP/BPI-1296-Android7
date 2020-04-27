@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Realtek Debug</string>
+    <string name="pref_cat_appearance">Realtek Debug Tools</string>
+    <string name="pref_save_path">pref_save_path</string>
+    <string name="pref_save_path_title">pref_save_path_title</string>
+    <string name="text_size_medium_value">text_size_medium_value</string>
+    <string name="pref_dump_log">pref_dump_log</string>
+    <string name="pref_dump_log_title">Dump log (include DvdPlayer)</string>
+    <string name="pref_dump_log_summary">pref_pref_dump_log_summary</string>
+    <string name="pref_start_record">pref_start_record</string>
+    <string name="pref_start_record_title">Start Record</string>
+
+    <string name="log_level_debug">Debug</string>
+    <string name="log_level_error">Error</string>
+    <string name="log_level_info">Info</string>
+    <string name="log_level_value_debug">D</string>
+    <string name="log_level_value_error">E</string>
+    <string name="log_level_value_info">I</string>
+    <string name="log_level_value_verbose">V</string>
+    <string name="log_level_value_warn">W</string>
+    <string name="log_level_value_wtf">F</string>
+    <string name="log_level_verbose">Verbose</string>
+    <string name="log_level_warn">Warn</string>
+    <string name="log_level_wtf">What a Terrible Failure</string>
+
+    <string name="log_recording_started">Log recording started.</string>
+    <string name="log_saved">Log saved.</string>
+    <string name="unable_to_save_log">Unable to save log. Did you enter a valid filename?</string>
+    <string name="notification_subtext">Select to stop recording.</string>
+    <string name="notification_ticker">Log recording started</string>
+    <string name="notification_title">Log recording in progress</string>
+
+    <string name="sd_card_not_found">SD card not found.</string>
+
+    <string name="pref_log_line_period">log_line_period</string>
+    <string name="pref_log_line_period_default">200</string>
+    <string name="pref_default_log_level">default_level</string>
+    <string name="pref_buffer_choice_main_value">main</string>
+    <string name="pref_buffer">buffer</string>
+    <string name="pref_dump_stream">pref_dump_stream</string>
+    <string name="pref_dump_stream_title">Dump Stream</string>
+    <string name="pref_dump_network_info">pref_dump_network_info</string>
+    <string name="pref_dump_network_info_title">Dump Network Info</string>
+    <string name="pref_dump_iQiYi">pref_dump_iQiYi</string>
+    <string name="pref_dump_iQiYi_title">Dump iQiYi server Info</string>
+    <string name="pref_dump_buffer_info">pref_dump_buffer_info</string>
+    <string name="pref_dump_buffer_info_title">Dump Buffer Info</string>
+    <string name="pref_dump_video_info">pref_dump_video_info</string>
+    <string name="pref_dump_video_info_title">Dump Video Info</string>
+    <string name="pref_dump_dvdplayer">pref_dump_dvdplayer</string>
+    <string name="pref_dump_dvdplayer_title">Dump DvdPlayer</string>
+    <string name="pref_dumpsys_meminfo">pref_dumpsys_meminfo</string>
+    <string name="pref_dumpsys_meminfo_title">dumpsys meminfo</string>
+    <string name="pref_cat_appearance_key">pref_cat_appearance_key</string>
+    <string name="pref_dump_kernel_log">pref_dump_kernel_log</string>
+    <string name="pref_dump_kernel_log_title">Dump Kernel Log</string>
+    <string name="pref_dump_audio_log">pref_dump_audio_log</string>
+    <string name="pref_dump_audio_log_title">Dump Audio fw Log</string>
+    <string name="pref_dump_dmesg_log">pref_dump_dmesg_log</string>
+    <string name="pref_dump_dmesg_log_title">Dump dmesg (From booting), ifconfig</string>
+    <string name="pref_cat_dvdplayer">DvdPlayer Related</string>
+    <string name="pref_stop_all">pref_stop_all</string>
+    <string name="pref_pref_stop_all_title">Stop All</string>
+    <string name="pref_start_all">pref_start_all</string>
+    <string name="pref_pref_start_all_title">Start All</string>
+    <string name="pref_unmount_device">pref_unmount_device</string>
+    <string name="pref_unmount_device_title">Stop All and Unmount storage</string>
+    <string name="storage_unmount_success">Storage unmount success</string>
+    <string name="storage_unmount_failure">Storage unmount failure</string>
+    <string name="pref_auto_boot_log_title">Auto boot log</string>
+    <string name="pref_auto_boot_log_key">pref_auto_boot_log_key</string>
+</resources>

@@ -1,0 +1,22 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg_option"
+    android:gravity="center"
+    android:alpha="0.85"
+    android:orientation="vertical" >
+
+
+    <ListView
+        android:id="@+id/option_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+	android:listSelector="@color/transparent"
+	android:stackFromBottom ="false"
+	android:transcriptMode ="alwaysScroll"
+	android:scrollbars="none" >
+    </ListView>
+</LinearLayout>

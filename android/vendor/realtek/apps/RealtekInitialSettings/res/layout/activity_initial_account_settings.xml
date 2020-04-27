@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg03"
+    tools:context=".InitialWirelessSettingsActivity" >
+
+	<!-- Title text -->
+	<TextView
+		android:layout_width="934px"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="120px"
+   		android:layout_marginLeft="493px"
+		android:gravity="center"
+		android:text="@string/account_login"
+		android:textColor="#57CAD9"
+		android:textSize="40sp"
+		android:textStyle="bold" />
+      
+	<!-- Info text, only show when login failed  -->
+	<TextView
+		android:id="@+id/login_failed_info_text"
+		android:layout_width="934px"
+		android:layout_height="wrap_content"
+   		android:layout_marginTop="220px"
+   		android:layout_marginLeft="493px"
+		android:gravity="center"
+		android:textColor="#57CAD9"
+		android:textSize="40sp" />
+      
+	<!-- Skip Icon --> 
+	<ImageButton 
+		android:id="@+id/skip_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginLeft="1681px"	
+   		android:layout_marginTop="652px"		
+   		android:background="@color/transparent"
+		android:src="@drawable/skip_icon_focus_selector" />
+    
+	<!-- Skip Icon Text --> 
+   	<TextView
+		android:id="@+id/hint_skip_icon"
+  		android:text="@string/hint_skip_icon_text"
+   		android:textColor="#A5AAC5"
+       	android:textSize="40sp"
+		android:gravity="center"
+   		android:layout_marginLeft="1596px"	
+   		android:layout_marginTop="778px"		
+   		android:layout_width="288px"
+   		android:layout_height="60px" />
+
+	<!-- Login Icon --> 
+	<ImageButton 
+		android:id="@+id/login_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+   		android:layout_marginLeft="1681px"	
+   		android:layout_marginTop="870px"		
+   		android:background="@color/transparent"
+		android:src="@drawable/login_icon_focus_selector" />
+    
+	<!-- Login Icon Text --> 
+   	<TextView
+		android:id="@+id/hint_login_icon"
+  		android:text="@string/hint_login_icon_text"
+   		android:textColor="#A5AAC5"
+       	android:textSize="40sp"
+		android:gravity="center"
+   		android:layout_marginLeft="1596px"	
+   		android:layout_marginTop="996px"		
+   		android:layout_width="288px"
+   		android:layout_height="60px" />
+    
+</RelativeLayout>

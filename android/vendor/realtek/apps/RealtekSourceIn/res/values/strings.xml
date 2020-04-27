@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Source In</string>
+    <string name="no_signal">Warning : No signal from HDMI tx</string>
+</resources>

@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dialog_security_result_bg_color" >
+
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/dialog_wireless_connecting_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="60px"
+        android:layout_marginTop="60px"
+        android:background="@color/transparent" />
+
+    <!-- Dialog Text -->
+    <TextView
+        android:id="@+id/dialog_wireless_connection_state"
+        android:textColor="#626264"
+        android:textSize="40sp"
+		android:textStyle="bold"
+        android:layout_marginLeft="420px"
+        android:layout_marginTop="40px"
+        android:layout_width="688px"
+        android:layout_height="200px" />
+
+	<!-- Invisible EditText -->
+	<!-- We do a trick solution here to let the dialog stay on the screen until the user do input -->
+	<EditText
+		android:visibility="invisible"
+		android:layout_width="1px"
+		android:layout_height="1px" >
+
+		<requestFocus />
+	</EditText>
+
+
+</RelativeLayout>

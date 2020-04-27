@@ -1,0 +1,22 @@
+<resources>
+
+    <dimen name="RTK_option_w">182dp</dimen>
+    <dimen name="RTK_option_h">429dp</dimen>
+
+    <dimen name="RTK_smblogin_x">207dp</dimen>
+    <dimen name="RTK_smblogin_y">133dp</dimen>
+    <dimen name="RTK_smblogin_w">444dp</dimen>
+    <dimen name="RTK_smblogin_h">213dp</dimen>
+
+    <dimen name="gridview_item_width">165dp</dimen>
+    <dimen name="gridview_item_height">160dp</dimen>
+    <dimen name="preview_media_info_text_size">15sp</dimen>
+    <dimen name="top_path_info_text_size">13sp</dimen>
+
+    <!--item_of_listview-->
+    <dimen name="item_of_listview_focused_img_layout_width">539dp</dimen>
+    <dimen name="item_of_listview_focused_img_layout_height">44dp</dimen>
+    <dimen name="item_of_listview_list_type_img_layout_width">47dp</dimen>
+    <dimen name="item_of_listview_list_type_img_layout_height">44dp</dimen>
+    <dimen name="item_of_listview_folder_img_layout_width">13dp</dimen>
+</resources>

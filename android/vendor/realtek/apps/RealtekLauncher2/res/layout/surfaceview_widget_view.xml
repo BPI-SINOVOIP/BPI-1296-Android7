@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:foreground="#000000" >
+
+        <SurfaceView android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <VideoView android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+    
+<!-- Label at bottom -->
+    <FrameLayout android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/rtk_dtv_widget_label_height"
+        android:background="@color/rtk_dtv_widget_label_background"
+        android:layout_gravity="bottom"
+        >
+    	
+        <!-- ImageView to display current source, HDMI, DTV or Camera -->
+	    <ImageView android:id="@+id/icon"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="@dimen/rtk_dtv_buttom_icon_margin_top"
+	        android:layout_marginLeft="@dimen/rtk_dtv_buttom_icon_margin_left"
+	        android:src="@drawable/hdmi_in_100"
+	        android:contentDescription="@string/w_dtv_label">
+	    </ImageView>
+        
+    </FrameLayout>
+</LinearLayout>

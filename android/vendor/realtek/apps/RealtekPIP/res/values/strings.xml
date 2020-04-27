@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Multi-Video</string>
+    <string name="surface_name">Multi-Video</string>
+    <string name="pip1x1">Grid 1x1 </string>
+    <string name="pip1x2">Grid 1x2 </string>
+    <string name="pip2x2">Grid 2x2 </string>
+    <string name="pip3x3">Grid 3x3 </string>
+    <string name="pip4x4">Grid 4x4 </string>
+    <string name="txtview">VideoNum</string>
+    <string name="txtview2">AudioNum</string>
+    <string name="ok">OK</string>
+    <string name="repeat">Repeat</string>
+    <string name="audioclick">AudioClick</string>
+    <string name="freerun">FreeRun</string>
+    <string name="tunnelmode">TunnelMode</string>
+    <string name="videoonly">VideoOnly</string>
+    <string name="performance">Performance</string>
+    <string name="render">Render</string>
+    <string name="title1">SourcePath01</string>
+    <string name="title2">SourcePath02</string>
+    <string name="title3">SourcePath03</string>
+    <string name="title4">SourcePath04</string>
+    <string name="title5">SourcePath05</string>
+    <string name="title6">SourcePath06</string>
+    <string name="title7">SourcePath07</string>
+    <string name="title8">SourcePath08</string>
+    <string name="title9">SourcePath09</string>
+    <string name="title10">SourcePath10</string>
+    <string name="title11">SourcePath11</string>
+    <string name="title12">SourcePath12</string>
+    <string name="title13">SourcePath13</string>
+    <string name="title14">SourcePath14</string>
+    <string name="title15">SourcePath15</string>
+    <string name="title16">SourcePath16</string>
+    
+    <string name="content1">storage/sda1/video.mp4</string>
+    <string name="content2">storage/sda1/video2.mp4</string>
+    <string name="content3">storage/sda1/video3.mp4</string>
+    <string name="content4">storage/sda1/video4.mp4</string>
+    <string name="content5">storage/sda1/video5.mp4</string>
+    <string name="content6">storage/sda1/video6.mp4</string>
+    <string name="content7">storage/sda1/video7.mp4</string>
+    <string name="content8">storage/sda1/video8.mp4</string>
+    <string name="content9">storage/sda1/video9.mp4</string>
+    <string name="content10">storage/sda1/video10.mp4</string>
+    <string name="content11">storage/sda1/video11.mp4</string>
+    <string name="content12">storage/sda1/video12.mp4</string>
+    <string name="content13">storage/sda1/video13.mp4</string>
+    <string name="content14">storage/sda1/video14.mp4</string>
+    <string name="content15">storage/sda1/video15.mp4</string>
+    <string name="content16">storage/sda1/video16.mp4</string>
+    
+    <string-array name="playList">
+        <item>storage/sda1/video3.mp4</item>
+        <item>storage/sda1/video2.mp4</item>
+        <item>storage/sda1/video.mp4</item>
+        <item>storage/sda1/video4.mp4</item>
+        <item>storage/sda1/video5.mp4</item>
+        <item>storage/sda1/video6.mp4</item>
+        <item>storage/sda1/video7.mp4</item>
+        <item>storage/sda1/video8.mp4</item>
+        <item>storage/sda1/video9.mp4</item>
+        <item>storage/sda1/video10.mp4</item>
+        <item>storage/sda1/video11.mp4</item>
+        <item>storage/sda1/video12.mp4</item>
+        <item>storage/sda1/video13.mp4</item>
+        <item>storage/sda1/video14.mp4</item>
+        <item>storage/sda1/video15.mp4</item>
+        <item>storage/sda1/video16.mp4</item>
+    </string-array>
+    <string name="description">Here is some guides for PIP Demo APK \n
+        1. Set Up your mediasource playList in strings.xml \n
+        2. Choose the surface view layout, system default supports 1x2, 2x2, 3x3 and 4x4 \n
+        3. you can also manually define the number of video and audio track \n
+        4. Repeat option means each content will loop playback when it finish \n
+        5. Use DPAD left or right key to switch content during playback \n\n
+        WARNING: System has its limitation to support PIP function, it depends on the hardware limitation
+    </string>
+
+
+    <string-array name="source">
+        <item>U-Disk</item>
+        <item>Samba</item>
+        <item>HDMI-Rx</item>
+        <item>USB-Camera</item>
+    </string-array>
+    <string name="sourcePath">SourcePath</string>
+	
+	
+	<string name="tv1">Select your SMB service:</string>
+    <string name="bt_add">Add</string>
+    <string name="bt_edit">Edit</string>
+    <string name="bt_delete">Delete</string>
+    <string name="bt_login">Login</string>
+	<string name="server">Server</string>
+	<string name="username">Username</string>
+	<string name="password">Password</string>
+	<string name="share">Share</string>
+	<string name="domain">Domain</string>
+	<string name="bt_ok">OK</string>
+	<string name="bt_cancel">CANCEL</string>
+	<string name="save">Save</string>
+	<string name="cancel">Cancel</string>
+	<string name="chb_nodomain">No domain</string>
+	<string name="range">1~16</string>
+	<string name="chb_rememberme">Remember me</string>
+
+
+</resources>

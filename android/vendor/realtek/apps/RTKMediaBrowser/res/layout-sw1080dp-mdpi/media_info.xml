@@ -1,0 +1,102 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Media type -->
+	<ImageView
+		android:id="@+id/topMediaInfoBg"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="72dp"
+        android:layout_marginLeft="52dp"
+        android:layout_width="wrap_content"        
+        android:layout_height="wrap_content"/>        
+
+	<TextView
+        android:id="@+id/topMediaInfo"
+        android:textColor="@color/white"
+        android:textSize="32sp" 
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="232dp"
+        android:layout_width="wrap_content"        
+        android:layout_height="wrap_content"/>       
+
+	<ImageView
+        android:id="@+id/topLoadingIcon"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="62dp"
+        android:layout_marginTop="27dp"
+        android:layout_width="30dp"        
+        android:layout_height="30dp"        
+        />
+
+	<LinearLayout 
+	    android:id="@+id/ll_above_gv"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+	    android:layout_marginTop="100dp"
+	    android:layout_marginLeft="0dp"
+	    android:orientation="horizontal"
+	    android:layout_width="fill_parent"
+	    android:layout_height="50dp"
+	    >
+		<!-- Path Msg -->    
+		<ImageView
+		    android:id="@+id/TitleLine0"
+		    android:layout_alignParentLeft="true"
+		    android:layout_alignParentTop="true"
+		    android:layout_marginTop="46dp"
+		    android:layout_marginLeft="0dp"
+		    android:layout_width="1005dp"        
+		    android:layout_height="3dp"        
+		    android:src="@color/BWTitleGreen" />
+		
+		<LinearLayout 
+			android:id="@+id/PathLinearLayout"
+		    android:orientation="horizontal"
+        	android:layout_alignParentLeft="true"
+        	android:layout_alignParentTop="true"
+		    android:layout_marginLeft="0dp"
+		    android:layout_width="848dp"
+	    	android:layout_height="50dp"
+			android:layout_gravity="right"
+		    >
+			<ImageView
+			    android:id="@+id/TitleLine1"
+			    android:layout_alignParentLeft="true"
+			    android:layout_alignParentTop="true"
+			    android:layout_marginTop="46dp"
+			    android:layout_marginLeft="0dp"
+			    android:layout_width="0dp"
+			    android:layout_weight="1"	
+				android:gravity="right"
+			    android:layout_height="3dp"        
+			    android:src="@color/BWTitleGreen" />
+
+			<ImageView
+			    android:id="@+id/topPathIcon"
+			    android:layout_toRightOf="@+id/TitleLine1"
+			    android:layout_alignParentTop="true"
+			    android:layout_marginTop="0dp"
+			    android:layout_marginLeft="0dp"
+				android:gravity="right"
+			    android:layout_width="wrap_content"
+				android:minWidth="46dp"		
+			    android:layout_height="wrap_content" />		
+			
+			<TextView
+			    android:id="@+id/topPathInfo"
+			    android:layout_toRightOf="@+id/topPathIcon"
+			    android:layout_alignParentTop="true"
+			    android:layout_marginLeft="0dp"
+			    android:layout_width="wrap_content"
+				android:ellipsize="start"
+				android:singleLine="true"
+				android:gravity="right|bottom"
+			    android:layout_height="fill_parent"
+			    android:textColor="@color/BWTitleGreen"
+			    android:textSize="@dimen/top_path_info_text_size" />
+
+		</LinearLayout>
+	</LinearLayout>
+</merge>

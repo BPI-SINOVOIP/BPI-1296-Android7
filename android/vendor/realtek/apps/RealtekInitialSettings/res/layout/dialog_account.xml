@@ -1,0 +1,76 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/popup_bg" >
+
+    <!-- Dialog Title -->
+    <TextView
+        android:id="@+id/dialog_account_login_title"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp"
+		android:textStyle="bold"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="40px"
+        android:layout_width="288px"
+        android:layout_height="60px" />
+
+    <!-- Login Lock Icon -->
+    <ImageButton
+        android:id="@+id/dialog_account_login_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="860px"
+        android:layout_marginTop="0px"
+		android:src="@drawable/popup_login" 
+        android:background="@color/transparent" />
+
+    <!-- Account Icon -->
+    <ImageButton
+        android:id="@+id/dialog_account_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="173px"
+        android:background="@color/transparent"
+        android:src="@drawable/account_email_focus"
+        android:paddingLeft="0px" />
+
+    <!-- Account input -->
+    <EditText
+        android:id="@+id/dialog_account_input"
+        android:textColor="#97A8A8"
+        android:textSize="30sp"
+        android:layout_width="743px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="160px"
+        android:layout_marginTop="203px">
+
+        <requestFocus />
+    </EditText>
+
+    <!-- Lock Icon -->
+    <ImageButton
+        android:id="@+id/dialog_password_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="288px"
+        android:background="@color/transparent" 
+		android:src="@drawable/account_password_focus"
+		android:paddingLeft="0px" />
+
+	<!-- Password input -->
+	<EditText
+        android:id="@+id/dialog_password_input"
+        android:textColor="#009999"
+        android:textSize="30sp"
+		android:password="true"
+        android:layout_width="743px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="160px"
+        android:layout_marginTop="338px">
+
+	</EditText>
+
+</RelativeLayout>
