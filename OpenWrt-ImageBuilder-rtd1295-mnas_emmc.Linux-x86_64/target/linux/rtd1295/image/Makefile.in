@@ -35,7 +35,7 @@ AUDIOADDR:=$(if $(CONFIG_AUDIO_ADDR_LEGACY),0x01b00000,0x0F900000)
 
 # default value
 # 1 = yes, 0 = no
-install_bootloader=0
+install_bootloader=1
 install_factory?=0
 update_etc=1
 stop_reboot=0
@@ -67,7 +67,7 @@ efuse_key?=0
 chip_rev:=$(if $(CONFIG_TARGET_NAS_IMG_SECURE_CHIP_B),2,)
 hash_imgfile=1
 verify=1
-offline_gen?=n
+offline_gen?=y
 gen_install_binary?=n
 ANDROID_IMGS?=$(if $(CONFIG_XEN),y,n)
 HYPERVISOR=$(if $(CONFIG_XEN),y,n)
