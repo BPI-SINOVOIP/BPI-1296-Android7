@@ -40,8 +40,5 @@ PRODUCT_COPY_FILES += frameworks/native/data/etc/tablet_core_hardware.xml:system
 PRODUCT_COPY_FILES += device/realtek/kylin/overlay/system/etc/permissions/tablet_extend_hardware.xml:system/etc/permissions/tablet_extend_hardware.xml
 PRODUCT_COPY_FILES += device/realtek/kylin/audio_policy_tablet.conf:system/etc/audio_policy.conf
 
-PRODUCT_PACKAGES += Calendar
-PRODUCT_PACKAGES += RealtekSettings
-
 PRODUCT_PROPERTY_OVERRIDES += ro.sf.lcd_density=240
 

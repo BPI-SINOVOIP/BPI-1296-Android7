@@ -484,28 +484,29 @@ PRODUCT_PACKAGES += dhcpcd.conf
 ###################################################
 # built-in applications
 ###################################################
-PRODUCT_PACKAGES += RtkLauncher2
+#PRODUCT_PACKAGES += RtkLauncher2
+PRODUCT_PACKAGES += RealtekSettings
 PRODUCT_PACKAGES += TvProvider
 PRODUCT_PACKAGES += RTKSourceIn
-PRODUCT_PACKAGES += DMR
+#PRODUCT_PACKAGES += DMR
 PRODUCT_PACKAGES += RealtekGallery2
 #PRODUCT_PACKAGES += RealtekInitialSettings
 PRODUCT_PACKAGES += RealtekSoftwareUpdater
+PRODUCT_PACKAGES += Calendar
 PRODUCT_PACKAGES += Music
 PRODUCT_PACKAGES += MediaBrowser
 PRODUCT_PACKAGES += Browser2
 #PRODUCT_PACKAGES += RealtekQuickSearchBox
-PRODUCT_PACKAGES += RTKControlPanel
+#PRODUCT_PACKAGES += RTKControlPanel
 #PRODUCT_PACKAGES += ApplicationsProvider
 ifeq ($(USE_TOGO_MANAGER), YES)
 PRODUCT_PACKAGES += ToGo
 PRODUCT_PROPERTY_OVERRIDES += ro.with_togoproxy=false
 endif
 PRODUCT_PACKAGES += RTKMiracastSink
-PRODUCT_PACKAGES += RealtekSystemUI
-#PRODUCT_PACKAGES += SystemUI
+#PRODUCT_PACKAGES += RealtekSystemUI
 PRODUCT_PACKAGES += RealtekSuspendHandler
-PRODUCT_PACKAGES += RealtekPIP
+#PRODUCT_PACKAGES += RealtekPIP
 #PRODUCT_PACKAGES += RealtekMediaRecoderDemo
 #PRODUCT_PACKAGES += RealtekFloatingWindowDemo
 PRODUCT_PACKAGES += RealtekEncoder
