@@ -1,14 +1,14 @@
 #!/bin/bash
 
 SCRIPTDIR=$PWD
+OPENWRTDIR=$SCRIPTDIR/Openwrt
 ANDROIDDIR=$SCRIPTDIR/android
-KERNELDIR=$SCRIPTDIR/linux-kernel
+KERNELDIR=$SCRIPTDIR/linux-4.1.7
 MALIDIR=$SCRIPTDIR/mali
 PHOENIXDIR=$SCRIPTDIR/phoenix
 UBOOTDIR=$SCRIPTDIR/bootcode
 TOOLCHAINDIR=$PHOENIXDIR/toolchain
 PRODUCT_DEVICE_PATH=android/out/target/product/kylin
-OPENWRTDIR=$SCRIPTDIR/OpenWrt-ImageBuilder-rtd1295-mnas_emmc.Linux-x86_64
 source $SCRIPTDIR/build_prepare.sh
 config_get CUSTOMER
 config_get GIT_SERVER_URL
@@ -64,7 +64,7 @@ build_openwrt()
 {
     pushd $OPENWRTDIR > /dev/null
         yes "" | make oldconfig && ./netconfig.sh ott
-        yes "" | make oldconfig && make -j4 V=s
+        yes "" | make oldconfig && make -j8 V=s
 
 	ERR=$?
     popd
@@ -86,11 +86,11 @@ function build_cmd()
 clean_openwrt()
 {
 	pushd $OPENWRTDIR > /dev/null
-		make clean V=99 -j4;rm .config.old;git stash;git stash clear
+		make clean V=99 -j8;rm .config.old
 	popd  > /dev/null
 
-	pushd $OPENWRTKERNELDIR > /dev/null
-		make clean;rm -rf include/config/;git stash;git stash clear
+	pushd $KERNELDIR > /dev/null
+		make distclean;rm .config*
 	popd > /dev/null
 
 	return $ERR
