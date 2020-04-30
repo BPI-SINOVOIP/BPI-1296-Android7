@@ -348,6 +348,7 @@ PRODUCT_PACKAGES += libOMX_Core
 PRODUCT_PACKAGES += libjpu
 PRODUCT_PACKAGES += libvpu
 PRODUCT_PACKAGES += libve3
+PRODUCT_PACKAGES += libvp9
 PRODUCT_PACKAGES += libOMX.realtek.video.dec
 PRODUCT_PACKAGES += libOMX.realtek.video.enc
 PRODUCT_PACKAGES += libOMX.realtek.video.dec.vp9
@@ -382,6 +383,15 @@ PRODUCT_PACKAGES += libRTKFLVExtractor
 PRODUCT_PACKAGES += libRTKDSDExtractor
 PRODUCT_PACKAGES += libRTKAPEExtractor
 PRODUCT_PACKAGES += libRTKHEIFExtractor
+PRODUCT_PACKAGES += libRtkHDMICallbackNative
+PRODUCT_PACKAGES += libRtkHWMBinder
+PRODUCT_PACKAGES += libRtkHWMBinderservice
+PRODUCT_PACKAGES += libRtkRtsp
+PRODUCT_PACKAGES += libRtkScreenRecord
+PRODUCT_PACKAGES += libRTKVOWriteback
+PRODUCT_PACKAGES += libTEEapi
+PRODUCT_PACKAGES += libteec
+PRODUCT_PACKAGES += librtk_ion
 
 ifeq ($(USE_RTK_EXTRACTOR), true)
 PRODUCT_PACKAGES += libRTKExtractor
@@ -404,6 +414,10 @@ else
 PRODUCT_PROPERTY_OVERRIDES += ro.config.enablegpioservice=false
 endif
 
+PRODUCT_PACKAGES += mpclient
+PRODUCT_PACKAGES += mpclient2
+PRODUCT_PACKAGES += mpDTVclient
+PRODUCT_PACKAGES += TestRtkHDMICallbackNative
 PRODUCT_PACKAGES += libwpa_client
 PRODUCT_PACKAGES += wpa_cli
 PRODUCT_PACKAGES += wpa_supplicant

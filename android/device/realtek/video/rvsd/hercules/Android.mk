@@ -330,7 +330,7 @@ endif
 
 LOCAL_CFLAGS += -Wno-multichar
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_32_BIT_ONLY := true
 
@@ -393,7 +393,7 @@ endif
 
 LOCAL_CFLAGS += -Wno-multichar
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE:= mpclient2
 
@@ -461,7 +461,7 @@ endif
 
 LOCAL_CFLAGS += -Wno-multichar
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_32_BIT_ONLY := true
 

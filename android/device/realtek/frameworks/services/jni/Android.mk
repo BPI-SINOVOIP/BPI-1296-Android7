@@ -26,7 +26,7 @@ include device/realtek/proprietary/libs/rtk_libs/system/include/MakeConfig
 # [optional, user, eng] 
 # eng = required
 # optinal = no install on target
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 # This is the target being built.
 LOCAL_MODULE:= librealtek_runtime
@@ -257,7 +257,7 @@ LOCAL_SHARED_LIBRARIES += libutils
 LOCAL_SHARED_LIBRARIES += libbinder
 LOCAL_SHARED_LIBRARIES += liblog
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_CFLAGS += -DBINDER_IPC_32BIT=1
 
@@ -281,7 +281,7 @@ LOCAL_SHARED_LIBRARIES += libRtkHDMICallbackNative
 
 LOCAL_C_INCLUDES += $(TOP)/device/realtek/frameworks/services/jni/NativeHDMICallback
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_MODULE:= TestRtkHDMICallbackNative
 

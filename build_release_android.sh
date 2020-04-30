@@ -69,7 +69,7 @@ build_android()
 {
     pushd $ANDROIDDIR
         source ./env.sh
-        lunch rtk_$BUILDTYPE_ANDROID-eng
+        lunch rtk_$BUILDTYPE_ANDROID-userdebug
         make -j $MULTI $VERBOSE
         ERR=$?
     popd
@@ -194,7 +194,7 @@ else
                 build_cmd build_android
                 
 				build_cmd ln_libOMX_realtek
-				./widevine_so.sh
+				#./widevine_so.sh
                 ;;
 			checkout)
 				build_cmd checkout_android

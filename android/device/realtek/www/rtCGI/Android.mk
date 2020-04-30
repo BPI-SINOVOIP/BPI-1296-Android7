@@ -68,7 +68,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_CFLAGS += $(DEFINES)
 LOCAL_CFLAGS += -DANDROID	
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_STATIC_LIBRARIES := libfcgi
 LOCAL_SHARED_LIBRARIES := libcutils	libjansson
@@ -130,7 +130,7 @@ LOCAL_CFLAGS += $(DEFINES)
 LOCAL_CFLAGS += -DANDROID
 
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_STATIC_LIBRARIES := libfcgi
 LOCAL_SHARED_LIBRARIES := libcutils libjansson libRTKSetupClass libMediaQuery
@@ -182,7 +182,7 @@ LOCAL_C_INCLUDES += device/realtek/proprietary/libs/Include \
 endif
 LOCAL_CFLAGS += $(DEFINES) -DANDROID
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SHARED_LIBRARIES := libcutils libRTKSetupClass
 
@@ -201,7 +201,7 @@ LOCAL_MODULE := togoRead.fcgi
 
 LOCAL_MODULE_PATH := $(CGI_PATH)
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := togoRead.cpp libcgi.cpp util.cpp
 
@@ -239,7 +239,7 @@ LOCAL_MODULE := togoOutCGI.cgi
 
 LOCAL_MODULE_PATH := $(CGI_PATH)
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := togoOutCGI.cpp
 
@@ -274,7 +274,7 @@ LOCAL_MODULE_PATH := $(DOC_PATH)
 
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_PREBUILT)
 
@@ -289,7 +289,7 @@ LOCAL_MODULE_PATH := $(DOC_PATH)
 
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-LOCAL_MODULE_TAGS := optional eng
+LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_PREBUILT)
 
