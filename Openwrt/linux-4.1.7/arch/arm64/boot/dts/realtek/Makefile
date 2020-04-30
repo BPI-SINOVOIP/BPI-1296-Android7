@@ -19,6 +19,7 @@ dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-saola-1GB.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-saola-1GB.CMAx2.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-qa-rescue-3GB.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-qa-rescue-4GB.dtb
+dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-bananapi-2GB.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-saola-2GB.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-saola-3GB.dtb
 dtb-$(CONFIG_ARCH_RTD129x) += rtd-1296-saola-4GB.dtb

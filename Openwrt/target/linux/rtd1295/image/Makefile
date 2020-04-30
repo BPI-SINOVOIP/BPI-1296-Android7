@@ -11,7 +11,20 @@ include $(CURDIR)/Makefile.in
 -include $(CURDIR)/../$(SUBTARGET)/Makefile.in
 include $(CURDIR)/audiofw.mk
 
-RTK_CHIP:=$(if $(findstring saola,$(PROFILE)),rtd-1296,rtd-1295)
+BANANAPI:=$(if $(findstring bananapi,$(PROFILE)),true,false)
+SAOLA:=$(if $(findstring saola,$(PROFILE)),true,false)
+
+ifeq ($(BANANAPI), true)
+    $(warning "bananapi rtd-1296 chip selected")
+    RTK_CHIP:=rtd-1296
+else ifeq ($(SAOLA), true)
+    $(warning "saola rtd-1296 chip selected")
+    RTK_CHIP:=rtd-1296
+else
+    $(warning "giraffe rtd-1295 chip selected") 
+    RTK_CHIP:=rtd-1295
+endif
+
 IMAGE_PATH:=$(LINUX_DIR)/arch/$(LINUX_KARCH)/boot/Image
 IMAGE_FILE:=$(if $(wildcard $(IMAGE_PATH)), $(IMAGE_PATH), $(KERNEL_BUILD_DIR)/Image)
 DTB_FILE:=$(DTS_DIR)/realtek/rtd-129x-openwrt.dtb
@@ -178,9 +191,9 @@ define Image/Build/Profile
 	fi
 	if [ "$(SUBTARGET)" = "mnas_emmc" ]; then \
 		if [ "$(CONFIG_ANDROID_CONSOLE)" = "y" ]; then \
-			sed -i "s/loglevel=4/loglevel=4 androidboot.selinux=permissive console.switch=android/" $(DTS_FILE); \
+			sed -i "s/loglevel=/androidboot.selinux=permissive console.switch=android loglevel=/" $(DTS_FILE); \
 		else \
-			sed -i "s/loglevel=4/loglevel=4 androidboot.selinux=permissive console.switch=openwrt/" $(DTS_FILE); \
+			sed -i "s/loglevel=/androidboot.selinux=permissive console.switch=openwrt loglevel=/" $(DTS_FILE); \
 		fi \
 	fi
  ifeq ($(CONFIG_RTD_1295_HWNAT),y)
