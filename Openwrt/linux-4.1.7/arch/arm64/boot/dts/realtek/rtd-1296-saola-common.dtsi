@@ -81,15 +81,15 @@
         interrupts = <0 34 4>;
     };
 
-	rtk_misc_gpio: rtk_misc_gpio@9801b100 {
-		gpios =
-			<&rtk_misc_gpio 8 0 0>,			/* install button, input, default N/A */
-                        <&rtk_misc_gpio 55 1 0>,                        /* HDMITX_OFF pin default out low */
-			<&rtk_misc_gpio 100 1 1>;		/* audio dac unmute , output, default high */
-	};
+    rtk_misc_gpio: rtk_misc_gpio@9801b100 {
+	gpios =
+		<&rtk_misc_gpio 8 0 0>,		/* install button, input, default N/A */
+		<&rtk_misc_gpio 55 1 0>,        /* HDMITX_OFF pin default out low */
+		<&rtk_misc_gpio 100 1 1>;	/* audio dac unmute , output, default high */
+    };
 
     rfkill: rfkilligpio@0{
-        gpios = <&rtk_iso_gpio 24 1 0>;                         /*bt power , output, default low */
+        gpios = <&rtk_iso_gpio 24 1 0>;         /*bt power , output, default low */
         status = "okay";
     };
 
@@ -106,5 +106,5 @@
 	wakeup-gpio-activity = /* (0) active low (1) active high*/
 		<1>, /* BT : high activity */
 		<0>; /* Wifi : high activity */
-  };
+    };
 };

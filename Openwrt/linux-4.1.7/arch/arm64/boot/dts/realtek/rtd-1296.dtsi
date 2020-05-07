@@ -165,21 +165,21 @@
         status = "okay";
     };
 
-	hdmitx@9800D000 {
-		compatible = "Realtek,rtk119x-hdmitx";
-		reg = <0x9800d000 0x560>,<0x98007200 0x4>; /* HDMITX, I2C1_REQ_CTRL */
-		gpio-hpd-detect = <&rtk_iso_gpio 6 0 0>; /* Hotplug detect pin */
-		//gpio-audio-mute = <&rtk_misc_gpio 100 1 1>; /* Audio DAC mute control */
-		status = "okay";
+    hdmitx@9800D000 {
+        compatible = "Realtek,rtk119x-hdmitx";
+        reg = <0x9800d000 0x560>,<0x98007200 0x4>; /* HDMITX, I2C1_REQ_CTRL */
+        gpio-hpd-detect = <&rtk_iso_gpio 6 0 0>; /* Hotplug detect pin */
+        //gpio-audio-mute = <&rtk_misc_gpio 100 1 1>; /* Audio DAC mute control */
+        status = "okay";
 
-		scdc_rr {
-			enable-scdc-rr = <0>;
-			interrupt-parent = <&mux_intc>;
-			#interrupt-cells = <1>;
-			interrupt-controller;
-			interrupts = <1 31>;
-		};
-	};
+        scdc_rr {
+		enable-scdc-rr = <0>;
+		interrupt-parent = <&mux_intc>;
+		#interrupt-cells = <1>;
+		interrupt-controller;
+		interrupts = <1 31>;
+        };
+    };
 
     hdcptx@9800D000 {
         compatible = "Realtek,rtk129x-hdcptx";
@@ -733,6 +733,8 @@
         reg = <0x9801B700 0x400>;
         interrupt-parent = <&mux_intc>;
         interrupts = <0 26>;
+	pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_2>;
         i2c-num = <2>;
         status = "okay";
         #address-cells = <1>;
@@ -745,6 +747,8 @@
         reg = <0x9801B900 0x400>;
         interrupt-parent = <&mux_intc>;
         interrupts = <0 23>;
+	pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_3>;
         i2c-num = <3>;
         status = "okay";
         #address-cells = <1>;
@@ -783,6 +787,7 @@
             compatible = "rtk-rts5400";
             reg = <0x6A>;
             realtek,12v-power-gpio = <&rtk_misc_gpio 16 1 0>; /*1296 u3host power, output, default low */
+	    status = "disabled";
         };
     };
 
@@ -920,28 +925,28 @@
         status = "disabled";
     };
 
-	cec0@98037800 {
-		compatible = "Realtek,rtd1295-cec0";
-		reg = <0x98037800 0xe0>,<0x98007000 0x100>,<0x98037500 0x100>;
-		interrupts = <0 26 4>;
-		module-enable = <1>;
-		clocks = <&cc CC_CLK_SYS>,
-			<&iclk_en CLK_EN_CBUS_OSC>,
-			<&iclk_en CLK_EN_CBUS_SYS>,
-			<&iclk_en CLK_EN_CBUSTX_SYS>,
-			<&iclk_en CLK_EN_CBUSRX_SYS>;
-		clock-names = "sys",
-			"cbus_osc",
-			"cbus_sys",
-			"cbustx_sys",
-			"cbusrx_sys";
-		resets = <&irst IRSTN_CBUS>,
-			<&irst IRSTN_CBUSTX>,
-			<&irst IRSTN_CBUSRX>;
-		reset-names = "cbus",
-			"cbustx",
-			"cbusrx";
-		status = "okay";
+    cec0@98037800 {
+	compatible = "Realtek,rtd1295-cec0";
+	reg = <0x98037800 0xe0>,<0x98007000 0x100>,<0x98037500 0x100>;
+	interrupts = <0 26 4>;
+	module-enable = <1>;
+	clocks = <&cc CC_CLK_SYS>,
+		<&iclk_en CLK_EN_CBUS_OSC>,
+		<&iclk_en CLK_EN_CBUS_SYS>,
+		<&iclk_en CLK_EN_CBUSTX_SYS>,
+		<&iclk_en CLK_EN_CBUSRX_SYS>;
+	clock-names = "sys",
+		"cbus_osc",
+		"cbus_sys",
+		"cbustx_sys",
+		"cbusrx_sys";
+	resets = <&irst IRSTN_CBUS>,
+		<&irst IRSTN_CBUSTX>,
+		<&irst IRSTN_CBUSRX>;
+	reset-names = "cbus",
+		"cbustx",
+		"cbusrx";
+	status = "okay";
 	};
 
     power-management{
@@ -957,28 +962,28 @@
         pwms = <&pwm 0 37878>;
         status = "okay";
     };
-	dptx@9803D000 {
-		compatible = "Realtek,rtk129x-dptx";
-		reg = <0x9803D000 0x1000>, <0x98000000 0x1000>, <0x98009400 0x600>, <0x98005000 0x1000>;
+    dptx@9803D000 {
+	compatible = "Realtek,rtk129x-dptx";
+	reg = <0x9803D000 0x1000>, <0x98000000 0x1000>, <0x98009400 0x600>, <0x98005000 0x1000>;
         interrupts = <0 29 4>; /*gen Ri*/
-		clocks = <&clk_en_1 CLK_EN_TVE>,
-			<&clk_en_1 CLK_EN_VO>,
-			<&clk_en_1 CLK_EN_LVDS>;
-		resets = <&irst IRSTN_DP>,
-			<&rst1 RSTN_TVE>,
-			<&rst1 RSTN_VO>,
-			<&rst1 RSTN_LVDS>;
-		reset-names = "dp",
-			"tve",
-			"vo",
-			"lvds";
-		status = "disabled";
-		dp_hpd {
-			gpios = <&rtk_iso_gpio 7 0 0>; /*HPD, input, default N/A */
-			interrupt-parent = <&rtk_iso_gpio>;
-			interrupts = <7>; /*HPD*/
-		};
+	clocks = <&clk_en_1 CLK_EN_TVE>,
+		<&clk_en_1 CLK_EN_VO>,
+		<&clk_en_1 CLK_EN_LVDS>;
+	resets = <&irst IRSTN_DP>,
+		<&rst1 RSTN_TVE>,
+		<&rst1 RSTN_VO>,
+		<&rst1 RSTN_LVDS>;
+	reset-names = "dp",
+		"tve",
+		"vo",
+		"lvds";
+	status = "disabled";
+	dp_hpd {
+		gpios = <&rtk_iso_gpio 7 0 0>; /*HPD, input, default N/A */
+		interrupt-parent = <&rtk_iso_gpio>;
+		interrupts = <7>; /*HPD*/
 	};
+    };
 
     efuse@98017000 {
         compatible = "Realtek,rtk-efuse";
@@ -997,30 +1002,30 @@
         status = "okay";
     };
 
-	audio-out-devices {
-		compatible = "realtek,audio-out";
+    audio-out-devices {
+	compatible = "realtek,audio-out";
+	status = "okay";
+	spdif {
+		compatible = "spdif";
 		status = "okay";
-		spdif {
-			compatible = "spdif";
-			status = "okay";
-		};
-		dac {
-			compatible = "dac";
-			status = "okay";
-		};
-		i2s  {
-			compatible = "i2s";
-			status = "okay";
-		};
-		hdmi  {
-			compatible = "hdmi";
-			status = "okay";
-		};
-		global  {
-			compatible = "global";
-			status = "okay";
-		};
 	};
+	dac {
+		compatible = "dac";
+		status = "okay";
+	};
+	i2s  {
+		compatible = "i2s";
+		status = "okay";
+	};
+	hdmi  {
+		compatible = "hdmi";
+		status = "okay";
+	};
+	global  {
+		compatible = "global";
+		status = "okay";
+	};
+    };
 
     mcp {
         compatible = "Realtek,rtk-mcp";

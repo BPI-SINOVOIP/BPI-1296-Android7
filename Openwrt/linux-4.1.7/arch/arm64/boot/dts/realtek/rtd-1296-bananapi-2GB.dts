@@ -9,8 +9,6 @@
 /memreserve/ 0x10100000                 0x04100000                  ; /* 0x10100000 ~ 0x141fffff */
 
 #include "rtd-129x-ion-2GB-tee.dtsi"
-#include "rtd-1296.dtsi"
-#include "rtd-129x-dvfs.dtsi"
 #include "rtd-1296-saola-common.dtsi"
 
 / {
@@ -43,23 +41,28 @@
         device_type = "memory";
         reg = <0 0x80000000>;   /* 2048 MB */
     };
+
     firmware {
-      optee {
-        compatible = "linaro,optee-tz";
-        method = "smc";
-      };
+        optee {
+            compatible = "linaro,optee-tz";
+            method = "smc";
+        };
     };
+
     mem_remap {
         compatible = "Realtek,rtk1295-mem_remap";
         #address-cells = <1>;
         #size-cells = <1>;
         ranges;
+
         rbus {
             reg = <RBUS_BASE_PHYS RBUS_BASE_SIZE>;
         };
+
         common {
             reg = <RPC_COMM_PHYS RPC_COMM_SIZE>;
         };
+
         ringbuf {
             reg = <RPC_RINGBUF_PHYS RPC_RINGBUF_SIZE>;
         };
@@ -73,6 +76,7 @@
                 ION_SECURE_HEAP_PHYS ION_SECURE_HEAP_SIZE ION_SECURE_HEAP_FLAG
                 >;
         };
+
         rtk,ion-heap@8 {    /* Audio */
             compatible = "Realtek,rtk-ion-reserve";
             reg = <8>;
@@ -80,6 +84,7 @@
                 ION_AUDIO_HEAP_PHYS ION_AUDIO_HEAP_SIZE ION_AUDIO_HEAP_FLAG
                 >;
         };
+
         rtk,ion-heap@7 {    /* TYPE_MEDIA */
             compatible = "Realtek,rtk-ion-reserve";
             reg = <7>;
@@ -90,6 +95,7 @@
                 >;
         };
     };
+
     reserved-memory {
         #address-cells = <1>;
         #size-cells = <1>;
@@ -105,5 +111,222 @@
             reg-names = "ramoops_mem";
             no-map;
         };
+    };
+
+    rtk_misc_gpio: rtk_misc_gpio@9801b100 {
+        gpios = <&rtk_misc_gpio 55 1 0>; /* HDMITX_OFF pin default out low */
+    };
+
+    rfkill: rfkilligpio@0{
+        gpios = <&rtk_iso_gpio 24 1 0>; /*bt power , output, default low */
+        status = "okay";
+    };
+
+    power-management{
+        wakeup-gpio-enable = <1>;
+        wakeup-gpio-list = <&rtk_iso_gpio 30 0 0>; /* power key */
+        wakeup-gpio-activity = <1>;
+	pwms;
+	status = "okay";
+    };
+
+    rtk_misc_gpio@9801b100 {
+        status = "okay";
+    };
+
+    rtk_iso_gpio@98007100 {
+        status = "okay";
+    };
+
+    hdmitx@9800D000 {
+        gpio-hpd-detect = <&rtk_iso_gpio 6 0 0>; /* Hotplug detect pin */
+        /* gpio-audio-mute = <&rtk_misc_gpio 100 1 1>; */ /* Audio DAC mute control */
+        status = "okay";
+    };
+
+    hdcptx@9800D000 {
+        status = "okay";
+    };
+
+    hdmirx@98034000 {
+        gpio-rx-hpd-ctrl = <&rtk_iso_gpio 22 1 0>;
+        /* gpio-5v-detect = <&rtk_iso_gpio 21 0 0>; */
+        status = "okay";
+    };
+
+    uart0: serial0@98007800 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&uart0_pins>;
+        status = "okay";
+    };
+
+    uart1: serial1@9801B200 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&uart1_pins_all>;
+        status = "okay";
+    };
+
+    uart2: serial2@9801B400 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&uart2_pins_0>;
+        status = "okay";
+    };
+
+    nic: gmac@98016000 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&rgmii0_pins>,
+                <&etn_led_pins>;
+        status = "okay";
+    };
+
+    hwnat: gmac@0x98060000 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&rgmii0_pins>;
+        gpio_link_led_enable = <0>; /* 0:disable, 1:enable */
+        gpios = <&rtk_iso_gpio 27 1 0>; /* Link LED, output, default low */
+
+	status = "disabled";
+    };
+
+    pcie@9804E000 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie1_clk_pins>;
+	gpios = <&rtk_misc_gpio 16 1 0 >;
+	status = "okay";
+    };
+
+    pcie2@9803B000 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pcie2_clk_pins>;
+	gpios = <&rtk_misc_gpio 19 1 0 >;
+	status = "okay";
+    };
+
+    sdio@98010A00 {
+	gpios = <&rtk_iso_gpio 23 1 1>;
+        status = "disabled";
+    };
+
+    sdmmc@98010400 {
+        gpios = <&rtk_misc_gpio 99 1 0>; /*sd power , output, default high  (poweroff) */
+        status = "okay";
+    };
+
+    emmc@98012000 {
+	status = "okay";
+    };
+
+    irda@98007400 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&ir_rx_pins>,
+                <&ir_tx_pins>;
+        status = "okay";
+    };
+
+    i2c_0: i2c@0x98007D00 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_0>;
+        status = "okay";
+    };
+
+    i2c_1: i2c@0x98007C00 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_1>;
+        status = "okay";
+    };
+
+    i2c_2: i2c@0x9801B700 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_2>;
+        status = "okay";
+    };
+
+    i2c_3: i2c@0x9801B900 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_3>;
+        status = "okay";
+    };
+
+    i2c_4: i2c@0x9801BA00 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_4>;
+        status = "okay";
+    };
+
+    i2c_5: i2c@0x9801BB00 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2c_pins_5>;
+        status = "okay";
+    };
+
+    spi@9801BD00 {
+        status = "okay";
+    };
+
+    pwm@980070D0 {
+        status = "okay";
+
+        pwm_0 {
+            enable = <1>;
+        };
+        pwm_1 {
+            enable = <0>;
+        };
+        pwm_2 {
+            enable = <0>;
+        };
+        pwm_3 {
+            enable = <0>;
+        };
+    };
+
+    rtd1295-lsadc@0x98012800 {
+        status = "okay";
+    };
+
+    dptx@9803D000 {
+        status = "okay";
+
+	dp_hpd {
+            gpios = <&rtk_iso_gpio 7 0 0>; /*HPD, input, default N/A */
+        };
+    };
+
+    sata@9803F000 {
+        status = "okay";
+
+        sata0: sata-port@0 {
+            gpios = <&rtk_misc_gpio 56 1 1>;
+        };
+        sata1: sata-port@1 {
+	    gpios = <&rtk_misc_gpio 56 1 1>;
+        };
+    };
+
+    audio-out-devices {
+        status = "okay";
+
+        spdif {
+            status = "okay";
+        };
+        dac {
+            status = "okay";
+        };
+        i2s  {
+            status = "okay";
+        };
+        hdmi  {
+            status = "okay";
+        };
+        global  {
+            status = "okay";
+        };
+    };
+
+    rtk_usb_power_manager {
+	realtek,type_c-power-gpio = <&rtk_iso_gpio 1 1 0>;
+	realtek,u2host-power-gpio = <&rtk_misc_gpio 18 1 0>;
+        realtek,u3host-power-gpio = <&rtk_misc_gpio 20 1 0>;
+	status = "okay";
     };
 };
