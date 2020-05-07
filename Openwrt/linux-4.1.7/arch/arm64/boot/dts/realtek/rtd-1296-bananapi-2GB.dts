@@ -329,4 +329,21 @@
         realtek,u3host-power-gpio = <&rtk_misc_gpio 20 1 0>;
 	status = "okay";
     };
+
+    gpio-keys {
+	compatible = "gpio-keys";
+	status = "okay";
+
+	power {
+	    label = "Power Button";
+	    gpios = <&rtk_iso_gpio 30 0 1>;
+	    linux,code = <116>;
+	};
+
+	/*boot {
+	    label = "Power Button";
+	    gpios = <&rtk_iso_gpio 30 0 1>;
+	    linux,code = <116>;
+	};*/
+    };
 };
