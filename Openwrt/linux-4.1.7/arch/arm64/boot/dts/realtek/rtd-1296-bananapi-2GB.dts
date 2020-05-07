@@ -346,4 +346,12 @@
 	    linux,code = <116>;
 	};*/
     };
+
+    gpio-fan {
+	compatible = "gpio-fan";
+	#cooling-cells = <2>;
+	gpio-fan,speed-map = <0 0 3000 1>;
+	gpios = <&rtk_misc_gpio 15 1 1>;
+	status = "okay";
+    };
 };
