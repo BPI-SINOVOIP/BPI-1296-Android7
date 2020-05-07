@@ -1302,7 +1302,7 @@ static int SD_Stream(struct sd_cmd_pkt *cmd_info)
     dma_leng = cmd_info->data->blksz * cmd_info->data->blocks;
 
 #ifdef RTK_EMMC_HEALTH_REPORT
-	if(host->remainder == 0) printk(KERN_INFO "cmd_info->data->blksz = %d\n", cmd_info->data->blksz);
+	//if(host->remainder == 0) printk(KERN_INFO "cmd_info->data->blksz = %d\n", cmd_info->data->blksz);
 	//1G = 1024 x 1024 x 1024 bytes, so emmc size is from ext_csd,
 	if((cmd_info->cmd->opcode==24 || cmd_info->cmd->opcode==25) && host->card!=NULL) {
 		host->remainder += cmd_info->data->blocks;
