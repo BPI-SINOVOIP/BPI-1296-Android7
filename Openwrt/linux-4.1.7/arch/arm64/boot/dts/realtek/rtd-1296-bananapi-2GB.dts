@@ -249,6 +249,13 @@
         pinctrl-names = "default";
         pinctrl-0 = <&i2c_pins_0>;
         status = "okay";
+
+	gmt-g2227@12 {
+            status = "okay";
+
+	    /* enable pmic poweroff, property in power-management node must be disabled */
+	    /*system-power-controller;*/
+	};
     };
 
     i2c_1: i2c@0x98007C00 {
