@@ -1,23 +1,19 @@
 #!/bin/bash
 TOPDIR=$PWD
 SCRIPTDIR=$TOPDIR
-OPENWRTDIR=$SCRIPTDIR/Openwrt
 ANDROIDDIR=$TOPDIR/android
-KERNELDIR=$OPENWRTDIR/linux-4.1.7
+KERNELDIR=$TOPDIR/linux-kernel
 MALIDIR=$TOPDIR/mali
 PLATFORMDIR=$TOPDIR/phoenix
 BOOTCODEDIR=$TOPDIR/bootcode
 IMAGEDIR=$TOPDIR/image_file_creator
 RTKSRC=$TOPDIR/software_Phoenix_RTK
+OPENWRTDIR=$SCRIPTDIR/Openwrt
 TOOLCHAINDIR=$PLATFORMDIR/toolchain
 CONFIG_MAGIC=CONFIG_
 CONFIG_FILE=$TOPDIR/.build_config
-OPENWRTKERNELDIR=$OPENWRTDIR/build_dir/target-aarch64_cortex-a53+neon_glibc-2.19/linux-rtd1295_mnas_emmc/linux-4.1.7/
-#PRODUCT_DEVICE_PATH=$ANDROIDDIR/out/target/product/kylin32
-#MODULE_PATH=$ANDROIDDIR/out/target/product/kylin32/system/vendor/modules
-#TFTPROOT=~/tftpboot
-#VERBOSE=showcommands
-VERBOSE=
+OPENWRTKERNELDIR=$OPENWRTDIR/linux-4.1.7
+
 NCPU=`grep processor /proc/cpuinfo | wc -l`
 MULTI=`expr $NCPU + 2`
 
