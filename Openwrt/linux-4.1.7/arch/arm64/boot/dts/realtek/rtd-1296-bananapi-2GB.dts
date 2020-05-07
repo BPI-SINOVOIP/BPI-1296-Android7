@@ -354,4 +354,30 @@
 	gpios = <&rtk_misc_gpio 15 1 1>;
 	status = "okay";
     };
+    
+    leds {
+	compatible = "gpio-leds";
+	status = "okay";
+
+	red {
+		label = "red";
+		gpios = <&rtk_iso_gpio 27 1 1>;
+		linux,default-trigger = "default-on";
+		default-active = "low";
+	};
+
+	green {
+		label = "green";
+		gpios = <&rtk_misc_gpio 97 1 1>;
+		linux,default-trigger = "timer";
+		default-active = "low";
+	};
+
+	blue {
+                label = "blue";
+                gpios = <&rtk_misc_gpio 98 1 1>;
+                linux,default-trigger = "default-on";
+		default-active = "low";
+        };
+    };
 };
