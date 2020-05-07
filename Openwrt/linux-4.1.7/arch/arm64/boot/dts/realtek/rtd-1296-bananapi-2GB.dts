@@ -221,6 +221,28 @@
         pinctrl-0 = <&ir_rx_pins>,
                 <&ir_tx_pins>;
         status = "okay";
+
+        Realtek,irrx-protocol = <1>;
+        Realtek,irtx-protocol = <1>;
+        Realtek,cust-code = <0xC617>;
+        Realtek,scancode-msk = <0x00FF0000>;
+        Realtek,custcode-msk = <0x0000FFFF>;
+
+        /* <scancode, keycode> */
+        Realtek,keymap-tbl = <
+                0x12    116             //KEY_POWER             //POWER
+                0x0F    102             //KEY_HOME              //HOME
+                0x0D    158             //KEY_BACK              //RETURN
+                0x01    103             //KEY_UP                //UP
+                0x19    105             //KEY_LEFT              //LEFT
+                0x40    352             //KEY_OK                //OK
+                0x11    106             //KEY_RIGHT             //RIGHT
+                0x09    108             //KEY_DOWN              //DOWN
+                0x7F    114             //KEY_VOLUMEDOWN        //VOL-
+                0x1C    115             //KEY_VOLUMEUP          //VOL+
+        >;
+        /*IR detect interval, NEC default=50ms, should less than 100ms, and bigger than 9ms*/
+	Realtek,reg-ir-dpir = <50>;
     };
 
     i2c_0: i2c@0x98007D00 {

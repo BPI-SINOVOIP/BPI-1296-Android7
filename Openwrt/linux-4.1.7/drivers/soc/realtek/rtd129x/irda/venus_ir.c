@@ -441,6 +441,8 @@ int venus_ir_IrMessage2Keycode(unsigned int message, unsigned int *p_keycode)
 	unsigned int scancode;
 	struct venus_key_table *key_table = ir_dev->p_rtk_key_table;
 
+	RTK_debug(KERN_DEBUG "scancode=0x%x\n", message);
+
 	for(count=0; count<ir_dev->irda_dev_count; count++) {	/* for multiple support 2015.04.22*/
 		for(i=0; i<32; i++) {
 			if((0x1<<i)&(key_table[count].custcode_msk)) {
@@ -459,7 +461,7 @@ int venus_ir_IrMessage2Keycode(unsigned int message, unsigned int *p_keycode)
 			for (i=0; i<key_table[count].size; i++) {
 				if (scancode == key_table[count].keys[i].scancode) {
 					*p_keycode = key_table[count].keys[i].keycode;
-					RTK_debug(KERN_DEBUG "[%s]  %s  %d    report key scancode=0x%x keycode=%d\n",__FILE__,__FUNCTION__,__LINE__, scancode, *p_keycode);
+					RTK_debug(KERN_DEBUG "report key scancode=0x%x keycode=%d\n", scancode, *p_keycode);
 					return 0;
 				}
 			}
