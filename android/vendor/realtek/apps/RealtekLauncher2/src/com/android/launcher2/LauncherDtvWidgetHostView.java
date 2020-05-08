@@ -109,7 +109,7 @@ public class LauncherDtvWidgetHostView extends LauncherAppWidgetHostView {
     public static boolean isCameraInitialized = false;
     public static boolean isLocalFileInitialized = false;
     public static boolean isHDMIRXInitialized = false;
-    static int currentSource = -1; // to identify the first setting
+    static int currentSource = SOURCE_HDMI; // to identify the first setting
 
     public static Launcher mLauncher = null;
     public static View mDtvRootView = null;

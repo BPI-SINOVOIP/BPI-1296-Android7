@@ -498,15 +498,12 @@ PRODUCT_PACKAGES += dhcpcd.conf
 ###################################################
 # built-in applications
 ###################################################
-#PRODUCT_PACKAGES += RtkLauncher2
-PRODUCT_PACKAGES += RealtekSettings
 PRODUCT_PACKAGES += TvProvider
 PRODUCT_PACKAGES += RTKSourceIn
 #PRODUCT_PACKAGES += DMR
 PRODUCT_PACKAGES += RealtekGallery2
 #PRODUCT_PACKAGES += RealtekInitialSettings
 PRODUCT_PACKAGES += RealtekSoftwareUpdater
-PRODUCT_PACKAGES += Calendar
 PRODUCT_PACKAGES += Music
 PRODUCT_PACKAGES += MediaBrowser
 PRODUCT_PACKAGES += Browser2

@@ -37,6 +37,7 @@ PRODUCT_MODEL  := Realtek Kylin 32-bit TV
 PRODUCT_BRAND  := realtek
 PRODUCT_MANUFACTURER := realtek
 
+PRODUCT_PACKAGES += RtkLauncher2
 PRODUCT_PACKAGES += RealtekTvSettings
 #PRODUCT_PACKAGES += RealtekTvQuickSettings
 PRODUCT_PACKAGES += RealtekAppDrawer
