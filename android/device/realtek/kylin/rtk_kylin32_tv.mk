@@ -33,14 +33,17 @@ PRODUCT_CHARACTERISTICS := tv
 
 PRODUCT_DEVICE := kylin32_tv
 PRODUCT_NAME   := rtk_kylin32_tv
-PRODUCT_MODEL  := Realtek Kylin 32-bit TV
-PRODUCT_BRAND  := realtek
-PRODUCT_MANUFACTURER := realtek
+PRODUCT_MODEL  := Bananapi W2
+PRODUCT_BRAND  := BPI
+PRODUCT_MANUFACTURER := Sinovoip
 
 PRODUCT_PACKAGES += RtkLauncher2
 PRODUCT_PACKAGES += RealtekTvSettings
 #PRODUCT_PACKAGES += RealtekTvQuickSettings
 PRODUCT_PACKAGES += RealtekAppDrawer
+PRODUCT_PACKAGES += DMR
+PRODUCT_PACKAGES += RTKControlPanel
+PRODUCT_PACKAGES += RealtekPIP
 
 PRODUCT_PACKAGES += UseHDMITvInputService
 PRODUCT_PACKAGES += SampleTvInput
@@ -50,6 +53,9 @@ PRODUCT_PACKAGES += Provision
 
 # DHCKYLIN-38, Need DocumentsUI to handle android.provider.action.BROWSE_DOCUMENT_ROOT
 PRODUCT_PACKAGES += DocumentsUI
+
+# bpi, keyboard
+PRODUCT_PACKAGES += LeanKeyKeyboardPro
 
 PRODUCT_PROPERTY_OVERRIDES += ro.sf.lcd_density=320
 
