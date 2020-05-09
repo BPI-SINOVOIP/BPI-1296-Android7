@@ -381,7 +381,7 @@ static int detect_host(struct type_c_data *type_c) {
 	u32 cc1_config, cc2_config, default_ctrl;
 	u32 cc_rd = En_rd;
 
-	if (type_c->check_at_boot || (type_c->rd_config == EXTERNAL_Rd)) {
+	if (/*type_c->check_at_boot || */(type_c->rd_config == EXTERNAL_Rd)) {
 		cc_rd = 0;
 	}
 
