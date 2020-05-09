@@ -20,7 +20,7 @@ MULTI=`expr $NCPU + 2`
 build_openwrt()
 {
     pushd $OPENWRTDIR > /dev/null
-        yes "" | make oldconfig && ./netconfig.sh ott
+        yes "" | make oldconfig && ./netconfig.sh $OPENWRT_CONFIG
         yes "" | make oldconfig && make -j8 V=s
 
 	ERR=$?
