@@ -31,9 +31,11 @@ OBJS  +=  rcic.o
 all : $(MYLIB) 
 
 %.o:%.c
+	@mkdir -p obj
 	@$(CC) $(CFLAGS) -I inc $(INCS) -c $< -o obj/$@		
 	
 $(MYLIB): $(OBJS)
+	@mkdir -p lib
 	@set -e; for i in $(OBJS); do $(AR) rcv $(MYLIB) obj/$$i; done;		
 	
 clean:	

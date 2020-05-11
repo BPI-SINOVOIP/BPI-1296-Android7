@@ -52,9 +52,11 @@ endif
 all : $(MYLIB) $(MYPROG)
 
 %.o:%.cpp
+	@mkdir -p obj
 	@$(CC) $(CFLAGS) $(INCS) -c $< -o obj/$@		
 	
 $(MYLIB): $(OBJS)
+	@mkdir -p lib
 	@set -e; for i in $(OBJS); do $(AR) rcv $(MYLIB) obj/$$i; done;	
 	
 $(MYPROG): $(MYLIB)
