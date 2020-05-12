@@ -69,9 +69,9 @@ ifeq ($(CONFIG_PACKAGE_kmod-cfg80211),y)
 USER_NAME:=$(shell id -u -n)
 define Image/Prepare/Setconfig
 	grep -q guest $(TARGET_DIR)/etc/config/dhcp || cat ../conf/dhcp.guest >> $(TARGET_DIR)/etc/config/dhcp
-	sed -i 's/OpenWrt_2.4G$$$$/OpenWrt_2.4G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
-	sed -i 's/OpenWrt_5G$$$$/OpenWrt_5G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
-	sed -i 's/GuestWRT_5G$$$$/GuestWRT_5G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
+	#sed -i 's/OpenWrt_2.4G$$$$/OpenWrt_2.4G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
+	#sed -i 's/OpenWrt_5G$$$$/OpenWrt_5G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
+	#sed -i 's/GuestWRT_5G$$$$/GuestWRT_5G_$(USER_NAME)/g' $(TARGET_DIR)/etc/config/wireless
 	sed -i "/\b$(LAN_ETH)\b/a\	option type 'bridge'" $(TARGET_DIR)/etc/config/network
 	if [ "$(SUBTARGET)" = "mnas_emmc" ]; then \
 	grep -q veth $(TARGET_DIR)/etc/config/network || \
