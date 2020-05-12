@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 TARGETS="router ott"
 if [ "$1" = "" ]; then
     echo "Please select config target:"
@@ -30,7 +32,7 @@ OPTION="CONFIG_$1"
     esac
 }
 
-ROUTER_MOD="rtl8192cd mac80211 cfg80211 lib80211"
+ROUTER_MOD="rtkwifiu mac80211 cfg80211 lib80211"
 ROUTER_MOD+=" rtd1295hwnat"
 OTT_MOD="ottrtl8188eu ottrtl8189es ottrtl8189fs ottrtl8192cu ottrtl8192eu ottrtl8723bs \
          ottrtl8723bu ottrtl8723ds ottrtl8811au ottrtl8812au ottrtl8812bu ottrtl8814au \
