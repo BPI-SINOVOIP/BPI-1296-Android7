@@ -35,11 +35,17 @@ define KernelPackage/rtk_btusb/config
 	config RTL8822BU_BT_FW
 		bool "Realtek RTL8822BU BT Firmware"
 		default n
+	config RTL8822BE_BT_FW
+		bool "Realtek RTL8822BE BT Firmware"
+		default n
 	config RTL8821CU_BT_FW
 		bool "Realtek RTL8821CU BT Firmware"
 		default n
 	config RTL8723DU_BT_FW
 		bool "Realtek RTL8723DU BT Firmware"
+		default n
+	config RTL8812AE_BT_FW
+		bool "Realtek RTL8812AE BT Firmware"
 		default n
   endif
 endef
@@ -71,6 +77,12 @@ ifneq ($(CONFIG_RTL8821CU_BT_FW),)
 endif
 ifneq ($(CONFIG_RTL8723DU_BT_FW),)
 	$(INSTALL_DATA) ./files/firmware/8723du/* $(1)/lib/firmware
+endif
+ifneq ($(CONFIG_RTL8822BE_BT_FW),)
+	$(INSTALL_DATA) ./files/firmware/8822be/* $(1)/lib/firmware
+endif
+ifneq ($(CONFIG_RTL8812AE_BT_FW),)
+	$(INSTALL_DATA) ./files/firmware/8812ae/* $(1)/lib/firmware
 endif
 endef
 
