@@ -8,11 +8,7 @@ config interface loopback
 
 config interface 'wan'
         option ifname 'eth0'
-        option proto 'static'
-#       option hostname 'OpenWRT-Kylin'
-        option ipaddr '192.168.0.9'
-        option netmask '255.255.255.0'
-
+        option proto 'dhcp'
 
 config globals globals
 	option ula_prefix auto
