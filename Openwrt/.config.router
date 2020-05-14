@@ -2742,32 +2742,32 @@ CONFIG_PACKAGE_MAC80211_MESH=y
 # CONFIG_PACKAGE_kmod-net-prism54 is not set
 # CONFIG_PACKAGE_kmod-net-rtl8188eu is not set
 # CONFIG_PACKAGE_kmod-net-rtl8192su is not set
-CONFIG_PACKAGE_kmod-ottrtl8188eu=m
-CONFIG_PACKAGE_kmod-ottrtl8188fu=m
-CONFIG_PACKAGE_kmod-ottrtl8189es=m
-CONFIG_PACKAGE_kmod-ottrtl8189fs=m
-CONFIG_PACKAGE_kmod-ottrtl8192cu=m
-CONFIG_PACKAGE_kmod-ottrtl8192ee=m
-CONFIG_PACKAGE_kmod-ottrtl8192es=m
-CONFIG_PACKAGE_kmod-ottrtl8192eu=m
-CONFIG_PACKAGE_kmod-ottrtl8723bs=m
-CONFIG_PACKAGE_kmod-ottrtl8723bu=m
-CONFIG_PACKAGE_kmod-ottrtl8723ds=m
-CONFIG_PACKAGE_kmod-ottrtl8723du=m
-CONFIG_PACKAGE_kmod-ottrtl8811au=m
-CONFIG_PACKAGE_kmod-ottrtl8812ae=m
-CONFIG_PACKAGE_kmod-ottrtl8812au=m
-CONFIG_PACKAGE_kmod-ottrtl8812bu=m
-CONFIG_PACKAGE_kmod-ottrtl8814au=m
-CONFIG_PACKAGE_kmod-ottrtl8821as=m
-CONFIG_PACKAGE_kmod-ottrtl8821au=m
-CONFIG_PACKAGE_kmod-ottrtl8821ce=m
-CONFIG_PACKAGE_kmod-ottrtl8821cs=m
-CONFIG_PACKAGE_kmod-ottrtl8821cu=m
-CONFIG_PACKAGE_kmod-ottrtl8822be=m
-CONFIG_PACKAGE_kmod-ottrtl8822bs=m
-CONFIG_PACKAGE_kmod-ottrtl8822bu=m
-CONFIG_PACKAGE_kmod-ottrtl8822cs=m
+# CONFIG_PACKAGE_kmod-ottrtl8188eu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8188fu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8189es is not set
+# CONFIG_PACKAGE_kmod-ottrtl8189fs is not set
+# CONFIG_PACKAGE_kmod-ottrtl8192cu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8192ee is not set
+# CONFIG_PACKAGE_kmod-ottrtl8192es is not set
+# CONFIG_PACKAGE_kmod-ottrtl8192eu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8723bs is not set
+# CONFIG_PACKAGE_kmod-ottrtl8723bu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8723ds is not set
+# CONFIG_PACKAGE_kmod-ottrtl8723du is not set
+# CONFIG_PACKAGE_kmod-ottrtl8811au is not set
+# CONFIG_PACKAGE_kmod-ottrtl8812ae is not set
+# CONFIG_PACKAGE_kmod-ottrtl8812au is not set
+# CONFIG_PACKAGE_kmod-ottrtl8812bu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8814au is not set
+# CONFIG_PACKAGE_kmod-ottrtl8821as is not set
+# CONFIG_PACKAGE_kmod-ottrtl8821au is not set
+# CONFIG_PACKAGE_kmod-ottrtl8821ce is not set
+# CONFIG_PACKAGE_kmod-ottrtl8821cs is not set
+# CONFIG_PACKAGE_kmod-ottrtl8821cu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8822be is not set
+# CONFIG_PACKAGE_kmod-ottrtl8822bs is not set
+# CONFIG_PACKAGE_kmod-ottrtl8822bu is not set
+# CONFIG_PACKAGE_kmod-ottrtl8822cs is not set
 # CONFIG_PACKAGE_kmod-p54-common is not set
 # CONFIG_PACKAGE_kmod-p54-pci is not set
 # CONFIG_PACKAGE_kmod-p54-usb is not set
@@ -2782,7 +2782,7 @@ CONFIG_PACKAGE_kmod-ottrtl8822cs=m
 CONFIG_PACKAGE_kmod-rtkwifiu=y
 CONFIG_RTKWIFIU=y
 CONFIG_RTKWIFIU_CONCURRENT_MODE=y
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188eu=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188eu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188fu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8189es is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8189fs is not set
@@ -2790,18 +2790,19 @@ CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188eu=y
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8192ee is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8192eu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8723bs is not set
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8723bu=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8723bu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8723du is not set
-# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8812ae is not set
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8812au=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8811au is not set
+CONFIG_PACKAGE_kmod-rtkwifiu-rtl8812ae=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8812au is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8814au is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821as is not set
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821au=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821au is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821cs is not set
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821cu=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8821cu is not set
 CONFIG_PACKAGE_kmod-rtkwifiu-rtl8822be=y
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8822bs is not set
-CONFIG_PACKAGE_kmod-rtkwifiu-rtl8822bu=y
+# CONFIG_PACKAGE_kmod-rtkwifiu-rtl8822bu is not set
 # CONFIG_PACKAGE_kmod-rtl8180 is not set
 # CONFIG_PACKAGE_kmod-rtl8187 is not set
 # CONFIG_PACKAGE_kmod-rtl8192ce is not set
