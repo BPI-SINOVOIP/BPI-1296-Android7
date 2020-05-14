@@ -1980,6 +1980,9 @@ ifneq ($(CONFIG_RTKWIFIU),)
 ifeq ($(KERNEL_PATCHVER), 3.10)
 	$(call PatchDir,$(PKG_BUILD_DIR),./rtkwifiu/patches-3.10,)
 endif
+ifneq ($(CONFIG_PACKAGE_kmod-rtkwifiu-rtl8822be),)
+	$(call PatchDir,$(PKG_BUILD_DIR),./rtkwifiu/patches-rtl8822be,)
+endif
 endif
 	$(Build/Patch)
 	$(TAR) -C $(PKG_BUILD_DIR) -xzf $(DL_DIR)/$(IPW2100_NAME)-$(IPW2100_VERSION).tgz

@@ -2781,7 +2781,7 @@ CONFIG_PACKAGE_MAC80211_MESH=y
 # CONFIG_PACKAGE_kmod-rt73-usb is not set
 CONFIG_PACKAGE_kmod-rtkwifiu=y
 CONFIG_RTKWIFIU=y
-CONFIG_RTKWIFIU_CONCURRENT_MODE=y
+# CONFIG_RTKWIFIU_CONCURRENT_MODE is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188eu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8188fu is not set
 # CONFIG_PACKAGE_kmod-rtkwifiu-rtl8189es is not set

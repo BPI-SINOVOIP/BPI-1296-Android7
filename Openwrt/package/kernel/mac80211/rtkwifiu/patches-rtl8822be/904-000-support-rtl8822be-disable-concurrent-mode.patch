@@ -1,0 +1,22 @@
+--- a/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/core/rtw_p2p.c
++++ b/drivers/net/wireless/realtek/rtkwifiu/rtl8822be/core/rtw_p2p.c
+@@ -3346,8 +3346,10 @@ static int cancel_ro_ch_handler(_adapter *padapter, u8 *buf)
+ 		#endif/*CONFIG_AP_MODE*/
+ 		rtw_mi_buddy_issue_nulldata(padapter, NULL, 0, 3, 500);
+ 
++#ifdef CONFIG_CONCURRENT_MODE
+ 		if (ATOMIC_READ(&pwdev_priv->switch_ch_to) == 0)
+ 			ATOMIC_SET(&pwdev_priv->switch_ch_to, 1);
++#endif
+ 	}
+ 
+ 	rtw_p2p_set_state(pwdinfo, rtw_p2p_pre_state(pwdinfo));
+@@ -4660,7 +4662,7 @@ void ap_p2p_switch_timer_process(void *FunctionContext)
+ 	if (rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE))
+ 		return;
+ 
+-#ifdef CONFIG_IOCTL_CFG80211
++#if defined(CONFIG_IOCTL_CFG80211) && defined(CONFIG_CONCURRENT_MODE)
+ 	ATOMIC_SET(&pwdev_priv->switch_ch_to, 1);
+ #endif
+ 
