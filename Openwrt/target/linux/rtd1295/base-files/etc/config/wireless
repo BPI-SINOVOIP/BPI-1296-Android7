@@ -1,0 +1,15 @@
+config wifi-device  radio0
+	option type     mac80211
+	option channel  11
+	option hwmode	11g
+	option path	'platform/9804e000.pcie/pci0000:00/0000:00:00.0'
+	option htmode	HT20
+	option country	'US'
+
+config wifi-device  radio1
+	option type     mac80211
+	option channel  149
+	option hwmode	11a
+	option path	'platform/9803b000.pcie2/pci0001:01/0001:01:00.0'
+	option htmode	VHT80
+	option country	'US'
