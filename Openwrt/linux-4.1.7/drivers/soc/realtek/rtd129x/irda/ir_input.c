@@ -39,7 +39,7 @@ long int Input_Keybit_Length = sizeof(data->input_dev->keybit);
 int venus_ir_input_init(void)
 {
 	struct input_dev *input_dev;
-	
+
 	int result;
 	data = kzalloc(sizeof(*data), GFP_KERNEL);
 	if (!data) {
@@ -93,10 +93,17 @@ exit:
 	return -1;
 }
 
+int venus_ir_input_exit(void)
+{
+	input_unregister_device(data->input_dev);
+	kfree(data);
+}
+
 void venus_ir_input_report_key(uint32_t keycode)
 {
 	atomic_inc(&data->reportCount);
 	data->keycode = keycode;
+
 	input_report_key(data->input_dev, data->keycode, 1);
 	input_sync(data->input_dev);	
 }

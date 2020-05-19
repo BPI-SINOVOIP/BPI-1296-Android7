@@ -135,7 +135,7 @@ on boot
     chown bluetooth net_bt_stack /proc/bluetooth/sleep/btwrite
 
 
-        #UART device
+    #UART device
     chmod 0660 /dev/ttyS1
     chown bluetooth net_bt_stack /dev/ttyS1
 
@@ -151,6 +151,9 @@ on boot
     chown bluetooth net_bt_stack /system/etc/bluetooth
     chown bluetooth net_bt_stack /data/misc/bluetooth
     #setprop ro.bt.bdaddr_path "/data/misc/bluetooth/bdaddr"
+
+    # Multi IR
+    write /sys/devices/platform/98007000.irda/ir_replace_table "/system/vendor/modules/new_ir_keymap.conf"
 
     start libchk
     start start_tee_sup

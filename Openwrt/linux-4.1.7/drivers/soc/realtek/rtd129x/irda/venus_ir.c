@@ -971,7 +971,9 @@ ssize_t irda_store_ir_replace_table(struct device *dev, struct device_attribute 
 		ir_dev->p_rtk_key_table = new_p_rtk_key_table;
 	}
 	/* Hardware Registers Initialization */
+	venus_ir_input_exit();
 	rtk_ir_init();
+	venus_ir_input_init();
 
 irda_error1:
 	filp_close(filep, 0);

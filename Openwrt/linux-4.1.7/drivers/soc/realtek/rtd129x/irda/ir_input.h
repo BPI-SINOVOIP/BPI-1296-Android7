@@ -17,6 +17,7 @@
 #include <linux/types.h>
 
 int venus_ir_input_init(void);
+int venus_ir_input_exit(void);
 void venus_ir_input_cleanup(void);
 void venus_ir_input_report_key(uint32_t keycode);
 void venus_ir_input_report_end(void);
