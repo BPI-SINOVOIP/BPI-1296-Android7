@@ -1362,7 +1362,7 @@ static int dwc3_rtk_type_c_init(struct type_c_data *type_c)
 		type_c->is_attach = IN_DETACH;
 		type_c->connect_change = CONNECT_NO_CHANGE;
 		type_c->cur_mode = USB_DR_MODE_PERIPHERAL;
-		type_c->check_at_boot = true;
+		type_c->check_at_boot = false;
 
 		detect_host(type_c);
 
