@@ -58,8 +58,8 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
     private static final String TAG = "OpenwrtSettings";
     private static final boolean DEBUG = false;
 
-    private static final String KEY_AFP_TOGGLE = "toggle_afp_service";
-    private static final String KEY_DAAP_TOGGLE = "toggle_daap_service";
+    /*private static final String KEY_AFP_TOGGLE = "toggle_afp_service";*/
+    /*private static final String KEY_DAAP_TOGGLE = "toggle_daap_service";*/
     private static final String KEY_FTP_TOGGLE = "toggle_ftp_service";
     private static final String KEY_BT_TOGGLE = "toggle_bt_service";
     private static final String KEY_SAMBA_TOGGLE = "toggle_samba_service";
@@ -68,8 +68,8 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
     private static final String WIFI_AP_SSID_AND_SECURITY_5G = "openwrt_wifi_ap_5g";
     private static final String KEY_ADVANCED = "openwrt_advanced_key";
 
-    private SwitchPreference mAfpSwitch;
-    private SwitchPreference mDaapSwitch;
+    /*private SwitchPreference mAfpSwitch;*/
+    /*private SwitchPreference mDaapSwitch;*/
     private SwitchPreference mFtpSwitch;
     private SwitchPreference mBtSwitch;
     private SwitchPreference mSambaSwitch;
@@ -92,15 +92,15 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
 
     private SambaStatus smbStatus;
     private FtpStatus ftpStatus;
-    private AfpdStatus afpdStatus;
+    /*private AfpdStatus afpdStatus;*/
     private BtStatus btStatus;
-    private DaapStatus daapStatus;
+    /*private DaapStatus daapStatus;*/
     private DlnaStatus dlnaStatus;
 
 	public static String set_samba = "/nas/set/samba";
 	public static String set_ftp = "/nas/set/ftpd";
-    public static String set_afpd = "/nas/set/afpd";
-    public static String set_daap = "/nas/set/daap";
+    /*public static String set_afpd = "/nas/set/afpd";*/
+    /*public static String set_daap = "/nas/set/daap";*/
     public static String set_bt = "/nas/set/bt";
     public static String set_dlna = "/nas/set/dlna";
 
@@ -121,8 +121,8 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
 
         sUbusUtil = UbusUtil.getInstance(getContext());
 
-        mAfpSwitch = findAndInitSwitchPref(KEY_AFP_TOGGLE);
-        mDaapSwitch = findAndInitSwitchPref(KEY_DAAP_TOGGLE);
+        /*mAfpSwitch = findAndInitSwitchPref(KEY_AFP_TOGGLE);*/
+        /*mDaapSwitch = findAndInitSwitchPref(KEY_DAAP_TOGGLE);*/
         mFtpSwitch = findAndInitSwitchPref(KEY_FTP_TOGGLE);
         mBtSwitch = findAndInitSwitchPref(KEY_BT_TOGGLE);
         mSambaSwitch = findAndInitSwitchPref(KEY_SAMBA_TOGGLE);
@@ -265,11 +265,11 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
                 return false;
             }
 
-            if (KEY_AFP_TOGGLE.equals(command[0])) {
+            /*if (KEY_AFP_TOGGLE.equals(command[0])) {
                 sv = Server.Service.AFP;
             } else if (KEY_DAAP_TOGGLE.equals(command[0])) {
                 sv = Server.Service.ITUNES;
-            } else if (KEY_FTP_TOGGLE.equals(command[0])) {
+            } else */if (KEY_FTP_TOGGLE.equals(command[0])) {
                 sv = Server.Service.FTP;
             } else if (KEY_BT_TOGGLE.equals(command[0])) {
                 sv = Server.Service.DOWNLOADER;
@@ -402,9 +402,9 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
 
         smbStatus = (SambaStatus) server.getServiceStatus(Server.Service.SAMBA);
         ftpStatus = (FtpStatus) server.getServiceStatus(Server.Service.FTP);
-        afpdStatus = (AfpdStatus) server.getServiceStatus(Server.Service.AFP);
+        /*afpdStatus = (AfpdStatus) server.getServiceStatus(Server.Service.AFP);*/
         btStatus = (BtStatus) server.getServiceStatus(Server.Service.DOWNLOADER);
-        daapStatus = (DaapStatus) server.getServiceStatus(Server.Service.ITUNES);
+        /*daapStatus = (DaapStatus) server.getServiceStatus(Server.Service.ITUNES);*/
         dlnaStatus = (DlnaStatus) server.getServiceStatus(Server.Service.DLNA);
 
         return true;
@@ -414,9 +414,9 @@ public class OpenwrtSettings extends SettingsPreferenceFragment
         try{
             mSambaSwitch.setChecked(smbStatus.isRunning ? true : false);
             mFtpSwitch.setChecked(ftpStatus.isRunning ? true : false);
-            mAfpSwitch.setChecked(afpdStatus.isRunning ? true : false);
+            /*mAfpSwitch.setChecked(afpdStatus.isRunning ? true : false);*/
             mBtSwitch.setChecked(btStatus.isRunning ? true : false);
-            mDaapSwitch.setChecked(daapStatus.isRunning ? true : false);
+            /*mDaapSwitch.setChecked(daapStatus.isRunning ? true : false);*/
             mDmsSwitch.setChecked(dlnaStatus.isRunning ? true : false);
         } catch (NullPointerException e) {e.printStackTrace();}
     }

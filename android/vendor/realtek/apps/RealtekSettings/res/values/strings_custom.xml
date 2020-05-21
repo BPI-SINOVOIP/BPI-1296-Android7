@@ -141,9 +141,9 @@
 
     <!-- OpenWRT settings -->
     <string name="openwrt_settings_title">Openwrt Settings</string>
-    <string name="openwrt_afp_mode">AFP Service</string>
+    <!-- <string name="openwrt_afp_mode">AFP Service</string> -->
     <string name="openwrt_bt_mode">BT Service</string>
-    <string name="openwrt_daap_mode">DAAP Service</string>
+    <!-- <string name="openwrt_daap_mode">DAAP Service</string> -->
     <string name="openwrt_dms_mode">DMS Service</string>
     <string name="openwrt_ftp_mode">FTP Service</string>
     <string name="openwrt_samba_mode">Samba Server</string>

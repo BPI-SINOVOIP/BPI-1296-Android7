@@ -39,13 +39,13 @@
         android:key="toggle_ftp_service"
         android:title="@string/openwrt_ftp_mode" />
 
-    <SwitchPreference
+    <!-- <SwitchPreference
         android:key="toggle_afp_service"
-        android:title="@string/openwrt_afp_mode" />
+        android:title="@string/openwrt_afp_mode" /> -->
 
-    <SwitchPreference
+    <!-- <SwitchPreference
         android:key="toggle_daap_service"
-        android:title="@string/openwrt_daap_mode" />
+        android:title="@string/openwrt_daap_mode" /> -->
 
     <SwitchPreference
         android:key="toggle_bt_service"
