@@ -489,6 +489,7 @@ typedef struct {
 	// HPD
 	int rx_5v_state;
 	int gpio_hpd_ctrl;
+	int gpio_sel;
 	int gpio_5v_det;
 
 	unsigned int audio_freq;

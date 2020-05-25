@@ -213,6 +213,9 @@ static int rtk_hdmitx_resume(struct device *dev)
 
 	HDMI_INFO("Enter %s", __func__);
 
+	/* bpi, sel_gpio high in sleep mode, change back to low level */
+	gpio_direction_output(tx_dev.sel_gpio, 0);
+
 	hdmitx_scdcrr_resume();
 	ret_val = rtk_hdmitx_switch_resume();
 
@@ -250,14 +253,27 @@ static int rtk_hdmi_probe(struct platform_device *pdev)
 		"gpio-hpd-detect", 0);
 
 	if (tx_dev.hpd_gpio < 0) {
-		HDMI_ERROR("Could not get gpio from of");
+		HDMI_ERROR("Could not get hpd gpio from of");
 		goto end;
 	} else {
 		HDMI_INFO("hotplug gpio(%d)", tx_dev.hpd_gpio);
 	}
 
 	if (gpio_request(tx_dev.hpd_gpio, pdev->dev.of_node->name))
-		HDMI_ERROR("Request gpio(%d) fail", tx_dev.hpd_gpio);
+		HDMI_ERROR("Request hpd gpio(%d) fail", tx_dev.hpd_gpio);
+
+	/* Initial ts3dv642 sel2 gpio */
+	tx_dev.sel_gpio = of_get_named_gpio(pdev->dev.of_node,
+		"gpio-hdmitx-sel", 0);
+	if (tx_dev.sel_gpio < 0) {
+		HDMI_ERROR("Could not get sel gpio from of");
+		/*goto end;*/
+	} else {
+		HDMI_INFO("sel gpio(%d)", tx_dev.sel_gpio);
+	}
+
+	if (gpio_request(tx_dev.sel_gpio, "hdmitx_sel"))
+                HDMI_ERROR("Request sel gpio(%d) fail", tx_dev.sel_gpio);
 
 	/* Get hotplug gpio irq */
 	tx_dev.hpd_irq = gpio_to_irq(tx_dev.hpd_gpio);

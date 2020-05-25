@@ -15,3 +15,12 @@ endef
 
 $(eval $(call Profile,bananapi-2GB))
 
+define Profile/ccbox-4GB
+  NAME:=CCbox 4GB board
+endef
+
+define Profile/ccbox-4GB/Description
+	CCbox board V1.0 4GB
+endef
+
+$(eval $(call Profile,ccbox-4GB))

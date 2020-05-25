@@ -25,6 +25,7 @@ typedef struct {
     struct device dev;
 	void __iomem *reg_base;
 	int hpd_gpio;
+	int sel_gpio;
 	unsigned int hpd_irq;
 } hdmitx_device_t;
 

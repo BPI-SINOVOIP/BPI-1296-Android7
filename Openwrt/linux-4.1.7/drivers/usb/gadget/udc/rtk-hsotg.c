@@ -3121,7 +3121,7 @@ static int rtk_hsotg_udc_start(struct usb_gadget *gadget,
 	dev_info(hsotg->dev, "bound driver %s\n", driver->driver.name);
 	return 0;
 
-//err:
+err:
 	hsotg->driver = NULL;
 	return ret;
 }
