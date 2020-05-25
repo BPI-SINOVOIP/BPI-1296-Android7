@@ -2523,6 +2523,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
             loadIntegerSetting(stmt, Settings.System.POINTER_SPEED,
                     R.integer.def_pointer_speed);
 
+            loadStringSetting(stmt, Settings.System.TIME_12_24,
+                    R.string.def_time_12_24);
+
 			loadIntegerSetting(stmt, Settings.System.REALTEK_SETUP_TV_SYSTEM, 
 					R.integer.def_realtek_setup_tv_system);
 
@@ -2778,6 +2781,12 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
             loadIntegerSetting(stmt, Settings.Secure.SLEEP_TIMEOUT,
                     R.integer.def_sleep_timeout);
+
+            loadStringSetting(stmt, Settings.Secure.ENABLED_INPUT_METHODS,
+                    R.string.enabled_input_methods);
+
+            loadStringSetting(stmt, Settings.Secure.DEFAULT_INPUT_METHOD,
+                    R.string.def_input_method);
 
             /*
              * IMPORTANT: Do not add any more upgrade steps here as the global,

@@ -28,6 +28,7 @@
     <string name="def_bluetooth_disabled_profiles" translatable="false">0</string>
     <bool name="def_auto_time">true</bool>
     <bool name="def_auto_time_zone">true</bool>
+    <string name="def_time_12_24" translatable="false"></string>
     <bool name="def_accelerometer_rotation">true</bool>
     <!-- Default screen brightness, from 0 to 255.  102 is 40%. -->
     <integer name="def_screen_brightness">102</integer>
@@ -216,4 +217,10 @@
 
     <!-- Default setting for ability to add users from the lock screen -->
     <bool name="def_add_users_from_lockscreen">false</bool>
+
+    <!-- Default enabled input method -->
+    <string name="enabled_input_methods" translatable="false"></string>
+
+    <!-- Default input method -->
+    <string name="def_input_method" translatable="false"></string>
 </resources>

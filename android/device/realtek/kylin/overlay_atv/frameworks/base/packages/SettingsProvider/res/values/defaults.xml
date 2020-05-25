@@ -18,4 +18,7 @@
 -->
 <resources>
     <bool name="def_wifi_on">true</bool>
+    <string name="def_time_12_24" translatable="false">24</string>
+    <string name="enabled_input_methods" translatable="false">com.liskovsoft.leankeyboard/.ime.LeanbackImeService</string>
+    <string name="def_input_method" translatable="false">com.liskovsoft.leankeyboard/.ime.LeanbackImeService</string>
 </resources>
