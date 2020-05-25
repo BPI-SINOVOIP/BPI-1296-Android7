@@ -4742,7 +4742,7 @@ hub_port_init (struct usb_hub *hub, struct usb_device *udev, int port1,
 				"print dump_stack for %s %s USB device number %d using %s (%s)\n",
 				(udev->config) ? "reset" : "new", speed,
 				devnum, udev->bus->controller->driver->name, dev_name(udev->bus->controller->parent));
-		dump_stack();
+		/* dump_stack();  bpi, disable dump_stack */
 	}
 #endif
 

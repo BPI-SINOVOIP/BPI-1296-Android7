@@ -61,6 +61,7 @@ void __iomem *RTK_GIC_DIST_BASE;
 void __iomem *RTK_CPU_WRAPPER_BASE;
 
 int RTK_CHIP_VERSION = 0;
+int pwm_used = 0;
 
 #define rtk_suspend_shm_func(_name, _offset, _def)                                  \
 void rtk_suspend_##_name##_set(unsigned int val)                                    \
@@ -123,17 +124,17 @@ int rtk_set_suspend_mode(const char *buf, int n)
     len = p ? p - buf : n;
 
     if (strncmp(buf, "standby", len) == 0) {
-        pr_debug("[RTD129x_PM] GET state = standby\n");
-        pr_debug("[RTD129x_PM] SET state = standby, suepend_mode = wfi\n");
+        pr_info("[RTD129x_PM] GET state = standby\n");
+        pr_info("[RTD129x_PM] SET state = standby, suepend_mode = wfi\n");
         suspend_mode = SUSPEND_TO_WFI;
         ret = -EINVAL;
     } else if (strncmp(buf, "sleep", len) == 0) {
-        pr_debug("[RTD129x_PM] GET state = sleep\n");
-        pr_debug("[RTD129x_PM] SET state = mem, suepend_mode = ram\n");
+        pr_info("[RTD129x_PM] GET state = sleep\n");
+        pr_info("[RTD129x_PM] SET state = mem, suepend_mode = ram\n");
         suspend_mode = SUSPEND_TO_RAM;
     } else if (strncmp(buf, "off", len) == 0) {
-         pr_debug("[RTD129x_PM] GET state = off\n");
-         pr_debug("[RTD129x_PM] SET state = mem, suepend_mode = coolboot\n");
+         pr_info("[RTD129x_PM] GET state = off\n");
+         pr_info("[RTD129x_PM] SET state = mem, suepend_mode = coolboot\n");
         suspend_mode = SUSPEND_TO_COOLBOOT;
     } else if (strncmp(buf, "mem", len) == 0) {
         if (suspend_mode_stored) {
@@ -143,8 +144,8 @@ int rtk_set_suspend_mode(const char *buf, int n)
             return 0;
         }
 
-        pr_debug("[RTD129x_PM] GET state = mem\n");
-        pr_debug("[RTD129x_PM] SET state = mem, suepend_mode = ram\n");
+        pr_info("[RTD129x_PM] GET state = mem\n");
+        pr_info("[RTD129x_PM] SET state = mem, suepend_mode = ram\n");
         suspend_mode = SUSPEND_TO_RAM;
     } else 
         return -EINVAL;
@@ -488,7 +489,7 @@ static int rtk_suspend_to_coolboot(void)
     return ret;
 }
 
-void rtk_suspend_gpip_output_change_suspend(void)
+void rtk_suspend_gpio_output_change_suspend(void)
 {
     int i = 0;
     unsigned int val;
@@ -529,7 +530,7 @@ void rtk_suspend_gpip_output_change_suspend(void)
     }
 }
 
-void rtk_suspend_gpip_output_change_resume(void)
+void rtk_suspend_gpio_output_change_resume(void)
 {
     int i = 0;
     unsigned int val;
@@ -593,8 +594,12 @@ static int rtk_suspend_enter(suspend_state_t suspend_state)
             notify_acpu(NOTIFY_RESUME_PLATFORM);
             break;
         case PM_SUSPEND_MEM:
-			pwm_enable(pwm);
-			rtk_suspend_gpip_output_change_suspend();
+			if(pwm_used)
+				pwm_enable(pwm);
+
+			rtk_suspend_gpio_output_change_suspend();
+
+			printk(KERN_INFO "[RTD129x_PM] rtk suspend_mode = %d\n", suspend_mode);
 
             if (suspend_mode == SUSPEND_TO_WFI)
                 ret = rtk_suspend_to_wfi();
@@ -616,8 +621,11 @@ static int rtk_suspend_enter(suspend_state_t suspend_state)
             printk(KERN_INFO "[RTD129x_PM] Platform Resume ...\n");
             notify_acpu(NOTIFY_RESUME_PLATFORM);
 
-			rtk_suspend_gpip_output_change_resume();
-			pwm_disable(pwm);
+			rtk_suspend_gpio_output_change_resume();
+
+			if(pwm_used)
+				pwm_disable(pwm);
+
             break;
         default:
             ret = -EINVAL;
@@ -639,6 +647,11 @@ static int rtk_suspend_begin(suspend_state_t suspend_state)
 	pwm = devm_of_pwm_get(&pdev_locad->dev, pdev_locad->dev.of_node, NULL);
 	if (IS_ERR(pwm)) {
 		printk(KERN_ERR "[RTD129x_PM] Can't get pwm pin (21)\n");
+		pwm_used = 0;
+	}
+	else {
+		printk(KERN_ERR "[RTD129x_PM] get pwm pin (21)\n");
+		pwm_used = 1;
 	}
 
     switch(suspend_state) {
@@ -658,7 +671,8 @@ static void rtk_suspend_end(void)
 {
     printk(KERN_INFO "[RTD129x_PM] Suspend End\n");
 
-	devm_pwm_put(&pdev_locad->dev, pwm);
+	if(pwm_used)
+		devm_pwm_put(&pdev_locad->dev, pwm);
 
     notify_acpu(NOTIFY_RESUME_END);
     cpu_idle_poll_ctrl(false);

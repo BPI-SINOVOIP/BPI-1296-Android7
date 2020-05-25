@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 TARGETS="router ott"
 if [ "$1" = "" ]; then
     echo "Please select config target:"
