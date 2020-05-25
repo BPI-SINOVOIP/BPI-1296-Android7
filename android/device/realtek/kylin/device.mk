@@ -57,7 +57,7 @@ PRODUCT_PROPERTY_OVERRIDES += dalvik.vm.heapmaxfree=8m
 #PRODUCT_DEX_PREOPT_DEFAULT_FLAGS := --compiler-filter=speed
 #$(call add-product-dex-preopt-module-config,services,--compiler-filter=space)
 
-PRODUCT_PROPERTY_OVERRIDES += persist.sys.timezone=Asia/Taipei
+PRODUCT_PROPERTY_OVERRIDES += persist.sys.timezone=Asia/Shanghai
 PRODUCT_PROPERTY_OVERRIDES += wifi.interface=wlan0
 PRODUCT_PROPERTY_OVERRIDES += wifi.supplicant_scan_interval=120
 PRODUCT_PROPERTY_OVERRIDES += ro.opengles.version=196610
@@ -533,13 +533,7 @@ ifeq ($(USE_VMX_DEMO_APK), true)
 PRODUCT_PACKAGES += VmxRtkDemo
 endif
 
-
-#ifeq ($(TARGET_BUILD_VARIANT), eng)
 PRODUCT_LOCALES := en_US zh_TW zh_CN
-#else # user build
-#PRODUCT_LOCALES := en_US zh_TW zh_CN
-#endif
-
 
 # add verity dependencies
 $(call inherit-product, build/target/product/verity.mk)
