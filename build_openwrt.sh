@@ -47,7 +47,7 @@ function build_cmd()
 clean_openwrt()
 {
 	pushd $OPENWRTDIR > /dev/null
-		make clean V=99 -j8;rm .config.old
+		make clean V=99 -j8;rm .config .config.old
 	popd  > /dev/null
 
 	pushd $OPENWRTKERNELDIR > /dev/null
