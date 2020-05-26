@@ -15,7 +15,7 @@
 	chosen {
         linux,initrd-start = <ROOTFS_NORMAL_START>;
         linux,initrd-end = <ROOTFS_NORMAL_END>;
-        bootargs = "earlycon=uart8250,mmio32,0x98007800 console=ttyS0,115200 init=/init androidboot.hardware=kylin androidboot.storage=emmc loglevel=4"
+        bootargs = "earlycon=uart8250,mmio32,0x98007800 console=ttyS0,115200 init=/init androidboot.hardware=kylin androidboot.storage=emmc loglevel=4";
 	};
 
 	chosen {
