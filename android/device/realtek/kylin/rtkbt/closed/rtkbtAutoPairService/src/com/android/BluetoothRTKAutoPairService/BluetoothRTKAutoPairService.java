@@ -61,6 +61,7 @@ import java.util.Set;
 
 import android.app.NotificationManager;
 import android.app.Notification;
+import android.support.v4.app.NotificationCompat;
 
 /*
  * BluetoothRTKAutoPairService receive auto_pairable_device found event
@@ -480,11 +481,21 @@ public class BluetoothRTKAutoPairService extends Service {
     }
 
     public int startServiceForeground(Intent intent, int flags, int startId) {
-        Notification notification = new Notification(R.drawable.ic_bluetooth, "RTKBT AutoPair Process"
+        /*Notification notification = new Notification(R.drawable.ic_bluetooth, "RTKBT AutoPair Process"
                         , System.currentTimeMillis());
         notification.setLatestEventInfo(this, "Realtek Bluetooth",
                 "AutoPair Process", null);
-        notification.flags = Notification.FLAG_SHOW_LIGHTS;
+        notification.flags = Notification.FLAG_SHOW_LIGHTS;*/
+
+	/* bpi, fix setLatestEventInfo() is deprecated */
+	Notification notification = new NotificationCompat.Builder(this)
+		.setSmallIcon(R.drawable.ic_bluetooth)
+		.setContentTitle("Realtek Bluetooth")
+		.setContentText("AutoPair Process")
+		.setDefaults(Notification.DEFAULT_SOUND)
+		.setWhen(System.currentTimeMillis())
+		.build();
+
         startForeground(1, notification);
 
         return START_STICKY;
