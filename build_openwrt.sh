@@ -26,6 +26,10 @@ build_openwrt()
 		make defconfig
 	fi
 
+	if [ "${BUILDTYPE_ANDROID}" = "kylin32_tv" ]; then
+		sed -i 's/kylin32"/kylin32_tv"/' .config
+	fi
+
 	make -j8 V=s
 	ERR=$?
     popd
