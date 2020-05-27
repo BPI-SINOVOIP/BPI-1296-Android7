@@ -257,10 +257,12 @@ static int rtk_hdmi_probe(struct platform_device *pdev)
 		goto end;
 	} else {
 		HDMI_INFO("hotplug gpio(%d)", tx_dev.hpd_gpio);
-	}
 
-	if (gpio_request(tx_dev.hpd_gpio, pdev->dev.of_node->name))
-		HDMI_ERROR("Request hpd gpio(%d) fail", tx_dev.hpd_gpio);
+		if (gpio_is_valid(tx_dev.hpd_gpio)) {
+			if (gpio_request(tx_dev.hpd_gpio, pdev->dev.of_node->name))
+				HDMI_ERROR("Request hpd gpio(%d) fail", tx_dev.hpd_gpio);
+		}
+	}
 
 	/* Initial ts3dv642 sel2 gpio */
 	tx_dev.sel_gpio = of_get_named_gpio(pdev->dev.of_node,
@@ -270,10 +272,12 @@ static int rtk_hdmi_probe(struct platform_device *pdev)
 		/*goto end;*/
 	} else {
 		HDMI_INFO("sel gpio(%d)", tx_dev.sel_gpio);
-	}
 
-	if (gpio_request(tx_dev.sel_gpio, "hdmitx_sel"))
-                HDMI_ERROR("Request sel gpio(%d) fail", tx_dev.sel_gpio);
+		if (gpio_is_valid(tx_dev.sel_gpio)) {
+			if (gpio_request(tx_dev.sel_gpio, "hdmitx_sel"))
+				HDMI_ERROR("Request sel gpio(%d) fail", tx_dev.sel_gpio);
+		}
+	}
 
 	/* Get hotplug gpio irq */
 	tx_dev.hpd_irq = gpio_to_irq(tx_dev.hpd_gpio);
