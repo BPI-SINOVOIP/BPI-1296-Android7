@@ -738,10 +738,16 @@ int hdmirx_rtk_drv_probe(struct platform_device *pdev)
 	else
 	{
 		HDMIRX_INFO("hdmirx sel2 gpio(%d)",hdmi.gpio_sel);
-                if (!gpio_is_valid(hdmi.gpio_sel))
-                        HDMIRX_ERROR("gpio %d is not valid", hdmi.gpio_sel);
-                if(gpio_request(hdmi.gpio_sel, "hdmirx_sel"))
-                        HDMIRX_ERROR("Request gpio %d fail", hdmi.gpio_sel);
+        if (gpio_is_valid(hdmi.gpio_sel)) {
+			if(gpio_request(hdmi.gpio_sel, "hdmirx_sel")) {
+				HDMIRX_ERROR("Request gpio %d fail", hdmi.gpio_sel);
+				hdmi.gpio_sel = -1;
+			}
+        }
+		else {
+			HDMIRX_ERROR("gpio %d is not valid", hdmi.gpio_sel);
+			hdmi.gpio_sel = -1;
+		}
 	}
 
 	// 5V detect GPIO
@@ -950,8 +956,10 @@ static int hdmirx_rtk_drv_resume(struct device *dev)
 	//Disable RX clock for saving power
 	hdmirx_clock_control(CLK_HDMIRX|CLK_RXWRAP|CLK_MIPI, CTL_DISABLE);
 
-	/* bpi, sel_gpio low in sleep mode, change back to high level */
-	gpio_direction_output(hdmi.gpio_sel, 1);
+	/* bpi, sel_gpio input/low in sleep mode, change back to high level */
+	if(hdmi.gpio_sel > 0)
+		gpio_direction_output(hdmi.gpio_sel, 1);
+	
 	Hdmi_SetHPD(0);
 	hdmi_hw_tsk = kthread_run(mipi_top_thread, hdmi_dev, "mipi_hw_thread");
 

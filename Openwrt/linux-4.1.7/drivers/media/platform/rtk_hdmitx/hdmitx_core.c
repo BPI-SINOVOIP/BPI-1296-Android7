@@ -213,8 +213,9 @@ static int rtk_hdmitx_resume(struct device *dev)
 
 	HDMI_INFO("Enter %s", __func__);
 
-	/* bpi, sel_gpio high in sleep mode, change back to low level */
-	gpio_direction_output(tx_dev.sel_gpio, 0);
+	/* bpi, sel_gpio external pull high in sleep mode, change back to low level */
+	if(tx_dev.sel_gpio > 0)
+		gpio_direction_output(tx_dev.sel_gpio, 0);
 
 	hdmitx_scdcrr_resume();
 	ret_val = rtk_hdmitx_switch_resume();
@@ -274,8 +275,14 @@ static int rtk_hdmi_probe(struct platform_device *pdev)
 		HDMI_INFO("sel gpio(%d)", tx_dev.sel_gpio);
 
 		if (gpio_is_valid(tx_dev.sel_gpio)) {
-			if (gpio_request(tx_dev.sel_gpio, "hdmitx_sel"))
+			if (gpio_request(tx_dev.sel_gpio, "hdmitx_sel")) {
 				HDMI_ERROR("Request sel gpio(%d) fail", tx_dev.sel_gpio);
+				tx_dev.sel_gpio = -1;
+			}
+		}
+		else {
+			HDMI_ERROR("sel gpio %d is not valid", tx_dev.sel_gpio);
+			tx_dev.sel_gpio = -1;
 		}
 	}
 
