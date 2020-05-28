@@ -290,7 +290,6 @@ static int _indirect_cfg_write(unsigned long addr, unsigned long data, unsigned 
 	unsigned long status;
 	unsigned char mask;
 	int try_count = 1000;
-	int retry = 0;
 
 	if (ADDR_TO_DEVICE_NO(addr) != 0)
 		return PCIBIOS_DEVICE_NOT_FOUND;
@@ -301,7 +300,7 @@ static int _indirect_cfg_write(unsigned long addr, unsigned long data, unsigned 
 		return PCIBIOS_SET_FAILED;
 
 	data = (data << _pci_bit_shift(addr)) & _pci_bit_mask(mask);
-write_resend:
+
 	rtk_pci2_ctrl_write(PCIE_INDIR_CTR, 0x12);
 	rtk_pci2_ctrl_write(PCIE_CFG_ST, CFG_ST_ERROR|CFG_ST_DONE);
 	rtk_pci2_ctrl_write(PCIE_CFG_ADDR, addr);
@@ -319,11 +318,13 @@ write_resend:
 		udelay(50);
 	} while (!(status & CFG_ST_DONE) && try_count--);
 
+	if (try_count < 0) {
+		PCI_CFG_WARNING("Write config data (%p) failed - timeout\n",
+				(void *) addr);
+		goto error_occur;
+	}
 
-	if (rtk_pci2_ctrl_read(PCIE_CFG_ST) & CFG_ST_ERROR || try_count < 0) {
-		if (try_count < 0)
-			PCI_CFG_WARNING("Write config data (%p) failed - timeout\n",
-					(void *) addr);
+	if (rtk_pci2_ctrl_read(PCIE_CFG_ST) & CFG_ST_ERROR) {
 		if (status & CFG_ST_DETEC_PAR_ERROR)
 			PCI_CFG_WARNING("Write config data failed - PAR error detected\n");
 		if (status & CFG_ST_SIGNAL_SYS_ERROR)
@@ -334,13 +335,8 @@ write_resend:
 			PCI_CFG_WARNING("Write config data failed - target abort\n");
 		if (status & CFG_ST_SIG_TAR_ABORT)
 			PCI_CFG_WARNING("Write config data failed - tar abort\n");
-		retry++;
-		if (retry < 2) {
-			rtk_pci2_ctrl_write(PCIE_CFG_ST, CFG_ST_ERROR|CFG_ST_DONE);
-			goto write_resend;
-		} else {
-			goto error_occur;
-		}
+
+		goto error_occur;
 	}
 
 	rtk_pci2_ctrl_write(PCIE_CFG_ST, CFG_ST_ERROR|CFG_ST_DONE);
@@ -359,7 +355,6 @@ static int _indirect_cfg_read(unsigned long addr, u32 *pdata, unsigned char size
 	unsigned long status;
 	unsigned char mask;
 	int try_count = 20000;
-	int retry = 0;
 
 	if (ADDR_TO_DEVICE_NO(addr) != 0)
 		return PCIBIOS_DEVICE_NOT_FOUND;
@@ -368,7 +363,7 @@ static int _indirect_cfg_read(unsigned long addr, u32 *pdata, unsigned char size
 
 	if (!mask)
 		return PCIBIOS_SET_FAILED;
-read_resend:
+
 	rtk_pci2_ctrl_write(PCIE_INDIR_CTR, 0x10);
 	rtk_pci2_ctrl_write(PCIE_CFG_ST, 0x3);
 	rtk_pci2_ctrl_write(PCIE_CFG_ADDR, (addr & ~0x3));
@@ -380,9 +375,12 @@ read_resend:
 		udelay(50);
 	} while (!(status & CFG_ST_DONE) && try_count--);
 
-	if (rtk_pci2_ctrl_read(PCIE_CFG_ST) & CFG_ST_ERROR || try_count < 0) {
-		if (try_count < 0)
-			PCI_CFG_WARNING("Read config data (%p) failed - timeout\n", (void *) addr);
+	if (try_count < 0) {
+		PCI_CFG_WARNING("Read config data (%p) failed - timeout\n", (void *) addr);
+		goto error_occur;
+	}
+
+	if (rtk_pci2_ctrl_read(PCIE_CFG_ST) & CFG_ST_ERROR) {
 		if (status & CFG_ST_DETEC_PAR_ERROR)
 			PCI_CFG_WARNING("Read config data failed - PAR error detected\n");
 		if (status & CFG_ST_SIGNAL_SYS_ERROR)
@@ -393,13 +391,7 @@ read_resend:
 			PCI_CFG_WARNING("Read config data failed - target abort\n");
 		if (status & CFG_ST_SIG_TAR_ABORT)
 			PCI_CFG_WARNING("Read config data failed - tar abort\n");
-		retry++;
-		if (retry < 2) {
-			rtk_pci2_ctrl_write(PCIE_CFG_ST, CFG_ST_ERROR|CFG_ST_DONE);
-			goto read_resend;
-		} else {
-			goto error_occur;
-		}
+		goto error_occur;
 	}
 
 	rtk_pci2_ctrl_write(PCIE_CFG_ST, 0x3);
