@@ -2788,6 +2788,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
             loadStringSetting(stmt, Settings.Secure.DEFAULT_INPUT_METHOD,
                     R.string.def_input_method);
 
+            loadIntegerSetting(stmt, Settings.Secure.SKIP_FIRST_USE_HINTS,
+                    R.integer.def_skip_first_use_hints);
+
             /*
              * IMPORTANT: Do not add any more upgrade steps here as the global,
              * secure, and system settings are no longer stored in a database

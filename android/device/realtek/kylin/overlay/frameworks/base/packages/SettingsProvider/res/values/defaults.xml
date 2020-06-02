@@ -17,4 +17,6 @@
  */
 -->
 <resources>
+    <!-- Default for Settings.Secure.SKIP_FIRST_USE_HINTS -->
+    <integer name="def_skip_first_use_hints">1</integer>
 </resources>

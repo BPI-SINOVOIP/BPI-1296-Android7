@@ -223,4 +223,7 @@
 
     <!-- Default input method -->
     <string name="def_input_method" translatable="false"></string>
+
+    <!-- Default for Settings.Secure.SKIP_FIRST_USE_HINTS -->
+    <integer name="def_skip_first_use_hints">0</integer>
 </resources>
