@@ -42,12 +42,13 @@ dvfs_random_test()
     freqRange=`busybox expr ${maxFreq} - ${minFreq}`
 
     dvfs_chmod 777
-    dvfs_set_mode performance
+    dvfs_set_mode userspace
 
     until [ ]
     do
         freq=`busybox expr ${RANDOM} % ${freqRange}`
         freq=`busybox expr ${freq} + ${minFreq}`
+	echo "set freq to ${freq}000"
         dvfs_freq_force_to ${freq}000
         sleep ${delay}
     done

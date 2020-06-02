@@ -146,6 +146,7 @@ static int realtek_129x_cpufreq_set_target(struct cpufreq_policy *policy,
 	unsigned int idx;
 	struct cpufreq_freqs freqs;
 
+#if 0
 	if (!strcmp(policy->governor->name, "userspace")) {
 
 		pr_debug("[USERSPACE GOV] set frequency to %d MHz\n",
@@ -158,6 +159,7 @@ static int realtek_129x_cpufreq_set_target(struct cpufreq_policy *policy,
 
 		return ret;
 	}
+#endif
 
 	virtual_freq_stor = target_freq;
 	if (virtual_freq_en && target_freq >= virtual_freq_threshold) {

@@ -117,6 +117,7 @@
 		<2    9  1300000>,
 		<2   11  1400000>;
 
+	/* bpi soc type, column 2 is index num in voltage-table */
         frequency-table,rev1 =
 		<0    0   300000>,
 		<0    0   500000>,
