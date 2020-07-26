@@ -406,4 +406,8 @@
 		default-active = "low";
         };
     };
+
+    dwc3_drd: rtk_dwc3_drd@98013200 {
+        status = "disabled";
+    };
 };
