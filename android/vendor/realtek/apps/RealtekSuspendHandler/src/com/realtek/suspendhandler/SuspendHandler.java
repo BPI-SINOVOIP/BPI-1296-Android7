@@ -30,6 +30,17 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ActivityManager.RunningTaskInfo;
 
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +60,10 @@ public class SuspendHandler extends BroadcastReceiver {
     private static final String YELLOW="\033[0;33;33m";
     private static final String END="\033[m";
 
+    private static final String RED_LED_FILE="/sys/class/leds/red/trigger";
+    private static final String BLUE_LED_FILE="/sys/class/leds/blue/trigger";
+    private static final String GREEN_LED_FILE="/sys/class/leds/green/trigger";
+
     private Context mContext;
     private AudioManager mSound = null;
 	//private int mUnmountCounter = 0;
@@ -60,6 +75,7 @@ public class SuspendHandler extends BroadcastReceiver {
     public SuspendHandler(SuspendService service){
         mService = service;
         manager = (StorageManager) mService.getSystemService(Context.STORAGE_SERVICE);
+		setLedState(true);
     }
 
     @Override
@@ -73,6 +89,7 @@ public class SuspendHandler extends BroadcastReceiver {
         Slog.d(TAG, "onReceive \""+action+"\" mode: \""+modeString+"\"");
 
         if(action.equals(Intent.ACTION_SCREEN_OFF)){
+		    setLedState(false);
             mService.cancelPendingSearch();
             if(mode == SuspendService.SCREEN_OFF_SUSPEND_ON){
                 String suspendMode = mService.getPlatformSuspendMode();
@@ -92,6 +109,7 @@ public class SuspendHandler extends BroadcastReceiver {
         }else if(action.equals(Intent.ACTION_SCREEN_ON)){
 
             // it is good to always process screen on.
+            setLedState(true);
             onReceiveScreenOn();
             mSound = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
             if (mSound != null) {
@@ -517,4 +535,95 @@ public class SuspendHandler extends BroadcastReceiver {
         return mUnmountCounter;
     }
 
+
+    private void setRedLedOn()
+    {
+	try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(RED_LED_FILE));
+            bw.write("default-on");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + RED_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + RED_LED_FILE);
+        }
+    }
+
+    private void setRedLedOff()
+    {
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(RED_LED_FILE));
+            bw.write("none");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + RED_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + RED_LED_FILE);
+        }
+    }
+
+    private void setBlueLedOn()
+    {
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(BLUE_LED_FILE));
+            bw.write("default-on");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + BLUE_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + BLUE_LED_FILE);
+        }
+    }
+
+    private void setBlueLedOff()
+    {
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(BLUE_LED_FILE));
+            bw.write("none");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + BLUE_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + BLUE_LED_FILE);
+        }
+    }
+
+    private void setGreenLedOn()
+    {
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(GREEN_LED_FILE));
+            bw.write("default-on");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + GREEN_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + GREEN_LED_FILE);
+        }
+    }
+
+    private void setGreenLedOff()
+    {
+        try{
+            BufferedWriter bw = new BufferedWriter(new FileWriter(GREEN_LED_FILE));
+            bw.write("none");
+            bw.close();
+        } catch (FileNotFoundException e){
+            Slog.e(TAG, "Write FileNotFoundException " + GREEN_LED_FILE);
+        } catch (IOException e) {
+            Slog.e(TAG, "Write IOException " + GREEN_LED_FILE);
+        }
+    }
+
+    private void setLedState(boolean enable) {
+		if(enable) {
+	    	setRedLedOff();
+	    	setBlueLedOff();
+	    	setGreenLedOn();
+		}
+		else {
+	    	setRedLedOff();
+	    	setGreenLedOff();
+	    	setBlueLedOn();
+		}
+    }
 }

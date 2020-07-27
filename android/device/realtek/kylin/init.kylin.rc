@@ -123,6 +123,14 @@ on boot
     chown system system /sys/kernel/suspend/watchdog_en
     chmod 0664 /sys/kernel/suspend/watchdog_en
 
+    # LED
+    chown system system /sys/class/leds/blue/trigger
+    chmod 0664 /sys/class/leds/blue/trigger
+    chown system system /sys/class/leds/red/trigger
+    chmod 0664 /sys/class/leds/red/trigger
+    chown system system /sys/class/leds/green/trigger
+    chmod 0664 /sys/class/leds/green/trigger
+    
     # CTS requirement
     chmod 0775 /tmp
 
