@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">HDMIRxDemo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="view_type">View type:</string>
+    <string name="demo_type">Demo type:</string>
+    <string name="camera_type">Preview source:</string>
+    <string name="record_on">Enable MediaRecorder</string>
+    <string name="floating_window_demo_text">FloatingWindowDemo:</string>
+    <string name="background_record_demo_text">BackgroundRecordDemo:</string>
+    <string name="show_view">Show preview window (runtime option)</string>
+    <string name="window_size">Window size:</string>
+    <string name="no_preview">No Preview!!</string>
+    <string name="browse">-></string>
+    <string name="file_select">Select a file to play:</string>
+    <string name="rec_resolution">Record resolution:</string>
+    <string name="exit_behavior">Exit behavior:</string>
+    <string name="rec_output">Record output path:</string>
+    <string name="rec_format">Record format:</string>
+    <string name="schedule_rec">Schedule record</string>
+    <string name="schedule_hour">Hour:</string>
+    <string name="schedule_minute">Minute:</string>
+    <string name="ip_common">.</string>
+</resources>

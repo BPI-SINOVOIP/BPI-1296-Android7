@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <!-- top blank area -->
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="40px"
+        android:orientation="vertical"
+        android:gravity="center"/>
+
+    <LinearLayout android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="40px"
+        android:layout_marginRight="40px"
+        android:gravity="center">
+
+        <!-- Date picker and title -->
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="top|left">
+            <TextView android:id="@+id/date_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="34px"
+                style="@style/TextAppearance.Medium"/>
+            <DatePicker android:id="@+id/date_picker"
+                android:datePickerMode="spinner"
+                android:calendarViewShown="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- vertical separator line -->
+        <include android:layout_width="2px"
+            android:layout_height="match_parent"
+            android:layout_marginTop="60px"
+            android:layout_marginBottom="40px"
+            layout="@layout/separator_line"/>
+
+        <!-- start time picker and title -->
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="top|left">
+            <TextView android:id="@+id/start_time_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="34px"
+                style="@style/TextAppearance.Medium"/>
+            <TimePicker android:id="@+id/start_time_picker"
+                android:timePickerMode="spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- horizontal separator line -->
+        <include android:layout_width="10px"
+            android:layout_height="2px"
+            android:layout_marginTop="20px"
+            layout="@layout/separator_line"/>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="top|left">
+            <TextView android:id="@+id/end_time_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="34px"
+                style="@style/TextAppearance.Medium"/>
+            <TimePicker android:id="@+id/end_time_picker"
+                android:timePickerMode="spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/ok_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/focus_green"
+        android:gravity="center">
+        <TextView android:id="@+id/info_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26px"
+            android:layout_marginBottom="26px"
+            android:textColor="@color/focus_white"
+            style="@style/TextAppearance.Medium"/>
+    </LinearLayout>
+</LinearLayout>

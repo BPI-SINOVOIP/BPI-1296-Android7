@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.hdmirxdemo"
+    android:sharedUserId="android.uid.system"
+    android:versionCode="1"
+    android:versionName="1.0" >
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name">
+        <uses-library android:name="com.realtek" />
+        <receiver android:enabled="true"
+            android:name="com.example.hdmirxdemo.MyReceiver">
+            <intent-filter android:priority="100" >
+                <action android:name="android.intent.action.HDMIRX_PLUGGED"/>
+                <action android:name="android.intent.action.HDMIRX_HDCP_STATUS"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.PLATFORM_SCREEN_ON"/>
+                <action android:name="android.intent.action.PLATFORM_SCREEN_OFF"/>
+                <action android:name="android.intent.action.VIDEO_STATUS"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- new designed service with flexiable capability -->
+        <service android:enabled="true"
+            android:name="com.example.hdmirxdemo.FloatingWindowService2" >
+        </service>
+
+        <!-- watchdog service -->
+        <service android:enabled="true"
+            android:name="com.example.hdmirxdemo.WatchdogService" >
+        </service>
+
+        <!--
+        <service android:enabled="true"
+            android:name="com.example.hdmirxdemo.GeneralService" >
+        </service>
+        -->
+
+        <activity
+            android:name="com.example.hdmirxdemo.MainActivity3"
+            android:theme="@style/MaterialTheme"
+            android:screenOrientation="nosensor"
+            android:configChanges="navigation|keyboard|keyboardHidden"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

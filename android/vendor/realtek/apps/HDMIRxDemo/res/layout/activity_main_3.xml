@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- title area -->
+    <LinearLayout android:id="@+id/title_group"
+        android:orientation="horizontal"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="20px"
+        android:layout_width="match_parent"
+        android:layout_height="186px">
+
+    <ImageView android:id="@+id/title_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20px"
+        android:src="@drawable/title_icon"/>
+
+    <TextView android:id="@+id/title_textview"
+        style="@style/TextAppearance.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <RelativeLayout android:id="@+id/main_group"
+        android:layout_below="@id/title_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include android:id="@+id/preview_group"
+            android:layout_width="484px"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="198px"
+            layout="@layout/layout_preview_group" />
+
+        <LinearLayout android:id="@+id/blank1"
+            android:layout_width="98px"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/preview_group"/>
+
+        <LinearLayout android:id="@+id/rec_out_group"
+            android:layout_toRightOf="@id/blank1"
+            android:layout_width="942px"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginRight="198px"
+            android:gravity="top|center_horizontal">
+
+            <include android:id="@+id/rec_group"
+                android:layout_width="match_parent"
+                android:layout_height="333px"
+                android:layout_marginBottom="40px"
+                layout="@layout/layout_rec_group" />
+
+            <include android:id="@+id/sch_rec_group"
+                android:layout_width="match_parent"
+                android:layout_height="373px"
+                layout="@layout/layout_sch_rec_group" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

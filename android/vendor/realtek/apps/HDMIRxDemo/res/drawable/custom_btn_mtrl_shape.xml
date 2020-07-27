@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+   
+    <!-- pressed state
+    <item android:state_pressed="true">
+        <inset xmlns:android="http://schemas.android.com/apk/res/android"
+            android:insetLeft="4px"
+            android:insetTop="6px"
+            android:insetRight="4px"
+            android:insetBottom="6px">
+            <shape android:shape="rectangle">
+                <corners android:radius="2px" />
+                <solid android:color="#88FF0000" />
+                <padding android:left="8px"
+                    android:top="4px"
+                    android:right="8px"
+                    android:bottom="4px" />
+            </shape>
+        </inset>
+    </item>
+    -->
+
+    <!-- focused state -->
+    <item android:state_focused="true">
+        <inset xmlns:android="http://schemas.android.com/apk/res/android"
+            android:insetLeft="4px"
+            android:insetTop="6px"
+            android:insetRight="4px"
+            android:insetBottom="6px">
+            <shape android:shape="rectangle">
+                <corners android:radius="2px" />
+                <solid android:color="@color/focus_green" />
+                <padding android:left="8px"
+                    android:top="4px"
+                    android:right="8px"
+                    android:bottom="4px" />
+            </shape>
+        </inset>
+    </item>
+
+    <!-- disable state -->
+    <item android:state_enabled="false">
+        <inset xmlns:android="http://schemas.android.com/apk/res/android"
+            android:insetLeft="4px"
+            android:insetTop="6px"
+            android:insetRight="4px"
+            android:insetBottom="6px">
+            <shape android:shape="rectangle">
+                <corners android:radius="2px" />
+                <solid android:color="@color/my_gray_disable" />
+                <padding android:left="8px"
+                    android:top="4px"
+                    android:right="8px"
+                    android:bottom="4px" />
+            </shape>
+        </inset>
+    </item>
+
+    <!-- normal state -->
+    <item>
+        <inset xmlns:android="http://schemas.android.com/apk/res/android"
+            android:insetLeft="4px"
+            android:insetTop="6px"
+            android:insetRight="4px"
+            android:insetBottom="6px">
+            <shape android:shape="rectangle">
+                <corners android:radius="2px" />
+                <solid android:color="@color/my_gray_light" />
+                <padding android:left="8px"
+                    android:top="4px"
+                    android:right="8px"
+                    android:bottom="4px" />
+            </shape>
+        </inset>
+    </item>
+
+</selector>

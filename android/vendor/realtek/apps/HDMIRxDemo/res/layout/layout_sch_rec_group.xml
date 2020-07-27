@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|left">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top|left">
+
+        <RelativeLayout android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight=".60"
+            android:layout_marginLeft="20px">
+
+            <TextView android:id="@+id/add_rec_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8px"
+                android:layout_alignParentBottom="true"
+                android:textColor="@color/focus_green"/>
+
+        </RelativeLayout>
+
+        <Button android:id="@+id/add_rec_button"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight=".40"
+            android:textColor="@drawable/btn_text_color_selector"
+            android:textSize="@dimen/btn_text_size"
+            android:drawableLeft="@drawable/btn_booking"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
+    <include android:layout_width="match_parent"
+        android:layout_height="2px"
+        layout="@layout/separator_line_green"/>
+
+    <!-- schedule record list -->
+    <com.example.hdmirxdemo.SchRecListView 
+        android:id="@+id/list_view"
+        android:layout_marginTop="5px"
+        android:cacheColorHint="@android:color/transparent"
+        android:listSelector="@drawable/sch_rec_list_item_bg_selector"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

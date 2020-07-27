@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="focus_green">#009688</color>
+    <color name="my_gray">#7F7F7F</color>
+    <color name="my_gray_dark">#3F3F3F</color>
+    <color name="my_gray_light">#AFAFAF</color>
+    <color name="my_gray_disable">#AAEFEFEF</color>
+    <color name="focus_red">#FF0000</color>
+    <color name="unfocus_red">#A84530</color>
+    <color name="focus_white">#FFFFFF</color>
+    <color name="ripple_color">#55000000</color>
+</resources>
+

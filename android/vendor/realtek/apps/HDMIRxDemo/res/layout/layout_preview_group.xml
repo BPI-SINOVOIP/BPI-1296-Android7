@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5px"
+    android:gravity="top|left">
+
+    <!--
+    <Button android:id="@+id/pip_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@drawable/btn_text_color_selector"
+        android:textSize="@dimen/btn_text_size"
+        android:textAllCaps="false"
+        android:drawableLeft="@drawable/btn_pip"/>
+    -->
+
+    <Button android:id="@+id/broadcast_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@drawable/btn_text_color_selector"
+        android:textSize="@dimen/btn_text_size"
+        android:textAllCaps="false"
+        android:drawableLeft="@drawable/btn_broadcast"/>
+
+    <LinearLayout android:id="@+id/rx_background"
+        android:layout_width="match_parent"
+        android:layout_height="300px"
+        android:background="@drawable/pip_bg_selector"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_margin="5px">
+
+        <TextView android:id="@+id/no_signal_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Medium"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <!--
+    <SurfaceView android:id="@+id/rx_surfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="300px"
+        android:layout_margin="5px"/>
+    -->
+
+    <!-- preview setting sub title -->
+
+    <!--
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10px"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|left">
+
+        <TextView android:id="@+id/preview_sub_title_textview"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Small"
+            android:layout_weight=".70"/>
+
+        <ImageButton android:id="@+id/preview_setting_button"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight=".30"
+            android:src="@drawable/btn_preview_setting" />
+
+    </LinearLayout>
+    -->
+
+    <!--
+    <include android:layout_width="match_parent"
+        android:layout_height="2px"
+        layout="@layout/separator_line"/>
+    -->
+
+   <CheckBox android:id="@+id/mute_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

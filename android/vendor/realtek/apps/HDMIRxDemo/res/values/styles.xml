@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <style name="MaterialTheme" parent="android:Theme.Material.Light.NoActionBar" >
+        <!--
+        <item name="android:textColorPrimary">#ff0000</item>
+        <item name="android:colorControlActivated">#ff0000</item>
+        -->
+        <!--
+        <item name="android:colorButtonNormal">@color/focus_green</item>
+        <item name="android:colorPrimary">#ff0000</item>
+        <item name="android:colorPrimaryDark">#00ff00</item>
+        <item name="android:colorAccent">#0000ff</item>
+        -->
+        <item name="android:textColorSecondary">@drawable/my_selector</item>
+        <item name="android:buttonStyle">@style/My.Button.Style</item>
+    </style>
+
+    <style name="MyTimePicker" parent="@android:style/Widget.Material.TimePicker"/>
+    <style name="TextAppearance.Title" parent="@android:style/TextAppearance.Material.Title"/>
+    <style name="TextAppearance.Medium" parent="@android:style/TextAppearance.Material.Medium"/>
+    <style name="TextAppearance.Small" parent="@android:style/TextAppearance.Material.Small"/>
+    <!-- un used -->
+    <style name="Animation_Window">
+        <item name="android:windowEnterAnimation">@anim/no_anim</item>
+        <item name="android:windowExitAnimation">@anim/no_anim</item>
+    </style>
+
+    <style name="My.Button.Style" parent="android:Widget.Material.Button">
+        <item name="android:background">@drawable/btn_material</item>
+    </style>
+
+</resources>

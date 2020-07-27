@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top|left">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top|left">
+
+        <RelativeLayout android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight=".60"
+            android:layout_marginLeft="20px">
+
+            <TextView android:id="@+id/rec_setting_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8px"
+                android:layout_alignParentBottom="true"
+                android:textColor="@color/focus_green" />
+
+        </RelativeLayout>
+
+        <Button android:id="@+id/rec_setting_button"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight=".40"
+            android:textColor="@drawable/btn_text_color_selector"
+            android:textSize="@dimen/btn_text_size"
+            android:drawableLeft="@drawable/btn_record"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
+    <include android:layout_width="match_parent"
+        android:layout_height="2px"
+        layout="@layout/separator_line_green" />
+
+    <include android:id="@+id/resolution_spinner"
+        android:layout_marginTop="20px"
+        android:layout_marginBottom="5px"
+        android:layout_width="442px"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_spinner_widget" />
+
+    <!--
+    <include android:id="@+id/format_spinner"
+        android:layout_marginTop="20px"
+        android:layout_marginBottom="5px"
+        android:layout_width="442px"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_spinner_widget" />
+    -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20px"
+        android:gravity="center_vertical|left" >
+
+        <TextView android:id="@+id/path_title_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="85px"
+            style="@style/TextAppearance.Medium" />
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|left" >
+
+            <TextView android:id="@+id/path_textview"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight=".80"
+                android:textColor="@color/focus_green"
+                android:maxLines="1"
+                android:ellipsize="marquee"
+                android:layout_marginRight="20px"
+                style="@style/TextAppearance.Medium" />
+
+            <Button android:id="@+id/path_button"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight=".20"
+                android:textColor="@drawable/btn_text_color_selector"
+                android:drawablePadding="1px"
+                android:drawableRight="@drawable/btn_path" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

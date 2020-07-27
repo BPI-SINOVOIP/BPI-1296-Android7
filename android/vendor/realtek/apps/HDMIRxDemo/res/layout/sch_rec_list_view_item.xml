@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.example.hdmirxdemo.SchRecListViewItem xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10px"
+    android:gravity="top|left">
+
+    <TextView android:id="@+id/date_text_view"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10px"
+        android:layout_marginTop="5px"
+        android:layout_weight=".20"
+        style="@style/TextAppearance.Medium"/>
+
+    <TextView android:id="@+id/time_text_view"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5px"
+        android:layout_weight=".20"
+        android:textColor="@drawable/sch_rec_item_selector_1"
+        style="@style/TextAppearance.Medium" />
+
+    <TextView android:id="@+id/duration_text_view"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight=".30"
+        android:layout_marginTop="5px"
+        style="@style/TextAppearance.Medium" />
+
+    <!--
+    <TextView android:id="@+id/format_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView android:id="@+id/path_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    -->
+
+    <ImageView android:id="@+id/remove_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/sch_rec_list_item_rm_btn_selector"
+        android:layout_alignParentRight="true" />
+
+</com.example.hdmirxdemo.SchRecListViewItem>

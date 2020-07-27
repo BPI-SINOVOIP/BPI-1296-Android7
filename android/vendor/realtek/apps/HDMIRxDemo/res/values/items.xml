@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2009 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ -->
+
+<resources>
+    <string-array name="view_type_item" translatable="false">
+        <item>SurfaceView</item>
+        <item>TextureView</item>
+    </string-array>
+    <string-array name="view_type_item_2" translatable="false">
+        <item>TextureView</item>
+        <item>SurfaceView</item>
+        <item>No preview</item>
+    </string-array>
+    <string-array name="window_size_item" translatable="false">
+        <item>FULL</item>
+        <item>PIP</item>
+    </string-array>
+    <string-array name="window_size_item_2" translatable="false">
+        <item>HD (window size:576x324)</item>
+        <item>SD (window size:320x240)</item>
+    </string-array>
+    <string-array name="camera_type_item" translatable="false">
+        <item>HDMIRx</item>
+        <item>USB Camera</item>
+        <item>USB Camera + HDMIRx</item>
+    </string-array>
+    <string-array name="demo_type_item" translatable="false">
+        <item>Floating window demo</item>
+        <item>Background record demo</item>
+    </string-array>
+    <string-array name="rec_resolution_item" translatable="false">
+        <item>preview resolution</item>
+        <item>scale to 1080p if preview is 4K2K</item>
+    </string-array>
+    <string-array name="exit_behavior_item" translatable="false">
+        <item>zoom to PIP</item>
+        <item>Hide Preview</item>
+    </string-array>
+    <string-array name="rec_output_item" translatable="false">
+        <item>Internal Storage</item>
+        <item>UDP streaming (239.0.0.1:7890)</item>
+    </string-array>
+    <string-array name="rec_format_item" translatable="false">
+        <item>ts</item>
+        <item>mp4</item>
+    </string-array>
+
+    <string-array name="empty_item" translatable="false">
+    </string-array>
+</resources>

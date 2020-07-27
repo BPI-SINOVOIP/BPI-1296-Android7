@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/focus_white"
+    android:gravity="center">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50px"
+        android:layout_marginBottom="30px"
+        android:layout_marginRight="40px"
+        android:layout_marginLeft="40px"
+        android:background="@color/focus_white"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView android:id="@+id/warning_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="26px"
+            android:layout_marginTop="26px"
+            android:textColor="@color/my_gray_dark"
+            style="@style/TextAppearance.Medium"/>
+
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/ok_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/focus_green"
+        android:gravity="center">
+
+        <TextView android:id="@+id/ok_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="60px"
+            android:layout_marginLeft="60px"
+            android:layout_marginBottom="26px"
+            android:layout_marginTop="26px"
+            android:textColor="@color/focus_white"
+            style="@style/TextAppearance.Medium"/>
+    </LinearLayout>
+</LinearLayout>
