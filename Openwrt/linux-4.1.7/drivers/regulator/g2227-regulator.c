@@ -592,6 +592,21 @@ static const struct dev_pm_ops g2227_regulator_pm_ops = {
 	.resume = g2227_regulator_resume,
 };
 
+/* bpi, fix gpio 97, 98 still on in S3 state */
+static void g2227_regulator_shutdown(struct i2c_client *client)
+{
+	int i, mode = 0;
+
+	pr_info("[PMIC] Enter %s\n", __func__);
+
+	for (i = 0; i < ARRAY_SIZE(g2227_desc); i++) {
+		rtk_regulator_prepare_suspend_state(g2227_desc[i].rdev,
+			mode);
+	};
+
+	regulator_suspend_prepare(PM_SUSPEND_MEM);
+}
+
 static const struct i2c_device_id g2227_regulator_ids[] = {
 	{"gmt-g2227", 0},
 	{ },
@@ -606,6 +621,7 @@ static struct i2c_driver g2227_regulator_driver = {
 	},
 	.id_table = g2227_regulator_ids,
 	.probe    = g2227_regulator_probe,
+	.shutdown = g2227_regulator_shutdown,
 };
 
 module_i2c_driver(g2227_regulator_driver);
